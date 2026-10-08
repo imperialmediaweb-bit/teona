@@ -3,7 +3,7 @@ import Link from "next/link";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ASOCIATIA, RUTE, SMS } from "@/date/asociatie";
-import { SIGLE_SPONSORI } from "@/date/sponsori";
+import { SIGLE_PRIMA_PAGINA } from "@/date/sponsori";
 import Aparitie from "@/componente/Aparitie";
 import Decor from "@/componente/Decor";
 import Fotografie, { type Umbra } from "@/componente/Fotografie";
@@ -446,7 +446,7 @@ export default function PrimaPagina() {
               prin alb-negru, aproape dispăreau. Chenarul le dă aceeași
               înălțime, așa cum cere caietul, fără să le deformeze. */}
           <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
-            {SIGLE_SPONSORI.map((sigla) => (
+            {SIGLE_PRIMA_PAGINA.map((sigla) => (
               <li key={sigla.nume}>
                 <div className="colt-mic-a flex h-24 items-center justify-center bg-hartie p-4 shadow-[0_10px_26px_-18px_rgba(35,35,35,0.45)] transition-all duration-300 ease-cald hover:-translate-y-1 hover:shadow-[0_16px_32px_-16px_rgba(247,79,34,0.4)] motion-reduce:hover:translate-y-0">
                   <Image

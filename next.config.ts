@@ -1,4 +1,6 @@
 import type { NextConfig } from "next";
+import { REDIRECTIONARI } from "./src/date/redirectionari";
+import { redirectionariProiecte } from "./src/lib/redirectionari-proiecte.mjs";
 
 /**
  * Cloudinary e folosit doar dacă e configurat.
@@ -33,6 +35,27 @@ const nextConfig: NextConfig = {
     // trebuie doar ca să urci sau să listezi fișiere.
     NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: cloudinary,
     NEXT_PUBLIC_CLOUDINARY_FOLDER: process.env.CLOUDINARY_FOLDER ?? "Teona",
+  },
+
+  /**
+   * Adresele vechi de pe teona-ariana.ro, redirecționate permanent.
+   * Lista și motivele sunt în `src/date/redirectionari.ts`.
+   * Adresele de proiect (`/portfolio/...`) se rezolvă în cod, nu aici.
+   */
+  async redirects() {
+    const reguli = [...REDIRECTIONARI, ...redirectionariProiecte()].map(
+      ({ de_la, la }) => ({ source: de_la, destination: la, permanent: true }),
+    );
+
+    // Ultima, după cele punctuale: orice altă adresă veche de proiect duce la
+    // lista de proiecte, nu la 404.
+    reguli.push({
+      source: "/portfolio/:slug*",
+      destination: "/proiecte",
+      permanent: true,
+    });
+
+    return reguli;
   },
 
   turbopack: {

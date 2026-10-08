@@ -29,8 +29,30 @@ export const TELEFON_PRINCIPAL = TELEFOANE[0];
 
 export const EMAIL = {
   contact: "contact@teona-ariana.ro",
+  /**
+   * Alias, cerut explicit la 7.4: „Adresa se creează ca alias, ca persoana
+   * care le gestionează să poată fi schimbată fără a modifica site-ul.”
+   * Redirecționează acum către mihaela.sfichi@teona-ariana.ro.
+   */
   redirectionare: "redirectionare@teona-ariana.ro",
+  fundraising: "mihaela.sfichi@teona-ariana.ro",
 } as const;
+
+/** Persoanele de contact pentru firme (8.7). */
+export const CONTACT_FIRME = [
+  {
+    nume: "Mihaela Sfichi",
+    rol: "Manager fundraising",
+    email: "mihaela.sfichi@teona-ariana.ro",
+    telefon: { afisat: "0748 250 704", apel: "+40748250704" },
+  },
+  {
+    nume: "Cristea Costiuc",
+    rol: "Președinte",
+    email: "contact@teona-ariana.ro",
+    telefon: { afisat: "0754 510 167", apel: "+40754510167" },
+  },
+] as const;
 
 export const ADRESE = {
   casaTeona: {
@@ -101,6 +123,7 @@ export const RUTE = {
   confidentialitate: "/politica-de-confidentialitate",
   termeni: "/termeni-si-conditii",
   cookieuri: "/politica-de-cookieuri",
+  raport2025: "/raport-de-activitate-2025",
 } as const;
 
 /** Meniul principal, în ordinea cerută de caietul de sarcini (12.1). */

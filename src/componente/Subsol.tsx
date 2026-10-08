@@ -1,4 +1,3 @@
-import { cacheLife } from "next/cache";
 import Link from "next/link";
 import {
   ADRESE,
@@ -12,20 +11,7 @@ import {
 import Retele from "./Retele";
 import Sigla from "./Sigla";
 import DeschideSetariCookieuri from "./DeschideSetariCookieuri";
-
-/**
- * Anul din rândul de copyright — „anul din copyright este cel curent” (regula
- * generală din caiet).
- *
- * Cu Cache Components activat, Next refuză `new Date()` la pregenerare: valoarea
- * s-ar îngheța la momentul build-ului. Îl punem într-o funcție cu memorie de
- * câteva ore, așa că rămâne randat pe server și se împrospătează singur.
- */
-async function anulCurent() {
-  "use cache";
-  cacheLife("hours");
-  return new Date().getFullYear();
-}
+import { anulCurent } from "@/lib/an";
 
 /** Subsolul (12.3). Identic pe toate paginile. */
 export default async function Subsol() {

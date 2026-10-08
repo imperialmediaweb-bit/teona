@@ -17,7 +17,23 @@
  */
 
 const ADRESA = process.argv[2] ?? "http://localhost:3000";
-const PAGINI = ["/"];
+const PAGINI = [
+  "/",
+  "/despre-noi",
+  "/casa-teona",
+  "/proiecte",
+  "/sponsori-si-parteneri",
+  "/redirectioneaza-3-5",
+  "/directioneaza-20",
+  "/suntem-in-presa",
+  "/devino-voluntar",
+  "/contact",
+  "/doneaza",
+  "/raport-de-activitate-2025",
+  "/politica-de-confidentialitate",
+  "/termeni-si-conditii",
+  "/politica-de-cookieuri",
+];
 
 const UMPLUTURA = [
   /lorem ipsum/i,

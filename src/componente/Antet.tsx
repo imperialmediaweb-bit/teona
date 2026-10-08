@@ -93,12 +93,15 @@ export default function Antet() {
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
+        {/* Sub 380 px, numele din siglă se micșorează: la 320 px (ecranele
+            vechi mici, încă în uz) altfel împingea bara peste marginea
+            ecranului și pagina se derula lateral. */}
         <Link
           href={RUTE.acasa}
           aria-label={`${ASOCIATIA.denumire} — prima pagină`}
           className="group shrink-0"
         >
-          <Sigla className="text-[0.95rem] transition-transform duration-300 ease-cald group-hover:scale-[1.03] sm:text-[1.05rem]" />
+          <Sigla className="text-[0.82rem] transition-transform duration-300 ease-cald group-hover:scale-[1.03] min-[380px]:text-[0.95rem] sm:text-[1.05rem]" />
         </Link>
 
         {/* Nouă intrări plus butonul Donează nu încap sub 1280 px fără să se

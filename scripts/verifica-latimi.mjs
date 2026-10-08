@@ -19,11 +19,19 @@ try {
   );
   process.exit(2);
 }
-const b=await chromium.launch();
+const PAGINI = [
+  '/', '/despre-noi', '/casa-teona', '/proiecte', '/sponsori-si-parteneri',
+  '/redirectioneaza-3-5', '/directioneaza-20', '/suntem-in-presa',
+  '/devino-voluntar', '/contact', '/doneaza', '/raport-de-activitate-2025',
+  '/politica-de-confidentialitate', '/termeni-si-conditii', '/politica-de-cookieuri',
+];
+
+const b=await chromium.launch({ executablePath: process.env.CHROMIUM ?? '/opt/pw-browsers/chromium' });
 let probleme=0;
 for (const w of [320,360,390,414,768,1024,1280,1440,1920]) {
+ for (const ruta of PAGINI) {
   const pg=await (await b.newContext({viewport:{width:w,height:900}})).newPage();
-  await pg.goto('http://localhost:3000/',{waitUntil:'networkidle'});
+  await pg.goto('http://localhost:3000'+ruta,{waitUntil:'networkidle'});
   await pg.waitForTimeout(400);
   const r = await pg.evaluate(() => {
     const lat = document.documentElement.clientWidth;
@@ -34,9 +42,13 @@ for (const w of [320,360,390,414,768,1024,1280,1440,1920]) {
     return { scroll: document.documentElement.scrollWidth, lat, vinovati };
   });
   const depaseste = r.scroll > r.lat + 1;
-  if (depaseste) probleme++;
-  console.log(`${String(w).padStart(5)}px  ${depaseste ? '✗ depășire ' + r.scroll + 'px: ' + r.vinovati.join(' | ') : '✓'}`);
+  if (depaseste) {
+    probleme++;
+    console.log(`${String(w).padStart(5)}px ${ruta}  ✗ depășire ${r.scroll}px: ${r.vinovati.join(' | ')}`);
+  }
   await pg.context().close();
+ }
+ console.log(`${String(w).padStart(5)}px  verificat ${PAGINI.length} pagini`);
 }
 await b.close();
 process.exit(probleme ? 1 : 0);

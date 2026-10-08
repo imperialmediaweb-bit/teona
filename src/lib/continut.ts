@@ -76,12 +76,30 @@ export type FisierMedia = {
  * aici, într-un singur loc, nu la fiecare afișare: așa nu există cale prin care
  * un text să ajungă pe pagină nereparat.
  */
+const CAMPURI_TEHNICE = new Set([
+  "slug",
+  "adresa",
+  "fisier",
+  "poza",
+  "pozaPrincipala",
+  "poze",
+  "imagine",
+  "id",
+]);
+
 function reparaAdanc<T>(nod: T): T {
   if (typeof nod === "string") return repara(nod) as T;
   if (Array.isArray(nod)) return nod.map(reparaAdanc) as T;
   if (nod && typeof nod === "object") {
     return Object.fromEntries(
-      Object.entries(nod).map(([cheie, valoare]) => [cheie, reparaAdanc(valoare)]),
+      Object.entries(nod).map(([cheie, valoare]) => [
+        cheie,
+        // Un slug sau o adresă nu e text citit de om: e un identificator.
+        // Trecut prin `repara`, `termeni-si-conditii` devine
+        // `termeni-si-condiții`, iar pagina nu se mai găsește după slug —
+        // exact așa a căzut build-ul paginilor legale prima dată.
+        CAMPURI_TEHNICE.has(cheie) ? valoare : reparaAdanc(valoare),
+      ]),
     ) as T;
   }
   return nod;
