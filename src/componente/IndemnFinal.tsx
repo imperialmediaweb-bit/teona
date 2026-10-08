@@ -21,7 +21,7 @@ export default function IndemnFinal({
   return (
     <>
       <Val culoare="text-caramiziu-500" />
-      <section className="granulatie relative overflow-hidden bg-caramiziu-500 pb-20 lg:pb-24">
+      <section className="granulatie relative overflow-hidden bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-700 pb-20 lg:pb-24">
         {/* Cercuri mari, abia vizibile, în loc de un fundal plat. */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
           <span className="absolute -top-40 -right-24 size-[34rem] rounded-full border-2 border-hartie/15" />

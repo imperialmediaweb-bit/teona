@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { ASOCIATIA, RUTE, SMS } from "@/date/asociatie";
 import { SIGLE_SPONSORI } from "@/date/sponsori";
 import Aparitie from "@/componente/Aparitie";
-import Arcada from "@/componente/Arcada";
+import Fotografie, { type Umbra } from "@/componente/Fotografie";
 import Buton from "@/componente/Buton";
 import Cifre from "@/componente/Cifre";
 import IndemnFinal from "@/componente/IndemnFinal";
@@ -25,22 +25,25 @@ import Testimoniale, { type Testimonial } from "@/componente/acasa/Testimoniale"
  */
 const ACCENTE = [
   {
-    chip: "bg-caramiziu-50 text-caramiziu-600",
+    chip: "bg-caramiziu-100 text-caramiziu-600",
     plin: "group-hover:bg-caramiziu-500",
-    contur: "border-caramiziu-300",
-    numar: "text-caramiziu-200",
+    umbra: "shadow-[0_18px_38px_-18px_rgba(247,79,34,0.5)]",
+    numar: "text-caramiziu-300",
+    fotografie: "caramiziu" as Umbra,
   },
   {
-    chip: "bg-miere-50 text-miere-700",
+    chip: "bg-miere-100 text-miere-700",
     plin: "group-hover:bg-miere-400",
-    contur: "border-miere-300",
-    numar: "text-miere-200",
+    umbra: "shadow-[0_18px_38px_-18px_rgba(255,172,0,0.5)]",
+    numar: "text-miere-300",
+    fotografie: "miere" as Umbra,
   },
   {
-    chip: "bg-turcoaz-50 text-turcoaz-700",
+    chip: "bg-turcoaz-100 text-turcoaz-700",
     plin: "group-hover:bg-turcoaz-500",
-    contur: "border-turcoaz-300",
-    numar: "text-turcoaz-200",
+    umbra: "shadow-[0_18px_38px_-18px_rgba(42,159,163,0.45)]",
+    numar: "text-turcoaz-300",
+    fotografie: "turcoaz" as Umbra,
   },
 ] as const;
 
@@ -198,19 +201,13 @@ export default function PrimaPagina() {
                 <li key={mod.titlu} className={i === 0 ? "lg:col-span-2" : ""}>
                   <Aparitie intarziere={i * 0.05} className="h-full">
                     <article className="group relative h-full">
-                      {/* Conturul decalat: adâncime trasă cu linia, nu ceața
-                          cenușie de sub cardurile oricărei teme. */}
                       <div
-                        aria-hidden="true"
-                        className={`absolute inset-0 translate-x-2 translate-y-2 rounded-card border-2 transition-transform duration-300 ease-cald group-hover:translate-x-3 group-hover:translate-y-3 motion-reduce:group-hover:translate-x-2 motion-reduce:group-hover:translate-y-2 ${accent.contur}`}
-                      />
-                      <div
-                        className={`relative flex h-full flex-col gap-5 rounded-card border-2 border-cerneala/10 bg-hartie p-6 transition-transform duration-300 ease-cald group-hover:-translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:group-hover:translate-x-0 motion-reduce:group-hover:translate-y-0 ${
+                        className={`relative flex h-full flex-col gap-5 rounded-[1.75rem] bg-hartie p-6 transition-all duration-400 ease-cald group-hover:-translate-y-2 motion-reduce:group-hover:translate-y-0 ${accent.umbra} ${
                           i === 0 ? "sm:p-8 lg:flex-row lg:items-center lg:gap-7" : ""
                         }`}
                       >
                         <span
-                          className={`flex shrink-0 items-center justify-center rounded-t-full rounded-b-2xl transition-all duration-300 ease-cald group-hover:text-hartie ${accent.chip} ${accent.plin} ${
+                          className={`flex shrink-0 items-center justify-center rounded-[1.1rem] transition-all duration-400 ease-cald group-hover:-rotate-6 group-hover:scale-110 group-hover:text-hartie motion-reduce:group-hover:scale-100 motion-reduce:group-hover:rotate-0 ${accent.chip} ${accent.plin} ${
                             i === 0 ? "size-16" : "size-14"
                           }`}
                         >
@@ -274,24 +271,27 @@ export default function PrimaPagina() {
                 <Aparitie intarziere={i * 0.07} className="h-full">
                   <article className="group flex h-full flex-col">
                     {campanie.poza ? (
-                      <Arcada
+                      <Fotografie
                         cale={campanie.poza.cale}
                         alt={campanie.poza.alt}
                         legenda={campanie.poza.legenda}
-                        contur={ACCENTE[i % 3].contur}
+                        umbra={ACCENTE[i % 3].fotografie}
                         raport="aspect-[4/5]"
-                        cuApropiere
                         dimensiuni="(min-width: 1024px) 380px, 92vw"
                       />
                     ) : (
                       // Fără chipuri recognoscibile: până vine o fotografie
                       // potrivită, locul ei îl ține motto-ul, nu o poză de arhivă.
-                      <div className="relative aspect-[4/5]">
-                        <div
+                      <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 shadow-[0_22px_45px_-20px_rgba(247,79,34,0.6)] transition-transform duration-500 ease-cald group-hover:-translate-y-1.5 motion-reduce:group-hover:translate-y-0">
+                        <span
                           aria-hidden="true"
-                          className={`absolute inset-0 translate-x-3 translate-y-3 rounded-t-full rounded-b-amplu border-2 ${ACCENTE[i % 3].contur}`}
+                          className="absolute -top-16 -right-16 size-56 rounded-full border-2 border-hartie/25"
                         />
-                        <div className="relative flex size-full items-center justify-center rounded-t-full rounded-b-amplu bg-caramiziu-500 px-8">
+                        <span
+                          aria-hidden="true"
+                          className="absolute -bottom-20 -left-12 size-48 rounded-full border-2 border-hartie/20"
+                        />
+                        <div className="relative flex size-full items-center justify-center px-8">
                           <p className="scris text-center text-h3 leading-tight text-hartie">
                             „{ASOCIATIA.motto}”
                           </p>
@@ -325,31 +325,25 @@ export default function PrimaPagina() {
         <div className="mx-auto grid max-w-7xl items-center gap-16 px-4 sm:px-6 lg:grid-cols-2 lg:gap-20 lg:px-8">
           <Aparitie>
             <div className="relative mx-auto max-w-md lg:max-w-none">
-              <Arcada
+              <Fotografie
                 cale="/poze/2024/11/poza2_enhanced-1.webp"
                 alt="Trei copii desenează pe o tablă albă pe care scrie „Casa Teona” cu verde"
                 legenda="Casa Teona"
-                contur="border-turcoaz-300"
+                umbra="turcoaz"
                 raport="aspect-[4/5]"
                 dimensiuni="(min-width: 1024px) 420px, 88vw"
                 className="w-[80%]"
               />
               {/* Clădirea, mai mică, suprapusă — ca o poză pusă peste alta. */}
               <div className="absolute right-0 bottom-6 w-[44%]">
-                <div className="relative aspect-square">
-                  <div
-                    aria-hidden="true"
-                    className="absolute inset-0 -translate-x-2 translate-y-2 rounded-t-full rounded-b-amplu border-2 border-miere-300"
+                <div className="relative aspect-square overflow-hidden rounded-[1.5rem] border-[6px] border-hartie bg-hartie shadow-[0_20px_40px_-18px_rgba(255,172,0,0.7)]">
+                  <Image
+                    src="/poze/2024/11/poza3_enhanced.webp"
+                    alt="Clădirea Casa Teona din Suceava, cu firma „Casa TEONA” deasupra intrării"
+                    fill
+                    sizes="(min-width: 1024px) 240px, 44vw"
+                    className="rounded-[1.1rem] object-cover"
                   />
-                  <div className="relative size-full overflow-hidden rounded-t-full rounded-b-amplu border-4 border-hartie bg-hartie">
-                    <Image
-                      src="/poze/2024/11/poza3_enhanced.webp"
-                      alt="Clădirea Casa Teona din Suceava, cu firma „Casa TEONA” deasupra intrării"
-                      fill
-                      sizes="(min-width: 1024px) 240px, 44vw"
-                      className="object-cover"
-                    />
-                  </div>
                 </div>
               </div>
             </div>
@@ -367,7 +361,7 @@ export default function PrimaPagina() {
                   key={punct.text}
                   className="flex items-center gap-4 rounded-card border-2 border-turcoaz-100 bg-turcoaz-50/60 p-4"
                 >
-                  <span className="flex size-11 shrink-0 items-center justify-center rounded-t-full rounded-b-2xl bg-turcoaz-500 text-hartie">
+                  <span className="flex size-11 shrink-0 items-center justify-center rounded-[0.9rem] bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
                     <Pictograma nume={punct.pictograma} className="size-5" />
                   </span>
                   <span className="text-amplu text-cerneala">{punct.text}</span>
@@ -405,7 +399,7 @@ export default function PrimaPagina() {
                 key={realizare.titlu}
                 className={i === 0 ? "sm:col-span-2" : undefined}
               >
-                <article className="flex h-full gap-5 rounded-card border-2 border-cerneala/10 bg-hartie p-6">
+                <article className="group flex h-full gap-5 rounded-[1.5rem] bg-hartie p-6 shadow-[0_16px_34px_-20px_rgba(35,35,35,0.4)] transition-transform duration-400 ease-cald hover:-translate-y-1.5 motion-reduce:hover:translate-y-0">
                   <span
                     aria-hidden="true"
                     className={`font-titlu text-h2 leading-none font-extrabold ${ACCENTE[i % 3].numar}`}
@@ -445,7 +439,7 @@ export default function PrimaPagina() {
           <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
             {SIGLE_SPONSORI.map((sigla) => (
               <li key={sigla.nume}>
-                <div className="flex h-24 items-center justify-center rounded-card border-2 border-hartie-umbra bg-hartie-calda p-4 transition-colors duration-300 hover:border-caramiziu-200 hover:bg-hartie">
+                <div className="flex h-24 items-center justify-center rounded-[1.25rem] bg-hartie p-4 shadow-[0_10px_26px_-18px_rgba(35,35,35,0.45)] transition-all duration-300 ease-cald hover:-translate-y-1 hover:shadow-[0_16px_32px_-16px_rgba(247,79,34,0.4)] motion-reduce:hover:translate-y-0">
                   <Image
                     src={sigla.cale}
                     alt={sigla.nume}

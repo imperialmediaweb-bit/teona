@@ -9,10 +9,10 @@ const formateaza = new Intl.NumberFormat("ro-RO").format;
 
 /** Culorile se rotesc, ca cele patru cifre să nu arate ca un singur bloc. */
 const CULORI = [
-  { cifra: "text-caramiziu-500", linie: "text-caramiziu-200" },
-  { cifra: "text-miere-500", linie: "text-miere-200" },
-  { cifra: "text-turcoaz-500", linie: "text-turcoaz-200" },
-  { cifra: "text-caramiziu-600", linie: "text-caramiziu-200" },
+  { cifra: "text-caramiziu-500", linie: "text-caramiziu-300", pata: "bg-caramiziu-100" },
+  { cifra: "text-miere-500", linie: "text-miere-300", pata: "bg-miere-100" },
+  { cifra: "text-turcoaz-500", linie: "text-turcoaz-300", pata: "bg-turcoaz-100" },
+  { cifra: "text-caramiziu-600", linie: "text-caramiziu-300", pata: "bg-caramiziu-100" },
 ] as const;
 
 function Numar({ valoare, sufix }: { valoare: number; sufix: string }) {
@@ -56,7 +56,13 @@ export default function Cifre() {
   return (
     <ul className="grid grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-4">
       {CIFRE.map((cifra, i) => (
-        <li key={cifra.eticheta} className="group text-center">
+        <li key={cifra.eticheta} className="group relative text-center">
+          {/* Pata de culoare din spatele cifrei: o ține pe pagină, ca un
+              marcaj trecut cu carioca peste. */}
+          <span
+            aria-hidden="true"
+            className={`absolute top-1 left-1/2 -z-10 size-20 -translate-x-1/2 rounded-full blur-xl transition-transform duration-500 ease-cald group-hover:scale-125 motion-reduce:group-hover:scale-100 lg:size-24 ${CULORI[i].pata}`}
+          />
           <p
             className={`font-titlu text-[3.25rem] leading-none font-extrabold transition-transform duration-500 ease-cald group-hover:-translate-y-1 motion-reduce:group-hover:translate-y-0 lg:text-[4.25rem] ${CULORI[i].cifra}`}
           >
