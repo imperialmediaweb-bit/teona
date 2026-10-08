@@ -40,6 +40,32 @@ def fara_miniatura(rel):
     return re.sub(rf"-\d+x\d+(\.(?:{EXTENSII}))$", r"\1", rel, flags=re.I)
 
 
+def indexeaza_variantele():
+    """
+    {cale fără sufixul de mărime: cea mai mare variantă existentă pe disc}
+
+    Descărcarea n-a adus originalul pentru toate pozele: 128 dintre ele există
+    doar ca miniaturi WordPress, de obicei la 1024 px — destul pentru web.
+    Fără indexul ăsta le-am fi pierdut pe toate, pentru că adresa din pagină
+    trimite la un original care nu e pe disc.
+    """
+    index = {}
+    radacina = os.path.join(RADACINA, "public", "poze")
+    for dirpath, _, fisiere in os.walk(radacina):
+        for nume in fisiere:
+            cale = os.path.relpath(os.path.join(dirpath, nume), radacina).replace(
+                os.sep, "/"
+            )
+            cheie = fara_miniatura(cale)
+            m = re.search(r"-(\d+)x(\d+)\.[a-z0-9]+$", cale, re.I)
+            # Originalul bate orice miniatură; între miniaturi câștigă cea mare.
+            marime = 0 if m is None else -int(m.group(1)) * int(m.group(2))
+            precedent = index.get(cheie)
+            if precedent is None or marime < precedent[0]:
+                index[cheie] = (marime, cale)
+    return {cheie: cale for cheie, (_, cale) in index.items()}
+
+
 def e_demo(url):
     return any(semn in url for semn in DEMO)
 
@@ -111,6 +137,7 @@ def main():
         if rel:
             alt_pe_cale[fara_miniatura(rel)] = (fisier.get("alt") or "").strip()
 
+    variante = indexeaza_variantele()
     arbori = elementor_pe_titlu(xml)
     rezultat = {}
     raport = []
@@ -130,13 +157,17 @@ def main():
             rel = cale_relativa(url)
             if not rel:
                 continue
-            rel = fara_miniatura(rel)
-            if rel in vazute:
+            cheie = fara_miniatura(rel)
+            if cheie in vazute:
                 continue
-            if not os.path.exists(os.path.join(RADACINA, "public", "poze", rel)):
+            # Originalul dacă îl avem, altfel cea mai mare variantă de pe disc.
+            pe_disc = variante.get(cheie)
+            if pe_disc is None:
                 continue
-            vazute.add(rel)
-            poze.append({"cale": f"/poze/{rel}", "alt": alt_pe_cale.get(rel, "")})
+            vazute.add(cheie)
+            poze.append(
+                {"cale": f"/poze/{pe_disc}", "alt": alt_pe_cale.get(cheie, "")}
+            )
 
         if poze or sarite_demo:
             rezultat[slug] = poze
