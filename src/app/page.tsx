@@ -2,69 +2,66 @@ import Image from "next/image";
 import Link from "next/link";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { ASOCIATIA, RUTE, SMS } from "@/date/asociatie";
+import { ADRESE, ASOCIATIA, RUTE, SMS } from "@/date/asociatie";
 import { SIGLE_PRIMA_PAGINA } from "@/date/sponsori";
-import Aparitie from "@/componente/Aparitie";
-import Decor from "@/componente/Decor";
-import Fotografie, { type Umbra } from "@/componente/Fotografie";
 import Buton from "@/componente/Buton";
-import Cifre from "@/componente/Cifre";
-import IndemnFinal from "@/componente/IndemnFinal";
 import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
-import Val from "@/componente/Val";
+import CifreIlustrate from "@/componente/acasa/CifreIlustrate";
 import Erou from "@/componente/acasa/Erou";
-import FasieDeFotografii from "@/componente/acasa/FasieDeFotografii";
+import {
+  Baloane,
+  Banda,
+  Bifa,
+  Casuta,
+  Copac,
+  Dealuri,
+  Nor,
+  Pata,
+  SageataDesenata,
+  Soare,
+} from "@/componente/acasa/Ilustratii";
+import IndemnIlustrat from "@/componente/acasa/IndemnIlustrat";
+import PozaLipita, { type Inclinare } from "@/componente/acasa/PozaLipita";
+import Sarma from "@/componente/acasa/Sarma";
 import Testimoniale, { type Testimonial } from "@/componente/acasa/Testimoniale";
 
 /**
- * Valul dintre secțiuni se trage peste capătul secțiunii de deasupra.
+ * Dealurile dintre secțiuni se trag peste capătul secțiunii de deasupra.
  *
- * Fără asta, partea transparentă a curbei lasă să se vadă fundalul paginii
- * (alb), nu culoarea secțiunii de sus — și între două secțiuni colorate
- * apărea o pană albă. Secțiunile de deasupra au spațiu jos cât înălțimea
- * valului, ca nimic din conținut să nu intre sub el.
+ * Dealul din spate și cel din mijloc se văd peste fundalul secțiunii de sus,
+ * de aceea ea are spațiu jos cât înălțimea desenului, ca nimic din conținut
+ * să nu intre sub ele. Dealul din față are culoarea secțiunii de jos, deci
+ * trecerea e fără cusătură.
  */
-const VAL_PESTE = "relative z-10 -mt-10 sm:-mt-14 lg:-mt-20";
+const DEAL_PESTE = "-mt-16 sm:-mt-24 lg:-mt-36";
 
 /**
- * Accentul fiecărui card.
+ * Marginea tăiată de mână a cărților de hârtie.
  *
- * Trei culori care se rotesc, nu una pe toate: ochiul le ia ca pe lucruri
- * diferite, nu ca pe copii ale aceluiași. Culoarea tare stă pe pictogramă și
- * pe contur; fundalul rămâne spălat, ca butonul de donație să fie în
- * continuare cel mai aprins lucru din pagină.
+ * Filtrul definit o singură dată, mai jos în pagină, tremură ușor conturul:
+ * o foaie tăiată cu foarfeca nu are margini perfect drepte. Se aplică doar
+ * pe fundalul cărții (un strat separat), niciodată pe text — textul rămâne
+ * drept și lizibil.
  */
-const ACCENTE = [
-  {
-    chip: "bg-caramiziu-100 text-caramiziu-600",
-    plin: "group-hover:bg-caramiziu-500",
-    umbra: "hover:shadow-[0_22px_44px_-22px_rgba(247,79,34,0.55)]",
-    numar: "text-caramiziu-300",
-    fotografie: "caramiziu" as Umbra,
-  },
-  {
-    chip: "bg-miere-100 text-miere-700",
-    plin: "group-hover:bg-miere-400",
-    umbra: "hover:shadow-[0_22px_44px_-22px_rgba(255,172,0,0.6)]",
-    numar: "text-miere-300",
-    fotografie: "miere" as Umbra,
-  },
-  {
-    chip: "bg-turcoaz-100 text-turcoaz-700",
-    plin: "group-hover:bg-turcoaz-500",
-    umbra: "hover:shadow-[0_22px_44px_-22px_rgba(42,159,163,0.5)]",
-    numar: "text-turcoaz-300",
-    fotografie: "turcoaz" as Umbra,
-  },
-] as const;
+const TAIAT = { filter: "url(#hartie-taiata)" } as const;
 
-/** 1.3 — cinci carduri, fiecare cu titlu, text scurt și un buton funcțional. */
+/**
+ * 1.3 — cinci carduri, fiecare cu titlu, text scurt și un buton funcțional.
+ *
+ * Fiecare card e o foaie de hârtie colorată, lipită cu bandă, ușor strâmbă —
+ * cu câteva grade, nu mai mult: formele rămân stabile și previzibile.
+ * Donația e foaia mare, în culoarea de identitate; celelalte patru, în
+ * tente spălate, ca butonul de donație să rămână cel mai aprins lucru.
+ */
 const MODURI_DE_SUSTINERE: ReadonlyArray<{
   pictograma: NumePictograma;
   titlu: string;
   text: string;
   buton: string;
   href: string;
+  hartie: string;
+  pata: string;
+  inclinare: string;
 }> = [
   {
     pictograma: "inima",
@@ -72,6 +69,9 @@ const MODURI_DE_SUSTINERE: ReadonlyArray<{
     text: "Orice sumă contează enorm pentru a ne putea continua activitatea.",
     buton: "Donează acum",
     href: RUTE.doneaza,
+    hartie: "bg-caramiziu-500",
+    pata: "text-miere-300",
+    inclinare: "-rotate-1",
   },
   {
     pictograma: "telefon",
@@ -79,6 +79,9 @@ const MODURI_DE_SUSTINERE: ReadonlyArray<{
     text: `Trimite ${SMS.text} la ${SMS.numar} și donezi ${SMS.sumaLunara} pe lună, fără formulare.`,
     buton: "Cum funcționează",
     href: `${RUTE.doneaza}#sms`,
+    hartie: "bg-miere-100",
+    pata: "text-miere-300",
+    inclinare: "rotate-1",
   },
   {
     pictograma: "document",
@@ -86,6 +89,9 @@ const MODURI_DE_SUSTINERE: ReadonlyArray<{
     text: "Din impozitul pe venit, fără niciun cost pentru tine.",
     buton: "Redirecționează",
     href: RUTE.redirectionare35,
+    hartie: "bg-turcoaz-100",
+    pata: "text-turcoaz-300",
+    inclinare: "-rotate-1",
   },
   {
     pictograma: "cladire",
@@ -93,6 +99,9 @@ const MODURI_DE_SUSTINERE: ReadonlyArray<{
     text: "Pentru firme: sponsorizare prin contract și direcționare din impozitul pe profit.",
     buton: "Devino partener",
     href: RUTE.directionare20,
+    hartie: "bg-hartie",
+    pata: "text-caramiziu-200",
+    inclinare: "rotate-1",
   },
   {
     pictograma: "familie",
@@ -100,6 +109,9 @@ const MODURI_DE_SUSTINERE: ReadonlyArray<{
     text: "Alătură-te celor peste 300 de voluntari care ne sunt alături.",
     buton: "Vreau să ajut",
     href: RUTE.voluntar,
+    hartie: "bg-caramiziu-100",
+    pata: "text-caramiziu-300",
+    inclinare: "-rotate-1",
   },
 ];
 
@@ -107,20 +119,21 @@ const MODURI_DE_SUSTINERE: ReadonlyArray<{
  * 1.4 — trei campanii fixe, fără sume, fără bare de progres și fără termene.
  *
  * „Cazuri umanitare” nu are fotografie: caietul cere o imagine fără chipuri
- * recognoscibile, iar în arhiva preluată nu există una verificată.
+ * recognoscibile, iar în arhiva preluată nu există una verificată. Până
+ * vine, locul ei îl ține un desen.
  */
 const CAMPANII: ReadonlyArray<{
   titlu: string;
   text: string;
   destinatie: string;
+  inclinare: Inclinare;
   poza?: { cale: string; alt: string; legenda: string };
 }> = [
   {
     titlu: "Tabere pentru copii și părinți",
     text: "Zile de joacă, liniște și sprijin pentru copiii cu nevoi speciale sau care au trecut prin cancer și familiile lor.",
     destinatie: "tabere",
-    // 4:3, deci intră în rama înaltă fără să piardă oamenii de pe margini;
-    // poza panoramică de dinainte rămânea doar cu o felie din mijloc.
+    inclinare: "stanga",
     poza: {
       cale: "/poze/2024/11/438127627_457431750190502_3491066331294449444_n.jpg",
       alt: "Copii, părinți și voluntari în tricouri albe, în fața pensiunii din tabăra RESPIRO, sub un cer cu nori albi",
@@ -131,6 +144,7 @@ const CAMPANII: ReadonlyArray<{
     titlu: "Casa Teona",
     text: "Un loc în care copiii învață prin joacă, iar părinții găsesc consiliere și sprijin.",
     destinatie: "casa-teona",
+    inclinare: "dreapta",
     poza: {
       cale: "/poze/2024/11/poza1_enhanced-1.webp",
       alt: "Un copil arată copăcelul din hârtie cu frunze verzi pe care l-a făcut la un atelier de la Casa Teona",
@@ -141,6 +155,7 @@ const CAMPANII: ReadonlyArray<{
     titlu: "Cazuri umanitare",
     text: "Ajutăm copii și familii în situații grele, acolo unde nevoia e urgentă.",
     destinatie: "cazuri-umanitare",
+    inclinare: "stanga",
   },
 ];
 
@@ -168,10 +183,19 @@ const REALIZARI = [
   },
 ] as const;
 
-const PUNCTE_CASA: ReadonlyArray<{ text: string; pictograma: NumePictograma }> = [
-  { text: "Joacă și activități adaptate fiecărui copil", pictograma: "joaca" },
-  { text: "Sprijin pentru întreaga familie", pictograma: "familie" },
-];
+/** Culoarea abțibildului cu numărul, pe rând. */
+const ABTIBILDURI = [
+  "text-caramiziu-200",
+  "text-miere-200",
+  "text-turcoaz-200",
+  "text-miere-200",
+  "text-caramiziu-200",
+] as const;
+
+const PUNCTE_CASA = [
+  "Joacă și activități adaptate fiecărui copil",
+  "Sprijin pentru întreaga familie",
+] as const;
 
 function citesteTestimoniale(): Testimonial[] {
   return JSON.parse(
@@ -180,6 +204,13 @@ function citesteTestimoniale(): Testimonial[] {
 }
 
 /*
+  Prima pagină, ca o carte de povești: un peisaj continuu, de sus în jos.
+
+  Cerul e în erou, dealurile coboară spre cifre, cărțile de hârtie colorată
+  stau pe pagina albă, pozele sunt lipite în album, sârma cu rufe trece pe
+  la mijloc, iar la final soarele apune în spatele dealurilor. Culorile sunt
+  cele trei ale asociației, în tentele lor; nimic nou.
+
   Liniile scrise de mână de deasupra titlurilor sunt textele de pe prima
   pagină a site-ului vechi, nu formulări noi. Caietul dictează titlurile și
   textele secțiunilor; aceste rânduri stau doar unde el nu spune nimic.
@@ -189,99 +220,127 @@ export default function PrimaPagina() {
 
   return (
     <>
+      {/* Filtrul pentru marginile tăiate de mână: definit o dată, folosit
+          de toate cărțile de hârtie din pagină. */}
+      <svg aria-hidden="true" focusable="false" className="absolute h-0 w-0">
+        <filter id="hartie-taiata" x="-4%" y="-4%" width="108%" height="108%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.014"
+            numOctaves="2"
+            seed="7"
+            result="zgomot"
+          />
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="zgomot"
+            scale="6"
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+        </filter>
+      </svg>
+
       <Erou />
 
-      {/* 1.2 — bara cu cifre, fără titlu. */}
-      <Val culoare="text-hartie" className={VAL_PESTE} />
-      <section className="bg-hartie pt-8 pb-8 lg:pt-12 lg:pb-12">
+      {/* 1.2 — bara cu cifre, fără titlu. Dealurile vin peste cer. */}
+      <Dealuri
+        spate="text-turcoaz-100"
+        mijloc="text-miere-100"
+        fata="text-hartie"
+        className={DEAL_PESTE}
+      />
+      <section className="bg-hartie pt-4 pb-10 lg:pt-6 lg:pb-14">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="sr-only">Rezultatele noastre</h2>
-          <Cifre />
+          <CifreIlustrate />
         </div>
       </section>
 
-      {/* 1.3 — Cum poți să ne susții */}
-      <section className="relative overflow-hidden bg-hartie pt-16 pb-24 lg:pt-20 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="spirala" className="pluteste-lent absolute top-16 right-[4%] size-9 text-turcoaz-200 lg:size-12" />
-          <Decor semn="stea" className="pluteste-lent absolute bottom-24 left-[3%] size-8 text-miere-300 lg:size-11" />
+      {/* 1.3 — Cum poți să ne susții: cinci foi de hârtie colorată. */}
+      <section className="relative bg-hartie pt-16 pb-36 lg:pt-20 lg:pb-52">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+          <Nor className="absolute top-10 right-[-3%] w-44 text-hartie-calda lg:w-64" />
+          <Nor className="absolute bottom-40 left-[-5%] w-52 text-hartie-calda lg:w-72" />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Caietul, la 1.3: „Titlul secțiunii: «Cum poți să ne susții».
               Fără frază introductivă.” */}
           <h2 className="max-w-2xl text-h2 text-cerneala">Cum poți să ne susții</h2>
 
-          {/* Donația e cardul mare, în culoarea de identitate, pe toată
-              înălțimea coloanei din stânga; celelalte patru, pe hârtie
-              caldă, în două rânduri. Ierarhia spune singură ce contează. */}
-          <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-14 grid gap-7 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
             {MODURI_DE_SUSTINERE.map((mod, i) => {
-              if (i === 0) {
-                return (
-                  <li key={mod.titlu} className="sm:col-span-2 lg:col-span-1 lg:row-span-2">
-                    <Aparitie className="h-full">
-                      <article className="granulatie relative flex h-full flex-col overflow-hidden colt-a bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 p-7 text-hartie shadow-[0_30px_60px_-30px_rgba(247,79,34,0.75)] sm:p-9">
-                        {/* Cercuri mari, abia vizibile, în loc de un fundal plat. */}
-                        <span
-                          aria-hidden="true"
-                          className="absolute -top-20 -right-20 size-64 rounded-full border-2 border-hartie/20"
-                        />
-                        <span
-                          aria-hidden="true"
-                          className="absolute -bottom-24 -left-16 size-56 rounded-full border-2 border-hartie/15"
-                        />
-                        <span className="colt-mic-b relative flex size-16 items-center justify-center bg-hartie/15 text-hartie">
-                          <Pictograma nume={mod.pictograma} className="size-8" />
-                        </span>
-                        <h3 className="relative mt-8 text-h3 text-hartie">{mod.titlu}</h3>
-                        <p className="relative mt-3 text-amplu text-hartie/90">
-                          {mod.text}
-                        </p>
-                        <div className="relative mt-auto pt-10">
-                          {/* Pe portocaliu, butonul portocaliu ar dispărea:
-                              aici cel mai puternic contrast e albul plin. */}
-                          <Buton
-                            href={mod.href}
-                            varianta="contur"
-                            marime="mare"
-                            className="border-hartie bg-hartie text-caramiziu-600 hover:border-hartie hover:text-caramiziu-700"
-                          >
-                            {mod.buton}
-                          </Buton>
-                        </div>
-                      </article>
-                    </Aparitie>
-                  </li>
-                );
-              }
-
-              const accent = ACCENTE[i % 3];
+              const mare = i === 0;
               return (
-                <li key={mod.titlu}>
-                  <Aparitie intarziere={i * 0.05} className="h-full">
-                    <article
-                      className={`group flex h-full flex-col ${i % 2 === 0 ? "colt-a" : "colt-b"} border border-hartie-umbra bg-hartie-calda p-6 transition-all duration-400 ease-cald hover:-translate-y-1.5 motion-reduce:hover:translate-y-0 sm:p-7 ${accent.umbra}`}
+                <li
+                  key={mod.titlu}
+                  className={mare ? "sm:col-span-2 lg:col-span-1 lg:row-span-2" : ""}
+                >
+                  <article
+                    className={`relative isolate flex h-full flex-col p-7 sm:p-8 ${mod.inclinare}`}
+                  >
+                    {/* Foaia: un strat separat, cu marginea tăiată de mână. */}
+                    <span
+                      aria-hidden="true"
+                      style={TAIAT}
+                      className={`absolute inset-0 -z-10 rounded-[18px_8px_16px_10px] ${mod.hartie} ${
+                        mare
+                          ? "shadow-[0_26px_50px_-24px_rgba(247,79,34,0.6)]"
+                          : "shadow-[0_18px_36px_-22px_rgba(35,35,35,0.3)]"
+                      }`}
+                    />
+                    <Banda className="-top-3 left-1/2 -translate-x-1/2 -rotate-2" />
+
+                    {mare && (
+                      <Soare
+                        aria-hidden="true"
+                        className="absolute top-6 right-6 size-28 text-miere-300 sm:size-36"
+                      />
+                    )}
+
+                    {/* Pictograma stă pe o pată de hârtie, nu într-un pătrat. */}
+                    <span className="relative flex size-16 items-center justify-center">
+                      <Pata
+                        varianta={i}
+                        className={`absolute inset-0 size-full ${mod.pata} ${i % 2 ? "rotate-12" : "-rotate-6"}`}
+                      />
+                      <Pictograma
+                        nume={mod.pictograma}
+                        className={`relative size-8 ${mare ? "text-caramiziu-700" : "text-cerneala"}`}
+                      />
+                    </span>
+
+                    <h3
+                      className={`mt-7 ${mare ? "text-h3 text-hartie" : "text-h4 text-cerneala"}`}
                     >
-                      <span
-                        className={`flex size-14 shrink-0 items-center justify-center ${i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"} transition-all duration-400 ease-cald group-hover:-rotate-6 group-hover:text-hartie motion-reduce:group-hover:rotate-0 ${accent.chip} ${accent.plin}`}
-                      >
-                        <Pictograma nume={mod.pictograma} className="size-7" />
-                      </span>
-                      <h3 className="mt-6 text-h4 text-cerneala">{mod.titlu}</h3>
-                      <p className="mt-2 flex-1 text-mic text-cerneala-moale">
-                        {mod.text}
-                      </p>
-                      <Buton
-                        href={mod.href}
-                        varianta="contur"
-                        marime="mic"
-                        className="mt-6 self-start"
-                      >
-                        {mod.buton}
-                        <Pictograma nume="sageata" className="size-4" />
-                      </Buton>
-                    </article>
-                  </Aparitie>
+                      {mod.titlu}
+                    </h3>
+                    <p
+                      className={`mt-3 flex-1 ${mare ? "text-amplu text-hartie/90" : "text-corp text-cerneala-moale"}`}
+                    >
+                      {mod.text}
+                    </p>
+
+                    <div className={mare ? "mt-auto pt-10" : "mt-7"}>
+                      {mare ? (
+                        // Pe portocaliu, butonul portocaliu ar dispărea:
+                        // aici cel mai puternic contrast e albul plin.
+                        <Buton
+                          href={mod.href}
+                          varianta="contur"
+                          marime="mare"
+                          className="border-hartie bg-hartie text-caramiziu-600 hover:border-hartie hover:text-caramiziu-700"
+                        >
+                          {mod.buton}
+                        </Buton>
+                      ) : (
+                        <Buton href={mod.href} varianta="contur" marime="mic">
+                          {mod.buton}
+                          <Pictograma nume="sageata" className="size-4" />
+                        </Buton>
+                      )}
+                    </div>
+                  </article>
                 </li>
               );
             })}
@@ -289,127 +348,127 @@ export default function PrimaPagina() {
         </div>
       </section>
 
-      {/* 1.4 — Campaniile noastre. Fotografii în arcade, nu carduri cu poză sus. */}
-      <Val culoare="text-tenta-cald" className={VAL_PESTE} />
-      <section className="granulatie relative overflow-hidden bg-tenta-cald pt-10 pb-24 lg:pt-16 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="stea" className="pluteste-lent absolute top-16 right-[7%] size-8 text-caramiziu-300 lg:size-11" />
-          <Decor semn="unda" className="pluteste-lent absolute bottom-28 left-[4%] size-10 text-miere-300 lg:size-14" />
-        </div>
+      {/* 1.4 — Campaniile noastre: trei poze lipite în album. */}
+      <Dealuri
+        spate="text-caramiziu-100"
+        mijloc="text-miere-100"
+        fata="text-tenta-cald"
+        className={DEAL_PESTE}
+      />
+      <section className="granulatie relative bg-tenta-cald pt-6 pb-36 lg:pt-10 lg:pb-52">
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <p className="scris text-amplu text-caramiziu-600">
-            Schimbăm vieți, construim speranță.
-          </p>
-          <h2 className="mt-2 max-w-2xl text-h2 text-cerneala">Campaniile noastre</h2>
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <p className="scris text-amplu text-caramiziu-600">
+                Schimbăm vieți, construim speranță.
+              </p>
+              <h2 className="mt-2 max-w-2xl text-h2 text-cerneala">Campaniile noastre</h2>
+            </div>
+            {/* Adnotare scrisă de mână: butonul Susține duce la Donează cu
+                destinația deja aleasă — exact ce spune și săgeata. */}
+            <p className="scris hidden items-end gap-2 text-amplu text-turcoaz-700 lg:flex">
+              <span className="max-w-56 leading-tight">
+                donația ajunge exact unde alegi tu
+              </span>
+              <SageataDesenata className="mb-1 w-16 shrink-0 -rotate-12 text-turcoaz-500" />
+            </p>
+          </div>
 
-          <ul className="mt-14 grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-16 grid gap-x-10 gap-y-20 sm:grid-cols-2 lg:grid-cols-3">
             {CAMPANII.map((campanie, i) => (
               <li key={campanie.titlu}>
-                <Aparitie intarziere={i * 0.07} className="h-full">
-                  <article className="group flex h-full flex-col">
-                    {campanie.poza ? (
-                      <Fotografie
-                        cale={campanie.poza.cale}
-                        alt={campanie.poza.alt}
-                        legenda={campanie.poza.legenda}
-                        umbra={ACCENTE[i % 3].fotografie}
-                        colt={i % 2 === 0 ? "a" : "b"}
-                        raport="aspect-[4/5]"
-                        dimensiuni="(min-width: 1024px) 380px, 92vw"
-                      />
-                    ) : (
-                      // Fără chipuri recognoscibile: până vine o fotografie
-                      // potrivită, locul ei îl ține motto-ul, pe miere, nu o
-                      // poză de arhivă și nici un bloc greu de portocaliu.
-                      <div className="relative aspect-[4/5] overflow-hidden colt-a bg-miere-100 shadow-[0_22px_45px_-20px_rgba(255,172,0,0.6)] transition-transform duration-500 ease-cald group-hover:-translate-y-1.5 motion-reduce:group-hover:translate-y-0">
-                        <Decor
-                          semn="inima"
-                          strokeWidth={0.9}
-                          className="absolute -right-14 -bottom-12 size-64 text-miere-300"
-                        />
-                        <Decor
-                          semn="stea"
-                          className="absolute top-8 left-8 size-10 text-caramiziu-300"
-                        />
-                        <Decor
-                          semn="soare"
-                          className="absolute top-16 right-10 size-12 text-miere-400"
-                        />
-                        <div className="relative flex size-full items-center justify-center px-8">
-                          <p className="scris text-center text-h3 leading-tight text-caramiziu-700">
-                            „{ASOCIATIA.motto}”
-                          </p>
-                        </div>
-                      </div>
-                    )}
+                <article className="flex h-full flex-col">
+                  {campanie.poza ? (
+                    <PozaLipita
+                      cale={campanie.poza.cale}
+                      alt={campanie.poza.alt}
+                      legenda={campanie.poza.legenda}
+                      inclinare={campanie.inclinare}
+                      raport="aspect-[4/4.6]"
+                      dimensiuni="(min-width: 1024px) 380px, 92vw"
+                    />
+                  ) : (
+                    <PozaLipita
+                      inclinare={campanie.inclinare}
+                      raport="aspect-[4/4.6]"
+                      legenda={`„${ASOCIATIA.motto}”`}
+                      continut={<Casuta className="absolute inset-0 size-full" />}
+                    />
+                  )}
 
-                    <h3 className="mt-9 text-h4 text-cerneala">{campanie.titlu}</h3>
-                    <p className="mt-2 flex-1 text-mic text-cerneala-moale">
-                      {campanie.text}
-                    </p>
-                    <Buton
-                      href={`${RUTE.doneaza}?destinatie=${campanie.destinatie}`}
-                      varianta={i === 0 ? "principal" : "contur"}
-                      marime="mic"
-                      className="mt-5 self-start"
-                    >
-                      Susține
-                    </Buton>
-                  </article>
-                </Aparitie>
+                  <h3 className="mt-10 text-h4 text-cerneala">{campanie.titlu}</h3>
+                  <p className="mt-2 flex-1 text-corp text-cerneala-moale">
+                    {campanie.text}
+                  </p>
+                  <Buton
+                    href={`${RUTE.doneaza}?destinatie=${campanie.destinatie}`}
+                    varianta={i === 0 ? "principal" : "contur"}
+                    marime="mic"
+                    className="mt-6 self-start"
+                  >
+                    Susține
+                  </Buton>
+                </article>
               </li>
             ))}
           </ul>
         </div>
       </section>
 
-      {/* 1.5 — Casa Teona */}
-      <Val culoare="text-hartie" className={VAL_PESTE} />
-      <section className="bg-hartie pt-10 pb-24 lg:pt-16 lg:pb-32">
-        <div className="mx-auto grid max-w-7xl items-center gap-16 px-4 sm:px-6 lg:grid-cols-2 lg:gap-20 lg:px-8">
-          <Aparitie>
-            <div className="relative mx-auto max-w-md lg:max-w-none">
-              <Fotografie
-                cale="/poze/2024/11/poza2_enhanced-1.webp"
-                alt="Trei copii desenează pe o tablă albă pe care scrie „Casa Teona” cu verde"
-                legenda="Casa Teona"
-                umbra="turcoaz"
-                colt="a"
-                raport="aspect-[4/5]"
-                dimensiuni="(min-width: 1024px) 420px, 88vw"
-                className="w-[80%]"
-              />
-              {/* Clădirea, mai mică, suprapusă — ca o poză pusă peste alta. */}
-              <div className="absolute right-0 bottom-6 w-[44%]">
-                <div className="relative aspect-square overflow-hidden colt-b border-[6px] border-hartie bg-hartie shadow-[0_20px_40px_-18px_rgba(255,172,0,0.7)]">
-                  <Image
-                    src="/poze/2024/11/poza3_enhanced.webp"
-                    alt="Clădirea Casa Teona din Suceava, cu firma „Casa TEONA” deasupra intrării"
-                    fill
-                    sizes="(min-width: 1024px) 240px, 44vw"
-                    className="object-cover"
-                  />
-                </div>
-              </div>
-            </div>
-          </Aparitie>
+      {/* 1.5 — Casa Teona, pe dealul turcoaz, cu doi copăcei. */}
+      <div className="relative">
+        <Dealuri
+          spate="text-turcoaz-200"
+          mijloc="text-turcoaz-100"
+          fata="text-tenta-turcoaz"
+          className={DEAL_PESTE}
+        />
+        <Copac className="absolute bottom-1 left-[9%] z-10 h-14 text-turcoaz-400 sm:h-20 lg:h-24" />
+        <Copac className="absolute bottom-0 left-[15%] z-10 h-9 text-turcoaz-500 sm:h-12 lg:h-16" />
+        <Copac className="absolute right-[12%] bottom-2 z-10 h-12 text-turcoaz-400 sm:h-16 lg:h-20" />
+      </div>
+      <section className="bg-tenta-turcoaz pt-10 pb-36 lg:pt-16 lg:pb-52">
+        <div className="mx-auto grid max-w-7xl items-center gap-20 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
+          <div className="relative mx-auto aspect-square w-full max-w-md lg:max-w-none">
+            <PozaLipita
+              cale="/poze/2024/11/poza2_enhanced-1.webp"
+              alt="Trei copii desenează pe o tablă albă pe care scrie „Casa Teona” cu verde"
+              legenda="La tablă, la Casa Teona"
+              inclinare="stanga"
+              banda="colturi"
+              raport="aspect-[4/3.4]"
+              dimensiuni="(min-width: 1024px) 460px, 74vw"
+              className="absolute top-0 left-0 z-10 w-[70%] lg:w-[72%]"
+            />
+            {/* Clădirea, mai mică, lipită peste — ca o poză pusă peste alta. */}
+            <PozaLipita
+              cale="/poze/2024/11/poza3_enhanced.webp"
+              alt="Clădirea Casa Teona din Suceava, cu firma „Casa TEONA” deasupra intrării"
+              legenda={ADRESE.casaTeona.strada}
+              inclinare="dreapta-mult"
+              raport="aspect-square"
+              dimensiuni="(min-width: 1024px) 250px, 40vw"
+              className="absolute right-0 bottom-0 z-20 w-[44%] lg:w-[40%]"
+            />
+          </div>
 
-          <Aparitie intarziere={0.1}>
+          <div>
             <p className="scris text-amplu text-turcoaz-700">
               Ne dedicăm îmbunătățirii calității vieții copiilor cu nevoi speciale.
             </p>
             <h2 className="mt-2 text-h2 text-cerneala">Casa Teona</h2>
 
-            <ul className="mt-8 grid gap-4">
+            <ul className="mt-8 grid gap-5">
               {PUNCTE_CASA.map((punct, i) => (
-                <li
-                  key={punct.text}
-                  className={`${i % 2 === 0 ? "colt-a" : "colt-b"} flex items-center gap-4 bg-turcoaz-50 p-4 shadow-[0_12px_28px_-20px_rgba(42,159,163,0.9)]`}
-                >
-                  <span className={`${i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"} flex size-11 shrink-0 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]`}>
-                    <Pictograma nume={punct.pictograma} className="size-5" />
+                <li key={punct} className="flex items-center gap-4">
+                  <span className="relative flex size-12 shrink-0 items-center justify-center">
+                    <Pata
+                      varianta={i + 2}
+                      className={`absolute inset-0 size-full text-turcoaz-200 ${i ? "rotate-12" : "-rotate-6"}`}
+                    />
+                    <Bifa className="relative size-6 text-turcoaz-700" />
                   </span>
-                  <span className="text-amplu text-cerneala">{punct.text}</span>
+                  <span className="text-amplu text-cerneala">{punct}</span>
                 </li>
               ))}
             </ul>
@@ -417,33 +476,60 @@ export default function PrimaPagina() {
             <Buton href={RUTE.casaTeona} className="mt-9">
               Află mai multe
             </Buton>
-          </Aparitie>
+
+            {/* Adresa, scrisă de mână, cu săgeata spre poza clădirii. */}
+            <p className="scris mt-8 flex items-start gap-3 text-amplu text-turcoaz-700">
+              <SageataDesenata intoarsa className="mt-1 w-14 shrink-0 rotate-12 text-turcoaz-500" />
+              <span className="leading-tight">
+                ne găsești pe {ADRESE.casaTeona.strada}, {ADRESE.casaTeona.oras}
+              </span>
+            </p>
+          </div>
         </div>
       </section>
 
-      <Val culoare="text-hartie-calda" className={VAL_PESTE} />
-      <FasieDeFotografii />
+      {/* Sârma cu fotografii: fără titlu, fără buton. */}
+      <Dealuri
+        spate="text-turcoaz-200"
+        mijloc="text-turcoaz-100"
+        fata="text-hartie"
+        className={DEAL_PESTE}
+      />
+      <Sarma />
 
-      {/* 1.6 — Ne susțin. Pe aceeași hârtie caldă ca fâșia de deasupra. */}
-      <section className="granulatie relative bg-hartie-calda pt-8 pb-24 lg:pt-12 lg:pb-32">
+      {/* 1.6 — Ne susțin. Sigle pe etichete albe, pe hârtie caldă. */}
+      <Dealuri
+        spate="text-miere-100"
+        mijloc="text-tenta-miere"
+        fata="text-hartie-calda"
+        className="-mt-10 sm:-mt-14 lg:-mt-20"
+      />
+      <section className="granulatie relative bg-hartie-calda pt-4 pb-20 lg:pt-6 lg:pb-28">
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
             <h2 className="text-h3 text-cerneala">Ne susțin</h2>
             <Link
               href={RUTE.sponsori}
-              className="font-titlu text-mic font-semibold text-caramiziu-600 underline-offset-4 transition hover:underline"
+              className="scris inline-flex items-center gap-2 text-amplu text-caramiziu-600 underline-offset-4 transition hover:underline"
             >
               Vezi toți sponsorii
+              <Pictograma nume="sageata" className="size-4" />
             </Link>
           </div>
 
-          {/* Siglele își păstrează culorile: multe sunt deja pe alb și, trecute
-              prin alb-negru, aproape dispăreau. Chenarul le dă aceeași
-              înălțime, așa cum cere caietul, fără să le deformeze. */}
-          <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+          {/* Siglele își păstrează culorile; eticheta albă le dă aceeași
+              înălțime, cum cere caietul, fără să le deformeze. Siglele sunt
+              ale firmelor, deci stau drepte — nu strâmbe ca pozele. */}
+          <ul className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
             {SIGLE_PRIMA_PAGINA.map((sigla, i) => (
               <li key={sigla.nume}>
-                <div className={`${i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"} flex h-24 items-center justify-center bg-hartie p-4 shadow-[0_10px_26px_-18px_rgba(35,35,35,0.45)] transition-all duration-300 ease-cald hover:-translate-y-1 hover:shadow-[0_16px_32px_-16px_rgba(247,79,34,0.4)] motion-reduce:hover:translate-y-0`}>
+                <div
+                  className={`flex h-24 items-center justify-center bg-hartie p-4 shadow-[0_10px_24px_-16px_rgba(35,35,35,0.35),0_1px_3px_rgba(35,35,35,0.06)] ${
+                    i % 2 === 0
+                      ? "rounded-[12px_5px_10px_6px]"
+                      : "rounded-[5px_12px_6px_10px]"
+                  }`}
+                >
                   <Image
                     src={sigla.cale}
                     alt={sigla.nume}
@@ -459,23 +545,21 @@ export default function PrimaPagina() {
       </section>
 
       {/* 1.7 — Ce am realizat împreună în ultimul an. Statice, fără animații. */}
-      <Val culoare="text-hartie" className={VAL_PESTE} />
-      <section className="relative overflow-hidden bg-hartie pt-10 pb-20 lg:pt-16 lg:pb-28">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="spirala" className="pluteste-lent absolute top-14 right-[5%] size-9 text-miere-300 lg:size-12" />
-          <Decor semn="stea" className="pluteste-lent absolute bottom-16 left-[4%] size-7 text-caramiziu-300 lg:size-10" />
-        </div>
+      <section className="granulatie relative overflow-hidden bg-hartie-calda pt-10 pb-36 lg:pt-14 lg:pb-56">
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <p className="scris text-amplu text-caramiziu-600">
-            Impactul campaniilor noastre.
-          </p>
-          <h2 className="mt-2 max-w-3xl text-h2 text-cerneala">
-            Ce am realizat împreună în ultimul an
-          </h2>
+          <div className="relative">
+            <p className="scris text-amplu text-caramiziu-600">
+              Impactul campaniilor noastre.
+            </p>
+            <h2 className="mt-2 max-w-3xl text-h2 text-cerneala">
+              Ce am realizat împreună în ultimul an
+            </h2>
+            <Baloane className="absolute -top-10 right-0 hidden h-44 lg:block xl:right-[4%]" />
+          </div>
 
-          {/* Trei carduri pe primul rând și două, mai late, pe al doilea:
+          {/* Trei foi pe primul rând și două, mai late, pe al doilea:
               cinci egale nu încap pe un rând fără să se rupă titlurile. */}
-          <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-6">
+          <ol className="mt-14 grid gap-7 sm:grid-cols-2 lg:grid-cols-6 lg:gap-8">
             {REALIZARI.map((realizare, i) => (
               <li
                 key={realizare.titlu}
@@ -483,18 +567,38 @@ export default function PrimaPagina() {
                   i === 4 ? "sm:col-span-2 lg:col-span-3" : ""
                 }`}
               >
-                {/* „Cinci carduri statice, fără animații” (1.7). De aceea nu se
-                    ridică la trecerea cu mouse-ul, ca restul cardurilor. */}
-                <article className={`flex h-full gap-5 ${i % 2 === 0 ? "colt-a" : "colt-b"} border border-hartie-umbra bg-hartie-calda p-6 sm:p-7`}>
+                {/* „Cinci carduri statice, fără animații” (1.7): nimic nu se
+                    ridică și nu se mișcă la trecerea cu mouse-ul. */}
+                <article
+                  className={`relative isolate flex h-full gap-5 p-6 sm:p-7 ${
+                    i % 2 === 0 ? "-rotate-1" : "rotate-1"
+                  }`}
+                >
                   <span
                     aria-hidden="true"
-                    className={`font-titlu text-[3rem] leading-none font-extrabold ${ACCENTE[i % 3].numar}`}
-                  >
-                    {String(i + 1).padStart(2, "0")}
+                    style={TAIAT}
+                    className="absolute inset-0 -z-10 rounded-[16px_7px_14px_9px] bg-hartie shadow-[0_18px_36px_-22px_rgba(35,35,35,0.3)]"
+                  />
+                  <Banda className="-top-3 left-1/2 -translate-x-1/2 rotate-2" />
+
+                  {/* Numărul, ca un abțibild rotund lipit în colț. */}
+                  <span className="relative flex size-14 shrink-0 items-center justify-center">
+                    <Pata
+                      varianta={i}
+                      className={`absolute inset-0 size-full ${ABTIBILDURI[i]} ${
+                        i % 2 ? "rotate-12" : "-rotate-6"
+                      }`}
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="scris relative text-[1.75rem] leading-none font-bold text-cerneala"
+                    >
+                      {i + 1}
+                    </span>
                   </span>
                   <div className="min-w-0">
                     <h3 className="text-h4 text-cerneala">{realizare.titlu}</h3>
-                    <p className="mt-1.5 text-mic text-cerneala-moale">
+                    <p className="mt-1.5 text-corp text-cerneala-moale">
                       {realizare.text}
                     </p>
                   </div>
@@ -504,7 +608,7 @@ export default function PrimaPagina() {
           </ol>
 
           {/* „Sub carduri: butonul Vezi toate proiectele” (1.7). */}
-          <div className="mt-12 text-center">
+          <div className="mt-14 text-center">
             <Buton href={RUTE.proiecte} varianta="secundar" marime="mare">
               Vezi toate proiectele
             </Buton>
@@ -515,7 +619,9 @@ export default function PrimaPagina() {
       {/* 1.8 — nu se randează cât timp asociația nu ne trimite testimonialele. */}
       <Testimoniale testimoniale={testimoniale} />
 
-      <IndemnFinal titlu="Dăruiește timp, dăruiește speranță!" />
+      <div className="-mt-20 sm:-mt-28 lg:-mt-40">
+        <IndemnIlustrat titlu="Dăruiește timp, dăruiește speranță!" />
+      </div>
     </>
   );
 }
