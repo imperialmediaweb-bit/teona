@@ -72,8 +72,17 @@ export default function FasieDeFotografii() {
   return (
     <section
       aria-label="Fotografii din tabere și de la Casa Teona"
-      className="overflow-hidden bg-cerneala py-5"
+      className="granulatie relative overflow-hidden bg-caramiziu-900 py-8"
     >
+      {/* Marginile se sting în fundal, ca banda să nu pară tăiată cu cuțitul. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-caramiziu-900 to-transparent sm:w-28"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-caramiziu-900 to-transparent sm:w-28"
+      />
       <div
         className={
           fara_miscare
@@ -85,7 +94,13 @@ export default function FasieDeFotografii() {
           <figure
             key={`${fotografie.cale}-${i}`}
             aria-hidden={fotografie.copie || undefined}
-            className="relative h-48 w-72 shrink-0 snap-start overflow-hidden rounded-moale sm:h-60 sm:w-96"
+            // Înălțimi alternate și colțuri decupate: o bandă de dreptunghiuri
+            // egale e un carusel de șablon, nu un album.
+            className={`relative shrink-0 snap-start overflow-hidden ${
+              i % 2 === 0
+                ? "colt-a h-48 w-72 sm:h-64 sm:w-96"
+                : "colt-b mt-6 h-40 w-60 sm:h-52 sm:w-80"
+            }`}
           >
             <Image
               src={fotografie.cale}
