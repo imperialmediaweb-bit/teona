@@ -109,10 +109,10 @@ export const SIGLE_SPONSORI: ReadonlyArray<Sigla> = [
  * Siglele pe care prima pagină le arată în banda „Ne susțin” (1.6).
  *
  * Grila completă rămâne pe pagina Sponsori și parteneri; pe prima pagină intră
- * primele paisprezece, cât să umple două rânduri fără să împingă restul
- * paginii în jos.
+ * primele douăsprezece: trei rânduri de câte patru, lângă fotografie, fără să
+ * împingă restul paginii în jos.
  */
-export const SIGLE_PRIMA_PAGINA = SIGLE_SPONSORI.slice(0, 14);
+export const SIGLE_PRIMA_PAGINA = SIGLE_SPONSORI.slice(0, 12);
 
 /**
  * Partenerii instituționali (3.7) — pe pagina Despre noi, nu pe Sponsori.
