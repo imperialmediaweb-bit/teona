@@ -198,12 +198,9 @@ export default function PrimaPagina() {
           <Decor semn="soare" className="pluteste-lent absolute bottom-16 left-[3%] size-9 text-miere-200 lg:size-12" />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl">
-            <p className="scris text-amplu text-turcoaz-600">
-              Cinci feluri. Alege-l pe al tău.
-            </p>
-            <h2 className="mt-1 text-h2 text-cerneala">Cum poți să ne susții</h2>
-          </div>
+          {/* Caietul, la 1.3: „Titlul secțiunii: «Cum poți să ne susții».
+              Fără frază introductivă.” */}
+          <h2 className="max-w-2xl text-h2 text-cerneala">Cum poți să ne susții</h2>
 
           <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {MODURI_DE_SUSTINERE.map((mod, i) => {
@@ -273,12 +270,7 @@ export default function PrimaPagina() {
           <Decor semn="unda" className="pluteste-lent absolute bottom-24 left-[4%] size-10 text-miere-300 lg:size-14" />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl">
-            <p className="scris text-amplu text-caramiziu-600">
-              Unde ajunge donația ta
-            </p>
-            <h2 className="mt-1 text-h2 text-cerneala">Campaniile noastre</h2>
-          </div>
+          <h2 className="max-w-2xl text-h2 text-cerneala">Campaniile noastre</h2>
 
           <ul className="mt-14 grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
             {CAMPANII.map((campanie, i) => (
@@ -367,10 +359,7 @@ export default function PrimaPagina() {
           </Aparitie>
 
           <Aparitie intarziere={0.1}>
-            <p className="scris text-amplu text-turcoaz-600">
-              Deschisă tot anul, nu doar vara
-            </p>
-            <h2 className="mt-1 text-h2 text-cerneala">Casa Teona</h2>
+            <h2 className="text-h2 text-cerneala">Casa Teona</h2>
 
             <ul className="mt-8 grid gap-4">
               {PUNCTE_CASA.map((punct) => (
@@ -403,12 +392,9 @@ export default function PrimaPagina() {
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-end justify-between gap-6">
-            <div className="max-w-2xl">
-              <p className="scris text-amplu text-miere-700">Anul care a trecut</p>
-              <h2 className="mt-1 text-h2 text-cerneala">
-                Ce am realizat împreună
-              </h2>
-            </div>
+            <h2 className="max-w-2xl text-h2 text-cerneala">
+              Ce am realizat împreună în ultimul an
+            </h2>
             <Buton href={RUTE.proiecte} varianta="secundar">
               Vezi toate proiectele
             </Buton>
@@ -420,7 +406,9 @@ export default function PrimaPagina() {
                 key={realizare.titlu}
                 className={i === 0 ? "sm:col-span-2" : undefined}
               >
-                <article className={`group flex h-full gap-5 ${i % 2 === 0 ? "colt-a" : "colt-b"} bg-hartie p-6 shadow-[0_16px_34px_-20px_rgba(35,35,35,0.4)] transition-transform duration-400 ease-cald hover:-translate-y-1.5 motion-reduce:hover:translate-y-0`}>
+                {/* „Cinci carduri statice, fără animații” (1.7). De aceea nu se
+                    ridică la trecerea cu mouse-ul, ca restul cardurilor. */}
+                <article className={`flex h-full gap-5 ${i % 2 === 0 ? "colt-a" : "colt-b"} bg-hartie p-6 shadow-[0_16px_34px_-20px_rgba(35,35,35,0.4)]`}>
                   <span
                     aria-hidden="true"
                     className={`font-titlu text-h2 leading-none font-extrabold ${ACCENTE[i % 3].numar}`}
