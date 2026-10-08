@@ -8,6 +8,14 @@ export type Testimonial = {
   citat: string;
   /** Doar prenumele și rolul: „Maria, mama unui băiat din tabără”. */
   semnatura: string;
+  /**
+   * De unde vine, când nu l-am primit direct.
+   *
+   * Pentru recenziile publice de pe pagina de Facebook a asociației scrie
+   * „Facebook”: omul care citește trebuie să știe că e o recenzie publică, nu
+   * un text cules de noi. La testimonialele date direct asociației lipsește.
+   */
+  sursa?: string;
 };
 
 /**
@@ -77,8 +85,15 @@ export default function Testimoniale({
               <blockquote className="mt-5 font-titlu text-h4 leading-snug text-cerneala sm:text-h3">
                 „{curent.citat}”
               </blockquote>
-              <figcaption className="mt-6 font-titlu font-semibold text-caramiziu-600">
-                {curent.semnatura}
+              <figcaption className="mt-6">
+                <span className="font-titlu font-semibold text-caramiziu-600">
+                  {curent.semnatura}
+                </span>
+                {curent.sursa && (
+                  <span className="mt-1.5 block text-nota text-cerneala-slab">
+                    recenzie publică pe {curent.sursa}
+                  </span>
+                )}
               </figcaption>
             </motion.figure>
           </AnimatePresence>
