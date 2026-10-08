@@ -92,7 +92,7 @@ export default function Antet() {
           : ""
       }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-3 min-[380px]:gap-4 sm:px-6 lg:px-8">
         {/* Sub 380 px, numele din siglă se micșorează: la 320 px (ecranele
             vechi mici, încă în uz) altfel împingea bara peste marginea
             ecranului și pagina se derula lateral. */}

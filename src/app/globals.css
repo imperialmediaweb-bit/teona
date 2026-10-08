@@ -89,10 +89,19 @@
   --text-corp: 1.0625rem;
   --text-amplu: 1.25rem;
   --text-h4: 1.5rem;
-  --text-h3: 1.875rem;
-  --text-h2: 2.5rem;
-  --text-h1: 3.25rem;
-  --text-afis: 4.5rem;
+  /*
+    Titlurile mari se măsoară și după lățimea ecranului, nu doar în rem.
+
+    Româna are cuvinte lungi care nu se pot rupe: „confidențialitate”,
+    „Redirecționează”, „Direcționează”. La 3,25rem fix, titlul paginii de
+    confidențialitate era de 388 px pe un ecran de 320 px — pagina se derula
+    lateral. `clamp` le micșorează doar acolo unde nu încap; de la ~430 px în
+    sus, mărimea e exact cea dinainte.
+  */
+  --text-h3: clamp(1.5rem, 5.5vw, 1.875rem);
+  --text-h2: clamp(1.875rem, 7vw, 2.5rem);
+  --text-h1: clamp(2rem, 9vw, 3.25rem);
+  --text-afis: clamp(2.5rem, 12vw, 4.5rem);
 
   --radius-moale: 0.75rem;
   --radius-card: 1.25rem;
@@ -122,6 +131,8 @@
   h3,
   h4 {
     font-family: var(--font-titlu);
+    /* Dacă tot apare un cuvânt mai lung decât rândul, se rupe el, nu pagina. */
+    overflow-wrap: break-word;
     /* 800 e greutatea la care Nunito se citește ca literele siglei. */
     font-weight: 800;
     line-height: 1.1;
