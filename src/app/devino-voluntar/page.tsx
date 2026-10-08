@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
 import Image from "next/image";
 import Link from "next/link";
 import { EMAIL, RUTE, TELEFOANE } from "@/date/asociatie";
@@ -14,11 +15,12 @@ import Pasi from "@/componente/pagina/Pasi";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
 import FormularVoluntar from "@/componente/formular/FormularVoluntar";
 
-export const metadata: Metadata = {
-  title: "Devino voluntar",
-  description:
-    "Alătură-te Culegătorilor de Zâmbete și fii alături de copiii cu nevoi speciale și de familiile lor.",
-};
+export const metadata: Metadata = metadate({
+  titlu: "Devino voluntar",
+  descriere:
+    "Alătură-te Culegătorilor de Zâmbete, voluntarii Asociației Teona Ariana Suceava, în tabere și la Casa Teona. Completezi formularul, te contactăm. De la 18 ani.",
+  cale: "/devino-voluntar",
+});
 
 /** 11.6 — șase fotografii cu voluntari. */
 const GALERIE = [
@@ -29,7 +31,7 @@ const GALERIE = [
   },
   {
     cale: "/poze/2024/11/Screenshot_56-1.png",
-    alt: "Un voluntar îi arată unei fetițe tricoul primit în tabără",
+    alt: "Un voluntar ține în fața unei fetițe un tricou negru cu „Keep calm and rock on”; amândoi zâmbesc",
   },
   {
     cale: "/poze/2024/11/278495378_647322639843213_2394948498616303816_n-1024x768.jpg",
@@ -37,7 +39,7 @@ const GALERIE = [
   },
   {
     cale: "/poze/2024/11/454507252_521713920428951_7631183889837889502_n-1.jpg",
-    alt: "Tineri voluntari cu căști portocalii de escaladă și hamuri, în grup, între brazi, în parcul de aventură",
+    alt: "Opt tineri cu căști portocalii de escaladă și hamuri, în grup, sub un brad, în parcul de aventură",
     legenda: "Parcul de aventură",
   },
   {
@@ -46,13 +48,14 @@ const GALERIE = [
   },
   {
     cale: "/poze/2024/11/413839128_386434587290219_1905121098743660996_n.jpg",
-    alt: "Voluntari și copii, în grup, la apus",
+    alt: "Opt voluntari tineri, în veste albe cu sigla asociației, în grup, la apus",
   },
 ] as const;
 
 export default function DevinoVoluntar() {
   return (
     <>
+      <JsonLd date={jsonLdFir([{ nume: "Devino voluntar", cale: RUTE.voluntar }])} />
       <AntetPagina
         scris="Culegătorii de Zâmbete"
         titlu="Devino voluntar"
@@ -137,7 +140,7 @@ export default function DevinoVoluntar() {
             />
             <Fotografie
               cale="/poze/2024/11/438101549_457431740190503_88663047373558950_n.jpg"
-              alt="Opt voluntari tineri, pe scenă, cu diplomele primite la finalul taberei"
+              alt="Nouă voluntari tineri, pe o scenă, cu diplomele de recunoștință primite la finalul taberei"
               legenda="La finalul taberei"
               umbra="miere"
               bloc="miere"

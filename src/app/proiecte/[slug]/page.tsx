@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -15,13 +16,34 @@ export function generateStaticParams() {
   return proiecteAfisate().map((proiect) => ({ slug: proiect.slug }));
 }
 
+/** Textul alternativ al unei fotografii din proiect: numerotat, ca niciunul să nu fie identic cu vecinul. */
+function altFotografie(titlu: string, index: number, total: number) {
+  return `${titlu} — fotografia ${index} din ${total}`;
+}
+
 export async function generateMetadata({
   params,
 }: PageProps<"/proiecte/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const proiect = proiectDupaSlug(slug);
-  if (!proiect) return { title: "Proiect" };
-  return { title: proiect.titlu };
+  // Un slug inexistent ajunge la 404; pagina aceea nu se indexează.
+  if (!proiect) return { title: "Proiect", robots: { index: false, follow: false } };
+
+  // Fără dată: `data` e data postării în WordPress, care nu e mereu data
+  // taberei (câteva proiecte au fost publicate abia în noiembrie 2024).
+  // Într-un rezumat de căutare ar trece drept data evenimentului.
+  const total = proiect.poze.length;
+  const fotografii =
+    total === 0 ? "" : total === 1 ? " O fotografie." : ` ${total} fotografii.`;
+  return metadate({
+    titlu: proiect.titlu,
+    descriere: `${proiect.titlu} — proiect al Asociației Teona Ariana Suceava.${fotografii}`,
+    cale: `/proiecte/${proiect.slug}`,
+    // Fotografia proiectului spune mai mult decât imaginea generală a site-ului.
+    imagine: proiect.coperta
+      ? { cale: proiect.coperta, alt: altFotografie(proiect.titlu, 1, total) }
+      : undefined,
+  });
 }
 
 /**
@@ -44,9 +66,16 @@ export default async function PaginaProiect({
 
   const categorie = CATEGORII.find((c) => c.id === proiect.categorie);
   const [prima, ...restul] = proiect.poze;
+  const total = proiect.poze.length;
 
   return (
     <>
+      <JsonLd
+        date={jsonLdFir([
+          { nume: "Proiecte", cale: RUTE.proiecte },
+          { nume: proiect.titlu, cale: `/proiecte/${proiect.slug}` },
+        ])}
+      />
       <section className="granulatie relative isolate overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-12 lg:pb-32">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
           <span className="pata absolute -top-32 right-[-8%] size-[26rem] rounded-full bg-miere-100/70 blur-3xl" />
@@ -97,7 +126,7 @@ export default async function PaginaProiect({
               <div className="colt-a relative aspect-[4/3] overflow-hidden bg-hartie-calda shadow-[0_34px_70px_-30px_rgba(247,79,34,0.55)] sm:aspect-[16/10]">
                 <Image
                   src={prima}
-                  alt={`Fotografie din proiectul „${proiect.titlu}”`}
+                  alt={altFotografie(proiect.titlu, 1, total)}
                   fill
                   priority
                   sizes="(min-width: 1024px) 1100px, 94vw"
@@ -128,9 +157,9 @@ export default async function PaginaProiect({
         <Galerie
           scris="În fotografii"
           titlu="Galerie"
-          poze={restul.map((poza) => ({
+          poze={restul.map((poza, i) => ({
             cale: poza,
-            alt: `Fotografie din proiectul „${proiect.titlu}”`,
+            alt: altFotografie(proiect.titlu, i + 2, total),
           }))}
           primaMare={false}
         />

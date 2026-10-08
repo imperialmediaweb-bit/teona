@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -20,11 +21,12 @@ import DeCopiat from "@/componente/pagina/DeCopiat";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
 import FormularContact from "@/componente/formular/FormularContact";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description:
-    "Scrie-ne pentru orice întrebare sau dorință de implicare. Telefon, email, adresele asociației și formular de contact.",
-};
+export const metadata: Metadata = metadate({
+  titlu: "Contact",
+  descriere:
+    "Telefon 0754 510 167, e-mail contact@teona-ariana.ro, Casa Teona pe Strada Zamca 22, Suceava. Formular de contact și paginile de Facebook, Instagram, TikTok.",
+  cale: "/contact",
+});
 
 /** Cele trei căi de contact (10.2), fiecare pe câmpul ei de culoare. */
 const CAI_DE_CONTACT: ReadonlyArray<{
@@ -77,6 +79,7 @@ export default function Contact() {
 
   return (
     <>
+      <JsonLd date={jsonLdFir([{ nume: "Contact", cale: RUTE.contact }])} />
       <AntetPagina
         scris="Scrie-ne sau sună-ne"
         titlu="Contact"
@@ -84,7 +87,7 @@ export default function Contact() {
         accent="turcoaz"
         poza={{
           cale: "/poze/2024/11/413839128_386434587290219_1905121098743660996_n.jpg",
-          alt: "Voluntari și copii, în grup, la apus",
+          alt: "Opt voluntari tineri, în veste albe cu sigla asociației, în grup, la apus",
           legenda: "Echipa noastră",
         }}
         pozaMica={{
@@ -224,7 +227,7 @@ export default function Contact() {
               <div className="colt-a relative aspect-[4/3] overflow-hidden bg-hartie-calda shadow-[0_26px_52px_-24px_rgba(247,79,34,0.5)]">
                 <Image
                   src="/poze/2024/11/438196694_1099567077821441_6735868067300369616_n-1.jpg"
-                  alt="O voluntară desenează împreună cu un copil, la masă"
+                  alt="O voluntară stă la masă lângă un băiețel care ține creioane colorate deasupra unui desen"
                   fill
                   sizes="(min-width: 1024px) 460px, 0px"
                   className="object-cover"
@@ -317,7 +320,7 @@ export default function Contact() {
             <div className="colt-a relative overflow-hidden bg-hartie p-3 shadow-[0_26px_52px_-24px_rgba(255,172,0,0.6)] sm:p-4">
               <Image
                 src="/poze/2024/11/Certificat-de-inregistrare-ATA_page-0001.jpg"
-                alt="Certificatul de înregistrare al Asociației Teona Ariana Suceava, emis de Ministerul Justiției"
+                alt="Certificatul de înregistrare fiscală al Asociației Teona Ariana Suceava, emis de ANAF, cu CIF 43533953"
                 width={900}
                 height={1273}
                 sizes="(min-width: 1024px) 520px, 92vw"

@@ -7,6 +7,7 @@ import BaraDeAnunt from "@/componente/BaraDeAnunt";
 import ButonDoneazaMobil from "@/componente/ButonDoneazaMobil";
 import Newsletter from "@/componente/Newsletter";
 import Subsol from "@/componente/Subsol";
+import { ADRESA_SITE, INDEXABIL, JsonLd, jsonLdAsociatie } from "./seo";
 import "./globals.css";
 
 // Fonturile sunt servite de pe domeniul nostru prin `next/font`: nicio cerere
@@ -42,13 +43,40 @@ const kalam = Kalam({
   display: "swap",
 });
 
+/**
+ * Metadatele comune. Fiecare pagină le completează cu ale ei prin
+ * `metadate()` din `seo.tsx`; aici stau doar cele care nu se schimbă.
+ *
+ * `metadataBase` e adresa de la care se rezolvă `canonical`, imaginile de
+ * distribuire și restul adreselor absolute — fără ea Next cădea pe
+ * `localhost:3000`. Ce trebuie schimbat la lansare e scris la `ADRESA_SITE`.
+ *
+ * `keywords`: Google nu mai citește eticheta de ani de zile, dar alte motoare
+ * și unele unelte o afișează încă; nu costă nimic. Ce contează pentru
+ * căutare sunt titlurile, descrierile și textul paginilor.
+ */
 export const metadata: Metadata = {
+  metadataBase: new URL(ADRESA_SITE),
   title: {
     default: ASOCIATIA.denumire,
     template: `%s · ${ASOCIATIA.denumire}`,
   },
   description: ASOCIATIA.fraza,
   applicationName: ASOCIATIA.denumire,
+  keywords: [
+    "Asociația Teona Ariana",
+    "Suceava",
+    "copii cu nevoi speciale",
+    "copii cu dizabilități",
+    "autism",
+    "sindrom Down",
+    "tabere RESPIRO",
+    "Casa Teona",
+    "ONG Suceava",
+    "donație",
+    "redirecționare 3,5%",
+    "voluntariat",
+  ],
   openGraph: {
     title: ASOCIATIA.denumire,
     description: ASOCIATIA.fraza,
@@ -56,7 +84,15 @@ export const metadata: Metadata = {
     type: "website",
     siteName: ASOCIATIA.denumire,
   },
-  robots: { index: true, follow: true },
+  twitter: {
+    card: "summary_large_image",
+    title: ASOCIATIA.denumire,
+    description: ASOCIATIA.fraza,
+  },
+  // Pe adresa de previzualizare nu se indexează nimic — vezi `INDEXABIL`.
+  robots: INDEXABIL
+    ? { index: true, follow: true, "max-image-preview": "large" }
+    : { index: false, follow: false },
 };
 
 export const viewport: Viewport = {
@@ -70,6 +106,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${nunito.variable} ${nunitoSans.variable} ${kalam.variable} h-full`}
     >
       <body className="flex min-h-full flex-col bg-hartie">
+        {/* Asociația, ca organizație, pe fiecare pagină: Google o leagă de
+            site indiferent pe ce pagină intră prima dată. */}
+        <JsonLd date={jsonLdAsociatie()} />
         <a
           href="#continut"
           className="sr-only rounded-full bg-cerneala px-5 py-3 font-titlu font-semibold text-hartie focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[70]"

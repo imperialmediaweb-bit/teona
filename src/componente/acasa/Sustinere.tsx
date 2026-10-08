@@ -24,7 +24,7 @@ const POZE = {
   // Tabăra din iunie 2024. Alt scris după ce m-am uitat la poză.
   doneaza: {
     cale: "/poze/2024/11/449496204_497189886214688_2290669171247077659_n-768x1024.jpg",
-    alt: "Copii se țin de mână în cerc, pe iarbă, lângă o plasă de volei, sub un cer cu nori",
+    alt: "O voluntară și patru copii se țin de mână în cerc, pe iarbă, lângă o plasă de volei; un copil stă ghemuit în mijloc",
   },
   sponsorizeaza: {
     cale: "/poze/2024/11/459590851_545309534736056_5697611419655887236_n.jpg",

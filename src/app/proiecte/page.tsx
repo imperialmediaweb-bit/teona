@@ -1,21 +1,25 @@
 import type { Metadata } from "next";
+import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
+import { RUTE } from "@/date/asociatie";
 import { proiecteAfisate } from "@/date/proiecte";
 import Decor from "@/componente/Decor";
 import IndemnFinal from "@/componente/IndemnFinal";
 import AntetPagina from "@/componente/pagina/AntetPagina";
 import ListaProiecte from "@/componente/proiecte/ListaProiecte";
 
-export const metadata: Metadata = {
-  title: "Proiecte",
-  description:
-    "Taberele RESPIRO, activitățile de la Casa Teona și cazurile umanitare ale Asociației Teona Ariana Suceava.",
-};
+export const metadata: Metadata = metadate({
+  titlu: "Proiecte",
+  descriere:
+    "Proiectele Asociației Teona Ariana Suceava, pe ani și categorii: tabere RESPIRO pentru copii cu autism și sindrom Down, Casa Teona și cazuri umanitare.",
+  cale: "/proiecte",
+});
 
 export default function Proiecte() {
   const proiecte = proiecteAfisate();
 
   return (
     <>
+      <JsonLd date={jsonLdFir([{ nume: "Proiecte", cale: RUTE.proiecte }])} />
       <AntetPagina
         scris="Tabere, ateliere, cazuri umanitare"
         titlu="Proiecte"
@@ -28,7 +32,7 @@ export default function Proiecte() {
         }}
         pozaMica={{
           cale: "/poze/2024/11/347598753_3647630975458046_6343055552353416081_n.jpg",
-          alt: "Mâini la un atelier de pictură: o foaie cu o amprentă roșie de palmă, creioane colorate și sticluțe de tempera pe masă",
+          alt: "O voluntară pictează cu pensula palma unei fete, la un atelier; pe masă, foi cu amprente de palme roșii și albastre și sticluțe de tempera",
         }}
       />
 
