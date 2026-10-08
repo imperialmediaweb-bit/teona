@@ -39,11 +39,20 @@ export default function Testimoniale({
   const curent = testimoniale[activ];
 
   return (
-    <section className="bg-hartie-calda py-20 lg:py-28">
+    <section className="bg-hartie py-20 lg:py-28">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-        <h2 className="text-center text-h2 text-cerneala">
+        {/* Rândul scris de mână și fraza de sub titlu sunt textele de la
+            testimonialele de pe site-ul vechi; titlul e cel din caiet. */}
+        <p className="scris text-center text-amplu text-caramiziu-600">
+          Oameni frumoși, cuvinte de suflet
+        </p>
+        <h2 className="mt-2 text-center text-h2 text-cerneala">
           Ce spun familiile și voluntarii noștri
         </h2>
+        <p className="mx-auto mt-4 max-w-2xl text-center text-cerneala-moale">
+          Fiecare cuvânt reflectă emoție, recunoștință și bucuria de a face
+          parte din această misiune.
+        </p>
 
         <div className="relative mt-12 min-h-56">
           <AnimatePresence mode="wait" initial={false}>

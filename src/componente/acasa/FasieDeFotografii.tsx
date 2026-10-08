@@ -11,14 +11,19 @@ import { useReducedMotion } from "motion/react";
  * Asociația are 220 de fotografii reale; până acum, prima pagină nu arăta
  * aproape niciuna.
  *
+ * Banda stă pe hârtie caldă, nu pe portocaliu închis ca înainte: fundalul
+ * întunecat le stingea culorile și era aceeași nuanță cafenie pe care
+ * clientul a respins-o la erou. Pe deschis, pozele rămân în culorile lor.
+ *
  * Mișcarea e CSS pur, nu JavaScript: nu consumă nimic la derulare și se oprește
  * singură la `prefers-reduced-motion`, unde banda devine o galerie derulabilă
- * cu degetul.
+ * cu degetul. 90 de secunde pe un ciclu: se simte că se mișcă, nu că fuge.
  */
 
 const FOTOGRAFII = [
   {
-    cale: "/poze/2024/11/449517170_497189979548012_3324146063316341558_n-1.webp",
+    // Originalul nedeformat; varianta `-1.webp` era întinsă pe lățime.
+    cale: "/poze/2024/11/449517170_497189979548012_3324146063316341558_n.jpg",
     alt: "Copii și voluntari cu căști și hamuri de escaladă, într-un parc de aventură",
   },
   {
@@ -27,7 +32,9 @@ const FOTOGRAFII = [
   },
   {
     cale: "/poze/2024/11/438078420_2487218841475117_8011761126956602391_n.jpg",
-    alt: "Un copil sare în aer pe iarbă, cu părul în vânt",
+    // Textul vechi spunea că un copil sare în aer. Nu: o voluntară îl
+    // învârte în brațe. Corectat după ce m-am uitat la poză.
+    alt: "O voluntară învârte un copil în brațe, pe iarbă, în fața unei clădiri de lemn din tabără; părul îi flutură în vânt",
   },
   {
     cale: "/poze/2024/11/poza1_enhanced-1.webp",
@@ -72,22 +79,22 @@ export default function FasieDeFotografii() {
   return (
     <section
       aria-label="Fotografii din tabere și de la Casa Teona"
-      className="granulatie relative overflow-hidden bg-caramiziu-900 py-8"
+      className="granulatie relative overflow-hidden bg-hartie-calda py-10 lg:py-14"
     >
       {/* Marginile se sting în fundal, ca banda să nu pară tăiată cu cuțitul. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-caramiziu-900 to-transparent sm:w-28"
+        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-hartie-calda to-transparent sm:w-28"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-caramiziu-900 to-transparent sm:w-28"
+        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-hartie-calda to-transparent sm:w-28"
       />
       <div
         className={
           fara_miscare
-            ? "flex snap-x gap-4 overflow-x-auto px-4 pb-3"
-            : "group flex w-max gap-4 [animation:deplasare_70s_linear_infinite] hover:[animation-play-state:paused]"
+            ? "flex snap-x gap-5 overflow-x-auto px-4 pb-3"
+            : "group flex w-max gap-5 [animation:deplasare_90s_linear_infinite] hover:[animation-play-state:paused]"
         }
       >
         {banda.map((fotografie, i) => (
@@ -98,8 +105,8 @@ export default function FasieDeFotografii() {
             // egale e un carusel de șablon, nu un album.
             className={`relative shrink-0 snap-start overflow-hidden ${
               i % 2 === 0
-                ? "colt-a h-48 w-72 sm:h-64 sm:w-96"
-                : "colt-b mt-6 h-40 w-60 sm:h-52 sm:w-80"
+                ? "colt-a h-52 w-72 shadow-[0_18px_36px_-20px_rgba(247,79,34,0.45)] sm:h-72 sm:w-[26rem]"
+                : "colt-b mt-8 h-44 w-60 shadow-[0_18px_36px_-20px_rgba(255,172,0,0.5)] sm:h-60 sm:w-80"
             }`}
           >
             <Image
@@ -110,7 +117,7 @@ export default function FasieDeFotografii() {
               // publicare, care altfel o semnalează pe bună dreptate.
               aria-hidden={fotografie.copie || undefined}
               fill
-              sizes="(min-width: 640px) 384px, 288px"
+              sizes="(min-width: 640px) 416px, 288px"
               className="object-cover"
             />
           </figure>

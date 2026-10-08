@@ -17,6 +17,16 @@ import FasieDeFotografii from "@/componente/acasa/FasieDeFotografii";
 import Testimoniale, { type Testimonial } from "@/componente/acasa/Testimoniale";
 
 /**
+ * Valul dintre secțiuni se trage peste capătul secțiunii de deasupra.
+ *
+ * Fără asta, partea transparentă a curbei lasă să se vadă fundalul paginii
+ * (alb), nu culoarea secțiunii de sus — și între două secțiuni colorate
+ * apărea o pană albă. Secțiunile de deasupra au spațiu jos cât înălțimea
+ * valului, ca nimic din conținut să nu intre sub el.
+ */
+const VAL_PESTE = "relative z-10 -mt-10 sm:-mt-14 lg:-mt-20";
+
+/**
  * Accentul fiecărui card.
  *
  * Trei culori care se rotesc, nu una pe toate: ochiul le ia ca pe lucruri
@@ -28,21 +38,21 @@ const ACCENTE = [
   {
     chip: "bg-caramiziu-100 text-caramiziu-600",
     plin: "group-hover:bg-caramiziu-500",
-    umbra: "shadow-[0_18px_38px_-18px_rgba(247,79,34,0.5)]",
+    umbra: "hover:shadow-[0_22px_44px_-22px_rgba(247,79,34,0.55)]",
     numar: "text-caramiziu-300",
     fotografie: "caramiziu" as Umbra,
   },
   {
     chip: "bg-miere-100 text-miere-700",
     plin: "group-hover:bg-miere-400",
-    umbra: "shadow-[0_18px_38px_-18px_rgba(255,172,0,0.5)]",
+    umbra: "hover:shadow-[0_22px_44px_-22px_rgba(255,172,0,0.6)]",
     numar: "text-miere-300",
     fotografie: "miere" as Umbra,
   },
   {
     chip: "bg-turcoaz-100 text-turcoaz-700",
     plin: "group-hover:bg-turcoaz-500",
-    umbra: "shadow-[0_18px_38px_-18px_rgba(42,159,163,0.45)]",
+    umbra: "hover:shadow-[0_22px_44px_-22px_rgba(42,159,163,0.5)]",
     numar: "text-turcoaz-300",
     fotografie: "turcoaz" as Umbra,
   },
@@ -109,9 +119,11 @@ const CAMPANII: ReadonlyArray<{
     titlu: "Tabere pentru copii și părinți",
     text: "Zile de joacă, liniște și sprijin pentru copiii cu nevoi speciale sau care au trecut prin cancer și familiile lor.",
     destinatie: "tabere",
+    // 4:3, deci intră în rama înaltă fără să piardă oamenii de pe margini;
+    // poza panoramică de dinainte rămânea doar cu o felie din mijloc.
     poza: {
-      cale: "/poze/2024/11/351164060_277811291485883_1768298065998774964_n.webp",
-      alt: "Copii și adulți în tabără, la munte, ținând litere care formează cuvântul „Mulțumim”",
+      cale: "/poze/2024/11/438127627_457431750190502_3491066331294449444_n.jpg",
+      alt: "Copii, părinți și voluntari în tricouri albe, în fața pensiunii din tabăra RESPIRO, sub un cer cu nori albi",
       legenda: "Tabăra RESPIRO",
     },
   },
@@ -167,6 +179,11 @@ function citesteTestimoniale(): Testimonial[] {
   );
 }
 
+/*
+  Liniile scrise de mână de deasupra titlurilor sunt textele de pe prima
+  pagină a site-ului vechi, nu formulări noi. Caietul dictează titlurile și
+  textele secțiunilor; aceste rânduri stau doar unde el nu spune nimic.
+*/
 export default function PrimaPagina() {
   const testimoniale = citesteTestimoniale();
 
@@ -174,85 +191,95 @@ export default function PrimaPagina() {
     <>
       <Erou />
 
-      {/* 1.2 — bara cu cifre, fără titlu. Pe hârtie caldă, nu pe o bandă
-          întunecată cu contoare: aia e bara de statistici a oricărui șablon. */}
-      <Val culoare="text-hartie-calda" />
-      <section className="granulatie relative overflow-hidden bg-hartie-calda pt-6 pb-16 lg:pb-20">
-        {/* Semne desenate, ca pe marginea unui caiet. Decor, nu conținut. */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="stea" className="pluteste-lent absolute top-8 left-[6%] size-7 text-miere-300 lg:size-9" />
-          <Decor semn="spirala" className="pluteste-lent absolute right-[8%] bottom-10 size-8 text-turcoaz-300 lg:size-11" />
-          <Decor semn="unda" className="pluteste-lent absolute top-1/3 right-[4%] size-9 text-caramiziu-200 lg:size-12" />
-        </div>
-        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+      {/* 1.2 — bara cu cifre, fără titlu. */}
+      <Val culoare="text-hartie" className={VAL_PESTE} />
+      <section className="bg-hartie pt-8 pb-8 lg:pt-12 lg:pb-12">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="sr-only">Rezultatele noastre</h2>
           <Cifre />
         </div>
       </section>
 
       {/* 1.3 — Cum poți să ne susții */}
-      <Val culoare="text-hartie" />
-      <section className="relative overflow-hidden bg-hartie pb-20 lg:pb-28">
+      <section className="relative overflow-hidden bg-hartie pt-16 pb-24 lg:pt-20 lg:pb-32">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="inima" className="pluteste-lent absolute top-24 right-[5%] size-8 text-caramiziu-200 lg:size-11" />
-          <Decor semn="soare" className="pluteste-lent absolute bottom-16 left-[3%] size-9 text-miere-200 lg:size-12" />
+          <Decor semn="spirala" className="pluteste-lent absolute top-16 right-[4%] size-9 text-turcoaz-200 lg:size-12" />
+          <Decor semn="stea" className="pluteste-lent absolute bottom-24 left-[3%] size-8 text-miere-300 lg:size-11" />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Caietul, la 1.3: „Titlul secțiunii: «Cum poți să ne susții».
               Fără frază introductivă.” */}
           <h2 className="max-w-2xl text-h2 text-cerneala">Cum poți să ne susții</h2>
 
+          {/* Donația e cardul mare, în culoarea de identitate, pe toată
+              înălțimea coloanei din stânga; celelalte patru, pe hârtie
+              caldă, în două rânduri. Ierarhia spune singură ce contează. */}
           <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {MODURI_DE_SUSTINERE.map((mod, i) => {
-              const accent = ACCENTE[i % 3];
-              return (
-                <li key={mod.titlu} className={i === 0 ? "lg:col-span-2" : ""}>
-                  <Aparitie intarziere={i * 0.05} className="h-full">
-                    <article className="group relative h-full">
-                      <div
-                        className={`relative flex h-full flex-col gap-5 ${i % 2 === 0 ? "colt-a" : "colt-b"} bg-hartie p-6 transition-all duration-400 ease-cald group-hover:-translate-y-2 motion-reduce:group-hover:translate-y-0 ${accent.umbra} ${
-                          i === 0 ? "sm:p-8 lg:flex-row lg:items-center lg:gap-7" : ""
-                        }`}
-                      >
+              if (i === 0) {
+                return (
+                  <li key={mod.titlu} className="sm:col-span-2 lg:col-span-1 lg:row-span-2">
+                    <Aparitie className="h-full">
+                      <article className="granulatie relative flex h-full flex-col overflow-hidden colt-a bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 p-7 text-hartie shadow-[0_30px_60px_-30px_rgba(247,79,34,0.75)] sm:p-9">
+                        {/* Cercuri mari, abia vizibile, în loc de un fundal plat. */}
                         <span
-                          className={`flex shrink-0 items-center justify-center ${i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"} transition-all duration-400 ease-cald group-hover:-rotate-6 group-hover:scale-110 group-hover:text-hartie motion-reduce:group-hover:scale-100 motion-reduce:group-hover:rotate-0 ${accent.chip} ${accent.plin} ${
-                            i === 0 ? "size-16" : "size-14"
-                          }`}
-                        >
-                          <Pictograma
-                            nume={mod.pictograma}
-                            className={i === 0 ? "size-8" : "size-7"}
-                          />
+                          aria-hidden="true"
+                          className="absolute -top-20 -right-20 size-64 rounded-full border-2 border-hartie/20"
+                        />
+                        <span
+                          aria-hidden="true"
+                          className="absolute -bottom-24 -left-16 size-56 rounded-full border-2 border-hartie/15"
+                        />
+                        <span className="colt-mic-b relative flex size-16 items-center justify-center bg-hartie/15 text-hartie">
+                          <Pictograma nume={mod.pictograma} className="size-8" />
                         </span>
-
-                        <div className="flex min-w-0 flex-1 flex-col">
-                          <h3
-                            className={`text-cerneala ${i === 0 ? "text-h3" : "text-h4"}`}
+                        <h3 className="relative mt-8 text-h3 text-hartie">{mod.titlu}</h3>
+                        <p className="relative mt-3 text-amplu text-hartie/90">
+                          {mod.text}
+                        </p>
+                        <div className="relative mt-auto pt-10">
+                          {/* Pe portocaliu, butonul portocaliu ar dispărea:
+                              aici cel mai puternic contrast e albul plin. */}
+                          <Buton
+                            href={mod.href}
+                            varianta="contur"
+                            marime="mare"
+                            className="border-hartie bg-hartie text-caramiziu-600 hover:border-hartie hover:text-caramiziu-700"
                           >
-                            {mod.titlu}
-                          </h3>
-                          <p className="mt-2 flex-1 text-mic text-cerneala-moale">
-                            {mod.text}
-                          </p>
-                          {i !== 0 && (
-                            <Buton
-                              href={mod.href}
-                              varianta="contur"
-                              marime="mic"
-                              className="mt-5 self-start"
-                            >
-                              {mod.buton}
-                              <Pictograma nume="sageata" className="size-4" />
-                            </Buton>
-                          )}
-                        </div>
-
-                        {i === 0 && (
-                          <Buton href={mod.href} className="shrink-0 self-start">
                             {mod.buton}
                           </Buton>
-                        )}
-                      </div>
+                        </div>
+                      </article>
+                    </Aparitie>
+                  </li>
+                );
+              }
+
+              const accent = ACCENTE[i % 3];
+              return (
+                <li key={mod.titlu}>
+                  <Aparitie intarziere={i * 0.05} className="h-full">
+                    <article
+                      className={`group flex h-full flex-col ${i % 2 === 0 ? "colt-a" : "colt-b"} border border-hartie-umbra bg-hartie-calda p-6 transition-all duration-400 ease-cald hover:-translate-y-1.5 motion-reduce:hover:translate-y-0 sm:p-7 ${accent.umbra}`}
+                    >
+                      <span
+                        className={`flex size-14 shrink-0 items-center justify-center ${i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"} transition-all duration-400 ease-cald group-hover:-rotate-6 group-hover:text-hartie motion-reduce:group-hover:rotate-0 ${accent.chip} ${accent.plin}`}
+                      >
+                        <Pictograma nume={mod.pictograma} className="size-7" />
+                      </span>
+                      <h3 className="mt-6 text-h4 text-cerneala">{mod.titlu}</h3>
+                      <p className="mt-2 flex-1 text-mic text-cerneala-moale">
+                        {mod.text}
+                      </p>
+                      <Buton
+                        href={mod.href}
+                        varianta="contur"
+                        marime="mic"
+                        className="mt-6 self-start"
+                      >
+                        {mod.buton}
+                        <Pictograma nume="sageata" className="size-4" />
+                      </Buton>
                     </article>
                   </Aparitie>
                 </li>
@@ -263,14 +290,17 @@ export default function PrimaPagina() {
       </section>
 
       {/* 1.4 — Campaniile noastre. Fotografii în arcade, nu carduri cu poză sus. */}
-      <Val culoare="text-tenta-cald" />
-      <section className="granulatie relative overflow-hidden bg-tenta-cald pb-20 lg:pb-28">
+      <Val culoare="text-tenta-cald" className={VAL_PESTE} />
+      <section className="granulatie relative overflow-hidden bg-tenta-cald pt-10 pb-24 lg:pt-16 lg:pb-32">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
           <Decor semn="stea" className="pluteste-lent absolute top-16 right-[7%] size-8 text-caramiziu-300 lg:size-11" />
-          <Decor semn="unda" className="pluteste-lent absolute bottom-24 left-[4%] size-10 text-miere-300 lg:size-14" />
+          <Decor semn="unda" className="pluteste-lent absolute bottom-28 left-[4%] size-10 text-miere-300 lg:size-14" />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="max-w-2xl text-h2 text-cerneala">Campaniile noastre</h2>
+          <p className="scris text-amplu text-caramiziu-600">
+            Schimbăm vieți, construim speranță.
+          </p>
+          <h2 className="mt-2 max-w-2xl text-h2 text-cerneala">Campaniile noastre</h2>
 
           <ul className="mt-14 grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
             {CAMPANII.map((campanie, i) => (
@@ -289,18 +319,24 @@ export default function PrimaPagina() {
                       />
                     ) : (
                       // Fără chipuri recognoscibile: până vine o fotografie
-                      // potrivită, locul ei îl ține motto-ul, nu o poză de arhivă.
-                      <div className="relative aspect-[4/5] overflow-hidden colt-b bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 shadow-[0_22px_45px_-20px_rgba(247,79,34,0.6)] transition-transform duration-500 ease-cald group-hover:-translate-y-1.5 motion-reduce:group-hover:translate-y-0">
-                        <span
-                          aria-hidden="true"
-                          className="absolute -top-16 -right-16 size-56 rounded-full border-2 border-hartie/25"
+                      // potrivită, locul ei îl ține motto-ul, pe miere, nu o
+                      // poză de arhivă și nici un bloc greu de portocaliu.
+                      <div className="relative aspect-[4/5] overflow-hidden colt-a bg-miere-100 shadow-[0_22px_45px_-20px_rgba(255,172,0,0.6)] transition-transform duration-500 ease-cald group-hover:-translate-y-1.5 motion-reduce:group-hover:translate-y-0">
+                        <Decor
+                          semn="inima"
+                          strokeWidth={0.9}
+                          className="absolute -right-14 -bottom-12 size-64 text-miere-300"
                         />
-                        <span
-                          aria-hidden="true"
-                          className="absolute -bottom-20 -left-12 size-48 rounded-full border-2 border-hartie/20"
+                        <Decor
+                          semn="stea"
+                          className="absolute top-8 left-8 size-10 text-caramiziu-300"
+                        />
+                        <Decor
+                          semn="soare"
+                          className="absolute top-16 right-10 size-12 text-miere-400"
                         />
                         <div className="relative flex size-full items-center justify-center px-8">
-                          <p className="scris text-center text-h3 leading-tight text-hartie">
+                          <p className="scris text-center text-h3 leading-tight text-caramiziu-700">
                             „{ASOCIATIA.motto}”
                           </p>
                         </div>
@@ -328,8 +364,8 @@ export default function PrimaPagina() {
       </section>
 
       {/* 1.5 — Casa Teona */}
-      <Val culoare="text-hartie" />
-      <section className="bg-hartie pb-20 lg:pb-28">
+      <Val culoare="text-hartie" className={VAL_PESTE} />
+      <section className="bg-hartie pt-10 pb-24 lg:pt-16 lg:pb-32">
         <div className="mx-auto grid max-w-7xl items-center gap-16 px-4 sm:px-6 lg:grid-cols-2 lg:gap-20 lg:px-8">
           <Aparitie>
             <div className="relative mx-auto max-w-md lg:max-w-none">
@@ -359,15 +395,18 @@ export default function PrimaPagina() {
           </Aparitie>
 
           <Aparitie intarziere={0.1}>
-            <h2 className="text-h2 text-cerneala">Casa Teona</h2>
+            <p className="scris text-amplu text-turcoaz-700">
+              Ne dedicăm îmbunătățirii calității vieții copiilor cu nevoi speciale.
+            </p>
+            <h2 className="mt-2 text-h2 text-cerneala">Casa Teona</h2>
 
             <ul className="mt-8 grid gap-4">
-              {PUNCTE_CASA.map((punct) => (
+              {PUNCTE_CASA.map((punct, i) => (
                 <li
                   key={punct.text}
-                  className="colt-a flex items-center gap-4 bg-turcoaz-50 p-4 shadow-[0_12px_28px_-20px_rgba(42,159,163,0.9)]"
+                  className={`${i % 2 === 0 ? "colt-a" : "colt-b"} flex items-center gap-4 bg-turcoaz-50 p-4 shadow-[0_12px_28px_-20px_rgba(42,159,163,0.9)]`}
                 >
-                  <span className="colt-mic-a flex size-11 shrink-0 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
+                  <span className={`${i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"} flex size-11 shrink-0 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]`}>
                     <Pictograma nume={punct.pictograma} className="size-5" />
                   </span>
                   <span className="text-amplu text-cerneala">{punct.text}</span>
@@ -382,56 +421,12 @@ export default function PrimaPagina() {
         </div>
       </section>
 
+      <Val culoare="text-hartie-calda" className={VAL_PESTE} />
       <FasieDeFotografii />
 
-      {/* 1.7 — Ce am realizat împreună în ultimul an. Statice, fără animații. */}
-      <section className="granulatie relative overflow-hidden bg-tenta-miere py-20 lg:py-28">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="spirala" className="pluteste-lent absolute top-14 left-[5%] size-9 text-miere-400/70 lg:size-12" />
-          <Decor semn="stea" className="pluteste-lent absolute right-[6%] bottom-16 size-7 text-caramiziu-300 lg:size-10" />
-        </div>
+      {/* 1.6 — Ne susțin. Pe aceeași hârtie caldă ca fâșia de deasupra. */}
+      <section className="granulatie relative bg-hartie-calda pt-8 pb-24 lg:pt-12 lg:pb-32">
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <h2 className="max-w-2xl text-h2 text-cerneala">
-              Ce am realizat împreună în ultimul an
-            </h2>
-            <Buton href={RUTE.proiecte} varianta="secundar">
-              Vezi toate proiectele
-            </Buton>
-          </div>
-
-          <ol className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {REALIZARI.map((realizare, i) => (
-              <li
-                key={realizare.titlu}
-                className={i === 0 ? "sm:col-span-2" : undefined}
-              >
-                {/* „Cinci carduri statice, fără animații” (1.7). De aceea nu se
-                    ridică la trecerea cu mouse-ul, ca restul cardurilor. */}
-                <article className={`flex h-full gap-5 ${i % 2 === 0 ? "colt-a" : "colt-b"} bg-hartie p-6 shadow-[0_16px_34px_-20px_rgba(35,35,35,0.4)]`}>
-                  <span
-                    aria-hidden="true"
-                    className={`font-titlu text-h2 leading-none font-extrabold ${ACCENTE[i % 3].numar}`}
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <div className="min-w-0">
-                    <h3 className="text-h4 text-cerneala">{realizare.titlu}</h3>
-                    <p className="mt-1.5 text-mic text-cerneala-moale">
-                      {realizare.text}
-                    </p>
-                  </div>
-                </article>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      {/* 1.6 — Ne susțin */}
-      <Val culoare="text-hartie" />
-      <section className="bg-hartie pb-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
             <h2 className="text-h3 text-cerneala">Ne susțin</h2>
             <Link
@@ -446,9 +441,9 @@ export default function PrimaPagina() {
               prin alb-negru, aproape dispăreau. Chenarul le dă aceeași
               înălțime, așa cum cere caietul, fără să le deformeze. */}
           <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
-            {SIGLE_PRIMA_PAGINA.map((sigla) => (
+            {SIGLE_PRIMA_PAGINA.map((sigla, i) => (
               <li key={sigla.nume}>
-                <div className="colt-mic-a flex h-24 items-center justify-center bg-hartie p-4 shadow-[0_10px_26px_-18px_rgba(35,35,35,0.45)] transition-all duration-300 ease-cald hover:-translate-y-1 hover:shadow-[0_16px_32px_-16px_rgba(247,79,34,0.4)] motion-reduce:hover:translate-y-0">
+                <div className={`${i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"} flex h-24 items-center justify-center bg-hartie p-4 shadow-[0_10px_26px_-18px_rgba(35,35,35,0.45)] transition-all duration-300 ease-cald hover:-translate-y-1 hover:shadow-[0_16px_32px_-16px_rgba(247,79,34,0.4)] motion-reduce:hover:translate-y-0`}>
                   <Image
                     src={sigla.cale}
                     alt={sigla.nume}
@@ -463,10 +458,64 @@ export default function PrimaPagina() {
         </div>
       </section>
 
+      {/* 1.7 — Ce am realizat împreună în ultimul an. Statice, fără animații. */}
+      <Val culoare="text-hartie" className={VAL_PESTE} />
+      <section className="relative overflow-hidden bg-hartie pt-10 pb-20 lg:pt-16 lg:pb-28">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <Decor semn="spirala" className="pluteste-lent absolute top-14 right-[5%] size-9 text-miere-300 lg:size-12" />
+          <Decor semn="stea" className="pluteste-lent absolute bottom-16 left-[4%] size-7 text-caramiziu-300 lg:size-10" />
+        </div>
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <p className="scris text-amplu text-caramiziu-600">
+            Impactul campaniilor noastre.
+          </p>
+          <h2 className="mt-2 max-w-3xl text-h2 text-cerneala">
+            Ce am realizat împreună în ultimul an
+          </h2>
+
+          {/* Trei carduri pe primul rând și două, mai late, pe al doilea:
+              cinci egale nu încap pe un rând fără să se rupă titlurile. */}
+          <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-6">
+            {REALIZARI.map((realizare, i) => (
+              <li
+                key={realizare.titlu}
+                className={`${i < 3 ? "lg:col-span-2" : "lg:col-span-3"} ${
+                  i === 4 ? "sm:col-span-2 lg:col-span-3" : ""
+                }`}
+              >
+                {/* „Cinci carduri statice, fără animații” (1.7). De aceea nu se
+                    ridică la trecerea cu mouse-ul, ca restul cardurilor. */}
+                <article className={`flex h-full gap-5 ${i % 2 === 0 ? "colt-a" : "colt-b"} border border-hartie-umbra bg-hartie-calda p-6 sm:p-7`}>
+                  <span
+                    aria-hidden="true"
+                    className={`font-titlu text-[3rem] leading-none font-extrabold ${ACCENTE[i % 3].numar}`}
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="text-h4 text-cerneala">{realizare.titlu}</h3>
+                    <p className="mt-1.5 text-mic text-cerneala-moale">
+                      {realizare.text}
+                    </p>
+                  </div>
+                </article>
+              </li>
+            ))}
+          </ol>
+
+          {/* „Sub carduri: butonul Vezi toate proiectele” (1.7). */}
+          <div className="mt-12 text-center">
+            <Buton href={RUTE.proiecte} varianta="secundar" marime="mare">
+              Vezi toate proiectele
+            </Buton>
+          </div>
+        </div>
+      </section>
+
       {/* 1.8 — nu se randează cât timp asociația nu ne trimite testimonialele. */}
       <Testimoniale testimoniale={testimoniale} />
 
-      <IndemnFinal />
+      <IndemnFinal titlu="Dăruiește timp, dăruiește speranță!" />
     </>
   );
 }

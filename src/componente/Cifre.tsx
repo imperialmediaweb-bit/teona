@@ -1,7 +1,7 @@
 "use client";
 
 import { animate, useInView, useReducedMotion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CIFRE } from "@/date/asociatie";
 
 /** 1.500 se scrie cu punct în română; 33 și 80 rămân cum sunt. */
@@ -15,11 +15,40 @@ const CULORI = [
   { cifra: "text-caramiziu-600", linie: "text-caramiziu-300", pata: "bg-caramiziu-100" },
 ] as const;
 
+/**
+ * `useLayoutEffect` rulează după ce React a scris în DOM, dar **înainte** ca
+ * browserul să deseneze. Pe server nu există desenare, iar React se plânge
+ * dacă îl găsește acolo — de aceea pe server folosim varianta care nu face
+ * nimic.
+ */
+const inainteDeDesenare =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
+
 function Numar({ valoare, sufix }: { valoare: number; sufix: string }) {
   const referinta = useRef<HTMLSpanElement>(null);
   const vizibil = useInView(referinta, { once: true, margin: "-80px" });
   const fara_miscare = useReducedMotion();
-  const [afisat, setAfisat] = useState(fara_miscare ? valoare : 0);
+
+  /*
+    Pornim de la cifra adevărată, nu de la zero.
+
+    Varianta de dinainte punea `0` în starea inițială, deci asta ajungea și în
+    HTML-ul trimis de server: „0 tabere organizate”, „0+ copii la Casa Teona”.
+    Cifrele reale apăreau abia după ce pornea JavaScriptul. Dacă scriptul cade,
+    e blocat sau întârzie pe o conexiune proastă, omul citește că asociația a
+    organizat zero tabere și a ajutat zero copii — pe site-ul unei asociații,
+    asta e mai rău decât orice problemă de design.
+
+    Acum HTML-ul conține cifra corectă. Numărătoarea e doar un adaos: se
+    coboară la zero abia în browser, înainte de prima desenare, deci nu se vede
+    nicio pâlpâire.
+  */
+  const [afisat, setAfisat] = useState(valoare);
+
+  inainteDeDesenare(() => {
+    if (!fara_miscare) setAfisat(0);
+    // Numai la montare: după ce numărătoarea a pornit, nu mai resetăm nimic.
+  }, []);
 
   useEffect(() => {
     if (!vizibil || fara_miscare) return;
