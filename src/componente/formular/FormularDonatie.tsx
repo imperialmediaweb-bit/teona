@@ -12,6 +12,7 @@ import {
 } from "@/date/asociatie";
 import Decor from "../Decor";
 import Pictograma from "../Pictograma";
+import { citesteSuma, scrieSuma } from "@/lib/suma";
 import Camp, {
   Bifa,
   Eroare,
@@ -97,12 +98,18 @@ function Formular({
   const [erori, setErori] = useState<Erori>({});
   const [trimis, setTrimis] = useState(false);
 
-  const sumaAleasa = suma ?? (altaSuma ? Number(altaSuma.replace(",", ".")) : null);
+  // „1.000” e o mie, nu unu. `Number()` brut citea punctul ca separator
+  // zecimal și butonul scria „Donează 1 lei lunar”.
+  const scrisaDeMana = citesteSuma(altaSuma);
+  const sumaAleasa = suma ?? scrisaDeMana.suma;
   const sumaValida =
     sumaAleasa !== null && Number.isFinite(sumaAleasa) && sumaAleasa > 0;
 
+  // Suma se scrie românește pe buton: „Donează 1.500 lei”, nu „1500”, și
+  // „12,50”, nu „12.5”. E ultimul lucru pe care îl citește donatorul înainte
+  // să apese.
   const etichetaButon = sumaValida
-    ? `Donează ${sumaAleasa} lei${lunar ? " lunar" : ""}`
+    ? `Donează ${scrieSuma(sumaAleasa)}${lunar ? " lunar" : ""}`
     : `Donează${lunar ? " lunar" : ""}`;
 
   function trimite(ev: React.FormEvent<HTMLFormElement>) {

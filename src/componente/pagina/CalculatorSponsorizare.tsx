@@ -5,6 +5,7 @@ import { EMAIL } from "@/date/asociatie";
 import Buton from "../Buton";
 import Pictograma from "../Pictograma";
 import Camp, { claseControl, claseControlGresit } from "../formular/Camp";
+import { citesteSuma, laBan, scrieSuma } from "@/lib/suma";
 
 /**
  * Calculatorul fiscal pentru firme (8.4).
@@ -23,61 +24,6 @@ import Camp, { claseControl, claseControlGresit } from "../formular/Camp";
  * termene de depunere: caietul le lasă „[de confirmat]”.
  */
 
-/**
- * Peste cifra asta nu mai calculăm nimic. Nicio firmă din România nu are o
- * cifră de afaceri de un milion de miliarde de lei; dacă apare, e un zero în
- * plus de la tastatură, și omul trebuie să afle, nu să primească o sumă
- * uriașă care arată plauzibil.
- */
-const LIMITA = 1_000_000_000_000_000;
-
-const format = new Intl.NumberFormat("ro-RO", {
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 2,
-});
-
-function lei(suma: number) {
-  return `${format.format(suma)} lei`;
-}
-
-/** Rotunjire la ban: 0,75% din 100.000 iese 750,0000000000001 în virgulă mobilă. */
-function laBan(suma: number) {
-  return Math.round(suma * 100) / 100;
-}
-
-/**
- * Citește o sumă scrisă de om, nu de calculator.
- *
- * Oamenii scriu cifrele cum le văd pe bilanț: „1.250.000”, „1 250 000” sau
- * „1250000,50”. Punctul e separator de mii când grupează câte trei cifre;
- * virgula e mereu zecimală. Câmpul gol nu e eroare — omul încă n-a scris.
- */
-function citesteSuma(brut: string): { suma: number | null; eroare?: string } {
-  let text = brut.trim().replace(/\s/g, "").replace(/lei$/i, "");
-  if (text === "") return { suma: null };
-
-  if (text.includes(",")) {
-    text = text.replace(/\./g, "").replace(",", ".");
-  } else if (/^-?\d{1,3}(\.\d{3})+$/.test(text)) {
-    text = text.replace(/\./g, "");
-  }
-
-  if (!/^-?\d+(\.\d+)?$/.test(text)) {
-    return { suma: null, eroare: "Scrie suma doar în cifre, de exemplu 250.000." };
-  }
-
-  const suma = Number(text);
-  if (suma < 0 || Object.is(suma, -0)) {
-    return { suma: null, eroare: "Suma nu poate fi negativă." };
-  }
-  if (suma > LIMITA) {
-    return {
-      suma: null,
-      eroare: "Suma e mai mare decât orice cifră reală. Verifică dacă n-a intrat un zero în plus.",
-    };
-  }
-  return { suma };
-}
 
 export default function CalculatorSponsorizare() {
   const id = useId();
@@ -203,7 +149,7 @@ export default function CalculatorSponsorizare() {
         {rezultat ? (
           <>
             <p className="relative mt-3 font-titlu text-[2.4rem] leading-none font-extrabold tracking-tight break-words sm:text-[3rem]">
-              {lei(rezultat.maxim)}
+              {scrieSuma(rezultat.maxim)}
             </p>
 
             <ul className="relative mt-6 grid gap-2.5">
@@ -215,7 +161,7 @@ export default function CalculatorSponsorizare() {
                   }`}
                 >
                   <span className="text-mic font-semibold">{prag.eticheta}</span>
-                  <span className="font-titlu text-corp font-bold">{lei(prag.suma)}</span>
+                  <span className="font-titlu text-corp font-bold">{scrieSuma(prag.suma)}</span>
                   {prag.limita && (
                     <span className="basis-full text-nota font-semibold text-caramiziu-700">
                       Acesta e pragul care limitează suma.

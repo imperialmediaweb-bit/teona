@@ -5,7 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RUTE } from "@/date/asociatie";
 import { proiectDupaSlug, proiecteAfisate } from "@/date/proiecte";
-import { CATEGORII } from "@/date/proiecte-tipuri";
+import { CATEGORII, type ProiectAfisat } from "@/date/proiecte-tipuri";
 import Decor from "@/componente/Decor";
 import IndemnFinal from "@/componente/IndemnFinal";
 import Pictograma from "@/componente/Pictograma";
@@ -21,6 +21,19 @@ function altFotografie(titlu: string, index: number, total: number) {
   return `${titlu} — fotografia ${index} din ${total}`;
 }
 
+/**
+ * Toate fotografiile unui proiect, coperta inclusă.
+ *
+ * Două proiecte au `pozaPrincipala`, dar lista `poze` goală: pagina lor
+ * rămânea fără nicio imagine, deși cardul din listă afișa coperta, iar textul
+ * de dedesubt promitea fotografii.
+ */
+function pozeleProiectului(proiect: ProiectAfisat): string[] {
+  return proiect.coperta && !proiect.poze.includes(proiect.coperta)
+    ? [proiect.coperta, ...proiect.poze]
+    : proiect.poze;
+}
+
 export async function generateMetadata({
   params,
 }: PageProps<"/proiecte/[slug]">): Promise<Metadata> {
@@ -32,7 +45,7 @@ export async function generateMetadata({
   // Fără dată: `data` e data postării în WordPress, care nu e mereu data
   // taberei (câteva proiecte au fost publicate abia în noiembrie 2024).
   // Într-un rezumat de căutare ar trece drept data evenimentului.
-  const total = proiect.poze.length;
+  const total = pozeleProiectului(proiect).length;
   const fotografii =
     total === 0 ? "" : total === 1 ? " O fotografie." : ` ${total} fotografii.`;
   return metadate({
@@ -65,8 +78,9 @@ export default async function PaginaProiect({
   if (!proiect) notFound();
 
   const categorie = CATEGORII.find((c) => c.id === proiect.categorie);
-  const [prima, ...restul] = proiect.poze;
-  const total = proiect.poze.length;
+  const toatePozele = pozeleProiectului(proiect);
+  const [prima, ...restul] = toatePozele;
+  const total = toatePozele.length;
 
   return (
     <>
@@ -103,9 +117,9 @@ export default async function PaginaProiect({
                 {categorie.eticheta}
               </span>
             )}
-            {proiect.poze.length > 0 && (
+            {toatePozele.length > 0 && (
               <span className="font-titlu text-nota font-bold tracking-wider text-cerneala-slab uppercase">
-                {proiect.poze.length} fotografii
+                {toatePozele.length} fotografii
               </span>
             )}
           </div>
@@ -145,8 +159,8 @@ export default async function PaginaProiect({
                 <Pictograma nume="document" className="size-5" />
               </span>
               <span>
-                Descrierea acestui proiect se scrie împreună cu asociația. Până
-                atunci, îl poți vedea în fotografii.
+                Descrierea acestui proiect se scrie împreună cu asociația.
+                {toatePozele.length > 0 && " Până atunci, îl poți vedea în fotografii."}
               </span>
             </p>
           </div>

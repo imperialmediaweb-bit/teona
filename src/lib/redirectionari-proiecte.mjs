@@ -15,30 +15,7 @@
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-
-const LUNI_IGNORATE = /[\u{1F000}-\u{1FAFF}\u{2190}-\u{21FF}\u{2300}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}]/gu;
-
-function curataTitlu(titlu) {
-  return titlu
-    .replace(LUNI_IGNORATE, " ")
-    .replace(/\s*-\s*Asociatia Teona Ariana\s*$/i, "")
-    .replace(/\s{2,}/g, " ")
-    .replace(/\s+([,.!?])/g, "$1")
-    .trim();
-}
-
-function faSlug(text) {
-  return text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/ș|ş/g, "s")
-    .replace(/ț|ţ/g, "t")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 72)
-    .replace(/-+$/g, "");
-}
+import { SEMNE, curataTitlu, faSlug } from "./slug-proiecte.mjs";
 
 export function redirectionariProiecte() {
   const brut = JSON.parse(
@@ -76,7 +53,7 @@ export function redirectionariProiecte() {
     // decodată, oricum ar trimite-o browserul.
     let n = 0;
     const sursa = slugVechi
-      .replace(LUNI_IGNORATE, "\u0000")
+      .replace(SEMNE, "\u0000")
       .replace(/\u0000+/g, () => `:e${n++}`);
 
     reguli.push({

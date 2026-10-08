@@ -1,4 +1,7 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { pozaLocala, proiecte as proiecteBrute } from "@/lib/continut";
+import { curataTitlu, faSlug } from "@/lib/slug-proiecte.mjs";
 import type { IdCategorie, ProiectAfisat } from "./proiecte-tipuri";
 
 export { CATEGORII } from "./proiecte-tipuri";
@@ -35,40 +38,31 @@ const LUNI = [
   "iulie", "august", "septembrie", "octombrie", "noiembrie", "decembrie",
 ];
 
-/**
- * Scoate emoji și semnele decorative dintr-un titlu de postare.
- *
- * Nu merge pe o listă de emoji — apar mereu altele. Merge pe intervalele de
- * caractere: simboluri, pictograme, steaguri, modificatori de ton al pielii.
- */
-function curataTitlu(titlu: string): string {
-  return titlu
-    .replace(
-      /[\u{1F000}-\u{1FAFF}\u{2190}-\u{21FF}\u{2300}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}\u{E0020}-\u{E007F}]/gu,
-      " ",
-    )
-    .replace(/\s*-\s*Asociatia Teona Ariana\s*$/i, "")
-    .replace(/\s{2,}/g, " ")
-    .replace(/\s+([,.!?])/g, "$1")
-    .trim();
-}
-
-function faSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/ș|ş/g, "s")
-    .replace(/ț|ţ/g, "t")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 72)
-    .replace(/-+$/g, "");
-}
-
 function dataCitita(iso: string): string {
   const [an, luna, zi] = iso.slice(0, 10).split("-").map(Number);
   return `${zi} ${LUNI[luna - 1]} ${an}`;
+}
+
+/**
+ * Calea unei poze, dacă fișierul chiar există pe disc.
+ *
+ * WordPress genera pentru fiecare imagine mai multe mărimi
+ * (`…_n-1024x485.jpg`), iar unele proiecte trimit la o astfel de variantă, nu
+ * la original. Variantele n-au fost descărcate toate, așa că una dintre ele
+ * cerea un fișier inexistent: galeria proiectului „Prima tabără Respiro”
+ * afișa un pătrat gol, iar serverul răspundea 404.
+ *
+ * Aici, dacă varianta lipsește, cădem pe originalul fără sufixul de mărime.
+ * Dacă nici el nu există, poza iese din listă: mai bine o galerie cu o poză
+ * mai puțin decât un dreptunghi gol pe pagină.
+ */
+function pozaCareExista(cale: string | null): string | null {
+  if (!cale) return null;
+  const peDisc = (c: string) => existsSync(join(process.cwd(), "public", c));
+  if (peDisc(cale)) return cale;
+
+  const original = cale.replace(/-\d+x\d+(\.[a-z0-9]+)$/i, "$1");
+  return original !== cale && peDisc(original) ? original : null;
 }
 
 /** Proiectele preluate, curățate și cu slug unic. */
@@ -97,6 +91,7 @@ export function proiecteAfisate(): ProiectAfisat[] {
 
       const poze = proiect.poze
         .map(pozaLocala)
+        .map(pozaCareExista)
         .filter((p): p is string => Boolean(p));
 
       return {
@@ -105,7 +100,7 @@ export function proiecteAfisate(): ProiectAfisat[] {
         data,
         dataCitita: dataCitita(data),
         categorie,
-        coperta: pozaLocala(proiect.pozaPrincipala) ?? poze[0] ?? null,
+        coperta: pozaCareExista(pozaLocala(proiect.pozaPrincipala)) ?? poze[0] ?? null,
         poze,
       };
     })
