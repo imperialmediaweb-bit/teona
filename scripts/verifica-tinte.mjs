@@ -1,9 +1,9 @@
 // Țintele de atins sub 40 px pe o latură, la lățimile mici de telefon.
 // Linkurile din mijlocul unei fraze (inline, într-un <p>) sunt exceptate.
-// Rulare: node scripts/verifica-tinte.mjs http://localhost:3001
+// Rulare: node scripts/verifica-tinte.mjs [adresa]   (implicit http://localhost:3000)
 import { chromium } from 'playwright';
 
-const ADRESA = process.argv[2] ?? 'http://localhost:3001';
+const ADRESA = process.argv[2] ?? 'http://localhost:3000';
 const RUTE = [
   '/despre-noi', '/casa-teona', '/proiecte', '/sponsori-si-parteneri',
   '/suntem-in-presa', '/devino-voluntar', '/contact', '/doneaza',

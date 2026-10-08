@@ -13,6 +13,7 @@ import Decor from "@/componente/Decor";
 import Fotografie from "@/componente/Fotografie";
 import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
 import Val, { VAL_PESTE } from "@/componente/Val";
+import CalculatorSponsorizare from "@/componente/pagina/CalculatorSponsorizare";
 import AntetPagina from "@/componente/pagina/AntetPagina";
 import DeCopiat from "@/componente/pagina/DeCopiat";
 import DocumentDeDescarcat from "@/componente/pagina/DocumentDeDescarcat";
@@ -244,10 +245,21 @@ export default function Directioneaza20() {
         </div>
       </section>
 
-      {/* AICI: calculatorul fiscal (8.4, etapa 2) — firma introduce cifra de
-          afaceri și impozitul pe profit și primește suma maximă care poate fi
-          direcționată, cu mențiunea „Calculul este orientativ.” Se montează
-          separat, după documente și înainte de întrebările frecvente. */}
+      {/* 8.4 — calculatorul fiscal. */}
+      <Val culoare="text-tenta-turcoaz" className={VAL_PESTE} />
+      <section className="granulatie relative overflow-hidden bg-tenta-turcoaz pt-6 pb-24 lg:pt-10 lg:pb-28">
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <TitluSectiune
+            scris="Înainte de contract"
+            titlu="Cât poate direcționa firma ta"
+            text="Scrie cele două cifre din bilanț și vezi pe loc suma maximă."
+            culoare="turcoaz"
+          />
+          <div className="mt-10">
+            <CalculatorSponsorizare />
+          </div>
+        </div>
+      </section>
 
       {/* 8.5 */}
       <Val culoare="text-hartie" className={VAL_PESTE} />

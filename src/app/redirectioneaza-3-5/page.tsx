@@ -17,6 +17,7 @@ import Fotografie from "@/componente/Fotografie";
 import IndemnFinal from "@/componente/IndemnFinal";
 import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
 import Val, { VAL_PESTE } from "@/componente/Val";
+import Formular230 from "@/componente/pagina/Formular230";
 import AntetPagina from "@/componente/pagina/AntetPagina";
 import DeCopiat from "@/componente/pagina/DeCopiat";
 import DocumentDeDescarcat from "@/componente/pagina/DocumentDeDescarcat";
@@ -264,9 +265,28 @@ export default async function Redirectioneaza35() {
         </div>
       </section>
 
-      {/* AICI: formularul 230 încorporat — completarea online, pas cu pas
-          (7.10, etapa 2). Se montează separat, după documente și înainte de
-          „De ce Asociația Teona Ariana”. */}
+      {/*
+        7.10 — completarea online a Formularului 230.
+
+        Caietul o pune în „etapa 2, după validare juridică și securizare”, și
+        adaugă că CNP-ul se cere doar dacă e strict necesar. Formular230.ro
+        face exact asta ca serviciu, iar asociația are deja cont acolo: site-ul
+        vechi îl încorpora cu același token. Așa datele omului nu trec prin
+        site-ul nostru deloc.
+      */}
+      <Val culoare="text-tenta-miere" className={VAL_PESTE} />
+      <section className="granulatie relative overflow-hidden bg-tenta-miere pt-6 pb-24 lg:pt-10 lg:pb-28">
+        <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <TitluSectiune
+            scris="Fără drum la poștă"
+            titlu="Completează formularul online"
+            text="Îl completezi și îl semnezi pe ecran. Noi îl depunem la ANAF, în numele tău, înainte de termen."
+          />
+          <div className="mt-10">
+            <Formular230 linkDescarcare="#documente" />
+          </div>
+        </div>
+      </section>
 
       {/* 7.6 — De ce Asociația Teona Ariana */}
       <Val culoare="text-hartie" className={VAL_PESTE} />
