@@ -21,36 +21,35 @@ const FOTOGRAFII = [
     cale: "/poze/2024/11/448953804_497190052881338_6639192819081512267_n-1.webp",
     alt: "Copii, părinți și voluntari ai Asociației Teona Ariana, în tricouri albe, într-o tabără RESPIRO la munte",
     legenda: "Tabăra RESPIRO",
-    /* Unde stau oamenii în poză, ca textul să nu cadă peste fețe. */
-    incadrare: "center 28%",
+    incadrare: "center 30%",
   },
   {
     cale: "/poze/2024/11/449517170_497189979548012_3324146063316341558_n-1.webp",
     alt: "Copii și voluntari cu căști și hamuri de escaladă, într-un parc de aventură din tabără",
     legenda: "Parcul de aventură",
-    incadrare: "center 30%",
+    incadrare: "center 32%",
   },
   {
     cale: "/poze/2025/04/11zon_resized.webp",
     alt: "Un copil arată curcubeul pe care l-a făcut din bețișoare colorate, în sala de joacă de la Casa Teona",
     legenda: "Atelier la Casa Teona",
-    incadrare: "70% center",
+    incadrare: "62% center",
   },
 ] as const;
 
 const INTERVAL = 7000;
 
 /**
- * Secțiunea principală (1.1): o fotografie mare, pe toată lățimea, cu textul
- * peste ea.
+ * Secțiunea principală (1.1).
  *
- * Fotografia se schimbă singură, cu o trecere lentă și o apropiere abia
- * perceptibilă — nu cu tăieturi bruște. Mișcarea rapidă și contrastul care sare
- * obosesc pe oricine și sunt greu de suportat pentru copiii cu
- * hipersensibilitate vizuală, cărora li se adresează asociația.
+ * Deliberat **nu** e banda cu fotografie pe toată lățimea și text alb peste ea:
+ * aia e exact așezarea șablonului de ONG de pe care plecăm, și arată la fel pe
+ * o mie de site-uri. Aici textul stă pe hârtie, la mărimea lui, iar fotografia
+ * e mare, într-o arcadă care iese din pagină pe dreapta.
  *
- * Textul rămâne pe loc; se schimbă doar poza și legenda ei. Așa titlul cerut de
- * caiet e citibil tot timpul, nu doar o treime din el.
+ * Arcada nu e un capriciu: o formă rotunjită sus citește a poartă, a intrare —
+ * potrivit pentru o casă în care copiii sunt primiți. Și o deosebește imediat
+ * de dreptunghiul plin al oricărui șablon.
  */
 export default function Erou() {
   const fara_miscare = useReducedMotion();
@@ -73,75 +72,48 @@ export default function Erou() {
   const fotografie = FOTOGRAFII[activ];
 
   return (
-    <section
-      className="relative isolate flex min-h-[min(44rem,88svh)] items-end overflow-hidden bg-cerneala"
-      onMouseEnter={() => setOprit(true)}
-      onMouseLeave={() => setOprit(false)}
-      onFocusCapture={() => setOprit(true)}
-      onBlurCapture={() => setOprit(false)}
-    >
-      {/* Fotografia */}
-      <div className="absolute inset-0 -z-10">
-        <AnimatePresence initial={false}>
-          <motion.div
-            key={fotografie.cale}
-            initial={{ opacity: 0, scale: fara_miscare ? 1 : 1.07 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{
-              opacity: { duration: fara_miscare ? 0 : 1.3, ease: [0.4, 0, 0.2, 1] },
-              scale: {
-                duration: fara_miscare ? 0 : INTERVAL / 1000 + 1.3,
-                ease: "linear",
-              },
-            }}
-            className="absolute inset-0"
-          >
-            <Image
-              src={fotografie.cale}
-              alt={fotografie.alt}
-              fill
-              priority={activ === 0}
-              sizes="100vw"
-              style={{ objectPosition: fotografie.incadrare }}
-              className="object-cover"
-            />
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Trei straturi, nu unul: un voal uniform fade poza; aici doar baza se
-            întunecă, destul cât textul să aibă contrast, cât să rămână poza. */}
-        <div className="absolute inset-0 bg-gradient-to-t from-cerneala via-cerneala/55 to-cerneala/15" />
-        <div className="absolute inset-0 bg-gradient-to-r from-cerneala/75 via-cerneala/25 to-transparent" />
-        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-cerneala/45 to-transparent" />
+    <section className="granulatie relative overflow-hidden bg-hartie">
+      {/* Pete moi de culoare, foarte palide, care plutesc încet. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <span className="pata pata-1 absolute -top-32 -left-32 size-[30rem] rounded-full bg-tenta-cald blur-2xl" />
+        <span className="pata pata-3 absolute bottom-0 left-1/3 size-96 rounded-full bg-tenta-turcoaz blur-2xl" />
       </div>
 
-      <div className="relative mx-auto w-full max-w-7xl px-4 pt-24 pb-10 sm:px-6 lg:px-8 lg:pt-32 lg:pb-12">
-        <div className="max-w-3xl">
-          <p className="scris text-h4 text-miere-300">„{ASOCIATIA.motto}”</p>
+      <div
+        className="relative mx-auto grid max-w-7xl gap-12 px-4 pt-10 pb-14 sm:px-6 lg:grid-cols-[1fr_minmax(0,30rem)] lg:items-center lg:gap-10 lg:px-8 lg:pt-14 lg:pb-20"
+        onMouseEnter={() => setOprit(true)}
+        onMouseLeave={() => setOprit(false)}
+        onFocusCapture={() => setOprit(true)}
+        onBlurCapture={() => setOprit(false)}
+      >
+        {/* ── Textul ─────────────────────────────────────────────────────── */}
+        <div className="order-2 max-w-2xl lg:order-1">
+          <p className="scris text-h4 text-caramiziu-600">„{ASOCIATIA.motto}”</p>
 
-          <h1 className="mt-3 text-[2.75rem] leading-[1.02] text-hartie sm:text-h1 lg:text-[5rem]">
-            Împreună,{" "}
+          <h1 className="mt-2 text-[2.9rem] leading-[0.98] text-cerneala sm:text-[4rem] lg:text-[4.75rem]">
+            Împreună,
+            <br />
             <span className="relative inline-block">
-              aducem bucurie
+              aducem
               <svg
-                viewBox="0 0 300 14"
+                viewBox="0 0 300 16"
                 preserveAspectRatio="none"
                 aria-hidden="true"
-                className="absolute -bottom-1 left-0 h-2.5 w-full text-caramiziu-500 sm:-bottom-2 sm:h-4"
+                className="absolute -bottom-2 left-0 h-3 w-full text-miere-300"
               >
                 <path
-                  d="M2 9C60 3 120 2 180 5c40 2 80 5 118 3"
+                  d="M3 11C70 4 150 3 215 6c30 1.5 55 4 82 5"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="5"
+                  strokeWidth="6"
                   strokeLinecap="round"
                 />
               </svg>
-            </span>
+            </span>{" "}
+            <span className="text-caramiziu-500">bucurie</span>
           </h1>
 
-          <p className="mt-7 max-w-xl text-amplu text-hartie/85">
+          <p className="mt-8 max-w-lg text-amplu text-cerneala-moale">
             Sprijinim copiii cu nevoi speciale și pe părinții lor prin tabere,
             terapie prin joacă și consiliere. Alătură-te celor care schimbă vieți.
           </p>
@@ -153,52 +125,101 @@ export default function Erou() {
               Donează acum
             </Buton>
 
-            <p className="flex flex-col justify-center rounded-card border border-hartie/20 bg-hartie/10 px-6 py-3 backdrop-blur-md">
-              <span className="font-titlu font-bold text-miere-300">
+            <p className="flex flex-col justify-center rounded-card border-2 border-miere-200 bg-tenta-miere px-5 py-2.5">
+              <span className="font-titlu font-bold text-miere-700">
                 Trimite {SMS.text} la {SMS.numar}
               </span>
-              <span className="text-mic text-hartie/75">
+              <span className="text-mic text-cerneala-moale">
                 {SMS.sumaLunara} lunar, direct din telefon
               </span>
             </p>
+          </div>
 
-            <a
-              href={LINKURI_EXTERNE.galantomZiuaTa}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-center gap-3 rounded-card border border-hartie/20 px-5 py-3 text-hartie transition-colors duration-300 hover:border-miere-300 hover:bg-hartie/10"
-            >
+          <a
+            href={LINKURI_EXTERNE.galantomZiuaTa}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group mt-5 inline-flex items-center gap-3"
+          >
+            <span className="flex size-11 items-center justify-center rounded-2xl bg-turcoaz-100 text-turcoaz-700 transition-all duration-300 ease-cald group-hover:scale-110 group-hover:bg-turcoaz-500 group-hover:text-hartie motion-reduce:group-hover:scale-100">
               <svg
                 viewBox="0 0 24 24"
-                className="size-6 shrink-0 text-miere-300"
+                className="size-5"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth={1.6}
+                strokeWidth={1.75}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 aria-hidden="true"
               >
                 <path d="M4 10.5h16v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5v-8zM3.5 7.5h17v3h-17v-3zM12 7.5v12M12 7.5S10.5 3 8.2 3a2.1 2.1 0 0 0 0 4.5H12zM12 7.5S13.5 3 15.8 3a2.1 2.1 0 0 1 0 4.5H12z" />
               </svg>
-              <span>
-                <span className="block font-titlu font-bold">
-                  Donează-ți ziua de naștere
-                </span>
-                <span className="block text-mic text-hartie/70">
-                  Strânge fonduri de ziua ta
-                </span>
+            </span>
+            <span>
+              <span className="block font-titlu font-bold text-cerneala underline-offset-4 group-hover:underline">
+                Donează-ți ziua de naștere
               </span>
-            </a>
-          </div>
+              <span className="block text-mic text-cerneala-moale">
+                Strânge fonduri de ziua ta
+              </span>
+            </span>
+          </a>
         </div>
 
-        {/* Legenda pozei și comenzile, pe acelaşi rând, jos */}
-        <div className="mt-12 flex flex-wrap items-center justify-between gap-5 border-t border-hartie/15 pt-5">
-          <p aria-live="polite" className="scris text-amplu text-miere-300">
-            {fotografie.legenda}
-          </p>
+        {/* ── Arcada cu fotografia ───────────────────────────────────────── */}
+        <div className="relative order-1 lg:order-2 lg:-mr-16 xl:-mr-24">
+          <div className="relative mx-auto aspect-[4/5] w-full max-w-md lg:max-w-none">
+            {/* Conturul gros, decalat — ca o umbră desenată, nu estompată. */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 translate-x-3 translate-y-3 rounded-t-full rounded-b-amplu border-2 border-caramiziu-300"
+            />
 
-          <div className="flex items-center gap-3">
+            <div className="relative size-full overflow-hidden rounded-t-full rounded-b-amplu bg-hartie-calda">
+              <AnimatePresence initial={false}>
+                <motion.div
+                  key={fotografie.cale}
+                  initial={{ opacity: 0, scale: fara_miscare ? 1 : 1.08 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{
+                    opacity: {
+                      duration: fara_miscare ? 0 : 1.2,
+                      ease: [0.4, 0, 0.2, 1],
+                    },
+                    scale: {
+                      duration: fara_miscare ? 0 : INTERVAL / 1000 + 1.2,
+                      ease: "linear",
+                    },
+                  }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src={fotografie.cale}
+                    alt={fotografie.alt}
+                    fill
+                    priority={activ === 0}
+                    sizes="(min-width: 1024px) 520px, 92vw"
+                    style={{ objectPosition: fotografie.incadrare }}
+                    className="object-cover"
+                  />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Legenda, pe o pastilă care iese din arcadă. */}
+            <p
+              aria-live="polite"
+              className="absolute -bottom-3 left-6 rounded-full bg-cerneala px-5 py-2 shadow-[0_10px_26px_-12px_rgba(35,35,35,0.6)]"
+            >
+              <span className="scris text-corp leading-none text-miere-300">
+                {fotografie.legenda}
+              </span>
+            </p>
+          </div>
+
+          {/* Comenzile, sub arcadă */}
+          <div className="mt-9 flex items-center justify-center gap-3">
             {FOTOGRAFII.map((f, i) => (
               <button
                 key={f.cale}
@@ -208,10 +229,11 @@ export default function Erou() {
                 aria-current={i === activ}
                 className="group py-2"
               >
-                {/* Bara care se umple arată și unde ești, și cât mai e. */}
                 <span
-                  className={`block h-1 overflow-hidden rounded-full transition-all duration-500 ease-cald ${
-                    i === activ ? "w-16 bg-hartie/25" : "w-7 bg-hartie/25 group-hover:bg-hartie/50"
+                  className={`block h-1.5 overflow-hidden rounded-full transition-all duration-500 ease-cald ${
+                    i === activ
+                      ? "w-14 bg-hartie-umbra"
+                      : "w-3 bg-hartie-umbra group-hover:bg-caramiziu-200"
                   }`}
                 >
                   {i === activ && (

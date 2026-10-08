@@ -67,6 +67,18 @@
   --color-hartie-calda: #f9f5f2;
   --color-hartie-umbra: #efe7e1;
 
+  /*
+    Tente de fundal, foarte palide.
+
+    Regula pe tot site-ul: suprafețele mari primesc culoarea spălată aproape
+    până la alb, iar culoarea tare rămâne pentru bucăți mici — o pictogramă,
+    un buton, o legendă. Invers, adică secțiuni întregi în portocaliu aprins,
+    ar obosi ochiul și ar face butonul de donație să nu mai iasă în evidență.
+  */
+  --color-tenta-cald: #fdf3ee;
+  --color-tenta-miere: #fdf6e7;
+  --color-tenta-turcoaz: #eef8f7;
+
   --font-titlu: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
   --font-text: var(--font-nunito-sans), ui-sans-serif, system-ui, sans-serif;
   --font-scris: var(--font-kalam), ui-serif, cursive;
