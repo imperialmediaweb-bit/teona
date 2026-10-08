@@ -23,13 +23,35 @@ valorile din fabrică ale Elementor, nealese de nimeni. **Nu sunt culori de bran
 
 ## Fonturi
 
-| font | folosire |
+Site-ul actual încarcă **Quicksand** (principal), **Nunito Sans** (secundar) și
+**Kalam** (cursiv, pentru „Nimic fără Dumnezeu").
+
+**Site-ul nou folosește Nunito în locul lui Quicksand la titluri.** Motivul e
+sigla: cuvintele „Asociația Teona Ariana" sunt scrise cu un sans rotunjit cu
+„a" **cu două etaje**, iar Quicksand are „a" geometric **într-un singur etaj**
+și e mult mai lat. Puse una lângă alta, sigla și titlurile se citeau ca două
+scrisuri diferite. Comparația s-a făcut randând „Asociația Teona Ariana" în
+Quicksand, Nunito, Nunito Sans, Baloo 2 și Fredoka alături de siglă — Nunito se
+suprapune peste literele ei.
+
+| font | folosire pe site-ul nou |
 |---|---|
-| **Quicksand** | principal — titluri și text |
-| **Nunito Sans** | secundar |
+| **Nunito** (600–800) | titluri, meniu, butoane — se potrivește cu sigla |
+| **Nunito Sans** (400–700) | textul lung; aceeași familie, mai neutră la paragraf |
 | **Kalam** (cursiv) | accente scrise de mână, ca „Nimic fără Dumnezeu" |
 
-Toate trei sunt pe Google Fonts.
+Titlurile sunt la greutatea **800**: acolo Nunito are grosimea literelor siglei.
+
+Toate trei sunt pe Google Fonts și se încarcă prin `next/font`, de pe domeniul
+nostru — deci nicio cerere către Google la deschiderea paginii, deci niciun
+cookie terț de cerut acord.
+
+### Diacritice
+
+Toate trei desenează **ă â î ș ț** și majusculele lor cu **virgulă dedesubt**,
+nu cu sedilă — verificat prin randare, nu presupus. Se încarcă subsetul
+`latin-ext`, fără de care ș și ț ar cădea pe un font de rezervă și s-ar vedea
+dintr-un alt scris.
 
 ## Siglă
 

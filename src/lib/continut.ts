@@ -2,6 +2,7 @@
 // Îl citim aici o singură dată, la build, cu tipuri clare.
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { repara } from "./diacritice";
 
 const dir = join(process.cwd(), "continut");
 const citeste = <T>(fisier: string): T =>
@@ -67,11 +68,32 @@ export type FisierMedia = {
   alt: string;
 };
 
-export const pagini = () => citeste<Pagina[]>("pagini.json");
-export const proiecte = () => citeste<Proiect[]>("proiecte.json");
-export const echipa = () => citeste<MembruEchipa[]>("echipa.json");
-export const articole = () => citeste<Articol[]>("articole.json");
-export const media = () => citeste<FisierMedia[]>("media.json");
+/**
+ * Trece orice șir dintr-o structură prin `repara`, păstrând forma structurii.
+ *
+ * Textele vin din WordPress cu diacritice puse inconsecvent — pe aceeași bară
+ * de meniu scria și „Redirecționează”, și „Redirectioneaza”. Corectura se face
+ * aici, într-un singur loc, nu la fiecare afișare: așa nu există cale prin care
+ * un text să ajungă pe pagină nereparat.
+ */
+function reparaAdanc<T>(nod: T): T {
+  if (typeof nod === "string") return repara(nod) as T;
+  if (Array.isArray(nod)) return nod.map(reparaAdanc) as T;
+  if (nod && typeof nod === "object") {
+    return Object.fromEntries(
+      Object.entries(nod).map(([cheie, valoare]) => [cheie, reparaAdanc(valoare)]),
+    ) as T;
+  }
+  return nod;
+}
+
+const citesteReparat = <T>(fisier: string): T => reparaAdanc(citeste<T>(fisier));
+
+export const pagini = () => citesteReparat<Pagina[]>("pagini.json");
+export const proiecte = () => citesteReparat<Proiect[]>("proiecte.json");
+export const echipa = () => citesteReparat<MembruEchipa[]>("echipa.json");
+export const articole = () => citesteReparat<Articol[]>("articole.json");
+export const media = () => citesteReparat<FisierMedia[]>("media.json");
 
 /**
  * În conținut, adresele pozelor sunt încă cele de pe teona-ariana.ro.

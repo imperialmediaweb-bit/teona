@@ -1,26 +1,146 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+  Culorile și fonturile vin din `continut/brand.md`, extrase din site-ul actual.
+  Portocaliul #F74F22 e culoarea de identitate; galbenul #FFAC00 îl însoțește,
+  niciodată singur. Variabilele `--e-global-color-*` ale Elementorului
+  (#6EC1E4, #61CE70) nu sunt culori de brand și nu apar aici.
+*/
+
+@theme {
+  /* Portocaliu — identitatea. Scara e construită în jurul lui #F74F22. */
+  --color-caramiziu-50: #fff4f0;
+  --color-caramiziu-100: #ffe4da;
+  --color-caramiziu-200: #ffc5b0;
+  --color-caramiziu-300: #ff9b78;
+  --color-caramiziu-400: #fd6f42;
+  --color-caramiziu-500: #f74f22;
+  --color-caramiziu-600: #e03a0f;
+  --color-caramiziu-700: #b82b09;
+  --color-caramiziu-800: #93250e;
+  --color-caramiziu-900: #78220f;
+
+  /* Galben — însoțitorul. */
+  --color-miere-50: #fff9ea;
+  --color-miere-100: #fff0c4;
+  --color-miere-200: #ffe08a;
+  --color-miere-300: #ffc846;
+  --color-miere-400: #ffac00;
+  --color-miere-500: #e59000;
+  --color-miere-600: #c06c00;
+  --color-miere-700: #994d05;
+  --color-miere-800: #7e3d0b;
+  --color-miere-900: #6b330c;
+
+  /* Cerneală — text. */
+  --color-cerneala: #232323;
+  --color-cerneala-moale: #616161;
+  --color-cerneala-slab: #8a8a8a;
+
+  /* Hârtie — fundaluri. */
+  --color-hartie: #ffffff;
+  --color-hartie-calda: #f9f5f2;
+  --color-hartie-umbra: #efe7e1;
+
+  --font-titlu: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+  --font-text: var(--font-nunito-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-scris: var(--font-kalam), ui-serif, cursive;
+
+  /* Scara tipografică: raport 1.25, ancorată la 17px pentru corpul de text. */
+  --text-nota: 0.8125rem;
+  --text-mic: 0.9375rem;
+  --text-corp: 1.0625rem;
+  --text-amplu: 1.25rem;
+  --text-h4: 1.5rem;
+  --text-h3: 1.875rem;
+  --text-h2: 2.5rem;
+  --text-h1: 3.25rem;
+  --text-afis: 4.5rem;
+
+  --radius-moale: 0.75rem;
+  --radius-card: 1.25rem;
+  --radius-amplu: 2rem;
+
+  --ease-cald: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Bara de meniu rămâne vizibilă la derulare; ancorele nu intră sub ea. */
+    scroll-padding-top: 7rem;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    background-color: var(--color-hartie);
+    color: var(--color-cerneala);
+    font-family: var(--font-text);
+    font-size: var(--text-corp);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-titlu);
+    /* 800 e greutatea la care Nunito se citește ca literele siglei. */
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Inelul de focalizare: site-ul trebuie folosibil de la tastatură (12.8). */
+  :focus-visible {
+    outline: 3px solid var(--color-caramiziu-500);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-caramiziu-200);
+    color: var(--color-caramiziu-900);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Linia scrisă de mână, cu Kalam — liantul vizual al site-ului. */
+  .scris {
+    font-family: var(--font-scris);
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1.3;
+  }
+
+  /* Subliniere desenată, nu chenar: apare sub cuvântul accentuat din titluri. */
+  .subliniat {
+    background-image: linear-gradient(
+      to top,
+      var(--color-miere-200) 0.12em,
+      transparent 0.12em
+    );
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+  }
+}
+
+/* Mișcarea e decor. Cine o refuză primește site-ul static, nu unul rupt. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
