@@ -32,6 +32,31 @@
   --color-miere-800: #7e3d0b;
   --color-miere-900: #6b330c;
 
+  /*
+    Turcoaz — a treia culoare.
+
+    Aleasă pentru două motive, nu pentru că „merge bine”:
+
+    1. E complementara portocaliului pe cercul culorilor, deci îl scoate în
+       evidență în loc să concureze cu el. Portocaliul rămâne culoarea care
+       cheamă la acțiune; turcoazul e fundalul pe care se vede.
+    2. Există deja la Casa Teona — panourile de pe perete din sala de joacă
+       sunt exact nuanța asta. Nu aducem o culoare din afară.
+
+    Folosit rar și calm: pentru pictograme, pentru fundaluri liniștite și
+    pentru secțiunile despre terapie și joacă. Niciodată pe butoane de donație.
+  */
+  --color-turcoaz-50: #effbfa;
+  --color-turcoaz-100: #d6f4f2;
+  --color-turcoaz-200: #b0e8e6;
+  --color-turcoaz-300: #7ed6d5;
+  --color-turcoaz-400: #45bcbd;
+  --color-turcoaz-500: #2a9fa3;
+  --color-turcoaz-600: #227f85;
+  --color-turcoaz-700: #20666c;
+  --color-turcoaz-800: #205257;
+  --color-turcoaz-900: #1e454a;
+
   /* Cerneală — text. */
   --color-cerneala: #232323;
   --color-cerneala-moale: #616161;
@@ -128,6 +153,98 @@
     pointer-events: none;
     opacity: 0.035;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /*
+    Petele moi din fundalul eroului.
+
+    Se mișcă foarte încet (20–28 de secunde un ciclu) și foarte puțin. Un
+    fundal care pulsează repede sau cu contrast mare obosește pe oricine și
+    poate fi greu de suportat pentru copiii cu hipersensibilitate vizuală —
+    adică exact cei cărora li se adresează asociația. De aceea mișcarea e la
+    limita observabilului: se simte că pagina e vie, nu că se agită.
+  */
+  .pata {
+    animation: pluteste 24s ease-in-out infinite;
+  }
+
+  .pata-2 {
+    animation-duration: 28s;
+    animation-delay: -6s;
+  }
+
+  .pata-3 {
+    animation-duration: 21s;
+    animation-delay: -12s;
+  }
+
+  @keyframes pluteste {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(2%, -3%, 0) scale(1.06);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pata {
+      animation: none;
+    }
+  }
+
+  /* Bara care se umple sub fotografia activă din erou. */
+  .umple {
+    animation: umplere linear forwards;
+  }
+
+  @keyframes umplere {
+    from {
+      width: 0%;
+    }
+    to {
+      width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .umple {
+      animation: none;
+      width: 100%;
+    }
+  }
+
+  /* Submeniul coboară, nu apare dintr-odată. */
+  .submeniu {
+    animation: coboara 220ms var(--ease-cald) both;
+  }
+
+  @keyframes coboara {
+    from {
+      opacity: 0;
+      transform: translate3d(0, -6px, 0);
+    }
+  }
+
+  /* Intrările meniului de telefon vin pe rând, la 40 ms una după alta. */
+  .intrare-meniu {
+    animation: intra 300ms var(--ease-cald) both;
+    animation-delay: calc(var(--rand, 0) * 40ms);
+  }
+
+  @keyframes intra {
+    from {
+      opacity: 0;
+      transform: translate3d(-10px, 0, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .submeniu,
+    .intrare-meniu {
+      animation: none;
+    }
   }
 
   /* Linia scrisă de mână, cu Kalam — liantul vizual al site-ului. */

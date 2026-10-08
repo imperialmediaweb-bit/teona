@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { cacheLife } from "next/cache";
 import Link from "next/link";
 import {
@@ -11,10 +10,8 @@ import {
   TELEFOANE,
 } from "@/date/asociatie";
 import Retele from "./Retele";
+import Sigla from "./Sigla";
 import DeschideSetariCookieuri from "./DeschideSetariCookieuri";
-
-const SIGLA =
-  "/poze/2024/03/WhatsApp_Image_2024-11-15_at_11.32.41_AM-removebg-preview.png";
 
 /**
  * Anul din rândul de copyright — „anul din copyright este cel curent” (regula
@@ -45,13 +42,7 @@ export default async function Subsol() {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1.3fr]">
           <div>
-            <Image
-              src={SIGLA}
-              alt={ASOCIATIA.denumire}
-              width={436}
-              height={161}
-              className="h-14 w-auto brightness-0 invert"
-            />
+            <Sigla className="text-[1.15rem]" />
             <p className="mt-5 max-w-sm text-mic leading-relaxed">
               {ASOCIATIA.fraza}
             </p>

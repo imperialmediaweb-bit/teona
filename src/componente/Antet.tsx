@@ -1,14 +1,17 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { MENIU, RUTE, ASOCIATIA } from "@/date/asociatie";
 import Buton from "./Buton";
-
-const SIGLA =
-  "/poze/2024/03/WhatsApp_Image_2024-11-15_at_11.32.41_AM-removebg-preview.png";
+import Sigla from "./Sigla";
 
 /**
  * Meniul capătă umbră abia după ce pagina a fost derulată câțiva pixeli.
@@ -22,7 +25,17 @@ function abonareLaDerulare(reciteste: () => void) {
   return () => window.removeEventListener("scroll", reciteste);
 }
 
-/** Meniul principal (12.1). Rămâne vizibil la derulare. */
+type Pastila = { stanga: number; latime: number } | null;
+
+/**
+ * Meniul principal (12.1). Alb, cu sigla în culorile ei, lipit sus la derulare.
+ *
+ * Mișcarea: o singură pastilă care alunecă dintr-un element în altul, în loc ca
+ * fiecare să-și aprindă propriul fundal. Un obiect care se mută se urmărește cu
+ * ochii mai ușor decât zece care clipesc pe rând — contează pentru oricine, dar
+ * mai ales pentru copiii cărora li se adresează site-ul. 300 ms: destul cât să
+ * se vadă traseul, prea puțin cât să încetinească.
+ */
 export default function Antet() {
   const cale = usePathname();
   const derulat = useSyncExternalStore(
@@ -30,6 +43,7 @@ export default function Antet() {
     () => window.scrollY > 8,
     () => false,
   );
+
   // Meniul de ecran mic ține minte și pagina pe care a fost deschis. La
   // navigare, calea se schimbă și meniul se consideră închis — fără să-l
   // închidem dintr-un efect, care ar costa o randare în plus la fiecare pagină.
@@ -45,9 +59,21 @@ export default function Antet() {
     pe: cale,
   });
   const submeniuDeschis = submeniu.pe === cale ? submeniu.nume : null;
-  const setSubmeniuDeschis = (nume: string | null) => setSubmeniu({ nume, pe: cale });
+  const setSubmeniuDeschis = (nume: string | null) =>
+    setSubmeniu({ nume, pe: cale });
 
-  // Cu meniul de telefon deschis, pagina din spate nu se derulează.
+  const navigatie = useRef<HTMLElement>(null);
+  const [pastila, setPastila] = useState<Pastila>(null);
+
+  const mutaPastila = useCallback((tinta: HTMLElement | null) => {
+    const container = navigatie.current;
+    if (!container || !tinta) return setPastila(null);
+    const c = container.getBoundingClientRect();
+    const t = tinta.getBoundingClientRect();
+    setPastila({ stanga: t.left - c.left, latime: t.width });
+  }, []);
+
+  // Cu meniul de ecran mic deschis, pagina din spate nu se derulează.
   useEffect(() => {
     document.body.style.overflow = meniuDeschis ? "hidden" : "";
     return () => {
@@ -60,56 +86,68 @@ export default function Antet() {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 ease-cald ${
+      className={`sticky top-0 z-50 bg-hartie transition-shadow duration-300 ease-cald ${
         derulat
-          ? "bg-hartie/95 shadow-[0_1px_0_0_var(--color-hartie-umbra),0_8px_24px_-16px_rgba(35,35,35,0.3)] backdrop-blur-md"
-          : "bg-hartie"
+          ? "shadow-[0_1px_0_0_var(--color-hartie-umbra),0_10px_30px_-22px_rgba(35,35,35,0.45)]"
+          : ""
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <Link
           href={RUTE.acasa}
-          className="shrink-0"
           aria-label={`${ASOCIATIA.denumire} — prima pagină`}
+          className="group shrink-0"
         >
-          <Image
-            src={SIGLA}
-            alt={ASOCIATIA.denumire}
-            width={436}
-            height={161}
-            priority
-            className="h-11 w-auto sm:h-12"
-          />
+          <Sigla className="text-[0.95rem] transition-transform duration-300 ease-cald group-hover:scale-[1.03] sm:text-[1.05rem]" />
         </Link>
 
-        {/* Nouă intrări de meniu plus butonul Donează nu încap sub 1280 px fără
-            să se rupă pe două rânduri. Sub pragul ăsta trece meniul de telefon. */}
+        {/* Nouă intrări plus butonul Donează nu încap sub 1280 px fără să se
+            rupă pe două rânduri. Sub prag trece meniul de ecran mic. */}
         <nav
+          ref={navigatie}
           aria-label="Meniu principal"
-          className="ml-auto hidden items-center gap-0.5 xl:flex"
+          onMouseLeave={() => setPastila(null)}
+          className="relative ml-auto hidden items-center gap-0.5 xl:flex"
         >
+          {/* Pastila care alunecă. Decorativă: nu intră în ordinea de citire. */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute top-1/2 -z-10 h-9 -translate-y-1/2 rounded-full bg-hartie-calda transition-all duration-300 ease-cald motion-reduce:transition-none"
+            style={{
+              left: pastila?.stanga ?? 0,
+              width: pastila?.latime ?? 0,
+              opacity: pastila ? 1 : 0,
+            }}
+          />
+
           {MENIU.map((element) =>
             element.subpagini ? (
               <div
                 key={element.eticheta}
                 className="relative"
-                onMouseEnter={() => setSubmeniuDeschis(element.eticheta)}
+                onMouseEnter={(ev) => {
+                  setSubmeniuDeschis(element.eticheta);
+                  mutaPastila(ev.currentTarget.firstElementChild as HTMLElement);
+                }}
                 onMouseLeave={() => setSubmeniuDeschis(null)}
               >
                 <button
                   type="button"
                   aria-expanded={submeniuDeschis === element.eticheta}
+                  onFocus={(ev) => mutaPastila(ev.currentTarget)}
                   onClick={() =>
                     setSubmeniuDeschis(
-                      submeniuDeschis === element.eticheta ? null : element.eticheta,
+                      submeniuDeschis === element.eticheta
+                        ? null
+                        : element.eticheta,
                     )
                   }
-                  className="flex items-center gap-1 rounded-full px-2.5 py-2 font-titlu text-mic font-semibold whitespace-nowrap text-cerneala transition hover:bg-hartie-calda hover:text-caramiziu-600"
+                  className="flex items-center gap-1 rounded-full px-2.5 py-2 font-titlu text-mic font-semibold whitespace-nowrap text-cerneala transition-colors duration-200 hover:text-caramiziu-600"
                 >
                   {element.eticheta}
                   <svg
                     viewBox="0 0 12 12"
-                    className={`size-3 transition-transform duration-200 ${
+                    className={`size-3 transition-transform duration-300 ease-cald ${
                       submeniuDeschis === element.eticheta ? "rotate-180" : ""
                     }`}
                     fill="none"
@@ -122,15 +160,18 @@ export default function Antet() {
                     <path d="M3 4.5L6 7.5L9 4.5" />
                   </svg>
                 </button>
+
                 {submeniuDeschis === element.eticheta && (
                   <div className="absolute top-full left-0 w-64 pt-2">
-                    <div className="overflow-hidden rounded-moale border border-hartie-umbra bg-hartie py-1.5 shadow-[0_16px_40px_-20px_rgba(35,35,35,0.45)]">
+                    <div className="submeniu overflow-hidden rounded-card border border-hartie-umbra bg-hartie p-1.5 shadow-[0_20px_50px_-24px_rgba(35,35,35,0.5)]">
                       {element.subpagini.map((sub) => (
                         <Link
                           key={sub.href}
                           href={sub.href}
-                          className={`block px-4 py-2.5 font-titlu text-mic font-semibold whitespace-nowrap transition hover:bg-hartie-calda hover:text-caramiziu-600 ${
-                            activ(sub.href) ? "text-caramiziu-600" : "text-cerneala"
+                          className={`block rounded-moale px-3.5 py-2.5 font-titlu text-mic font-semibold whitespace-nowrap transition-colors duration-200 hover:bg-hartie-calda hover:text-caramiziu-600 ${
+                            activ(sub.href)
+                              ? "text-caramiziu-600"
+                              : "text-cerneala"
                           }`}
                         >
                           {sub.eticheta}
@@ -145,18 +186,36 @@ export default function Antet() {
                 key={element.href}
                 href={element.href!}
                 aria-current={activ(element.href!) ? "page" : undefined}
-                className={`relative rounded-full px-2.5 py-2 font-titlu text-mic font-semibold whitespace-nowrap transition hover:bg-hartie-calda hover:text-caramiziu-600 ${
+                onMouseEnter={(ev) => mutaPastila(ev.currentTarget)}
+                onFocus={(ev) => mutaPastila(ev.currentTarget)}
+                className={`relative rounded-full px-2.5 py-2 font-titlu text-mic font-semibold whitespace-nowrap transition-colors duration-200 hover:text-caramiziu-600 ${
                   activ(element.href!) ? "text-caramiziu-600" : "text-cerneala"
                 }`}
               >
                 {element.eticheta}
+                {/* Pagina curentă are liniuța ei, care rămâne pe loc și când
+                    pastila pleacă în altă parte. */}
+                {activ(element.href!) && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-x-2.5 -bottom-0.5 h-0.5 rounded-full bg-caramiziu-500"
+                  />
+                )}
               </Link>
             ),
           )}
         </nav>
 
-        <div className="ml-auto flex items-center gap-2 xl:ml-2">
+        <div className="ml-auto flex items-center gap-2 xl:ml-3">
           <Buton href={RUTE.doneaza} marime="mic" className="hidden sm:inline-flex">
+            <svg
+              viewBox="0 0 24 24"
+              className="size-4"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M12 20.5S4 15.6 4 10.3A4.3 4.3 0 0 1 12 7.9a4.3 4.3 0 0 1 8 2.4c0 5.3-8 10.2-8 10.2z" />
+            </svg>
             Donează
           </Buton>
 
@@ -164,38 +223,46 @@ export default function Antet() {
             type="button"
             onClick={() => setMeniuDeschis(!meniuDeschis)}
             aria-expanded={meniuDeschis}
-            aria-controls="meniu-telefon"
+            aria-controls="meniu-ecran-mic"
             aria-label={meniuDeschis ? "Închide meniul" : "Deschide meniul"}
             className="rounded-full p-2.5 text-cerneala transition hover:bg-hartie-calda xl:hidden"
           >
-            <svg
-              viewBox="0 0 24 24"
-              className="size-6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              aria-hidden="true"
-            >
-              {meniuDeschis ? (
-                <path d="M6 6l12 12M18 6L6 18" />
-              ) : (
-                <path d="M4 7h16M4 12h16M4 17h16" />
-              )}
-            </svg>
+            {/* Trei linii care se strâng într-un X, fiecare pe traseul ei. */}
+            <span className="relative block size-6" aria-hidden="true">
+              {[0, 1, 2].map((i) => (
+                <span
+                  key={i}
+                  className="absolute left-0 block h-0.5 w-6 rounded-full bg-current transition-all duration-300 ease-cald motion-reduce:transition-none"
+                  style={{
+                    top: meniuDeschis ? "50%" : `${25 + i * 25}%`,
+                    transform: meniuDeschis
+                      ? `translateY(-50%) rotate(${i === 2 ? -45 : 45}deg)`
+                      : "none",
+                    opacity: meniuDeschis && i === 1 ? 0 : 1,
+                  }}
+                />
+              ))}
+            </span>
           </button>
         </div>
       </div>
 
       {meniuDeschis && (
         <div
-          id="meniu-telefon"
+          id="meniu-ecran-mic"
           className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-hartie-umbra bg-hartie px-4 pb-8 xl:hidden"
         >
-          <nav aria-label="Meniu principal (ecran mic)" className="flex flex-col py-2">
-            {MENIU.map((element) =>
+          <nav
+            aria-label="Meniu principal (ecran mic)"
+            className="flex flex-col py-2"
+          >
+            {MENIU.map((element, i) =>
               element.subpagini ? (
-                <div key={element.eticheta} className="py-1">
+                <div
+                  key={element.eticheta}
+                  className="intrare-meniu py-1"
+                  style={{ "--rand": i } as React.CSSProperties}
+                >
                   <p className="px-3 pt-3 pb-1 font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
                     {element.eticheta}
                   </p>
@@ -214,7 +281,8 @@ export default function Antet() {
                   key={element.href}
                   href={element.href!}
                   aria-current={activ(element.href!) ? "page" : undefined}
-                  className={`rounded-moale px-3 py-3 font-titlu font-semibold transition hover:bg-hartie-calda ${
+                  style={{ "--rand": i } as React.CSSProperties}
+                  className={`intrare-meniu rounded-moale px-3 py-3 font-titlu font-semibold transition hover:bg-hartie-calda ${
                     activ(element.href!) ? "text-caramiziu-600" : "text-cerneala"
                   }`}
                 >
