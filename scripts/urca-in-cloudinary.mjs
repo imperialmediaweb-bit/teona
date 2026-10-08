@@ -27,7 +27,7 @@
  *   node scripts/urca-in-cloudinary.mjs --proba    # arată ce ar urca, fără să urce
  *   node scripts/urca-in-cloudinary.mjs --rescrie  # suprascrie și ce există deja
  *
- * Folderul țintă: `CLOUDINARY_FOLDER`, implicit `T1`.
+ * Folderul țintă: `CLOUDINARY_FOLDER`, implicit `Teona`.
  */
 
 import { createHash } from "node:crypto";
@@ -90,7 +90,7 @@ function semneaza(parametri, secret) {
 }
 
 async function urca(fisier, { cheie, secret, cont }, folder) {
-  // `/poze/2024/11/nume.webp` -> `T1/2024/11/nume`, fără extensie: Cloudinary
+  // `/poze/2024/11/nume.webp` -> `Teona/2024/11/nume`, fără extensie: Cloudinary
   // o alege singur la livrare, după ce acceptă browserul.
   const rel = relative(SURSA, fisier).replace(/\\/g, "/");
   const idPublic = `${folder}/${rel.replace(/\.[^.]+$/, "")}`;
@@ -131,7 +131,7 @@ async function urca(fisier, { cheie, secret, cont }, folder) {
 }
 
 const acces = dateDeAcces();
-const folder = (process.env.CLOUDINARY_FOLDER ?? "T1").trim();
+const folder = (process.env.CLOUDINARY_FOLDER ?? "Teona").trim();
 const toate = (await fisiere(SURSA)).sort();
 
 let octetiTotal = 0;

@@ -12,14 +12,14 @@
 type Parametri = { src: string; width: number; quality?: number };
 
 const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-const FOLDER = process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || "T1";
+const FOLDER = process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || "Teona";
 
 export default function incarcator({ src, width, quality }: Parametri): string {
   // O adresă completă (o siglă externă, o poză de pe alt domeniu) se lasă așa.
   if (/^https?:\/\//.test(src)) return src;
 
   if (CLOUD) {
-    // `/poze/2024/11/nume.webp` -> `T1/2024/11/nume`. Extensia lipsește
+    // `/poze/2024/11/nume.webp` -> `Teona/2024/11/nume`. Extensia lipsește
     // intenționat: `f_auto` alege formatul după ce acceptă browserul.
     const id = `${FOLDER}/${src
       .replace(/^\/poze\//, "")

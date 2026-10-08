@@ -32,7 +32,7 @@ const nextConfig: NextConfig = {
     // Cheia și secretul rămân doar pe server și nu sunt folosite de site — ele
     // trebuie doar ca să urci sau să listezi fișiere.
     NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: cloudinary,
-    NEXT_PUBLIC_CLOUDINARY_FOLDER: process.env.CLOUDINARY_FOLDER ?? "T1",
+    NEXT_PUBLIC_CLOUDINARY_FOLDER: process.env.CLOUDINARY_FOLDER ?? "Teona",
   },
 
   turbopack: {
