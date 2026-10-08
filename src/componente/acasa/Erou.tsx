@@ -236,7 +236,9 @@ export default function Erou() {
                 onClick={() => mergiLa(i)}
                 aria-label={`Fotografia ${i + 1}: ${f.legenda}`}
                 aria-current={i === activ}
-                className="group py-2"
+                // Zona de atins e de 44 px, cât cere degetul; bara colorată rămâne
+                // subțire. Fără asta, ținta avea 16×22 px și se rata.
+                className="group grid h-11 place-items-center px-1"
               >
                 {/* Bara care se umple arată și unde ești, și cât mai e. */}
                 <span

@@ -45,12 +45,12 @@ export default async function Subsol() {
             <h2 className="font-titlu text-nota font-bold tracking-wider text-hartie uppercase">
               Pagini
             </h2>
-            <ul className="mt-4 grid gap-2.5">
+            <ul className="mt-3 grid">
               {linkuriMeniu.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-mic transition hover:text-miere-300"
+                    className="inline-flex min-h-11 items-center text-mic transition hover:text-miere-300"
                   >
                     {link.eticheta}
                   </Link>
@@ -59,7 +59,7 @@ export default async function Subsol() {
               <li>
                 <Link
                   href={RUTE.doneaza}
-                  className="text-mic font-semibold text-miere-300 transition hover:text-miere-200"
+                  className="inline-flex min-h-11 items-center text-mic font-semibold text-miere-300 transition hover:text-miere-200"
                 >
                   Donează
                 </Link>
@@ -71,12 +71,12 @@ export default async function Subsol() {
             <h2 className="font-titlu text-nota font-bold tracking-wider text-hartie uppercase">
               Contact
             </h2>
-            <ul className="mt-4 grid gap-2.5 text-mic">
+            <ul className="mt-3 grid text-mic">
               {TELEFOANE.map((telefon) => (
                 <li key={telefon.apel}>
                   <a
                     href={`tel:${telefon.apel}`}
-                    className="transition hover:text-miere-300"
+                    className="inline-flex min-h-11 items-center transition hover:text-miere-300"
                   >
                     {telefon.afisat}
                   </a>
@@ -85,7 +85,7 @@ export default async function Subsol() {
               <li>
                 <a
                   href={`mailto:${EMAIL.contact}`}
-                  className="transition hover:text-miere-300"
+                  className="inline-flex min-h-11 items-center transition hover:text-miere-300"
                 >
                   {EMAIL.contact}
                 </a>
@@ -120,7 +120,7 @@ export default async function Subsol() {
         </div>
 
         <div className="mt-14 border-t border-hartie/20 pt-7">
-          <ul className="flex flex-wrap items-center gap-x-3 gap-y-2 text-nota">
+          <ul className="flex flex-wrap items-center gap-x-3 text-nota">
             <li className="font-semibold text-hartie">{ASOCIATIA.denumire}</li>
             <li aria-hidden="true">·</li>
             <li>CIF {ASOCIATIA.cif}</li>
@@ -128,14 +128,14 @@ export default async function Subsol() {
             <li>
               <Link
                 href={RUTE.confidentialitate}
-                className="transition hover:text-miere-300"
+                className="inline-flex min-h-11 items-center transition hover:text-miere-300"
               >
                 Politica de confidențialitate
               </Link>
             </li>
             <li aria-hidden="true">·</li>
             <li>
-              <Link href={RUTE.termeni} className="transition hover:text-miere-300">
+              <Link href={RUTE.termeni} className="inline-flex min-h-11 items-center transition hover:text-miere-300">
                 Termeni și condiții
               </Link>
             </li>
@@ -143,7 +143,7 @@ export default async function Subsol() {
             <li>
               <Link
                 href={RUTE.cookieuri}
-                className="transition hover:text-miere-300"
+                className="inline-flex min-h-11 items-center transition hover:text-miere-300"
               >
                 Politica de cookie-uri
               </Link>

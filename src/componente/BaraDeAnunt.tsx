@@ -61,7 +61,7 @@ export default function BaraDeAnunt() {
         type="button"
         onClick={inchide}
         aria-label="Închide anunțul"
-        className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full p-1.5 text-hartie/60 transition hover:bg-hartie/10 hover:text-hartie"
+        className="absolute top-1/2 right-1 grid size-11 -translate-y-1/2 place-items-center rounded-full text-hartie/60 transition hover:bg-hartie/10 hover:text-hartie"
       >
         <svg
           viewBox="0 0 20 20"

@@ -8,7 +8,7 @@ export default function DeschideSetariCookieuri() {
     <button
       type="button"
       onClick={() => window.dispatchEvent(new Event(EVENIMENT_REDESCHIDE))}
-      className="underline underline-offset-2 transition hover:text-miere-300"
+      className="inline-flex min-h-11 items-center underline underline-offset-2 transition hover:text-miere-300"
     >
       Setări cookie-uri
     </button>

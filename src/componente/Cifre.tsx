@@ -92,8 +92,16 @@ export default function Cifre() {
             aria-hidden="true"
             className={`absolute top-1 left-1/2 -z-10 size-20 -translate-x-1/2 rounded-full blur-xl transition-transform duration-500 ease-cald group-hover:scale-125 motion-reduce:group-hover:scale-100 lg:size-24 ${CULORI[i].pata}`}
           />
+          {/*
+            Mărimea cifrei ține cont și de lățimea ecranului.
+
+            Fixă la 3,25rem, „1.500+” măsura 170 px, iar pe un ecran de 320 px
+            cele două coloane au doar ~140 px fiecare: cifra ieșea din ecran și
+            pagina se derula lateral. De la ~500 px în sus, mărimea e exact cea
+            dinainte.
+          */}
           <p
-            className={`font-titlu text-[3.25rem] leading-none font-extrabold transition-transform duration-500 ease-cald group-hover:-translate-y-1 motion-reduce:group-hover:translate-y-0 lg:text-[4.25rem] ${CULORI[i].cifra}`}
+            className={`font-titlu text-[clamp(2.1rem,11vw,3.25rem)] leading-none font-extrabold transition-transform duration-500 ease-cald group-hover:-translate-y-1 motion-reduce:group-hover:translate-y-0 lg:text-[4.25rem] ${CULORI[i].cifra}`}
           >
             <Numar valoare={cifra.valoare} sufix={cifra.sufix} />
           </p>

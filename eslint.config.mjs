@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Copiile de lucru ale agenților care lucrează la variante în paralel.
+    // Fiecare are propriul `.next`, iar eslint raporta sute de probleme din
+    // codul generat de Turbopack, nu din proiect.
+    ".claude/**",
   ]),
 ]);
 
