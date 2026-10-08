@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd, jsonLdFir, jsonLdIntrebari, metadate } from "@/app/seo";
 import Link from "next/link";
 import {
   ASOCIATIA,
@@ -17,14 +18,15 @@ import CalculatorSponsorizare from "@/componente/pagina/CalculatorSponsorizare";
 import AntetPagina from "@/componente/pagina/AntetPagina";
 import DeCopiat from "@/componente/pagina/DeCopiat";
 import DocumentDeDescarcat from "@/componente/pagina/DocumentDeDescarcat";
-import Intrebari from "@/componente/pagina/Intrebari";
+import Intrebari, { type Intrebare } from "@/componente/pagina/Intrebari";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
 
-export const metadata: Metadata = {
-  title: "Direcționează 20%",
-  description:
-    "Firma ta poate susține copiii noștri, fără costuri suplimentare față de impozitul pe care îl plătește oricum.",
-};
+export const metadata: Metadata = metadate({
+  titlu: "Direcționează 20%",
+  descriere:
+    "Firma ta poate sponsoriza Asociația Teona Ariana Suceava din impozitul pe profit, prin contract de sponsorizare sau Declarația 177. Calculator și documente.",
+  cale: "/directioneaza-20",
+});
 
 /**
  * 8.2 — cele două căi, fiecare cu patru pași.
@@ -86,9 +88,65 @@ function initiale(nume: string) {
     .join("");
 }
 
+/**
+ * Întrebările frecvente, în afara componentei: aceeași listă ajunge și pe
+ * pagină, și în datele structurate (`FAQPage`), deci nu pot diverge.
+ */
+const INTREBARI: ReadonlyArray<Intrebare> = [
+  {
+    intrebare: "Ce este Declarația 177?",
+    raspuns: (
+      <p>
+        Este declarația prin care o firmă cere ANAF să redirecționeze
+        către o asociație sumele de sponsorizare la care avea dreptul în
+        anii anteriori, dar pe care nu le-a folosit. Banii nu ies în
+        plus din firmă: sunt sume care altfel rămân la stat.
+      </p>
+    ),
+  },
+  {
+    intrebare: "Cum funcționează?",
+    raspuns: (
+      <p>
+        Firma calculează suma de sponsorizare rămasă nealocată, semnează
+        un contract de sponsorizare cu asociația și depune Declarația
+        177 la ANAF. ANAF virează apoi suma direct în contul asociației.
+      </p>
+    ),
+  },
+  {
+    intrebare: "Ce condiții trebuie îndeplinite?",
+    raspuns: (
+      <>
+        <p>
+          Firma trebuie să fie plătitoare de impozit pe profit sau pe
+          veniturile microîntreprinderilor, să aibă un contract de
+          sponsorizare încheiat cu asociația și să nu aibă obligații
+          fiscale restante.
+        </p>
+        <p>
+          Suma care poate fi direcționată și termenele se stabilesc
+          împreună cu contabilitatea firmei, pentru anul fiscal în curs.
+        </p>
+      </>
+    ),
+  },
+  {
+    intrebare: "Cum se depune?",
+    raspuns: (
+      <p>
+        Declarația se depune electronic, prin Spațiul Privat Virtual sau
+        prin portalul ANAF, de către firmă. Noi îți trimitem contractul
+        semnat și datele asociației de care ai nevoie pentru completare.
+      </p>
+    ),
+  },
+];
+
 export default function Directioneaza20() {
   return (
     <>
+      <JsonLd date={jsonLdFir([{ nume: "Direcționează 20%", cale: RUTE.directionare20 }])} />
       <AntetPagina
         scris="Pentru firme"
         titlu="Direcționează până la 20% din impozitul pe profit"
@@ -263,6 +321,7 @@ export default function Directioneaza20() {
 
       {/* 8.5 */}
       <Val culoare="text-hartie" className={VAL_PESTE} />
+      <JsonLd date={jsonLdIntrebari(INTREBARI)} />
       <Intrebari
         scris="Pe scurt"
         titlu="Întrebări frecvente despre Declarația 177"
@@ -271,56 +330,7 @@ export default function Directioneaza20() {
           alt: "Copii, părinți și voluntari în tricouri albe, așezați pe iarbă între două bannere ale asociației, în fața pensiunii din tabără",
           legenda: "Tabăra RESPIRO",
         }}
-        intrebari={[
-          {
-            intrebare: "Ce este Declarația 177?",
-            raspuns: (
-              <p>
-                Este declarația prin care o firmă cere ANAF să redirecționeze
-                către o asociație sumele de sponsorizare la care avea dreptul în
-                anii anteriori, dar pe care nu le-a folosit. Banii nu ies în
-                plus din firmă: sunt sume care altfel rămân la stat.
-              </p>
-            ),
-          },
-          {
-            intrebare: "Cum funcționează?",
-            raspuns: (
-              <p>
-                Firma calculează suma de sponsorizare rămasă nealocată, semnează
-                un contract de sponsorizare cu asociația și depune Declarația
-                177 la ANAF. ANAF virează apoi suma direct în contul asociației.
-              </p>
-            ),
-          },
-          {
-            intrebare: "Ce condiții trebuie îndeplinite?",
-            raspuns: (
-              <>
-                <p>
-                  Firma trebuie să fie plătitoare de impozit pe profit sau pe
-                  veniturile microîntreprinderilor, să aibă un contract de
-                  sponsorizare încheiat cu asociația și să nu aibă obligații
-                  fiscale restante.
-                </p>
-                <p>
-                  Suma care poate fi direcționată și termenele se stabilesc
-                  împreună cu contabilitatea firmei, pentru anul fiscal în curs.
-                </p>
-              </>
-            ),
-          },
-          {
-            intrebare: "Cum se depune?",
-            raspuns: (
-              <p>
-                Declarația se depune electronic, prin Spațiul Privat Virtual sau
-                prin portalul ANAF, de către firmă. Noi îți trimitem contractul
-                semnat și datele asociației de care ai nevoie pentru completare.
-              </p>
-            ),
-          },
-        ]}
+        intrebari={INTREBARI}
       />
 
       {/* 8.6 */}
@@ -332,7 +342,7 @@ export default function Directioneaza20() {
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:gap-16 lg:px-8">
           <Fotografie
             cale="/poze/2024/11/351164060_277811291485883_1768298065998774964_n.webp"
-            alt="Grup de copii și adulți în tabără, ținând litere care formează cuvântul „Mulțumim”"
+            alt="Copii și adulți în tricouri EGGER țin litere care formează „Mulțumim Egger”, în fața unui hambar de lemn negru cu o lună aurie și textul „Love you to the moon and back”"
             legenda="Mulțumim"
             umbra="caramiziu"
             bloc="caramiziu"

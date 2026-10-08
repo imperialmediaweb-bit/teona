@@ -68,7 +68,7 @@ export default function NeSustin() {
                   >
                     <Image
                       src={sigla.cale}
-                      alt={sigla.nume}
+                      alt={`Sigla ${sigla.nume}`}
                       width={200}
                       height={80}
                       className="max-h-full w-auto object-contain"

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd, jsonLdFir, jsonLdIntrebari, metadate } from "@/app/seo";
 import Link from "next/link";
 import {
   ADRESE,
@@ -21,15 +22,16 @@ import Formular230 from "@/componente/pagina/Formular230";
 import AntetPagina from "@/componente/pagina/AntetPagina";
 import DeCopiat from "@/componente/pagina/DeCopiat";
 import DocumentDeDescarcat from "@/componente/pagina/DocumentDeDescarcat";
-import Intrebari from "@/componente/pagina/Intrebari";
+import Intrebari, { type Intrebare } from "@/componente/pagina/Intrebari";
 import Pasi from "@/componente/pagina/Pasi";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
 
-export const metadata: Metadata = {
-  title: "Redirecționează 3,5%",
-  description:
-    "Nu te costă nimic în plus. Prin Formularul 230 alegi ca 3,5% din impozitul pe venit să ajungă la copiii noștri.",
-};
+export const metadata: Metadata = metadate({
+  titlu: "Redirecționează 3,5%",
+  descriere:
+    "Formularul 230: redirecționezi 3,5% din impozitul pe venit către Asociația Teona Ariana Suceava, fără niciun cost. Pași, documente și termenul de 25 mai.",
+  cale: "/redirectioneaza-3-5",
+});
 
 /** 7.4 — unde se trimit formularele. */
 const UNDE: ReadonlyArray<{
@@ -74,12 +76,63 @@ const UNDE: ReadonlyArray<{
   },
 ];
 
+/**
+ * Întrebările frecvente, în afara componentei: aceeași listă ajunge și pe
+ * pagină, și în datele structurate (`FAQPage`), deci nu pot diverge.
+ */
+const INTREBARI: ReadonlyArray<Intrebare> = [
+  {
+    intrebare: "Ce înseamnă să redirecționez?",
+    raspuns: (
+      <p>
+        Înseamnă că alegi ca 3,5% din impozitul pe venit, pe care oricum
+        îl plătești statului, să ajungă la Asociația Teona Ariana. Faci
+        asta completând Formularul 230 și îl depui o singură dată pe an.
+      </p>
+    ),
+  },
+  {
+    intrebare: "Mă costă ceva?",
+    raspuns: (
+      <p>
+        Nu. Nu plătești nimic în plus și nu pierzi nimic. Statul îți ia
+        oricum impozitul pe venit, iar prin Formularul 230 alegi doar
+        unde merge 3,5% din el. Dacă nu completezi formularul, acei bani
+        rămân la stat.
+      </p>
+    ),
+  },
+  {
+    intrebare: "Pot anula sau modifica?",
+    raspuns: (
+      <p>
+        Da, până la termenul de depunere. Dacă te răzgândești, depui un
+        nou Formular 230 și cel mai recent formular depus în termen este
+        cel luat în calcul. După termen, alegerea făcută rămâne valabilă
+        pentru anul respectiv.
+      </p>
+    ),
+  },
+  {
+    intrebare: "Până când trebuie să depun?",
+    raspuns: (
+      <p>
+        Formularul 230 se depune în fiecare an, până la 25 mai, pentru
+        veniturile din anul anterior. Tu trebuie doar să îl completezi,
+        cu datele tale și semnătura. Noi ne ocupăm de restul: îl depunem
+        pentru tine, la termen.
+      </p>
+    ),
+  },
+];
+
 export default async function Redirectioneaza35() {
   const an = await anulCurent();
   const bcr = CONTURI[0];
 
   return (
     <>
+      <JsonLd date={jsonLdFir([{ nume: "Redirecționează 3,5%", cale: RUTE.redirectionare35 }])} />
       <AntetPagina
         scris="Un formular, o dată pe an"
         titlu="Redirecționează 3,5% din impozitul tău"
@@ -342,58 +395,15 @@ export default async function Redirectioneaza35() {
 
       {/* 7.7 */}
       <Val culoare="text-hartie" className={VAL_PESTE} />
+      <JsonLd date={jsonLdIntrebari(INTREBARI)} />
       <Intrebari
         scris="Pe scurt"
         poza={{
           cale: "/poze/2024/11/386090253_3250740235223267_8748916196061085905_n.jpg",
-          alt: "Copii și voluntari la mesele de sub pergola de lemn a pensiunii, la masă, în tabără",
+          alt: "Fete și femei la o masă cu prăjituri, sub pergola de lemn a pensiunii, în tabără",
           legenda: "La masă, în tabără",
         }}
-        intrebari={[
-          {
-            intrebare: "Ce înseamnă să redirecționez?",
-            raspuns: (
-              <p>
-                Înseamnă că alegi ca 3,5% din impozitul pe venit, pe care oricum
-                îl plătești statului, să ajungă la Asociația Teona Ariana. Faci
-                asta completând Formularul 230 și îl depui o singură dată pe an.
-              </p>
-            ),
-          },
-          {
-            intrebare: "Mă costă ceva?",
-            raspuns: (
-              <p>
-                Nu. Nu plătești nimic în plus și nu pierzi nimic. Statul îți ia
-                oricum impozitul pe venit, iar prin Formularul 230 alegi doar
-                unde merge 3,5% din el. Dacă nu completezi formularul, acei bani
-                rămân la stat.
-              </p>
-            ),
-          },
-          {
-            intrebare: "Pot anula sau modifica?",
-            raspuns: (
-              <p>
-                Da, până la termenul de depunere. Dacă te răzgândești, depui un
-                nou Formular 230 și cel mai recent formular depus în termen este
-                cel luat în calcul. După termen, alegerea făcută rămâne valabilă
-                pentru anul respectiv.
-              </p>
-            ),
-          },
-          {
-            intrebare: "Până când trebuie să depun?",
-            raspuns: (
-              <p>
-                Formularul 230 se depune în fiecare an, până la 25 mai, pentru
-                veniturile din anul anterior. Tu trebuie doar să îl completezi,
-                cu datele tale și semnătura. Noi ne ocupăm de restul: îl depunem
-                pentru tine, la termen.
-              </p>
-            ),
-          },
-        ]}
+        intrebari={INTREBARI}
       />
 
       {/* 7.8 — datele asociației */}

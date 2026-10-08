@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
 import { ADRESE, EMAIL, RUTE, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import Aparitie from "@/componente/Aparitie";
 import Buton from "@/componente/Buton";
@@ -11,11 +12,12 @@ import AntetPagina from "@/componente/pagina/AntetPagina";
 import Galerie from "@/componente/pagina/Galerie";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
 
-export const metadata: Metadata = {
-  title: "Casa Teona",
-  description:
-    "Un loc unde copiii cu nevoi speciale învață prin joacă, iar părinții găsesc consiliere și sprijin.",
-};
+export const metadata: Metadata = metadate({
+  titlu: "Casa Teona",
+  descriere:
+    "Casa Teona, Strada Zamca 22, Suceava: copiii cu nevoi speciale învață prin joacă, părinții găsesc consiliere. Gratuit, luni–vineri, pe bază de programare.",
+  cale: "/casa-teona",
+});
 
 /**
  * 4.2 — descrierea casei, „împărțită în blocuri scurte, cu fotografii între
@@ -52,10 +54,14 @@ const BLOCURI: ReadonlyArray<{
     paragrafe: [
       "Pentru mulți dintre copiii noștri, o petrecere obișnuită nu e ușor de organizat, iar aici găsesc un spațiu al lor, cu baloane, tort și oameni care se bucură împreună cu ei. Pentru un copil, să se simtă sărbătorit contează foarte mult.",
     ],
+    // Fotografia de dinainte (412883312…) nu era o petrecere: arăta voluntari
+    // într-o cameră modestă, la un caz umanitar, cu chipurile copiilor —
+    // caietul nu permite chipuri la cazuri umanitare. Până primim o poză de
+    // la o aniversare de la Casa Teona, stă aici atelierul de brățări.
     poza: {
-      cale: "/poze/2024/11/412883312_386434367290241_7393749290576299021_n.jpg",
-      alt: "Copii și adulți la o petrecere, într-o sală decorată",
-      legenda: "Minipetrecere",
+      cale: "/poze/2025/03/WhatsApp-Image-2025-03-18-at-15.19.17.jpeg",
+      alt: "Copii fac brățări din mărgele la o masă, lângă o fată în tricoul asociației, în sala cu pictura din junglă de la Casa Teona",
+      legenda: "La Casa Teona",
     },
     umbra: "miere",
   },
@@ -76,7 +82,13 @@ const BLOCURI: ReadonlyArray<{
   },
 ];
 
-/** 4.4 — galeria. Fotografii reale de la casă, cu descrieri scrise de mână. */
+/**
+ * 4.4 — galeria. Fotografii reale de la casă, cu descrieri scrise de mână.
+ *
+ * Două fotografii au fost scoase (144023475…, 413874579…): erau vizite la
+ * familii, la cazuri umanitare, nu de la Casa Teona, și arătau chipurile
+ * copiilor. Se întorc în galeria potrivită doar cu acordul asociației.
+ */
 const GALERIE = [
   {
     cale: "/poze/2024/11/poza1_enhanced-1.webp",
@@ -85,11 +97,7 @@ const GALERIE = [
   },
   {
     cale: "/poze/2024/11/339454935_239875385107246_1378022596723045576_n-1.jpg",
-    alt: "Un copil se joacă pe covor cu piese colorate și creioane",
-  },
-  {
-    cale: "/poze/2024/11/144023475_332382214670592_1377571819752151730_n.jpg",
-    alt: "Doi copii cu un tort, la o aniversare",
+    alt: "O fetiță îl sărută pe obraz pe un băiețel; stau pe covor, între bețișoare colorate, un puzzle cu forme și cuburi",
   },
   {
     cale: "/poze/2025/03/WhatsApp-Image-2025-03-18-at-15.19.13.jpeg",
@@ -98,15 +106,11 @@ const GALERIE = [
   },
   {
     cale: "/poze/2024/11/347598753_3647630975458046_6343055552353416081_n.jpg",
-    alt: "Mâini la un atelier de pictură: o foaie cu o amprentă roșie de palmă, creioane colorate și sticluțe de tempera pe masă",
+    alt: "O voluntară pictează cu pensula palma unei fete, la un atelier; pe masă, foi cu amprente de palme roșii și albastre și sticluțe de tempera",
   },
   {
     cale: "/poze/2024/11/438196694_1099567077821441_6735868067300369616_n-1.jpg",
-    alt: "O voluntară desenează împreună cu un copil, la masă",
-  },
-  {
-    cale: "/poze/2024/11/413874579_386434257290252_5406161119704873877_n.jpg",
-    alt: "Copii se joacă cu jucării de pluș pe o canapea, lângă un perete pictat cu cer și nori",
+    alt: "O voluntară stă la masă lângă un băiețel care ține creioane colorate deasupra unui desen",
   },
   {
     cale: "/poze/2024/11/poza3_enhanced.webp",
@@ -120,6 +124,7 @@ export default function CasaTeona() {
 
   return (
     <>
+      <JsonLd date={jsonLdFir([{ nume: "Casa Teona", cale: RUTE.casaTeona }])} />
       <AntetPagina
         scris="Aici nu există ritm greșit"
         titlu="Casa Teona"

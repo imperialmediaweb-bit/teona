@@ -42,27 +42,27 @@ const FOTOGRAFII = [
   },
   {
     cale: "/poze/2024/11/412883312_386434367290241_7393749290576299021_n.jpg",
-    alt: "Copii și adulți la o petrecere, într-o sală decorată",
+    alt: "Voluntari în veste albe cu sigla asociației, într-o cameră modestă, alături de o familie cu copii mici și pungi cu daruri",
   },
   {
     cale: "/poze/2024/11/339454935_239875385107246_1378022596723045576_n-1.jpg",
-    alt: "Un copil se joacă pe covor cu piese colorate și creioane",
+    alt: "O fetiță îl sărută pe obraz pe un băiețel; stau pe covor, între bețișoare colorate, un puzzle cu forme și cuburi",
   },
   {
     cale: "/poze/2024/11/351164060_277811291485883_1768298065998774964_n.webp",
-    alt: "Grup de copii și adulți în tabără, ținând litere care formează cuvântul „Mulțumim”",
+    alt: "Copii și adulți în tricouri EGGER țin litere care formează „Mulțumim Egger”, în fața unui hambar de lemn negru cu o lună aurie și textul „Love you to the moon and back”",
   },
   {
     cale: "/poze/2024/11/413839128_386434587290219_1905121098743660996_n.jpg",
-    alt: "Voluntari și copii, în grup, la apus",
+    alt: "Opt voluntari tineri, în veste albe cu sigla asociației, în grup, la apus",
   },
   {
     cale: "/poze/2024/11/144023475_332382214670592_1377571819752151730_n.jpg",
-    alt: "Doi copii cu un tort, la o aniversare",
+    alt: "Două fetițe țin în brațe cadouri împachetate în hârtie de Crăciun, pe o canapea, acasă",
   },
   {
     cale: "/poze/2024/11/438196694_1099567077821441_6735868067300369616_n-1.jpg",
-    alt: "O voluntară desenează împreună cu un copil, la masă",
+    alt: "O voluntară stă la masă lângă un băiețel care ține creioane colorate deasupra unui desen",
   },
 ] as const;
 

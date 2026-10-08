@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
 import Image from "next/image";
 import { ASOCIATIA, RUTE } from "@/date/asociatie";
 import Aparitie from "@/componente/Aparitie";
@@ -16,11 +17,12 @@ import {
   PARTENERI_INSTITUTIONALI,
 } from "@/date/sponsori";
 
-export const metadata: Metadata = {
-  title: "Cine suntem",
-  description:
-    "Aducem bucurie copiilor cu nevoi speciale, copiilor care au trecut prin cancer și familiilor lor.",
-};
+export const metadata: Metadata = metadate({
+  titlu: "Despre noi",
+  descriere:
+    "Povestea Asociației Teona Ariana Suceava, din 2021: taberele RESPIRO, Casa Teona, echipa, voluntarii Culegătorii de Zâmbete și partenerii instituționali.",
+  cale: "/despre-noi",
+});
 
 /**
  * 3.2 — Povestea noastră, în trei blocuri, fiecare cu fotografia lui:
@@ -195,7 +197,7 @@ const VOLUNTARI = [
   },
   {
     cale: "/poze/2024/11/413839128_386434587290219_1905121098743660996_n.jpg",
-    alt: "Voluntari și copii, în grup, la apus",
+    alt: "Opt voluntari tineri, în veste albe cu sigla asociației, în grup, la apus",
   },
 ] as const;
 
@@ -213,6 +215,7 @@ function initiale(nume: string) {
 export default function DespreNoi() {
   return (
     <>
+      <JsonLd date={jsonLdFir([{ nume: "Despre noi", cale: RUTE.despre }])} />
       <AntetPagina
         scris="Împreună, din ianuarie 2021"
         titlu="Cine suntem"

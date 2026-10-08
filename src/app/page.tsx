@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -17,6 +18,15 @@ import FasieDeFotografii from "@/componente/acasa/FasieDeFotografii";
 import NeSustin from "@/componente/acasa/NeSustin";
 import Realizari from "@/componente/acasa/Realizari";
 import Testimoniale, { type Testimonial } from "@/componente/acasa/Testimoniale";
+import { metadate } from "./seo";
+
+export const metadata: Metadata = metadate({
+  titlu: "Asociația Teona Ariana Suceava · ONG pentru copii cu dizabilități",
+  titluAbsolut: true,
+  descriere:
+    "Tabere RESPIRO, Casa Teona și sprijin pentru copiii cu autism, sindrom Down sau alte nevoi speciale și familiile lor, în Suceava. Donează sau fii voluntar.",
+  cale: "/",
+});
 
 /**
  * Valul dintre secțiuni se trage peste capătul secțiunii de deasupra.
@@ -139,6 +149,7 @@ export default function PrimaPagina() {
 
             <Buton href={RUTE.casaTeona} className="mt-9">
               Află mai multe
+              <span className="sr-only">despre Casa Teona</span>
             </Buton>
           </Aparitie>
         </div>

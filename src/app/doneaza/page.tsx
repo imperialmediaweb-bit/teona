@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd, jsonLdFir, jsonLdIntrebari, metadate } from "@/app/seo";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -17,15 +18,16 @@ import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
 import Val, { VAL_PESTE } from "@/componente/Val";
 import DeCopiat from "@/componente/pagina/DeCopiat";
 import DocumentDeDescarcat from "@/componente/pagina/DocumentDeDescarcat";
-import Intrebari from "@/componente/pagina/Intrebari";
+import Intrebari, { type Intrebare } from "@/componente/pagina/Intrebari";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
 import FormularDonatie from "@/componente/formular/FormularDonatie";
 
-export const metadata: Metadata = {
-  title: "Donează",
-  description:
-    "Alege modul care ți se potrivește: card, SMS, transfer bancar sau redirecționarea impozitului. Donația ta ne ajută enorm.",
-};
+export const metadata: Metadata = metadate({
+  titlu: "Donează",
+  descriere:
+    "Donează pentru copiii cu nevoi speciale din Suceava: cu cardul, lunar prin SMS cu SUSTIN la 8835, prin transfer bancar sau de ziua ta. Întrebări frecvente.",
+  cale: "/doneaza",
+});
 
 /** Butonul alb, pentru fundalurile colorate: acolo portocaliul ar dispărea. */
 const BUTON_ALB =
@@ -43,9 +45,147 @@ const SCURTATURI: ReadonlyArray<{
   { href: "#firme", eticheta: "Pentru firme", pictograma: "document" },
 ];
 
+/**
+ * Întrebările frecvente, în afara componentei: aceeași listă ajunge și pe
+ * pagină, și în datele structurate (`FAQPage`), deci nu pot diverge.
+ */
+const INTREBARI: ReadonlyArray<Intrebare> = [
+  {
+    intrebare: "Pot dona lunar și opri oricând?",
+    raspuns: (
+      <p>
+        Da. Poți dona lunar prin SMS sau prin card, iar donația lunară
+        se oprește oricând, fără motivare și fără penalități. Dacă ai
+        nevoie de ajutor, scrie-ne la{" "}
+        <a
+          href={`mailto:${EMAIL.contact}`}
+          className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
+        >
+          {EMAIL.contact}
+        </a>{" "}
+        sau sună-ne la {TELEFON_PRINCIPAL.afisat}.
+      </p>
+    ),
+  },
+  {
+    intrebare: "Primesc confirmare pentru donație?",
+    raspuns: (
+      <p>
+        Da. Donațiile făcute online îți aduc o confirmare pe e-mail din
+        partea platformei de plată. Pentru donațiile prin transfer
+        bancar, extrasul tău de cont este dovada plății. Dacă ai nevoie
+        de o confirmare scrisă din partea asociației, scrie-ne la{" "}
+        {EMAIL.contact} și ți-o trimitem.
+      </p>
+    ),
+  },
+  {
+    intrebare: "Donația se poate deduce?",
+    raspuns: (
+      <p>
+        Donația făcută de o persoană fizică nu se deduce din impozitul
+        pe venit. Există însă o variantă care nu te costă nimic: poți
+        redirecționa 3,5% din impozitul pe venit către asociație, fără
+        să plătești în plus. Detalii găsești la pagina{" "}
+        <Link
+          href={RUTE.redirectionare35}
+          className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
+        >
+          Redirecționează 3,5%
+        </Link>
+        . Companiile pot beneficia de facilități fiscale prin contract
+        de sponsorizare, în condițiile legii.
+      </p>
+    ),
+  },
+  {
+    intrebare: "Cum donez ca firmă?",
+    raspuns: (
+      <>
+        <p>
+          Poți dona prin transfer bancar în contul asociației sau poți
+          încheia un contract de sponsorizare, care îți permite să
+          beneficiezi de facilitățile fiscale prevăzute de lege. Date
+          pentru plată:
+        </p>
+        <ul className="grid gap-1.5">
+          <li>Titular: {ASOCIATIA.denumireLegala}</li>
+          <li>CIF: {ASOCIATIA.cif}</li>
+          {CONTURI.map((cont) => (
+            <li key={cont.iban}>
+              Cont {cont.moneda} ({cont.banca}):{" "}
+              <span className="select-all">{cont.iban}</span>
+            </li>
+          ))}
+        </ul>
+        <p>
+          Pentru un contract de sponsorizare, scrie-ne la{" "}
+          {EMAIL.contact} sau sună-ne la {TELEFON_PRINCIPAL.afisat}. Ne
+          ocupăm împreună de toate documentele. De asemenea, poți
+          direcționa până la 20% din impozitul pe profit, la pagina{" "}
+          <Link
+            href={RUTE.directionare20}
+            className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
+          >
+            Direcționează 20%
+          </Link>
+          .
+        </p>
+      </>
+    ),
+  },
+  {
+    intrebare: "Cum opresc donația lunară prin SMS?",
+    raspuns: (
+      <p>
+        Trimite textul{" "}
+        <strong className="font-titlu font-bold text-cerneala">
+          {SMS.textOprire}
+        </strong>{" "}
+        la numărul {SMS.numar}. Mesajul este gratuit.
+      </p>
+    ),
+  },
+  {
+    intrebare: "Unde ajunge donația mea?",
+    raspuns: (
+      <>
+        <p>
+          Banii strânși merg către copiii și familiile din programele
+          noastre și către activitatea de zi cu zi a asociației. Sunt
+          folosiți pentru:
+        </p>
+        <ul className="grid list-disc gap-1.5 pl-5">
+          <li>
+            taberele pentru copii cu nevoi speciale, pentru copii
+            premianți din sistemul de protecție a copilului și pentru
+            copii care au trecut prin cancer (cazare, masă, transport,
+            activități);
+          </li>
+          <li>
+            activitățile de la Casa Teona: activități pentru copii și
+            grupuri de sprijin pentru părinți;
+          </li>
+          <li>
+            cheltuielile administrative ale centrului Casa Teona
+            (întreținere, utilități și funcționare), care păstrează
+            deschisă casa pentru copii și familii;
+          </li>
+          <li>
+            cazurile umanitare: în aceste situații nu dăm bani direct
+            beneficiarilor. Plătim noi facturile clinicilor și
+            medicamentele, iar banii ajung exact unde este nevoie.
+          </li>
+        </ul>
+      </>
+    ),
+  },
+];
+
 export default function Doneaza() {
   return (
     <>
+      <JsonLd date={jsonLdFir([{ nume: "Donează", cale: RUTE.doneaza }])} />
       {/* 2.1 — antet, cu formularul de card (2.2) în prim-plan, în dreapta. */}
       <section className="granulatie relative isolate overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-14 lg:pb-32">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
@@ -226,7 +366,7 @@ export default function Doneaza() {
                 <div className="relative aspect-[16/9] w-full">
                   <Image
                     src="/poze/2024/11/449496204_497189886214688_2290669171247077659_n-768x1024.jpg"
-                    alt="Copii se țin de mână în cerc, pe iarbă, lângă o plasă de volei, sub un cer cu nori"
+                    alt="O voluntară și patru copii se țin de mână în cerc, pe iarbă, lângă o plasă de volei; un copil stă ghemuit în mijloc"
                     fill
                     sizes="(min-width: 1024px) 600px, 92vw"
                     className="object-cover"
@@ -333,6 +473,7 @@ export default function Doneaza() {
                       className="mt-5 self-start"
                     >
                       Află cum
+                      <span className="sr-only">să direcționezi 20%</span>
                       <Pictograma nume="sageata" className="size-4" />
                     </Buton>
                   </div>
@@ -377,6 +518,7 @@ export default function Doneaza() {
 
       {/* 2.5 — întrebări frecvente */}
       <Val culoare="text-hartie" className={VAL_PESTE} />
+      <JsonLd date={jsonLdIntrebari(INTREBARI)} />
       <Intrebari
         scris="Ce ne întreabă donatorii"
         poza={{
@@ -384,138 +526,7 @@ export default function Doneaza() {
           alt: "Copii și voluntari, la o masă plină cu hârtie creponată colorată, carioci și boluri, la un atelier creativ din tabără",
           legenda: "Atelier în tabără",
         }}
-        intrebari={[
-          {
-            intrebare: "Pot dona lunar și opri oricând?",
-            raspuns: (
-              <p>
-                Da. Poți dona lunar prin SMS sau prin card, iar donația lunară
-                se oprește oricând, fără motivare și fără penalități. Dacă ai
-                nevoie de ajutor, scrie-ne la{" "}
-                <a
-                  href={`mailto:${EMAIL.contact}`}
-                  className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
-                >
-                  {EMAIL.contact}
-                </a>{" "}
-                sau sună-ne la {TELEFON_PRINCIPAL.afisat}.
-              </p>
-            ),
-          },
-          {
-            intrebare: "Primesc confirmare pentru donație?",
-            raspuns: (
-              <p>
-                Da. Donațiile făcute online îți aduc o confirmare pe e-mail din
-                partea platformei de plată. Pentru donațiile prin transfer
-                bancar, extrasul tău de cont este dovada plății. Dacă ai nevoie
-                de o confirmare scrisă din partea asociației, scrie-ne la{" "}
-                {EMAIL.contact} și ți-o trimitem.
-              </p>
-            ),
-          },
-          {
-            intrebare: "Donația se poate deduce?",
-            raspuns: (
-              <p>
-                Donația făcută de o persoană fizică nu se deduce din impozitul
-                pe venit. Există însă o variantă care nu te costă nimic: poți
-                redirecționa 3,5% din impozitul pe venit către asociație, fără
-                să plătești în plus. Detalii găsești la pagina{" "}
-                <Link
-                  href={RUTE.redirectionare35}
-                  className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
-                >
-                  Redirecționează 3,5%
-                </Link>
-                . Companiile pot beneficia de facilități fiscale prin contract
-                de sponsorizare, în condițiile legii.
-              </p>
-            ),
-          },
-          {
-            intrebare: "Cum donez ca firmă?",
-            raspuns: (
-              <>
-                <p>
-                  Poți dona prin transfer bancar în contul asociației sau poți
-                  încheia un contract de sponsorizare, care îți permite să
-                  beneficiezi de facilitățile fiscale prevăzute de lege. Date
-                  pentru plată:
-                </p>
-                <ul className="grid gap-1.5">
-                  <li>Titular: {ASOCIATIA.denumireLegala}</li>
-                  <li>CIF: {ASOCIATIA.cif}</li>
-                  {CONTURI.map((cont) => (
-                    <li key={cont.iban}>
-                      Cont {cont.moneda} ({cont.banca}):{" "}
-                      <span className="select-all">{cont.iban}</span>
-                    </li>
-                  ))}
-                </ul>
-                <p>
-                  Pentru un contract de sponsorizare, scrie-ne la{" "}
-                  {EMAIL.contact} sau sună-ne la {TELEFON_PRINCIPAL.afisat}. Ne
-                  ocupăm împreună de toate documentele. De asemenea, poți
-                  direcționa până la 20% din impozitul pe profit, la pagina{" "}
-                  <Link
-                    href={RUTE.directionare20}
-                    className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
-                  >
-                    Direcționează 20%
-                  </Link>
-                  .
-                </p>
-              </>
-            ),
-          },
-          {
-            intrebare: "Cum opresc donația lunară prin SMS?",
-            raspuns: (
-              <p>
-                Trimite textul{" "}
-                <strong className="font-titlu font-bold text-cerneala">
-                  {SMS.textOprire}
-                </strong>{" "}
-                la numărul {SMS.numar}. Mesajul este gratuit.
-              </p>
-            ),
-          },
-          {
-            intrebare: "Unde ajunge donația mea?",
-            raspuns: (
-              <>
-                <p>
-                  Banii strânși merg către copiii și familiile din programele
-                  noastre și către activitatea de zi cu zi a asociației. Sunt
-                  folosiți pentru:
-                </p>
-                <ul className="grid list-disc gap-1.5 pl-5">
-                  <li>
-                    taberele pentru copii cu nevoi speciale, pentru copii
-                    premianți din sistemul de protecție a copilului și pentru
-                    copii care au trecut prin cancer (cazare, masă, transport,
-                    activități);
-                  </li>
-                  <li>
-                    activitățile de la Casa Teona: activități pentru copii și
-                    grupuri de sprijin pentru părinți;
-                  </li>
-                  <li>
-                    cheltuielile administrative ale centrului Casa Teona
-                    (întreținere, utilități și funcționare), care păstrează
-                    deschisă casa pentru copii și familii;
-                  </li>
-                  <li>
-                    cazurile umanitare: în aceste situații nu dăm bani direct
-                    beneficiarilor. Plătim noi facturile clinicilor și
-                    medicamentele, iar banii ajung exact unde este nevoie.
-                  </li>
-                </ul>
-              </>
-            ),
-          },
-        ]}
+        intrebari={INTREBARI}
       />
     </>
   );

@@ -53,7 +53,7 @@ const REALIZARI: ReadonlyArray<{
     pictograma: "joaca",
     poza: {
       cale: "/poze/2025/03/WhatsApp-Image-2025-03-18-at-15.19.17.jpeg",
-      alt: "Copii fac brățări din mărgele la o masă, alături de o voluntară în tricoul asociației, în sala cu pictura din junglă de la Casa Teona",
+      alt: "Copii fac brățări din mărgele la o masă, lângă o fată în tricoul asociației, în sala cu pictura din junglă de la Casa Teona",
     },
   },
   {

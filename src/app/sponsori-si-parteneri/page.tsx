@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
 import Image from "next/image";
 import Link from "next/link";
 import { ASOCIATIA, RUTE } from "@/date/asociatie";
@@ -11,10 +12,12 @@ import Val, { VAL_PESTE } from "@/componente/Val";
 import AntetPagina from "@/componente/pagina/AntetPagina";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
 
-export const metadata: Metadata = {
-  title: "Sponsori și parteneri",
-  description: "Mulțumim companiilor care ne sunt alături.",
-};
+export const metadata: Metadata = metadate({
+  titlu: "Sponsori și parteneri",
+  descriere:
+    "Firmele care sprijină taberele RESPIRO, Casa Teona și cazurile umanitare ale Asociației Teona Ariana Suceava, și cum poate firma ta să li se alăture.",
+  cale: "/sponsori-si-parteneri",
+});
 
 /**
  * 6.2 — testimonialele sponsorilor.
@@ -46,6 +49,7 @@ const LINII = ["border-t-caramiziu-400", "border-t-miere-400", "border-t-turcoaz
 export default function SponsoriSiParteneri() {
   return (
     <>
+      <JsonLd date={jsonLdFir([{ nume: "Sponsori și parteneri", cale: RUTE.sponsori }])} />
       <AntetPagina
         scris="Împreună cu cei care cred în noi"
         titlu="Sponsori și parteneri"
@@ -53,7 +57,7 @@ export default function SponsoriSiParteneri() {
         accent="miere"
         poza={{
           cale: "/poze/2024/11/351164060_277811291485883_1768298065998774964_n.webp",
-          alt: "Grup de copii și adulți în tabără, ținând litere care formează cuvântul „Mulțumim”",
+          alt: "Copii și adulți în tricouri EGGER țin litere care formează „Mulțumim Egger”, în fața unui hambar de lemn negru cu o lună aurie și textul „Love you to the moon and back”",
           legenda: "Mulțumim",
         }}
         pozaMica={{

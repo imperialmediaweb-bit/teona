@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
 import Image from "next/image";
+import { RUTE } from "@/date/asociatie";
 import Aparitie from "@/componente/Aparitie";
 import Buton from "@/componente/Buton";
 import Decor from "@/componente/Decor";
@@ -8,10 +10,12 @@ import Pictograma from "@/componente/Pictograma";
 import AntetPagina from "@/componente/pagina/AntetPagina";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
 
-export const metadata: Metadata = {
-  title: "Suntem în presă",
-  description: "Presa, alături de misiunea noastră.",
-};
+export const metadata: Metadata = metadate({
+  titlu: "Suntem în presă",
+  descriere:
+    "Articole despre Asociația Teona Ariana Suceava în Monitorul de Suceava, Obiectiv de Suceava, Suceava News și suceava.online: tabere RESPIRO și evenimente.",
+  cale: "/suntem-in-presa",
+});
 
 /** Siglele publicațiilor, așa cum erau și pe site-ul vechi. */
 const PUBLICATII = {
@@ -118,6 +122,7 @@ const LINII = ["border-t-caramiziu-400", "border-t-miere-400", "border-t-turcoaz
 export default function SuntemInPresa() {
   return (
     <>
+      <JsonLd date={jsonLdFir([{ nume: "Suntem în presă", cale: RUTE.media }])} />
       <AntetPagina
         scris="Presa, alături de misiunea noastră"
         titlu="Suntem în presă"
@@ -132,7 +137,7 @@ export default function SuntemInPresa() {
         }}
         pozaMica={{
           cale: "/poze/2024/11/378583324_6701686126586406_7869118802634728634_n-1.jpg",
-          alt: "Un băiat în tricoul alb al asociației, cu brațele ridicate, pe iarbă, în fața pensiunii; în spate, alți copii și voluntari",
+          alt: "Un copil zâmbitor, în tricoul alb al asociației, cu mâinile la cap, pe iarbă, în fața pensiunii; în spate, alți copii și voluntari",
         }}
       />
 

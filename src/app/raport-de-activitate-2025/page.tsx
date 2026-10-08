@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
 import Link from "next/link";
 import { ADRESE, ASOCIATIA, EMAIL, RUTE, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import Buton from "@/componente/Buton";
@@ -6,11 +7,12 @@ import Decor from "@/componente/Decor";
 import Pictograma from "@/componente/Pictograma";
 import Val, { VAL_PESTE } from "@/componente/Val";
 
-export const metadata: Metadata = {
-  title: "Raport de activitate 2025",
-  description:
-    "Ce am făcut în 2025 și cum am folosit fiecare leu: tabere, Casa Teona, campanii sociale, venituri și cheltuieli.",
-};
+export const metadata: Metadata = metadate({
+  titlu: "Raport de activitate 2025",
+  descriere:
+    "Raportul anual 2025 al Asociației Teona Ariana Suceava: tabere RESPIRO, Casa Teona, campanii sociale, parteneri, sponsori, venituri și cheltuieli.",
+  cale: "/raport-de-activitate-2025",
+});
 
 /**
  * Raportul anual de activitate 2025 (secțiunea Transparență, 3.8).
@@ -296,6 +298,12 @@ function Tabel({
 export default function Raport2025() {
   return (
     <>
+      <JsonLd
+        date={jsonLdFir([
+          { nume: "Despre noi", cale: RUTE.despre },
+          { nume: "Raport de activitate 2025", cale: RUTE.raport2025 },
+        ])}
+      />
       <section className="granulatie relative isolate overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-12 lg:pb-32">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
           <span className="pata absolute -top-32 right-[-8%] size-[26rem] rounded-full bg-caramiziu-100/60 blur-3xl" />
