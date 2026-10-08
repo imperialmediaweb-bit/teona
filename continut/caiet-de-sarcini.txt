@@ -1,0 +1,671 @@
+
+========== PAGINA 1 ==========
+Lista de modificări pentru teona-ariana.ro
+Reguli valabile pe tot site-ul
+• Tot conținutul este în limba română, cu diacritice. Se elimină orice text în engleză rămas din șablon și
+toate imaginile demo.
+• Numele site-ului este „Asociația Teona Ariana Suceava”, nu „My Blog”. Anul din copyright este cel
+curent.
+• Butonul „Devino partener” duce peste tot la pagina Direcționează 20%.
+• Niciun buton sau link nu rămâne fără destinație. Fiecare buton duce unde promite. Se verifică toate
+linkurile de pe toate paginile.
+• Numerele de telefon se pot apela dintr-un click de pe mobil, iar adresele de email deschid aplicația de
+email.
+• Cifrele sunt aceleași peste tot: 33 de tabere organizate, peste 1.500 de participanți, peste 80 de copii
+la Casa Teona, peste 300 de voluntari. Asociația le poate modifica singură.
+• Datele asociației: Asociația Teona Ariana Suceava, CIF 43533953, telefoane 0754 510 167 și 0748 250
+704, email contact@teona-ariana.ro. Conturile bancare sunt cele de la pagina Donează.
+• Orice formular care colectează date personale are un acord GDPR și mesaje în română. După
+trimitere, persoana vede un mesaj de confirmare.
+• Se șterge sau se ascunde din motoarele de căutare pagina duplicat „Home Page Elementor 1” (adresa
+/home-page-1/) și se elimină categoria „Uncategorized”. Comentariile la articole se dezactivează, iar
+butoanele rămase în engleză („Read more” etc.) se traduc.
+• Site-ul trebuie să funcționeze bine pe telefon, cu imagini optimizate, ca să se încarce rapid.
+Lista de modificări teona-ariana.ro · pagina 1
+========== PAGINA 2 ==========
+1. Home (prima pagină)
+Secțiunile apar în ordinea de mai jos, de sus în jos. Meniul, bara de anunț, newsletterul și subsolul sunt
+descrise la „Elemente comune”.
+1.1 Secțiunea principală
+• Se înlocuiește mesajul generic cu titlul și fraza de mai jos, plus o fotografie recentă, cu textul
+alternativ „Copii și voluntari ai Asociației Teona Ariana, într-o tabără”.
+• Sub text apar trei elemente, în această ordine: butonul Donează acum (duce la pagina Donează);
+blocul Trimite SUSTIN la 8835, cu textul „5 € lunar, direct din telefon”, care este doar informație, nu
+buton; butonul Donează-ți ziua de naștere, cu textul „Strânge fonduri de ziua ta” (duce la pagina
+asociației de pe Galantom, https://dar.galantom.ro/fundraising_pages/create?id_project=2457).
+• Zona rămâne curată: fără alte texte sub butoane.
+Titlu
+Împreună, aducem bucurie
+Frază
+Sprijinim copiii cu nevoi speciale și pe părinții lor prin tabere, terapie prin joacă și consiliere. Alătură-te
+celor care schimbă vieți.
+1.2 Bara cu cifre
+• Patru cifre pe un rând, fără titlu. Pe telefon se așază câte două pe rând.
+• 33 · tabere organizate
+• 1.500+ · participanți
+• 80+ · copii la Casa Teona
+• 300+ · voluntari
+1.3 Cum poți să ne susții
+Titlul secțiunii: „Cum poți să ne susții”. Fără frază introductivă. Cinci carduri, fiecare cu titlu, text scurt și un
+buton funcțional:
+Cardul 1 · Donează
+Orice sumă contează enorm pentru a ne putea continua activitatea.
+• Buton: Donează acum · duce la pagina Donează.
+Cardul 2 · Donează lunar prin SMS
+Trimite SUSTIN la 8835 și donezi 5 € pe lună, fără formulare.
+• Buton: Cum funcționează · duce la pagina Donează, direct la blocul SMS.
+Cardul 3 · Redirecționează 3,5%
+Din impozitul pe venit, fără niciun cost pentru tine.
+• Buton: Redirecționează · duce la pagina Redirecționează 3,5%.
+Cardul 4 · Sponsorizează
+Pentru firme: sponsorizare prin contract și direcționare din impozitul pe profit.
+• Buton: Devino partener · duce la pagina Direcționează 20%.
+Lista de modificări teona-ariana.ro · pagina 2
+========== PAGINA 3 ==========
+Cardul 5 · Devino voluntar
+Alătură-te celor peste 300 de voluntari care ne sunt alături.
+• Buton: Vreau să ajut · duce la pagina Devino voluntar.
+1.4 Campaniile noastre
+• Se elimină campaniile vechi, cu sume strânse și ținte. În loc, apar trei campanii fixe, fără sume, fără
+bare de progres și fără termene.
+• Fiecare campanie are o imagine recentă, un titlu, o frază și butonul Susține, care duce la pagina
+Donează cu destinația donației deja aleasă. Imaginea de la „Cazuri umanitare” este fără chipuri
+recognoscibile.
+Tabere pentru copii și părinți
+Zile de joacă, liniște și sprijin pentru copiii cu nevoi speciale sau care au trecut prin cancer și familiile lor.
+Casa Teona
+Un loc în care copiii învață prin joacă, iar părinții găsesc consiliere și sprijin.
+Cazuri umanitare
+Ajutăm copii și familii în situații grele, acolo unde nevoia e urgentă.
+1.5 Casa Teona
+• Secțiunea „Terapii” de pe prima pagină dispare. În loc apare o prezentare scurtă a Casei Teona, cu o
+fotografie recentă.
+• Titlu: Casa Teona. Sub titlu, cele două puncte de mai jos, apoi butonul Află mai multe, care duce la
+pagina Casa Teona.
+Joacă și activități adaptate fiecărui copil
+Sprijin pentru întreaga familie
+1.6 Ne susțin
+• Bandă cu siglele firmelor sponsor, pe un rând, la aceeași înălțime. Titlu: „Ne susțin”. Link „Vezi toți
+sponsorii” către pagina Sponsori și parteneri.
+1.7 Ce am realizat împreună în ultimul an
+• Se înlocuiește secțiunea veche de rezultate cu cinci carduri statice, fără animații. Pe telefon se așază
+unul sub altul.
+• Sub carduri: butonul Vezi toate proiectele, care duce la pagina Proiecte.
+1. Prima tabără pentru copii care au trecut prin cancer
+Zile de bucurie pentru copii și pentru familiile lor.
+2. Tabăra Susținem Performanța
+Pentru copii premianți din sistemul de protecție a copilului.
+3. Două tabere pentru copii cu autism și sindrom Down
+Tabere dedicate, cu activități adaptate nevoilor lor.
+4. Peste 80 de copii la Casa Teona
+Ludoterapie, activități, minipetreceri de ziua lor, joacă și socializare.
+Lista de modificări teona-ariana.ro · pagina 3
+========== PAGINA 4 ==========
+5. Cazuri umanitare
+Sprijin medical, ajutor pentru familii în nevoie și donații de laptopuri.
+1.8 Ce spun familiile și voluntarii noștri
+• Titlu: „Ce spun familiile și voluntarii noștri”. Apar doar testimoniale de la părinți și de la voluntari.
+Cele de la sponsori merg pe pagina Sponsori și parteneri.
+• Aproximativ șase testimoniale, care se pot răsfoi cu butoane „Anterior” și „Următorul”, fără derulare
+automată. Pe telefon se vede unul odată.
+• Fiecare are un citat scurt (circa 20-35 de cuvinte) și semnătura cu prenumele și rolul, de exemplu
+„Maria, mama unui băiat din tabără” sau „Andrei, voluntar”. Fără nume de familie și fără fotografii.
+• Asociația poate adăuga sau scoate testimoniale oricând.
+1.9 Alte elemente pe Home
+• Newsletterul și subsolul apar pe această pagină ca pe toate celelalte (vezi „Elemente comune”).
+• Se elimină de pe Home: secțiunea „Terapii”, secțiunile Tabere Respiro și Suport educațional (se mută
+la pagina Proiecte), Despre noi, Echipă, Voluntari, Noutăți/Blog, secțiunea separată „Devino voluntar”
+(voluntariatul apare doar ca cardul 5, în testimoniale și în subsol) și pop-up-ul.
+Lista de modificări teona-ariana.ro · pagina 4
+========== PAGINA 5 ==========
+2. Donează
+Se deschide din butonul Donează din meniu, din „Donează acum” din secțiunea principală de pe Home și
+din cardul 1 din „Cum poți să ne susții”. Este centrul tuturor modalităților de donație, cu donația cu cardul
+în prim-plan.
+2.1 Antet
+Titlu
+Donează
+Frază
+Alege modul care ți se potrivește. Donația ta ne ajută enorm să oferim în continuare sprijin celor care au
+atât de mare nevoie.
+2.2 Donează cu cardul (primul bloc de pe pagină)
+Un singur formular, care se completează pe loc. Câmpurile, în ordine:
+• Suma (obligatoriu): butoane 20 lei, 50 lei, 100 lei și un câmp „Altă sumă (lei)”, în care donatorul scrie
+orice sumă. Nu impunem noi o sumă minimă.
+• Frecvența: „O dată” sau „Lunar”, cu „Lunar” preselectat.
+• Destinația donației: Oriunde e nevoie (implicit), Tabere, Casa Teona, Cazuri umanitare.
+• Prenume (opțional) și Nume (opțional), în câmpuri separate.
+• Email (obligatoriu), cu textul dedesubt: „Aici primești confirmarea donației.”
+• Telefon (opțional).
+• Bifă newsletter (opțională, nebifată): „Vreau să primesc ocazional vești despre activitatea asociației.”
+• Bifă acord (obligatorie): „Sunt de acord cu prelucrarea datelor mele, conform Politicii de
+confidențialitate.” (cu link către politică).
+• Buton: „Donează [suma] lei”, iar pentru donație lunară „Donează [suma] lei lunar”.
+• Sub buton: „Plată securizată. Datele cardului nu trec prin site-ul nostru.” Se afișează și pictogramele
+cardurilor acceptate.
+Mesaje de eroare, lângă câmp
+Suma lipsă: „Alege sau scrie suma pe care vrei să o donezi.”
+Sumă invalidă: „Introdu o sumă validă, în lei.”
+Email: „Introdu o adresă de e-mail validă.”
+Acord nebifat: „Bifează acordul pentru a continua.”
+După donație: pagina de mulțumire
+Mulțumim pentru donație!
+Donația ta de [suma] lei înseamnă mult pentru noi. Vei primi o confirmare pe e-mail din partea
+platformei de plată.
+• Buton: Înapoi la prima pagină.
+Lista de modificări teona-ariana.ro · pagina 5
+========== PAGINA 6 ==========
+Emailul automat de mulțumire
+Subiect: Mulțumim pentru donația ta
+Bună[, prenume],
+Mulțumim pentru donația de [suma] lei. Sprijinul tău ajută copiii cu nevoi speciale și pe părinții lor. Dacă
+ai întrebări, ne poți scrie la contact@teona-ariana.ro sau suna la 0754 510 167.
+Cu recunoștință,
+Echipa Asociației Teona Ariana Suceava
+• Dacă donatorul nu a completat prenumele, emailul începe cu „Bună,”.
+• Dacă bifează newsletterul, adresa lui intră în lista de abonați, cu email de confirmare.
+2.3 Alte modalități de a dona
+Patru blocuri, două câte două pe calculator și unul sub altul pe telefon. Fiecare bloc poate fi deschis direct
+dintr-un link (de exemplu cardul SMS de pe Home duce direct la blocul SMS).
+Donează lunar prin SMS
+Trimite SUSTIN la 8835 și donezi 5 € lunar
+Text: Numărul este valabil în rețelele Digi Mobil, Orange, Telekom România Mobile și Vodafone. Taxarea se
+face în doi pași.
+Pentru a activa donația lunară, este nevoie de confirmare. Mesajul de abonare și cel de confirmare sunt
+complet gratuite și nu implică niciun cost suplimentar. Odată confirmată abonarea, contribuția lunară este
+de 5 euro, aceasta fiind taxată automat prin SMS. Dacă dorești să oprești donațiile, trimite textul SUSTIN
+STOP la numărul 8835 (tarif gratuit).
+Pentru mai multe informații, poți contacta asociația la numărul de telefon 0754 510 167.
+Transfer bancar
+Donezi direct în contul asociației.
+BCR (RON): RO16 RNCB 0234 1852 3366 0001
+UniCredit Bank (RON): RO57 BACX 0000 0021 0940 3001
+UniCredit Bank (EUR): RO30 BACX 0000 0021 0940 3002
+Titular: ASOCIAȚIA TEONA ARIANA SUCEAVA · CIF: 43533953
+• Fiecare IBAN este text care se poate selecta (nu imagine) și are butonul Copiază IBAN.
+Donează-ți ziua de naștere
+Creează o pagină de strângere de fonduri pentru ziua ta și invită prietenii să te sprijine.
+• Buton: Creează pagina ta · duce la pagina asociației de pe Galantom.
+Redirecționează 3,5% din impozit
+Nu te costă nimic în plus: completezi formularul și o parte din impozitul pe venit ajunge la copii.
+• Buton: Redirecționează · duce la pagina Redirecționează 3,5%.
+▸ Termenul anual pentru redirecționarea de 3,5%, de actualizat în fiecare an.
+Lista de modificări teona-ariana.ro · pagina 6
+========== PAGINA 7 ==========
+2.4 Pentru firme
+Titlu
+Fii partenerul nostru, implică firma ta în povestea acestor copii minunați.
+Trei carduri, fiecare cu un buton:
+• Direcționează 20%: „Află cum poți direcționa o parte din impozitul pe profit către copii.” Buton Află
+cum, către pagina Direcționează 20%.
+• Declarația 177: „Modelul declarației, completat cu datele asociației.” Buton Descarcă declarația
+(fișier PDF).
+• Contract de sponsorizare: „Modelul de contract, gata de completat de firma ta.” Buton Descarcă
+contractul (fișier PDF sau Word).
+• Sub cele trei carduri: butonul Scrie-ne (către contact@teona-ariana.ro), pentru firmele care vor un
+contract personalizat.
+• Asociația poate înlocui singură cele două fișiere când se actualizează modelele.
+2.5 Întrebări frecvente
+La finalul paginii, șase întrebări scurte, cu răspunsurile de mai jos:
+• Pot dona lunar și opri oricând?
+Da. Poți dona lunar prin SMS sau prin card, iar donația lunară se oprește oricând, fără motivare și fără
+penalități. Dacă ai nevoie de ajutor, scrie-ne la contact@teona-ariana.ro sau sună-ne la 0754 510
+167.
+• Primesc confirmare pentru donație?
+Da. Donațiile făcute online îți aduc o confirmare pe e-mail din partea platformei de plată. Pentru
+donațiile prin transfer bancar, extrasul tău de cont este dovada plății. Dacă ai nevoie de o confirmare
+scrisă din partea asociației, scrie-ne la contact@teona-ariana.ro și ți-o trimitem.
+• Donația se poate deduce?
+Donația făcută de o persoană fizică nu se deduce din impozitul pe venit. Există însă o variantă care nu
+te costă nimic: poți redirecționa 3,5% din impozitul pe venit către asociație, fără să plătești în plus.
+Detalii găsești la pagina Redirecționează 3,5%. Companiile pot beneficia de facilități fiscale prin
+contract de sponsorizare, în condițiile legii.
+• Cum donez ca firmă?
+Poți dona prin transfer bancar în contul asociației sau poți încheia un contract de sponsorizare, care îți
+permite să beneficiezi de facilitățile fiscale prevăzute de lege. Date pentru plată:
+• Titular: ASOCIAȚIA TEONA ARIANA SUCEAVA
+• CIF: 43533953
+• Cont RON (BCR): RO16 RNCB 0234 1852 3366 0001
+• Cont RON (UniCredit): RO57 BACX 0000 0021 0940 3001
+• Cont EUR (UniCredit): RO30 BACX 0000 0021 0940 3002
+Pentru un contract de sponsorizare, scrie-ne la contact@teona-ariana.ro sau sună-ne la 0754 510
+167. Ne ocupăm împreună de toate documentele. De asemenea, poți direcționa până la 20% din
+impozitul pe profit, la pagina Direcționează 20%.
+• Cum opresc donația lunară prin SMS?
+Trimite textul SUSTIN STOP la numărul 8835. Mesajul este gratuit.
+Lista de modificări teona-ariana.ro · pagina 7
+========== PAGINA 8 ==========
+• Unde ajunge donația mea?
+Banii strânși merg către copiii și familiile din programele noastre și către activitatea de zi cu zi a
+asociației. Sunt folosiți pentru:
+• taberele pentru copii cu nevoi speciale, pentru copii premianți din sistemul de protecție a copilului
+și pentru copii care au trecut prin cancer (cazare, masă, transport, activități);
+• activitățile de la Casa Teona: activități pentru copii și grupuri de sprijin pentru părinți;
+• cheltuielile administrative ale centrului Casa Teona (întreținere, utilități și funcționare), care
+păstrează deschisă casa pentru copii și familii;
+• cazurile umanitare: în aceste situații nu dăm bani direct beneficiarilor. Plătim noi facturile
+clinicilor și medicamentele, iar banii ajung exact unde este nevoie.
+2.6 Ce se elimină
+• Butoanele care nu duc nicăieri, textele în engleză și orice formular vechi de donație care nu mai
+funcționează.
+Lista de modificări teona-ariana.ro · pagina 8
+========== PAGINA 9 ==========
+3. Despre noi
+3.1 Antet
+Titlu
+Cine suntem
+Subtitlu
+Aducem bucurie copiilor cu nevoi speciale, copiilor care au trecut prin cancer și familiilor lor.
+• Fotografie mare din tabără.
+3.2 Povestea noastră
+• Textul se împarte în trei blocuri, fiecare cu câte o fotografie: prima tabără, Casa Teona, tabăra de anul
+acesta.
+Asociația Teona Ariana Suceava a luat ființă în ianuarie 2021. Am pornit la drum cu o idee simplă: copiii cu
+nevoi speciale și familiile lor merită să aibă, din când în când, un loc în care să se simtă bine exact așa cum
+sunt. Nu aveam planuri mari, ci dorința de a face ceva concret, împreună cu oameni care gândesc la fel,
+indiferent de confesiune sau de opinii, pentru că bucuria nu ține de nicio etichetă.
+Așa au apărut taberele RESPIRO. Ne-am dorit să fie o pauză pentru copii și pentru părinții lor, și de la o
+tabără la alta au venit tot mai multe familii, tot mai mulți voluntari și tot mai multe prietenii. Acolo copiii se
+joacă, încearcă lucruri noi și se împrietenesc, iar părinții au timp să respire și să vorbească cu alți părinți. Din
+primele tabere am învățat ce contează cu adevărat: ritmul fiecărui copil, atenția și răbdarea.
+Pe drum, ne-am dorit să ajungem și la alți copii. Am început să sprijinim copii din sistemul de protecție a
+copilului, cu rezultate școlare deosebite, ca un „bravo” concret pentru munca lor, și să oferim burse și sprijin
+educațional, pentru ca fiecare copil să-și poată urma visul.
+Apoi ne-am dorit ca bucuria să nu fie doar o vacanță. Casa Teona a devenit locul în care copiii vin pe tot
+parcursul anului: terapii de grup, ateliere creative, meloterapie, stimulare senzorială, activități de socializare
+și consiliere pentru părinți. Toate sunt gratuite, iar terapia prin joacă este adaptată fiecărui copil.
+Anul acesta am organizat prima tabără RESPIRO pentru copii care au trecut prin cancer și pentru familiile
+lor, un pas pe care ni l-am dorit de mult și care ne-a arătat cât de mult mai putem face.
+Iată ce am reușit până acum, împreună: 33 de tabere organizate, peste 1.500 de participanți, peste 300 de
+voluntari implicați, peste 80 de copii primiți la Casa Teona și mai mult de 200 de sponsori și parteneri care
+au ales să fie alături de noi.
+Motto-ul nostru, „Nimic fără Dumnezeu”, ne amintește că tot ce am realizat s-a născut din încredere, din
+bunătate și din faptul că am fost împreună.
+Povestea noastră continuă. Dacă vrei să faci parte din ea, te așteptăm.
+3.3 Misiune, viziune, valori
+• Trei carduri cu pictogramă, sub poveste.
+Misiune
+Aducem bucurie și sprijin copiilor cu nevoi speciale, copiilor care au trecut prin cancer și celor din medii
+defavorizate, prin tabere, joacă și consiliere pentru întreaga familie.
+Lista de modificări teona-ariana.ro · pagina 9
+========== PAGINA 10 ==========
+Viziune
+O comunitate în care fiecare copil, indiferent de dificultățile sale sau de condițiile în care s-a născut, are
+șansa să se joace, să învețe și să viseze liber, iar fiecare părinte știe că nu e singur.
+Valori
+Incluziune: fiecare copil e primit exact așa cum este.
+Empatie: ascultăm înainte să ajutăm.
+Implicare: lucrăm împreună cu voluntari, parteneri și companii.
+Transparență: spunem deschis ce facem și cum folosim fiecare donație.
+3.4 Echipa
+• Carduri cu fotografie, nume, rol și o frază scurtă pentru fiecare membru afișat. Ordinea: conducerea,
+apoi echipa operațională. Cristea Costiuc – președinte, Iuliana Costiuc – vicepreședinte, Ștefan Roșu –
+vicepreședinte, Mihaela Sfichi – manager fundraising, Eudochia Pâțu – coordonator voluntari și Daniel
+Strîmbu – comunicare.
+3.5 Rezultate
+• Aceeași bandă de cifre ca pe Home (33 tabere · 1.500+ participanți · 80+ copii la Casa Teona · 300+
+voluntari), preluată automat din aceleași date, ca să nu apară variante diferite.
+3.6 Culegătorii de Zâmbete
+Voluntarii sunt o parte esențială a activităților noastre. În tabere și la Casa Teona se joacă cu copiii, îi
+însoțesc pe parcursul zilei, ajută la organizare și îi sprijină pe părinți. Datorită lor, fiecare copil primește
+atenția de care are nevoie, iar activitățile se desfășoară în siguranță și cu bucurie.
+Dacă vrei să faci parte din echipă, te așteptăm. Alătură-te Culegătorilor de Zâmbete.
+• Titlul secțiunii este „Culegătorii de Zâmbete”. Sub text, trei elemente: butonul Devino voluntar (către
+pagina Devino voluntar) și iconițele de Facebook și Instagram ale grupului Culegătorii de Zâmbete
+(conturi separate de ale asociației), cu textul „Urmărește-i pe Culegătorii de Zâmbete”.
+• Trei sau patru fotografii cu voluntari.
+3.7 Parteneri instituționali
+Parteneri instituționali
+Colaborăm cu instituții care ne sunt alături în munca pentru copii și familiile lor.
+• Bandă cu siglele: DGASPC Suceava, Spitalul de urgență, Colegiul Psihologilor din România (COPSI),
+Universitatea „Ștefan cel Mare” din Suceava (USV), Consiliul Județean Suceava.
+• Fiecare siglă poate duce la site-ul instituției, în fereastră nouă.
+3.8 Transparență
+Transparență
+Spunem deschis ce facem și cum folosim fiecare donație.
+• Buton de deschidere „Raport de activitate 2025”
+• Posibilitatea de a încărca și pe viitor celelalte rapoarte
+Lista de modificări teona-ariana.ro · pagina 10
+========== PAGINA 11 ==========
+3.9 Încheierea paginii
+Alege cum vrei să ajuți
+• Trei butoane: Donează (către Donează), Devino voluntar (către pagina Devino voluntar) și Devino
+partener (către pagina Direcționează 20%).
+Lista de modificări teona-ariana.ro · pagina 11
+========== PAGINA 12 ==========
+4. Casa Teona
+4.1 Antet
+Titlu
+Casa Teona
+Subtitlu
+Un loc unde copiii cu nevoi speciale învață prin joacă, iar părinții găsesc consiliere și sprijin.
+• Fotografie mare reală de la casă.
+• Două butoane: Sună pentru programare (se apelează 0754 510 167) și Sprijină Casa Teona (către
+pagina Donează).
+4.2 Descrierea casei
+• Textul împărțit în blocuri scurte, cu fotografii între ele: jocuri și ateliere, petreceri, întâlnirile cu
+părinții.
+Casa Teona este o familie extinsă pentru copiii cu nevoi speciale și pentru părinții lor. Aici nu există ritm
+greșit: copiii se joacă și învață în felul lor, iar noi mergem alături de ei.
+Zilele la Casa Teona sunt pline de activități. Copiii se joacă prin jocuri senzoriale, care îi ajută să-și descopere
+simțurile și să se liniștească. Desenează, pictează și lucrează în ateliere creative, unde contează mai mult cât
+se bucură decât cât de bine le iese. Învață prin joacă, pentru că așa învață cel mai bine, și își fac prieteni cu
+care se simt în largul lor.
+Pentru mulți dintre copiii noștri, o petrecere obișnuită nu e ușor de organizat, iar aici găsesc un spațiu al lor,
+cu baloane, tort și oameni care se bucură împreună cu ei. Pentru un copil, să se simtă sărbătorit contează
+foarte mult.
+Părinții sunt la fel de importanți ca și copiii. Mulți dintre ei duc zilnic o încărcătură pe care puțini o văd. De
+aceea, la Casa Teona au loc întâlniri de terapie de grup pentru părinți, în care pot vorbi deschis despre ce îi
+preocupă, pot primi consiliere și pot descoperi că alți părinți trec prin aceleași lucruri. Uneori, simplul fapt de
+a fi ascultat și înțeles face o mare diferență.
+Casa Teona înseamnă, în același timp, joacă, încredere, sprijin și apartenență la o comunitate. Este locul în
+care copiii pot fi copii, iar părinții pot respira. Dacă vrei să ne cunoști mai bine, să ne vizitezi sau să ne
+sprijini, ne bucurăm să te primim.
+4.3 Cum poți veni la Casa Teona
+Cum poți veni la Casa Teona
+Accesul este gratuit, pe bază de programare. Programul este de luni până vineri, între orele 9:00 și 17:00.
+Pentru programare, sună-ne la 0754 510 167 sau scrie-ne la contact@teona-ariana.ro.
+4.4 Galerie foto
+4.5 Unde ne găsiți
+• Adresa: Strada Zamca 22, Suceava, 720215.
+• Hartă cu butonul „Deschide în hartă”.
+• Program: luni-vineri, 9:00-17:00, acces gratuit, pe bază de programare.
+• Telefon 0754 510 167 și email contact@teona-ariana.ro.
+4.6 Rezultate
+Peste 80 de copii ne-au trecut pragul și s-au jucat alături de noi.
+Lista de modificări teona-ariana.ro · pagina 12
+========== PAGINA 13 ==========
+4.7 Alege cum vrei să ajuți
+• Trei butoane: Donează (către Donează), Devino voluntar (către pagina Devino voluntar) și Devino
+partener (către pagina Direcționează 20%).
+5. Proiecte
+Pagina Proiecte este acum o grilă cu peste 40 de proiecte și poze amestecate, cu filtre vechi. Se
+reorganizează în patru categorii:
+Proiecte 2026: taberele din acest an, prezentate pe rând, fiecare cu pagina ei, inclusiv tabăra pentru copiii
+care au trecut prin cancer. Fiecare tabără are fotografie mare de copertă.
+Proiecte 2025: diverse activități din 2025. Acum lipsesc de pe site, se adaugă.
+Proiecte 2021 – 2024: tot ce este acum pe pagina Proiecte se mută în această categorie.
+Cazuri umanitare: o categorie separată, cu propriile ei proiecte.
+Categoriile apar în partea de sus a paginii, în ordinea de mai sus, și înlocuiesc filtrele vechi („Sprijin
+Autism/Down”, „Educație Incluziune” etc.). Prima categorie afișată este Proiecte 2026.
+Fiecare proiect are propria pagină, cu titlu, dată, categorie, două-trei fraze de descriere și o galerie de
+fotografii. Pozele se mută în albumul proiectului lor, nu mai stau amestecate.
+Evenimentele neclasificate de acum se mută fiecare în categoria anului în care au avut loc.
+Fiecare proiect are o fotografie de copertă și între 6 și 20 de fotografii în galerie. Fotografiile au nume și
+text alternativ descriptive.
+La Cazuri umanitare nu se publică nume și nici diagnostice. Se pot adăuga, eventual, fotografii în care nu se
+văd fețele.
+Rămân neschimbate: butoanele Donează și Devino voluntar de la finalul paginii și linkurile către rețelele
+sociale din subsol.
+Urmează să finalizăm:
+▸ Lista proiectelor din 2026 (taberele, pe rând) și a activităților din 2025: denumire, perioadă, ce a fost. Cu
+ele se scriu textele proiectelor.
+▸ Lista cazurilor umanitare care se publică, cu o scurtă descriere a fiecăruia, fără nume și diagnostice.
+▸ Lista de clasificare a pozelor, completată de asociație: titlu proiect, categorie, an, număr de poze, poza
+de copertă, acord GDPR.
+Lista de modificări teona-ariana.ro · pagina 13
+========== PAGINA 14 ==========
+6. Sponsori și parteneri
+Pagina se simplifică. Rămân doar dovada socială, adică ce spun și cine ne susține, și un buton către donații.
+Informațiile pentru firme (contract, Declarația 177, direcționarea de 20%) nu mai apar aici, ci pe pagina
+Donează și pe pagina Direcționează 20%.
+6.1 Antet
+Sponsori și parteneri
+Mulțumim companiilor care ne sunt alături.
+6.2 Testimoniale
+• Citatul EGGER Group, într-un card cu logo.
+• Alte testimoniale de la sponsori, pe măsură ce asociația le adună, fiecare cu numele firmei. Dacă sunt
+doar unul sau două, se afișează simplu, fără carusel.
+„Suntem recunoscători pentru oportunitatea de a putea aduce bucurie acestor copii minunați. Ne-au
+învățat că adevărata frumusețe a lumii se simte dincolo de cuvinte.”
+EGGER Group
+6.3 Ne-au fost alături
+• Se păstrează grila de sigle (acum aproximativ 35), dar se adaugă și alte sigle ale sponsorilor care au
+mai apărut pe parcurs (de trimis de la asociație)
+• Instituțiile partenere (DGASPC, spital, USV, Colegiul Psihologilor etc.) nu apar aici, ci pe pagina Despre
+noi.
+6.4 Buton spre donații
+Vrei să te alături lor?
+• Buton: Donează (către pagina Donează).
+Lista de modificări teona-ariana.ro · pagina 14
+========== PAGINA 15 ==========
+7. Redirecționează 3,5%
+Pagină nouă, sub meniul „Redirecționează”. Se aseamănă ca structură cu paginile similare ale altor asociații
+din domeniu (Salvează o inimă): documente, trei pași clari, termen vizibil, întrebări frecvente și date ale
+asociației.
+7.1 Antet
+Redirecționează 3,5% din impozitul tău
+Nu te costă nimic în plus. Tu alegi unde ajunge o parte din impozitul pe venit.
+• Buton: Descarcă Formularul 230.
+7.2 Mesaj cheie, vizibil
+• Redirecționarea nu te costă nimic. Impozitul pe venit îl plătești oricum, iar prin Formularul 230 alegi
+ca 3,5% din el să meargă la o asociație în care ai încredere.
+• Alături apare termenul-limită al anului curent.
+▸ Termenul-limită anual pentru depunere
+7.3 Trei pași
+• Completezi Formularul 230 cu datele tale.
+• Semnezi formularul și declarația de consimțământ.
+• Ni-l trimiți nouă. Asociația îl depune la ANAF, în numele tău, înainte de termen.
+7.4 Unde se trimit formularele
+• Pe email, scanat sau fotografiat, la adresa redirectionare@teona-ariana.ro, care redirecționează
+către mihaela.sfichi@teona-ariana.ro. Adresa se creează ca alias, ca persoana care le gestionează să
+poată fi schimbată fără a modifica site-ul.
+• În persoană, la Casa Teona (Strada Zamca 22, luni-vineri, 9:00-17:00).
+• Persoana primește o confirmare că formularul a fost primit și, ulterior, că a fost depus.
+• Mesaj de siguranță a datelor, vizibil: „Datele tale sunt folosite doar pentru depunerea formularului și
+sunt șterse după [perioadă]”.
+7.5 Documente de descărcat (etapa 1)
+• Formularul 230 completat în prealabil cu datele asociației.
+• Declarația de consimțământ pentru depunerea formularului în numele persoanei.
+• Textul de informare GDPR pentru persoanele care trimit formularul.
+▸ Cele trei documente le pregătește asociația; fără ele, butoanele de descărcare rămân inactive la
+lansare.
+Lista de modificări teona-ariana.ro · pagina 15
+========== PAGINA 16 ==========
+7.6 De ce Asociația Teona Ariana
+Pentru copiii cu nevoi speciale și pentru familiile lor, o zi bună nu vine de la sine. De aceea organizăm
+tabere în care copiii se joacă, își fac prieteni și descoperă că pot, iar părinții respiră și află că nu sunt
+singuri. Am organizat 33 de tabere și am avut alături peste 1.500 de participanți.
+Bucuria nu ține doar câteva zile pe an. La Casa Teona, copiii vin pe tot parcursul anului la jocuri și ateliere,
+iar părinții găsesc consiliere și întâlniri de grup.
+Fiecare sumă redirecționată ajută la acest lucru: tabere, activități și un loc sigur pentru copii și familiile
+lor.
+7.7 Întrebări frecvente
+• Ce înseamnă să redirecționez? Înseamnă că alegi ca 3,5% din impozitul pe venit, pe care oricum îl
+plătești statului, să ajungă la Asociația Teona Ariana. Faci asta completând Formularul 230 și îl depui
+o singură dată pe an.
+• Mă costă ceva? Nu. Nu plătești nimic în plus și nu pierzi nimic. Statul îți ia oricum impozitul pe venit,
+iar prin Formularul 230 alegi doar unde merge 3,5% din el. Dacă nu completezi formularul, acei bani
+rămân la stat.
+• Pot anula sau modifica? Da, până la termenul de depunere. Dacă te răzgândești, depui un nou
+Formular 230 și cel mai recent formular depus în termen este cel luat în calcul. După termen, alegerea
+făcută rămâne valabilă pentru anul respectiv.
+• Până când trebuie să depun? Formularul 230 se depune în fiecare an, până la 25 mai, pentru
+veniturile din anul anterior. Tu trebuie doar să îl completezi, cu datele tale și semnătura. Noi ne
+ocupăm de restul: îl depunem pentru tine, la termen.
+7.8 Datele asociației
+Asociația Teona Ariana Suceava · CIF 43533953 · IBAN BCR: RO16 RNCB 0234 1852 3366 0001
+• Cu buton „Copiază” lângă date.
+7.9 Încheiere
+• Mulțumim că ai ales să fii alături de copiii noștri. Gestul tău contează. Butoanele Donează și Devino
+voluntar și formularul de newsletter din subsol.
+7.10 Etapa 2
+• Formular online pas cu pas (nume, adresă, semnătură), după validare juridică și securizare. CNP-ul se
+cere doar dacă este strict necesar, cu acord GDPR explicit.
+Lista de modificări teona-ariana.ro · pagina 16
+========== PAGINA 17 ==========
+8. Direcționează 20%
+Pagină nouă, sub meniul „Redirecționează”, pentru firme.
+8.1 Antet
+Direcționează până la 20% din impozitul pe profit
+Firma ta poate susține copiii noștri, fără costuri suplimentare față de impozitul pe care îl plătește oricum.
+• Butoane: Descarcă contractul și Scrie-ne.
+8.2 Două căi, în două blocuri
+• Declarația 177 (direcționarea bugetului de sponsorizare nealocat): patru pași (calculezi suma
+disponibilă, semnezi contractul de sponsorizare, depui Declarația 177 la ANAF, ANAF virează suma).
+Termen: [de confirmat].
+• Sponsorizare din impozitul pe profit (anul în curs): patru pași (calculezi suma, completezi contractul,
+îl semnezi, virezi banii). Termen: [de confirmat].
+8.3 Documente de descărcat (etapa 1)
+• Modelul de contract de sponsorizare (.docx) și Declarația 177 completată cu datele asociației (.pdf).
+8.4 Calculator fiscal (etapa 2)
+• Firma introduce cifra de afaceri și impozitul pe profit (în lei) și primește suma maximă care poate fi
+direcționată.
+• Sub calculator, mențiunea obligatorie: „Calculul este orientativ.”
+8.5 Întrebări frecvente despre Declarația 177
+• Ce este, cum funcționează, ce condiții trebuie îndeplinite, cum se depune.
+8.6 De ce Asociația Teona Ariana
+• Același text ca la pagina Redirecționează 3,5%, urmat de un link către pagina Sponsori și parteneri.
+8.7 Contact și date de cont
+• Persoana de contact pentru firme: Mihaela Sfichi, mihaela.sfichi@teona-ariana.ro, 0748 250 704,
+Cristea Costiuc, contact@teona-ariana.ro, 0754 510 167
+• Titular ASOCIAȚIA TEONA ARIANA SUCEAVA, CIF 43533953, IBAN BCR (RON) RO16 RNCB 0234 1852
+3366 0001 și conturile UniCredit (RON și EUR) de la pagina Donează, cu buton „Copiază” pentru
+fiecare.
+Lista de modificări teona-ariana.ro · pagina 17
+========== PAGINA 18 ==========
+9. Media (Suntem în presă)
+• Titlul paginii rămâne „Suntem în presă”, cu subtitlul „Presa, alături de misiunea noastră”. În meniu
+apare ca „Media”.
+• Fiecare apariție are sursa, titlul, data, butonul „Citește articolul” sau „Vezi video”, într-o fereastră
+nouă. Linkurile se testează înainte de publicare.
+• Videoclipurile de YouTube se pot vedea pe pagină. Cele de Facebook au buton „Vezi pe Facebook”.
+• Butoanele Donează și Devino voluntar la final.
+• Aparițiile se afișează în ordinea din lista cu linkuri trimisă de asociație.
+• Galeria de șase fotografii rămâne doar dacă are legătură cu aparițiile în presă; altfel se mută la
+Proiecte.
+Lista de modificări teona-ariana.ro · pagina 18
+========== PAGINA 19 ==========
+10. Contact
+10.1 Antet
+Contact
+Scrie-ne pentru orice întrebare sau dorință de implicare. Împreună putem aduce speranță și schimbare în
+viețile copiilor care au nevoie de noi.
+10.2 Date de contact
+• Telefoane: 0754 510 167 și 0748 250 704. Email: contact@teona-ariana.ro.
+• Fără persoane de contact pe această pagină. Persoanele din lista actuală de pe pagină se scot.
+10.3 Adrese, separate
+• Casa Teona: Strada Zamca 22, Suceava, 720215. Program luni-vineri, 9:00-17:00, acces gratuit, pe
+bază de programare. Cu butonul „Deschide în hartă”.
+• Sediul social: Strada Nicolae Milescu nr. 7, Suceava. Fără hartă.
+10.4 Formular de contact
+• Câmpuri: nume, email, telefon (opțional), „Sunt interesat de” (Donații și sponsorizări, Parteneriat
+pentru firme, Voluntariat, Casa Teona, Altceva) și mesaj.
+• Acord GDPR obligatoriu, mesaj de confirmare pe ecran și email automat de primire.
+• Toate cererile ajung la contact@teona-ariana.ro; alegerea din „Sunt interesat de” apare în email, ca
+să poată fi redirecționate intern.
+10.5 Rețele sociale
+• Iconițe Facebook, Instagram (@teonaariana_sv) și TikTok ale asociației, plus Facebook și Instagram
+ale Culegătorilor de Zâmbete, cu mențiune clară.
+10.6 Date oficiale
+• Denumirea completă, CIF 43533953 și certificatul de înregistrare afișat ca imagine pe pagină, fără
+buton de descărcare.
+• Link către secțiunea Transparență de pe pagina Despre noi.
+Lista de modificări teona-ariana.ro · pagina 19
+========== PAGINA 20 ==========
+11. Devino voluntar
+11.1 Antet
+Devino voluntar
+Implică-te activ, schimbă vieți!
+Alătură-te Culegătorilor de Zâmbete și fii alături de copiii cu nevoi speciale și de familiile lor, în tabere, la
+Casa Teona și la alte activități ale asociației.
+• Buton: Completează formularul (duce la formular).
+11.2 Cum funcționează
+1. Completezi formularul. Durează câteva minute.
+2. Te contactăm și stabilim împreună unde poți fi cel mai de folos.
+11.3 Cine poate fi voluntar
+Pentru a deveni voluntar, trebuie să ai minimum 18 ani.
+11.4 Formularul
+Titlu
+Spune-ne câte ceva despre tine
+Câmpuri
+• Nume și prenume (obligatoriu)
+• Email (obligatoriu)
+• Telefon
+• Data nașterii (obligatoriu), cu nota: „Folosim data nașterii pentru a verifica vârsta minimă.”
+• Ai mai făcut voluntariat înainte? (Da / Nu)
+• Cât timp poți dedica? (Zilnic, Săptămânal, Ocazional)
+• De ce vrei să devii voluntar? (text liber)
+• Se scot câmpurile vechi „Disponibilitate: dată și oră”, a doua întrebare deschisă și alegerile despre
+unde și cum vrea să ajute persoana: voluntarii nu aleg ce fac.
+• Dacă data nașterii arată sub 18 ani, formularul nu se trimite și apare mesajul de mai jos.
+Ne bucurăm că vrei să te implici! Deocamdată putem primi voluntari doar de la 18 ani.
+Acord GDPR obligatoriu:
+Sunt de acord ca Asociația Teona Ariana să-mi prelucreze datele personale pentru a mă contacta în
+legătură cu activitatea de voluntariat.
+• Buton: Trimite.
+11.5 După trimitere
+Mulțumim, [prenume]! Am primit formularul tău. Te contactăm în curând.
+Lista de modificări teona-ariana.ro · pagina 20
+========== PAGINA 21 ==========
+Email automat
+Bună, [prenume]! Am primit cererea ta de înscriere ca voluntar la Asociația Teona Ariana. Te contactăm
+în curând pentru a stabili cum te poți implica. Până atunci, ne găsești pe Facebook și Instagram.
+Mulțumim că vrei să faci parte din poveste!
+Echipa Teona Ariana
+• Cererile ajung la contact@teona-ariana.ro, cu eticheta „Voluntariat”, unde Eudochia are acces.
+11.6 Alte secțiuni
+• Culegătorii de Zâmbete: „Vezi ce facem împreună cu voluntarii noștri.”, cu iconițele Facebook și
+Instagram ale grupului.
+• Galerie: șase fotografii cu voluntari.
+• Alte moduri de a ajuta: „Nu poți fi voluntar acum? Poți ajuta și altfel.”, cu linkuri către Donează,
+Redirecționează 3,5% și Direcționează 20%.
+• Contact: „Ai întrebări? Scrie-ne la contact@teona-ariana.ro sau sună-ne la 0754 510 167 / 0748 250
+704.”
+Lista de modificări teona-ariana.ro · pagina 21
+========== PAGINA 22 ==========
+12. Elemente comune tuturor paginilor
+12.1 Meniul principal
+• Ordinea: Home, Despre noi, Casa Teona, Proiecte, Sponsori și parteneri, Redirecționează, Media,
+Devino voluntar, Contact, plus butonul Donează, evidențiat prin culoare.
+• „Redirecționează” se desface în două: Redirecționează 3,5% și Direcționează 20%.
+• „Media” duce la pagina „Suntem în presă”.
+• Meniul rămâne vizibil la derulare. Pe telefon, butonul Donează este mereu la vedere.
+12.2 Bara de anunț
+SMS cu SUSTIN la 8835 · 5 € lunar, direct din telefon.
+• Apare deasupra meniului, pe toate paginile. Vizitatorul o poate închide și nu mai reapare în aceeași
+vizită.
+12.3 Subsolul
+• Sigla și fraza: „Aducem bucurie copiilor cu nevoi speciale, copiilor care au trecut prin cancer și
+familiilor lor.”
+• Linkurile din meniu.
+• Contact: telefoanele 0754 510 167 și 0748 250 704, email contact@teona-ariana.ro, adresele Casa
+Teona (Strada Zamca 22) și Sediul social (Strada Nicolae Milescu nr. 7), pe rânduri separate.
+• Rețele sociale: Facebook, Instagram, TikTok, plus Culegătorii de Zâmbete.
+• Rând legal: Asociația Teona Ariana Suceava · CIF 43533953 · Politica de confidențialitate · Termeni și
+condiții · Politica de cookie-uri.
+• Copyright cu anul curent.
+12.4 Newsletter
+Rămâi aproape de noi
+Primești ocazional vești despre activitatea noastră.
+• Apare pe toate paginile, deasupra subsolului. Câmpuri: email (obligatoriu), nume (opțional) și acord
+GDPR obligatoriu: „Sunt de acord să primesc mesaje de la Asociația Teona Ariana. Mă pot dezabona
+oricând.” Buton: Abonează-mă.
+• După abonare: „Mulțumim! Verifică-ți emailul pentru a confirma abonarea.” Abonarea se confirmă
+prin email, iar fiecare mesaj trimis conține un link vizibil de dezabonare.
+• Formularul apare la lansarea noului site. Asociația nu are încă o platformă de newsletter; se alege și
+se configurează împreună, înainte de lansare, cu servere în Uniunea Europeană, dezabonare cu un
+click și posibilitatea de export al datelor.
+12.5 Bannerul de cookie-uri
+Folosim cookie-uri pentru ca site-ul să funcționeze corect și pentru a înțelege cum este folosit. Poți alege
+ce accepți.
+• Butoane: Acceptă toate, Refuz, Setări. În setări: cookie-uri necesare (mereu active), statistici și
+marketing (dezactivate până la acord). Nimic în afara celor necesare nu se încarcă înainte de acord.
+• Link către Politica de cookie-uri. Alegerea se poate schimba oricând din subsol.
+Lista de modificări teona-ariana.ro · pagina 22
+========== PAGINA 23 ==========
+12.6 Pagini legale
+• Politica de confidențialitate, Termenii și condițiile și Politica de cookie-uri există pe site-ul actual și
+rămân.
+12.7 Pagina 404
+Pagina nu a fost găsită
+Se pare că ai ajuns într-un loc care nu există. Hai înapoi la început.
+• Butoane: Mergi la Home, Donează.
+12.8 Alte elemente
+• Buton Donează plutitor pe telefon, mereu vizibil.
+• Pictograma site-ului (favicon) cu sigla și titlul filei „Asociația Teona Ariana Suceava”.
+• Imagine pentru distribuirea pe rețele (Facebook, WhatsApp), cu sigla și o fotografie.
+• Statistici de vizite, urmărind donațiile finalizate, alegerea „Lunar”, copierea IBAN-ului, click-urile către
+Galantom, Redirecționează 3,5% și Sponsori, și descărcările de documente.
+• Imagini cu text alternativ, contrast bun, site folosibil de la tastatură.
+Lista de modificări teona-ariana.ro · pagina 23
