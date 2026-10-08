@@ -42,3 +42,7 @@ next-env.d.ts
 
 # raport generat de scripts/audit-texte.py, se reface oricând
 /continut/texte-triaj.json
+
+# Copiile de lucru ale agenților care lucrează în paralel.
+# Fiecare e un depozit întreg; comise din greșeală, ar dubla tot proiectul.
+/.claude/worktrees/
