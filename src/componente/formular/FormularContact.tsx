@@ -2,15 +2,23 @@
 
 import { useId, useState } from "react";
 import { EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
-import Camp, { claseControl, claseControlGresit } from "./Camp";
+import Decor from "../Decor";
+import Pictograma from "../Pictograma";
+import Camp, {
+  Bifa,
+  Optiuni,
+  claseButonTrimite,
+  claseControl,
+  claseControlGresit,
+} from "./Camp";
 
 /** 10.4 — alegerile din „Sunt interesat de”, în ordinea din caiet. */
 const INTERESE = [
-  "Donații și sponsorizări",
-  "Parteneriat pentru firme",
-  "Voluntariat",
-  "Casa Teona",
-  "Altceva",
+  { valoare: "Donații și sponsorizări", eticheta: "Donații și sponsorizări", pictograma: "inima" },
+  { valoare: "Parteneriat pentru firme", eticheta: "Parteneriat pentru firme", pictograma: "cladire" },
+  { valoare: "Voluntariat", eticheta: "Voluntariat", pictograma: "familie" },
+  { valoare: "Casa Teona", eticheta: "Casa Teona", pictograma: "joaca" },
+  { valoare: "Altceva", eticheta: "Altceva", pictograma: "comunicare" },
 ] as const;
 
 type Erori = Partial<Record<"nume" | "email" | "mesaj" | "acord", string>>;
@@ -91,12 +99,20 @@ export default function FormularContact() {
 
   if (stare.fel === "reusit") {
     return (
-      <p
+      <div
         role="status"
-        className="colt-a bg-turcoaz-50 px-7 py-6 font-titlu text-amplu font-semibold text-turcoaz-800 shadow-[0_18px_40px_-24px_rgba(42,159,163,0.6)]"
+        className="granulatie relative overflow-hidden colt-a bg-turcoaz-100 p-8 shadow-[0_24px_50px_-26px_rgba(42,159,163,0.7)] sm:p-10"
       >
-        Mulțumim! Am primit mesajul tău și îți răspundem în curând.
-      </p>
+        <Decor semn="stea" strokeWidth={0.8} className="absolute -top-8 -right-8 size-36 text-turcoaz-200" />
+        <span className="relative flex size-14 items-center justify-center colt-mic-a bg-turcoaz-500 text-hartie shadow-[0_12px_26px_-12px_rgba(42,159,163,0.9)]">
+          <svg viewBox="0 0 24 24" className="size-7" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M5 12.5l4.5 4.5L19 7.5" />
+          </svg>
+        </span>
+        <p className="relative mt-5 font-titlu text-h4 font-bold text-turcoaz-900">
+          Mulțumim! Am primit mesajul tău și îți răspundem în curând.
+        </p>
+      </div>
     );
   }
 
@@ -104,124 +120,113 @@ export default function FormularContact() {
     <form
       onSubmit={trimite}
       noValidate
-      className="colt-a grid gap-5 bg-hartie p-6 shadow-[0_20px_42px_-24px_rgba(35,35,35,0.5)] sm:p-8"
+      className="relative overflow-hidden colt-a border border-hartie-umbra bg-hartie shadow-[0_26px_52px_-26px_rgba(247,79,34,0.45)]"
     >
-      <div className="grid gap-5 sm:grid-cols-2">
-        <Camp id={`${id}-nume`} eticheta="Nume" obligatoriu eroare={erori.nume}>
-          <input
-            id={`${id}-nume`}
-            name="nume"
-            type="text"
-            autoComplete="name"
-            aria-invalid={Boolean(erori.nume)}
-            aria-describedby={erori.nume ? `${id}-nume-eroare` : undefined}
-            className={erori.nume ? claseControlGresit : claseControl}
-          />
-        </Camp>
-
-        <Camp id={`${id}-email`} eticheta="Email" obligatoriu eroare={erori.email}>
-          <input
-            id={`${id}-email`}
-            name="email"
-            type="email"
-            autoComplete="email"
-            aria-invalid={Boolean(erori.email)}
-            aria-describedby={erori.email ? `${id}-email-eroare` : undefined}
-            className={erori.email ? claseControlGresit : claseControl}
-          />
-        </Camp>
-
-        <Camp id={`${id}-telefon`} eticheta="Telefon">
-          <input
-            id={`${id}-telefon`}
-            name="telefon"
-            type="tel"
-            autoComplete="tel"
-            className={claseControl}
-          />
-        </Camp>
-
-        <Camp id={`${id}-interes`} eticheta="Sunt interesat de" obligatoriu>
-          <select
-            id={`${id}-interes`}
-            name="interes"
-            defaultValue={INTERESE[0]}
-            className={claseControl}
-          >
-            {INTERESE.map((interes) => (
-              <option key={interes} value={interes}>
-                {interes}
-              </option>
-            ))}
-          </select>
-        </Camp>
+      {/* Capul formularului: un câmp de culoare, ca formularul să nu fie o
+          cutie albă pe hârtie albă. */}
+      <div className="granulatie relative overflow-hidden bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 px-6 py-5 text-hartie sm:px-8">
+        <Decor semn="unda" strokeWidth={0.9} className="absolute -right-6 -bottom-8 size-28 text-hartie/20" />
+        <p className="relative flex items-center gap-3 font-titlu text-amplu font-bold">
+          <span className="flex size-10 items-center justify-center colt-mic-b bg-hartie/20">
+            <Pictograma nume="plic" className="size-5" />
+          </span>
+          Trimite-ne un mesaj
+        </p>
       </div>
 
-      <Camp id={`${id}-mesaj`} eticheta="Mesaj" obligatoriu eroare={erori.mesaj}>
-        <textarea
-          id={`${id}-mesaj`}
-          name="mesaj"
-          rows={5}
-          aria-invalid={Boolean(erori.mesaj)}
-          aria-describedby={erori.mesaj ? `${id}-mesaj-eroare` : undefined}
-          className={`${erori.mesaj ? claseControlGresit : claseControl} resize-y`}
-        />
-      </Camp>
+      <div className="grid gap-5 p-6 sm:p-8">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Camp id={`${id}-nume`} eticheta="Nume" obligatoriu eroare={erori.nume}>
+            <input
+              id={`${id}-nume`}
+              name="nume"
+              type="text"
+              autoComplete="name"
+              aria-invalid={Boolean(erori.nume)}
+              aria-describedby={erori.nume ? `${id}-nume-eroare` : undefined}
+              className={erori.nume ? claseControlGresit : claseControl}
+            />
+          </Camp>
 
-      <div>
-        <label className="flex items-start gap-3 text-mic text-cerneala-moale">
-          <input
-            name="acord"
-            value="da"
-            type="checkbox"
-            aria-invalid={Boolean(erori.acord)}
-            className="mt-1 size-4 shrink-0 accent-caramiziu-500"
+          <Camp id={`${id}-email`} eticheta="Email" obligatoriu eroare={erori.email}>
+            <input
+              id={`${id}-email`}
+              name="email"
+              type="email"
+              autoComplete="email"
+              aria-invalid={Boolean(erori.email)}
+              aria-describedby={erori.email ? `${id}-email-eroare` : undefined}
+              className={erori.email ? claseControlGresit : claseControl}
+            />
+          </Camp>
+
+          <Camp id={`${id}-telefon`} eticheta="Telefon" className="sm:col-span-2">
+            <input
+              id={`${id}-telefon`}
+              name="telefon"
+              type="tel"
+              autoComplete="tel"
+              className={claseControl}
+            />
+          </Camp>
+        </div>
+
+        <Optiuni
+          name="interes"
+          legenda="Sunt interesat de"
+          optiuni={INTERESE}
+          defaultValue={INTERESE[0].valoare}
+          obligatoriu
+        />
+
+        <Camp id={`${id}-mesaj`} eticheta="Mesaj" obligatoriu eroare={erori.mesaj}>
+          <textarea
+            id={`${id}-mesaj`}
+            name="mesaj"
+            rows={5}
+            aria-invalid={Boolean(erori.mesaj)}
+            aria-describedby={erori.mesaj ? `${id}-mesaj-eroare` : undefined}
+            className={`${erori.mesaj ? claseControlGresit : claseControl} resize-y`}
           />
-          <span>
-            Sunt de acord ca Asociația Teona Ariana să-mi prelucreze datele
-            personale pentru a-mi răspunde la acest mesaj.{" "}
-            <span className="text-caramiziu-600" aria-hidden="true">
-              *
-            </span>
-          </span>
-        </label>
-        {erori.acord && (
-          <p className="mt-1.5 font-titlu text-mic font-semibold text-caramiziu-700">
-            {erori.acord}
+        </Camp>
+
+        <Bifa name="acord" obligatoriu eroare={erori.acord}>
+          Sunt de acord ca Asociația Teona Ariana să-mi prelucreze datele
+          personale pentru a-mi răspunde la acest mesaj.
+        </Bifa>
+
+        {stare.fel === "eroare" && (
+          <p
+            role="alert"
+            className="colt-mic-a border-2 border-caramiziu-200 bg-caramiziu-50 px-4 py-3 text-mic text-caramiziu-900"
+          >
+            {stare.mesaj}{" "}
+            <a
+              href={`mailto:${EMAIL.contact}`}
+              className="font-semibold underline underline-offset-2"
+            >
+              {EMAIL.contact}
+            </a>{" "}
+            sau{" "}
+            <a
+              href={`tel:${TELEFON_PRINCIPAL.apel}`}
+              className="font-semibold underline underline-offset-2"
+            >
+              {TELEFON_PRINCIPAL.afisat}
+            </a>
+            .
           </p>
         )}
-      </div>
 
-      {stare.fel === "eroare" && (
-        <p
-          role="alert"
-          className="colt-mic-a border-2 border-caramiziu-200 bg-caramiziu-50 px-4 py-3 text-mic text-caramiziu-900"
+        <button
+          type="submit"
+          disabled={stare.fel === "trimite"}
+          className={`${claseButonTrimite} w-full sm:w-fit`}
         >
-          {stare.mesaj}{" "}
-          <a
-            href={`mailto:${EMAIL.contact}`}
-            className="font-semibold underline underline-offset-2"
-          >
-            {EMAIL.contact}
-          </a>{" "}
-          sau{" "}
-          <a
-            href={`tel:${TELEFON_PRINCIPAL.apel}`}
-            className="font-semibold underline underline-offset-2"
-          >
-            {TELEFON_PRINCIPAL.afisat}
-          </a>
-          .
-        </p>
-      )}
-
-      <button
-        type="submit"
-        disabled={stare.fel === "trimite"}
-        className="inline-flex w-fit items-center justify-center rounded-full bg-caramiziu-500 px-8 py-3.5 font-titlu font-semibold text-hartie shadow-[0_12px_26px_-12px_rgba(247,79,34,0.9)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:bg-caramiziu-600 disabled:opacity-60 motion-reduce:hover:translate-y-0"
-      >
-        {stare.fel === "trimite" ? "Se trimite…" : "Trimite mesajul"}
-      </button>
+          {stare.fel === "trimite" ? "Se trimite…" : "Trimite mesajul"}
+          <Pictograma nume="sageata" className="size-4" />
+        </button>
+      </div>
     </form>
   );
 }

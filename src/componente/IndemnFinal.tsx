@@ -1,6 +1,6 @@
 import { ASOCIATIA, RUTE } from "@/date/asociatie";
 import Buton from "./Buton";
-import Val from "./Val";
+import Val, { VAL_PESTE } from "./Val";
 
 /**
  * „Alege cum vrei să ajuți” — cele trei butoane de la finalul paginilor.
@@ -9,18 +9,29 @@ import Val from "./Val";
  * celorlalte pagini, cu „Devino partener” ducând peste tot la Direcționează 20%.
  * De aceea sunt într-o componentă, nu copiate de unsprezece ori.
  *
+ * Paginile care cer doar două butoane (Proiecte, Media: „Donează și Devino
+ * voluntar la final”) primesc aceeași fâșie, cu `butoane="doua"`.
+ *
  * Închiderea nu e banda neagră cu care se termină orice șablon. E o fâșie în
  * culoarea de identitate, cu motto-ul scris de mână — ultimul lucru pe care îl
  * vede cineva care a derulat toată pagina.
  */
 export default function IndemnFinal({
   titlu = "Alege cum vrei să ajuți",
+  butoane = "trei",
+  /**
+   * Trage valul peste secțiunea de deasupra (vezi `VAL_PESTE`). Paginile
+   * interioare îl folosesc; prima pagină rămâne cum a fost aprobată.
+   */
+  peste = false,
 }: {
   titlu?: string;
+  butoane?: "trei" | "doua";
+  peste?: boolean;
 }) {
   return (
     <>
-      <Val culoare="text-caramiziu-500" />
+      <Val culoare="text-caramiziu-500" className={peste ? VAL_PESTE : ""} />
       <section className="granulatie relative overflow-hidden bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-700 pb-20 lg:pb-24">
         {/* Cercuri mari, abia vizibile, în loc de un fundal plat. */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
@@ -46,14 +57,16 @@ export default function IndemnFinal({
             <Buton href={RUTE.voluntar} varianta="secundar" marime="mare">
               Devino voluntar
             </Buton>
-            <Buton
-              href={RUTE.directionare20}
-              varianta="contur"
-              marime="mare"
-              className="border-hartie/50 bg-transparent text-hartie hover:border-hartie hover:bg-hartie/10 hover:text-hartie"
-            >
-              Devino partener
-            </Buton>
+            {butoane === "trei" && (
+              <Buton
+                href={RUTE.directionare20}
+                varianta="contur"
+                marime="mare"
+                className="border-hartie/50 bg-transparent text-hartie hover:border-hartie hover:bg-hartie/10 hover:text-hartie"
+              >
+                Devino partener
+              </Buton>
+            )}
           </div>
         </div>
       </section>

@@ -9,17 +9,20 @@ import {
   TELEFON_PRINCIPAL,
 } from "@/date/asociatie";
 import { anulCurent } from "@/lib/an";
+import Aparitie from "@/componente/Aparitie";
 import Buton from "@/componente/Buton";
 import Cifre from "@/componente/Cifre";
 import Decor from "@/componente/Decor";
+import Fotografie from "@/componente/Fotografie";
 import IndemnFinal from "@/componente/IndemnFinal";
 import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
-import Val from "@/componente/Val";
+import Val, { VAL_PESTE } from "@/componente/Val";
 import AntetPagina from "@/componente/pagina/AntetPagina";
 import DeCopiat from "@/componente/pagina/DeCopiat";
 import DocumentDeDescarcat from "@/componente/pagina/DocumentDeDescarcat";
 import Intrebari from "@/componente/pagina/Intrebari";
 import Pasi from "@/componente/pagina/Pasi";
+import TitluSectiune from "@/componente/pagina/TitluSectiune";
 
 export const metadata: Metadata = {
   title: "Redirecționează 3,5%",
@@ -32,10 +35,12 @@ const UNDE: ReadonlyArray<{
   pictograma: NumePictograma;
   titlu: string;
   text: React.ReactNode;
+  clase: string;
 }> = [
   {
     pictograma: "plic",
     titlu: "Pe email",
+    clase: "bg-caramiziu-500 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]",
     text: (
       <>
         Scanat sau fotografiat, la{" "}
@@ -52,6 +57,7 @@ const UNDE: ReadonlyArray<{
   {
     pictograma: "harta",
     titlu: "În persoană",
+    clase: "bg-miere-400 text-cerneala shadow-[0_10px_22px_-10px_rgba(255,172,0,0.9)]",
     text: (
       <>
         La Casa Teona, {ADRESE.casaTeona.strada}, {ADRESE.casaTeona.oras}.{" "}
@@ -62,6 +68,7 @@ const UNDE: ReadonlyArray<{
   {
     pictograma: "comunicare",
     titlu: "Primești confirmare",
+    clase: "bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
     text: "Îți confirmăm că am primit formularul și, ulterior, că a fost depus la ANAF.",
   },
 ];
@@ -73,6 +80,7 @@ export default async function Redirectioneaza35() {
   return (
     <>
       <AntetPagina
+        scris="Un formular, o dată pe an"
         titlu="Redirecționează 3,5% din impozitul tău"
         subtitlu="Nu te costă nimic în plus. Tu alegi unde ajunge o parte din impozitul pe venit."
         poza={{
@@ -80,85 +88,112 @@ export default async function Redirectioneaza35() {
           alt: "Mâna unui voluntar îi întinde o minge portocalie unei fetițe, pe o alee din tabără",
           legenda: "Tabăra RESPIRO",
         }}
+        pozaMica={{
+          cale: "/poze/2024/11/438814270_2663080130535965_2029375574315086726_n-766x1024.jpg",
+          alt: "Copii și voluntari, la o masă plină cu hârtie creponată colorată, carioci și boluri, la un atelier creativ din tabără",
+        }}
         butoane={
           <Buton href="#documente" marime="mare">
             Descarcă Formularul 230
+            <Pictograma nume="sageata" className="size-5 rotate-90" />
           </Buton>
         }
       />
 
-      {/* 7.2 — mesajul cheie, cu termenul-limită alături. */}
-      <section className="bg-hartie pb-20 lg:pb-24">
-        <div className="mx-auto grid max-w-7xl items-center gap-6 px-4 sm:px-6 lg:grid-cols-[1.6fr_1fr] lg:gap-10 lg:px-8">
-          <div className="colt-a bg-tenta-cald p-8 shadow-[0_20px_42px_-24px_rgba(247,79,34,0.5)] sm:p-10">
-            <p className="text-h4 leading-snug text-cerneala">
-              Redirecționarea nu te costă nimic. Impozitul pe venit îl plătești
-              oricum, iar prin Formularul 230 alegi ca 3,5% din el să meargă la o
-              asociație în care ai încredere.
-            </p>
-          </div>
+      {/* 7.2 — mesajul cheie, cu termenul-limită alături. Ies peste valul
+          antetului, ca banda de cifre de pe prima pagină. */}
+      <section className="relative overflow-hidden bg-hartie pb-24 lg:pb-32">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="relative z-20 -mt-6 grid gap-5 sm:-mt-10 lg:-mt-16 lg:grid-cols-[1.6fr_1fr] lg:gap-6">
+            <div className="granulatie relative overflow-hidden colt-a border border-hartie-umbra bg-hartie p-8 shadow-[0_34px_70px_-30px_rgba(247,79,34,0.5)] sm:p-10">
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -top-6 -right-2 font-titlu text-[8rem] leading-none font-extrabold tracking-tight text-caramiziu-50 select-none sm:text-[10rem]"
+              >
+                3,5%
+              </span>
+              <p className="relative max-w-2xl font-titlu text-h4 leading-snug font-bold text-cerneala sm:text-h3">
+                Redirecționarea nu te costă nimic. Impozitul pe venit îl plătești
+                oricum, iar prin Formularul 230 alegi ca 3,5% din el să meargă la
+                o asociație în care ai încredere.
+              </p>
+            </div>
 
-          <div className="colt-b flex flex-col items-start gap-2 bg-caramiziu-500 p-8 text-hartie shadow-[0_20px_42px_-22px_rgba(247,79,34,0.9)]">
-            <span className="font-titlu text-nota font-bold tracking-wider uppercase opacity-85">
-              Termen-limită {an}
-            </span>
-            {/*
-              Data e cea din lege, repetată și în întrebările frecvente din
-              caiet: „Formularul 230 se depune în fiecare an, până la 25 mai”.
-              Anul e cel curent, luat de pe server — nu îngheață la build.
-            */}
-            <span className="font-titlu text-h2 leading-none font-extrabold">
-              25 mai
-            </span>
-            <span className="text-mic opacity-90">
-              Pentru veniturile din anul anterior.
-            </span>
+            <div className="granulatie relative flex flex-col items-start gap-2 overflow-hidden colt-b bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 p-8 text-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.9)]">
+              <span
+                aria-hidden="true"
+                className="absolute -right-12 -bottom-16 size-48 rounded-full border-2 border-hartie/20"
+              />
+              <span className="relative font-titlu text-nota font-bold tracking-wider uppercase opacity-85">
+                Termen-limită {an}
+              </span>
+              {/*
+                Data e cea din lege, repetată și în întrebările frecvente din
+                caiet: „Formularul 230 se depune în fiecare an, până la 25 mai”.
+                Anul e cel curent, luat de pe server — nu îngheață la build.
+              */}
+              <span className="relative font-titlu text-[3.2rem] leading-none font-extrabold tracking-tight sm:text-[3.8rem]">
+                25 mai
+              </span>
+              <span className="relative text-mic opacity-90">
+                Pentru veniturile din anul anterior.
+              </span>
+            </div>
           </div>
         </div>
       </section>
 
       {/* 7.3 — trei pași */}
-      <Val culoare="text-hartie-calda" />
-      <section className="granulatie relative overflow-hidden bg-hartie-calda pb-20 lg:pb-24">
+      <Val culoare="text-hartie-calda" className={VAL_PESTE} />
+      <section className="granulatie relative overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-10 lg:pb-32">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor
-            semn="stea"
-            className="pluteste-lent absolute top-12 right-[6%] size-8 text-miere-300 lg:size-11"
-          />
+          <Decor semn="stea" className="pluteste-lent absolute top-12 right-[6%] size-8 text-miere-300 lg:size-11" />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-h2 text-cerneala">Trei pași</h2>
+          <TitluSectiune scris="Simplu ca o scrisoare" titlu="Trei pași" />
           <Pasi
-            className="mt-10"
+            className="mt-12"
             pasi={[
-              "Completezi Formularul 230 cu datele tale.",
-              "Semnezi formularul și declarația de consimțământ.",
-              "Ni-l trimiți nouă. Asociația îl depune la ANAF, în numele tău, înainte de termen.",
+              { text: "Completezi Formularul 230 cu datele tale.", pictograma: "document" },
+              { text: "Semnezi formularul și declarația de consimțământ.", pictograma: "maini" },
+              {
+                text: "Ni-l trimiți nouă. Asociația îl depune la ANAF, în numele tău, înainte de termen.",
+                pictograma: "plic",
+              },
             ]}
           />
         </div>
       </section>
 
       {/* 7.4 — unde se trimit formularele */}
-      <Val culoare="text-hartie" />
-      <section className="bg-hartie pb-20 lg:pb-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-h2 text-cerneala">Unde trimiți formularul</h2>
+      <Val culoare="text-hartie" className={VAL_PESTE} />
+      <section className="relative overflow-hidden bg-hartie pt-6 pb-24 lg:pt-10 lg:pb-32">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <Decor semn="unda" className="pluteste-lent absolute bottom-24 left-[3%] size-10 text-turcoaz-200 lg:size-14" />
+        </div>
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <TitluSectiune titlu="Unde trimiți formularul" />
 
-          <ul className="mt-10 grid gap-5 lg:grid-cols-3">
+          <ul className="mt-12 grid gap-5 lg:grid-cols-3">
             {UNDE.map((loc, i) => (
               <li key={loc.titlu}>
-                <div
-                  className={`flex h-full flex-col ${
-                    i % 2 === 0 ? "colt-a" : "colt-b"
-                  } bg-hartie-calda p-7 shadow-[0_18px_38px_-22px_rgba(35,35,35,0.45)]`}
-                >
-                  <span className="colt-mic-a flex size-12 items-center justify-center bg-caramiziu-100 text-caramiziu-600">
-                    <Pictograma nume={loc.pictograma} className="size-6" />
-                  </span>
-                  <h3 className="mt-5 text-h4 text-cerneala">{loc.titlu}</h3>
-                  <p className="mt-2 text-mic text-cerneala-moale">{loc.text}</p>
-                </div>
+                <Aparitie intarziere={i * 0.05} className="h-full">
+                  <div
+                    className={`flex h-full flex-col ${
+                      i % 2 === 0 ? "colt-a" : "colt-b"
+                    } border border-hartie-umbra bg-hartie p-7 shadow-[0_24px_50px_-26px_rgba(35,35,35,0.45)]`}
+                  >
+                    <span
+                      className={`flex size-14 items-center justify-center ${
+                        i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"
+                      } ${loc.clase}`}
+                    >
+                      <Pictograma nume={loc.pictograma} className="size-7" />
+                    </span>
+                    <h3 className="mt-6 text-h4 text-cerneala">{loc.titlu}</h3>
+                    <p className="mt-2 text-corp text-cerneala-moale">{loc.text}</p>
+                  </div>
+                </Aparitie>
               </li>
             ))}
           </ul>
@@ -170,85 +205,126 @@ export default async function Redirectioneaza35() {
             se folosesc datele. O perioadă inventată aici ar fi o promisiune
             pe care nimeni nu s-a angajat să o țină.
           */}
-          <p className="colt-mic-a mt-8 flex items-start gap-3 bg-turcoaz-50 px-5 py-4 text-mic text-turcoaz-900">
-            <span className="mt-0.5 shrink-0 text-turcoaz-600">
+          <p className="mt-8 flex items-start gap-4 colt-mic-b bg-turcoaz-50 px-5 py-4 text-corp text-turcoaz-900">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-turcoaz-500 text-hartie">
               <Pictograma nume="maini" className="size-5" />
             </span>
-            Datele tale sunt folosite doar pentru depunerea Formularului 230 la
-            ANAF, în numele tău. Nu le folosim în alt scop și nu le dăm nimănui.
+            <span className="pt-1.5">
+              Datele tale sunt folosite doar pentru depunerea Formularului 230 la
+              ANAF, în numele tău. Nu le folosim în alt scop și nu le dăm nimănui.
+            </span>
           </p>
         </div>
       </section>
 
       {/* 7.5 — documente */}
-      <Val culoare="text-tenta-cald" />
+      <Val culoare="text-tenta-cald" className={VAL_PESTE} />
       <section
         id="documente"
-        className="granulatie scroll-mt-32 bg-tenta-cald pb-20 lg:pb-24"
+        className="granulatie relative scroll-mt-32 overflow-hidden bg-tenta-cald pt-6 pb-24 lg:pt-10 lg:pb-32"
       >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-h2 text-cerneala">Documente de descărcat</h2>
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <Decor semn="spirala" className="pluteste-lent absolute top-14 right-[5%] size-9 text-caramiziu-200 lg:size-12" />
+        </div>
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <TitluSectiune scris="Tot ce ai nevoie, într-un loc" titlu="Documente de descărcat" />
 
-          <ul className="mt-10 grid gap-4 lg:grid-cols-3">
+          <ul className="mt-12 grid gap-5 lg:grid-cols-3">
             <li>
-              <DocumentDeDescarcat
-                titlu="Formularul 230"
-                descriere="Completat în prealabil cu datele asociației. Tu adaugi doar datele tale și semnătura."
-                format="PDF"
-              />
+              <Aparitie className="h-full">
+                <DocumentDeDescarcat
+                  titlu="Formularul 230"
+                  descriere="Completat în prealabil cu datele asociației. Tu adaugi doar datele tale și semnătura."
+                  format="PDF"
+                  colt="a"
+                />
+              </Aparitie>
             </li>
             <li>
-              <DocumentDeDescarcat
-                titlu="Declarația de consimțământ"
-                descriere="Ne dai dreptul să depunem formularul la ANAF în numele tău."
-                format="PDF"
-              />
+              <Aparitie intarziere={0.06} className="h-full">
+                <DocumentDeDescarcat
+                  titlu="Declarația de consimțământ"
+                  descriere="Ne dai dreptul să depunem formularul la ANAF în numele tău."
+                  format="PDF"
+                  colt="b"
+                />
+              </Aparitie>
             </li>
             <li>
-              <DocumentDeDescarcat
-                titlu="Informare GDPR"
-                descriere="Ce date primim, pentru ce le folosim și cât le păstrăm."
-                format="PDF"
-              />
+              <Aparitie intarziere={0.12} className="h-full">
+                <DocumentDeDescarcat
+                  titlu="Informare GDPR"
+                  descriere="Ce date primim, pentru ce le folosim și cât le păstrăm."
+                  format="PDF"
+                  colt="a"
+                />
+              </Aparitie>
             </li>
           </ul>
         </div>
       </section>
 
-      {/* 7.6 — De ce Asociația Teona Ariana */}
-      <Val culoare="text-hartie" />
-      <section className="bg-hartie pb-20 lg:pb-24">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-h2 text-cerneala">De ce Asociația Teona Ariana</h2>
-          <div className="mt-6 grid gap-4 text-amplu text-cerneala-moale">
-            <p>
-              Pentru copiii cu nevoi speciale și pentru familiile lor, o zi bună
-              nu vine de la sine. De aceea organizăm tabere în care copiii se
-              joacă, își fac prieteni și descoperă că pot, iar părinții respiră
-              și află că nu sunt singuri. Am organizat 33 de tabere și am avut
-              alături peste 1.500 de participanți.
-            </p>
-            <p>
-              Bucuria nu ține doar câteva zile pe an. La Casa Teona, copiii vin
-              pe tot parcursul anului la jocuri și ateliere, iar părinții găsesc
-              consiliere și întâlniri de grup.
-            </p>
-            <p>
-              Fiecare sumă redirecționată ajută la acest lucru: tabere,
-              activități și un loc sigur pentru copii și familiile lor.
-            </p>
-          </div>
-        </div>
+      {/* AICI: formularul 230 încorporat — completarea online, pas cu pas
+          (7.10, etapa 2). Se montează separat, după documente și înainte de
+          „De ce Asociația Teona Ariana”. */}
 
-        <div className="mx-auto mt-14 max-w-6xl px-4 sm:px-6 lg:px-8">
-          <h3 className="sr-only">Rezultatele noastre</h3>
-          <Cifre />
+      {/* 7.6 — De ce Asociația Teona Ariana */}
+      <Val culoare="text-hartie" className={VAL_PESTE} />
+      <section className="relative overflow-hidden bg-hartie pt-6 pb-24 lg:pt-10 lg:pb-32">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-7">
+              <TitluSectiune scris="Unde ajung banii" titlu="De ce Asociația Teona Ariana" />
+              <div className="mt-6 grid gap-4 text-amplu text-cerneala-moale">
+                <p>
+                  Pentru copiii cu nevoi speciale și pentru familiile lor, o zi bună
+                  nu vine de la sine. De aceea organizăm tabere în care copiii se
+                  joacă, își fac prieteni și descoperă că pot, iar părinții respiră
+                  și află că nu sunt singuri. Am organizat 33 de tabere și am avut
+                  alături peste 1.500 de participanți.
+                </p>
+                <p>
+                  Bucuria nu ține doar câteva zile pe an. La Casa Teona, copiii vin
+                  pe tot parcursul anului la jocuri și ateliere, iar părinții găsesc
+                  consiliere și întâlniri de grup.
+                </p>
+                <p>
+                  Fiecare sumă redirecționată ajută la acest lucru: tabere,
+                  activități și un loc sigur pentru copii și familiile lor.
+                </p>
+              </div>
+            </div>
+            <Fotografie
+              cale="/poze/2024/11/462119250_122094741458569469_941841061673534153_n.jpg"
+              alt="Copii, părinți și voluntari în tricouri albe, pe iarbă, în fața pensiunii din tabăra RESPIRO; câțiva copii fac cu mâna"
+              legenda="Familii în tabără"
+              umbra="miere"
+              bloc="miere"
+              colt="b"
+              raport="aspect-[4/3]"
+              dimensiuni="(min-width: 1024px) 480px, 92vw"
+              className="mx-auto w-full max-w-xl lg:col-span-5 lg:max-w-none"
+            />
+          </div>
+
+          <div className="relative mt-16 colt-a border border-hartie-umbra bg-hartie px-5 py-10 shadow-[0_34px_70px_-30px_rgba(247,79,34,0.45)] lg:mt-20 lg:px-12 lg:py-12">
+            <Decor semn="unda" className="absolute top-4 right-6 size-8 text-miere-300 lg:size-10" />
+            <Decor semn="stea" className="absolute bottom-4 left-6 size-6 text-caramiziu-200 lg:size-8" />
+            <h3 className="sr-only">Rezultatele noastre</h3>
+            <Cifre />
+          </div>
         </div>
       </section>
 
       {/* 7.7 */}
-      <Val culoare="text-hartie" />
+      <Val culoare="text-hartie" className={VAL_PESTE} />
       <Intrebari
+        scris="Pe scurt"
+        poza={{
+          cale: "/poze/2024/11/386090253_3250740235223267_8748916196061085905_n.jpg",
+          alt: "Copii și voluntari la mesele de sub pergola de lemn a pensiunii, la masă, în tabără",
+          legenda: "La masă, în tabără",
+        }}
         intrebari={[
           {
             intrebare: "Ce înseamnă să redirecționez?",
@@ -297,18 +373,22 @@ export default async function Redirectioneaza35() {
       />
 
       {/* 7.8 — datele asociației */}
-      <Val culoare="text-hartie-calda" />
-      <section className="granulatie bg-hartie-calda pb-20 lg:pb-24">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-h2 text-cerneala">Datele asociației</h2>
+      <Val culoare="text-hartie-calda" className={VAL_PESTE} />
+      <section className="granulatie relative overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-10 lg:pb-32">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <Decor semn="soare" className="pluteste-lent absolute top-12 right-[5%] size-9 text-miere-300 lg:size-12" />
+        </div>
+        <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <TitluSectiune scris="Pentru Formularul 230" titlu="Datele asociației" />
 
-          <div className="mt-8 grid gap-3">
+          <div className="mt-10 grid gap-3">
             <DeCopiat eticheta="Denumire" valoare={ASOCIATIA.denumireLegala} />
-            <DeCopiat eticheta="CIF" valoare={ASOCIATIA.cif} />
+            <DeCopiat eticheta="CIF" valoare={ASOCIATIA.cif} culoare="miere" colt="b" />
             <DeCopiat
               eticheta={`IBAN ${bcr.banca} (${bcr.moneda})`}
               valoare={bcr.iban}
               deCopiat={bcr.iban.replace(/\s/g, "")}
+              culoare="turcoaz"
             />
           </div>
 
@@ -339,8 +419,12 @@ export default async function Redirectioneaza35() {
         </div>
       </section>
 
-      {/* 7.9 */}
-      <IndemnFinal titlu="Mulțumim că ai ales să fii alături de copiii noștri" />
+      {/* 7.9 — „Butoanele Donează și Devino voluntar”. */}
+      <IndemnFinal
+        peste
+        butoane="doua"
+        titlu="Mulțumim că ai ales să fii alături de copiii noștri"
+      />
     </>
   );
 }
