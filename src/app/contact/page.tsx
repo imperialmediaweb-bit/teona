@@ -95,7 +95,11 @@ export default function Contact() {
 
       {/* 10.2 — date de contact. Fără persoane de contact: caietul cere
           explicit ca lista de persoane de pe pagina veche să fie scoasă. */}
-      <section className="relative overflow-hidden bg-hartie pb-24 lg:pb-32">
+      {/* Fără `overflow-hidden`: cardurile de dedesubt sunt trase în sus
+          intenționat, ca să iasă peste valul antetului. Cu el, secțiunea
+          le reteza exact partea ieșită — primul rând de text apărea tăiat
+          pe jumătate. */}
+      <section className="relative bg-hartie pb-24 lg:pb-32">
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="sr-only">Date de contact</h2>
           {/* Cele trei carduri ies peste valul antetului, ca banda de cifre

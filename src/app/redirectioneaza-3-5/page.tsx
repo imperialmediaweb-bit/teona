@@ -103,7 +103,11 @@ export default async function Redirectioneaza35() {
 
       {/* 7.2 — mesajul cheie, cu termenul-limită alături. Ies peste valul
           antetului, ca banda de cifre de pe prima pagină. */}
-      <section className="relative overflow-hidden bg-hartie pb-24 lg:pb-32">
+      {/* Fără `overflow-hidden`: cardurile de dedesubt sunt trase în sus
+          intenționat, ca să iasă peste valul antetului. Cu el, secțiunea
+          le reteza exact partea ieșită — primul rând de text apărea tăiat
+          pe jumătate. */}
+      <section className="relative bg-hartie pb-24 lg:pb-32">
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="relative z-20 -mt-6 grid gap-5 sm:-mt-10 lg:-mt-16 lg:grid-cols-[1.6fr_1fr] lg:gap-6">
             <div className="granulatie relative overflow-hidden colt-a border border-hartie-umbra bg-hartie p-8 shadow-[0_34px_70px_-30px_rgba(247,79,34,0.5)] sm:p-10">

@@ -153,7 +153,11 @@ export default function CasaTeona() {
 
       {/* 4.2 — fraza de deschidere stă într-un panou care iese peste valul
           antetului, ca banda de cifre de pe prima pagină. */}
-      <section className="relative overflow-hidden bg-hartie pb-24 lg:pb-32">
+      {/* Fără `overflow-hidden`: cardurile de dedesubt sunt trase în sus
+          intenționat, ca să iasă peste valul antetului. Cu el, secțiunea
+          le reteza exact partea ieșită — primul rând de text apărea tăiat
+          pe jumătate. */}
+      <section className="relative bg-hartie pb-24 lg:pb-32">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
           <Decor semn="soare" className="pluteste-lent absolute top-40 right-[3%] size-9 text-miere-300 lg:size-12" />
           <Decor semn="unda" className="pluteste-lent absolute bottom-40 left-[2%] size-10 text-turcoaz-200 lg:size-14" />
