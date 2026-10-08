@@ -22,6 +22,15 @@ export type Pagina = {
   poze: string[];
 };
 
+/**
+ * Un proiect, așa cum îl folosește site-ul.
+ *
+ * Textele libere („text”, „texteElementor”) au fost scoase din
+ * `continut/proiecte.json`: erau postări de Facebook importate, cu nume de
+ * familii, localități și diagnostice ale unor copii, iar site-ul nu le-a
+ * folosit niciodată. Dacă sunt nevoie vreodată, se regenerează din
+ * `scripts/export-wordpress.xml`, care a rămas neatins.
+ */
 export type Proiect = {
   id: string;
   titlu: string;
@@ -30,8 +39,6 @@ export type Proiect = {
   data: string;
   categorii: string[];
   etichete: string[];
-  text: string;
-  texteElementor: TextElementor[];
   poze: string[];
   pozaPrincipala: string | null;
 };
@@ -53,9 +60,6 @@ export type Articol = {
   adresa: string;
   categorii: string[];
   etichete: string[];
-  rezumat: string;
-  html: string;
-  text: string;
   pozaPrincipala: string | null;
 };
 
