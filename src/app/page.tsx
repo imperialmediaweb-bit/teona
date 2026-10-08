@@ -9,6 +9,7 @@ import Buton from "@/componente/Buton";
 import Cifre from "@/componente/Cifre";
 import IndemnFinal from "@/componente/IndemnFinal";
 import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
+import Rama from "@/componente/Rama";
 import SemnAripa from "@/componente/SemnAripa";
 import Erou from "@/componente/acasa/Erou";
 import FasieDeFotografii from "@/componente/acasa/FasieDeFotografii";
@@ -51,7 +52,7 @@ const MODURI_DE_SUSTINERE: ReadonlyArray<{
     href: RUTE.directionare20,
   },
   {
-    pictograma: "maini",
+    pictograma: "familie",
     titlu: "Devino voluntar",
     text: "Alătură-te celor peste 300 de voluntari care ne sunt alături.",
     buton: "Vreau să ajut",
@@ -69,7 +70,7 @@ const CAMPANII: ReadonlyArray<{
   titlu: string;
   text: string;
   destinatie: string;
-  poza?: { cale: string; alt: string };
+  poza?: { cale: string; alt: string; legenda: string };
 }> = [
   {
     titlu: "Tabere pentru copii și părinți",
@@ -78,6 +79,7 @@ const CAMPANII: ReadonlyArray<{
     poza: {
       cale: "/poze/2024/11/351164060_277811291485883_1768298065998774964_n.webp",
       alt: "Copii și adulți în tabără, la munte, ținând litere care formează cuvântul „Mulțumim”",
+      legenda: "Tabăra RESPIRO",
     },
   },
   {
@@ -87,6 +89,7 @@ const CAMPANII: ReadonlyArray<{
     poza: {
       cale: "/poze/2024/11/poza1_enhanced-1.webp",
       alt: "Un copil arată copăcelul din hârtie cu frunze verzi pe care l-a făcut la un atelier de la Casa Teona",
+      legenda: "Atelier creativ",
     },
   },
   {
@@ -234,27 +237,25 @@ export default function PrimaPagina() {
 
           <div className="mt-12 grid gap-6 lg:grid-cols-2 [&>*]:min-w-0">
             <Aparitie className="h-full">
-              <article className="group relative flex h-full min-h-[26rem] flex-col justify-end overflow-hidden rounded-amplu bg-cerneala p-6 sm:p-8 lg:min-h-[32rem] lg:p-10">
+              <article className="flex h-full flex-col gap-7 rounded-amplu bg-hartie p-6 shadow-[0_2px_28px_-16px_rgba(35,35,35,0.35)] sm:p-8">
                 {campanieMare.poza && (
-                  <>
-                    <Image
-                      src={campanieMare.poza.cale}
-                      alt={campanieMare.poza.alt}
-                      fill
-                      sizes="(min-width: 1024px) 620px, 100vw"
-                      className="object-cover transition-transform duration-[1200ms] ease-cald group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-cerneala via-cerneala/55 to-transparent" />
-                  </>
+                  <Rama
+                    cale={campanieMare.poza.cale}
+                    alt={campanieMare.poza.alt}
+                    legenda={campanieMare.poza.legenda}
+                    raport="aspect-[5/4]"
+                    cuApropiere
+                    dimensiuni="(min-width: 1024px) 560px, 92vw"
+                  />
                 )}
-                <div className="relative">
-                  <h3 className="text-h3 text-hartie sm:text-h2">{campanieMare.titlu}</h3>
-                  <p className="mt-3 max-w-md text-hartie/80">
+                <div className="mt-2 flex flex-1 flex-col">
+                  <h3 className="text-h3 text-cerneala">{campanieMare.titlu}</h3>
+                  <p className="mt-3 flex-1 text-cerneala-moale">
                     {campanieMare.text}
                   </p>
                   <Buton
                     href={`${RUTE.doneaza}?destinatie=${campanieMare.destinatie}`}
-                    className="mt-7"
+                    className="mt-7 self-start"
                   >
                     Susține
                   </Buton>
@@ -265,28 +266,27 @@ export default function PrimaPagina() {
             <div className="grid gap-6 [&>*]:min-w-0">
               {campaniiMici.map((campanie, i) => (
                 <Aparitie key={campanie.titlu} intarziere={0.08 + i * 0.08}>
-                  <article className="group flex h-full overflow-hidden rounded-amplu bg-hartie shadow-[0_2px_24px_-14px_rgba(35,35,35,0.35)]">
+                  <article className="flex h-full flex-col gap-5 rounded-amplu bg-hartie p-5 shadow-[0_2px_24px_-16px_rgba(35,35,35,0.35)] sm:flex-row sm:items-center sm:p-6">
                     {campanie.poza ? (
-                      <div className="relative w-2/5 shrink-0 overflow-hidden sm:w-1/3">
-                        <Image
-                          src={campanie.poza.cale}
-                          alt={campanie.poza.alt}
-                          fill
-                          sizes="(min-width: 1024px) 220px, 40vw"
-                          className="object-cover transition-transform duration-[1200ms] ease-cald group-hover:scale-105"
-                        />
-                      </div>
+                      <Rama
+                        cale={campanie.poza.cale}
+                        alt={campanie.poza.alt}
+                        raport="aspect-[4/3]"
+                        cuApropiere
+                        dimensiuni="(min-width: 640px) 220px, 92vw"
+                        className="w-full shrink-0 sm:w-44"
+                      />
                     ) : (
                       // Fără chipuri recognoscibile: până vine o fotografie
                       // potrivită, locul ei îl ține motto-ul, nu o poză de arhivă.
-                      <div className="flex w-2/5 shrink-0 items-center justify-center bg-caramiziu-500 p-5 sm:w-1/3">
-                        <p className="scris text-center text-h4 leading-tight text-hartie">
+                      <div className="flex aspect-[4/3] w-full shrink-0 items-center justify-center rounded-amplu border-[10px] border-hartie bg-caramiziu-500 p-3 shadow-[0_18px_50px_-24px_rgba(35,35,35,0.45)] sm:w-44">
+                        <p className="scris text-center text-amplu leading-tight text-hartie">
                           „{ASOCIATIA.motto}”
                         </p>
                       </div>
                     )}
 
-                    <div className="flex min-w-0 flex-1 flex-col p-6 lg:p-7">
+                    <div className="flex min-w-0 flex-1 flex-col">
                       <h3 className="text-h4 text-cerneala">{campanie.titlu}</h3>
                       <p className="mt-2 flex-1 text-mic text-cerneala-moale">
                         {campanie.text}
@@ -295,7 +295,7 @@ export default function PrimaPagina() {
                         href={`${RUTE.doneaza}?destinatie=${campanie.destinatie}`}
                         varianta="contur"
                         marime="mic"
-                        className="mt-5 self-start"
+                        className="mt-4 self-start"
                       >
                         Susține
                       </Buton>
@@ -314,27 +314,26 @@ export default function PrimaPagina() {
         <div className="mx-auto grid max-w-7xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-2 lg:gap-20 lg:px-8">
           <Aparitie>
             <div className="relative">
-              <div className="relative aspect-[4/5] w-[78%] overflow-hidden rounded-amplu">
-                <Image
-                  src="/poze/2024/11/poza2_enhanced-1.webp"
-                  alt="Trei copii desenează pe o tablă albă pe care scrie „Casa Teona” cu verde"
-                  fill
-                  sizes="(min-width: 1024px) 440px, 78vw"
-                  className="object-cover"
-                />
-              </div>
-              <div className="absolute right-0 bottom-0 aspect-square w-[46%] overflow-hidden rounded-amplu border-[6px] border-hartie">
-                <Image
-                  src="/poze/2024/11/poza3_enhanced.webp"
-                  alt="Clădirea Casa Teona din Suceava, cu firma „Casa TEONA” deasupra intrării"
-                  fill
-                  sizes="(min-width: 1024px) 260px, 46vw"
-                  className="object-cover"
-                />
-              </div>
+              <Rama
+                cale="/poze/2024/11/poza2_enhanced-1.webp"
+                alt="Trei copii desenează pe o tablă albă pe care scrie „Casa Teona” cu verde"
+                raport="aspect-[4/5]"
+                inclinare={-2}
+                legenda="Casa Teona"
+                dimensiuni="(min-width: 1024px) 420px, 78vw"
+                className="w-[78%]"
+              />
+              <Rama
+                cale="/poze/2024/11/poza3_enhanced.webp"
+                alt="Clădirea Casa Teona din Suceava, cu firma „Casa TEONA” deasupra intrării"
+                raport="aspect-square"
+                inclinare={3}
+                dimensiuni="(min-width: 1024px) 240px, 46vw"
+                className="absolute right-0 bottom-0 w-[46%]"
+              />
               <div
                 aria-hidden="true"
-                className="absolute -top-5 -left-5 -z-10 size-28 rounded-amplu bg-miere-300/70 lg:size-40"
+                className="absolute -top-6 -left-6 -z-10 size-28 rounded-amplu bg-turcoaz-200/70 lg:size-40"
               />
             </div>
           </Aparitie>
@@ -375,18 +374,29 @@ export default function PrimaPagina() {
             </Buton>
           </div>
 
-          {/* Listă numerotată pe o linie verticală, nu încă o grilă de carduri. */}
-          <ol className="relative border-l-2 border-hartie-umbra pl-8 lg:pl-10">
+          {/* Fișe, nu paragrafe pe o linie: fiecare realizare e un lucru de
+              sine stătător și se citește mai ușor separat. Numărul mare din
+              colț ține șirul, fără să mai fie nevoie de o linie verticală. */}
+          <ol className="grid gap-4 sm:grid-cols-2">
             {REALIZARI.map((realizare, i) => (
-              <li key={realizare.titlu} className="relative pb-9 last:pb-0">
-                <span
-                  aria-hidden="true"
-                  className="absolute top-1 -left-[2.3rem] flex size-8 items-center justify-center rounded-full bg-caramiziu-500 font-titlu text-nota font-bold text-hartie lg:-left-[3.05rem]"
-                >
-                  {i + 1}
-                </span>
-                <h3 className="text-h4 text-cerneala">{realizare.titlu}</h3>
-                <p className="mt-1.5 text-cerneala-moale">{realizare.text}</p>
+              <li
+                key={realizare.titlu}
+                className={i === 0 ? "sm:col-span-2" : undefined}
+              >
+                <article className="group relative flex h-full gap-5 overflow-hidden rounded-card border border-hartie-umbra bg-hartie p-6 transition-colors duration-300 hover:border-caramiziu-300">
+                  <span
+                    aria-hidden="true"
+                    className="font-titlu text-h2 leading-none font-extrabold text-hartie-umbra transition-colors duration-300 group-hover:text-caramiziu-200"
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="text-h4 text-cerneala">{realizare.titlu}</h3>
+                    <p className="mt-1.5 text-mic text-cerneala-moale">
+                      {realizare.text}
+                    </p>
+                  </div>
+                </article>
               </li>
             ))}
           </ol>

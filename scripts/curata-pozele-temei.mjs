@@ -27,7 +27,7 @@
 
 
 import { readdir, rm } from "node:fs/promises";
-import { basename, join } from "node:path";
+import { join } from "node:path";
 
 const RADACINA = new URL("..", import.meta.url).pathname;
 const POZE = join(RADACINA, "public", "poze");
