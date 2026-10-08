@@ -12,16 +12,30 @@ import { useState } from "react";
  * Dacă `navigator.clipboard` nu există sau e refuzat (se întâmplă pe http sau
  * cu permisiuni blocate), butonul spune cinstit că n-a putut și textul rămâne
  * selectabil cu mâna. Nu afișăm „Copiat!” pentru ceva ce nu s-a copiat.
+ *
+ * Butonul are cel puțin 44 px pe înălțime: pe telefon se apasă cu degetul,
+ * iar un IBAN copiat pe jumătate e mai rău decât unul necopiat.
  */
+
+const CULORI = {
+  caramiziu: "border-l-caramiziu-400",
+  miere: "border-l-miere-400",
+  turcoaz: "border-l-turcoaz-400",
+} as const;
+
 export default function DeCopiat({
   eticheta,
   valoare,
   /** Ce se copiază, dacă diferă de ce se afișează (IBAN fără spații). */
   deCopiat,
+  culoare = "caramiziu",
+  colt = "a",
 }: {
   eticheta: string;
   valoare: string;
   deCopiat?: string;
+  culoare?: keyof typeof CULORI;
+  colt?: "a" | "b";
 }) {
   const [stare, setStare] = useState<"gol" | "copiat" | "eroare">("gol");
 
@@ -36,7 +50,9 @@ export default function DeCopiat({
   }
 
   return (
-    <div className="colt-mic-a flex flex-col gap-3 bg-hartie p-4 shadow-[0_12px_28px_-20px_rgba(35,35,35,0.5)] sm:flex-row sm:items-center sm:justify-between">
+    <div
+      className={`colt-mic-${colt} flex flex-col gap-3 border border-hartie-umbra border-l-4 bg-hartie p-4 shadow-[0_14px_30px_-22px_rgba(35,35,35,0.5)] sm:flex-row sm:items-center sm:justify-between sm:pl-5 ${CULORI[culoare]}`}
+    >
       <div className="min-w-0">
         <span className="block font-titlu text-nota font-bold tracking-wider text-cerneala-slab uppercase">
           {eticheta}
@@ -50,21 +66,40 @@ export default function DeCopiat({
         <button
           type="button"
           onClick={copiaza}
-          className="inline-flex items-center gap-2 rounded-full border-2 border-cerneala/15 bg-hartie px-4 py-2 font-titlu text-mic font-semibold text-cerneala transition-all duration-200 ease-cald hover:border-caramiziu-500 hover:text-caramiziu-600"
+          className={`inline-flex min-h-11 items-center gap-2 rounded-full border-2 px-4 py-2 font-titlu text-mic font-semibold transition-all duration-200 ease-cald ${
+            stare === "copiat"
+              ? "border-turcoaz-500 bg-turcoaz-500 text-hartie"
+              : "border-cerneala/15 bg-hartie text-cerneala hover:border-caramiziu-500 hover:text-caramiziu-600"
+          }`}
         >
-          <svg
-            viewBox="0 0 24 24"
-            className="size-4"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.75}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <rect x="9" y="9" width="11" height="11" rx="2.5" />
-            <path d="M15 5.5A2.5 2.5 0 0 0 12.5 3h-6A3.5 3.5 0 0 0 3 6.5v6A2.5 2.5 0 0 0 5.5 15" />
-          </svg>
+          {stare === "copiat" ? (
+            <svg
+              viewBox="0 0 24 24"
+              className="size-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M5 12.5l4.5 4.5L19 7.5" />
+            </svg>
+          ) : (
+            <svg
+              viewBox="0 0 24 24"
+              className="size-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.75}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="9" y="9" width="11" height="11" rx="2.5" />
+              <path d="M15 5.5A2.5 2.5 0 0 0 12.5 3h-6A3.5 3.5 0 0 0 3 6.5v6A2.5 2.5 0 0 0 5.5 15" />
+            </svg>
+          )}
           {stare === "copiat" ? "Copiat" : "Copiază"}
         </button>
         <span role="status" className="sr-only">

@@ -9,6 +9,17 @@
  * Curba e aceeași peste tot, întoarsă după nevoie, ca să nu pară desenată
  * de fiecare dată altfel.
  */
+/**
+ * Valul tras peste capătul secțiunii de deasupra.
+ *
+ * Fără asta, partea transparentă a curbei lasă să se vadă fundalul paginii
+ * (alb), nu culoarea secțiunii de sus — și la trecerea dintr-o secțiune
+ * colorată în una albă curba dispărea cu totul: alb peste alb, tăiat drept.
+ * Secțiunea de deasupra își ține spațiu jos cât înălțimea valului
+ * (`pb-24 lg:pb-32`), ca nimic din conținut să nu intre sub el.
+ */
+export const VAL_PESTE = "relative z-10 -mt-10 sm:-mt-14 lg:-mt-20";
+
 export default function Val({
   /** Culoarea secțiunii **de dedesubt**: valul o aduce peste cea de deasupra. */
   culoare = "text-hartie",

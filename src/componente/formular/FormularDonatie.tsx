@@ -9,7 +9,15 @@ import {
   RUTE,
   TELEFON_PRINCIPAL,
 } from "@/date/asociatie";
-import Camp, { claseControl, claseControlGresit } from "./Camp";
+import Decor from "../Decor";
+import Pictograma from "../Pictograma";
+import Camp, {
+  Bifa,
+  Eroare,
+  Optiuni,
+  claseControl,
+  claseControlGresit,
+} from "./Camp";
 
 const SUME = [20, 50, 100] as const;
 
@@ -75,74 +83,94 @@ export default function FormularDonatie({
     return (
       <div
         role="status"
-        className="colt-a grid gap-4 bg-hartie p-7 shadow-[0_22px_45px_-24px_rgba(247,79,34,0.5)] sm:p-9"
+        className="relative overflow-hidden colt-a border border-hartie-umbra bg-hartie shadow-[0_26px_52px_-26px_rgba(247,79,34,0.5)]"
       >
-        <h3 className="text-h4 text-cerneala">
-          Plata cu cardul direct pe site se conectează acum
-        </h3>
-        <p className="text-cerneala-moale">
-          Alegem împreună cu asociația procesatorul de plăți, înainte de
-          lansare. Nu îți luăm datele cardului până atunci. Dar poți dona chiar
-          acum, pe una dintre căile care funcționează:
-        </p>
+        <div className="granulatie relative overflow-hidden bg-miere-300 px-7 py-6 sm:px-9">
+          <Decor semn="stea" strokeWidth={0.8} className="absolute -top-8 -right-8 size-32 text-miere-100" />
+          <h3 className="relative text-h4 text-miere-900">
+            Plata cu cardul direct pe site se conectează acum
+          </h3>
+        </div>
+        <div className="grid gap-5 p-7 sm:p-9">
+          <p className="text-cerneala-moale">
+            Alegem împreună cu asociația procesatorul de plăți, înainte de
+            lansare. Nu îți luăm datele cardului până atunci. Dar poți dona chiar
+            acum, pe una dintre căile care funcționează:
+          </p>
 
-        <ul className="grid gap-3">
-          <li>
-            <a
-              href={LINKURI_EXTERNE.galantom}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="colt-mic-a block bg-caramiziu-500 px-5 py-4 font-titlu font-semibold text-hartie transition hover:bg-caramiziu-600"
-            >
-              Donează cu cardul pe Galantom
-              <span className="mt-1 block text-mic font-normal opacity-90">
-                Pagina de strângere de fonduri a asociației. O dată sau lunar.
-              </span>
-            </a>
-          </li>
-          <li>
-            <a
-              href="#sms"
-              onClick={() => setTrimis(false)}
-              className="colt-mic-b block bg-hartie-calda px-5 py-4 font-titlu font-semibold text-cerneala transition hover:bg-hartie-umbra"
-            >
-              Donează lunar prin SMS
-              <span className="mt-1 block text-mic font-normal text-cerneala-moale">
-                Trimiți un mesaj, fără formulare.
-              </span>
-            </a>
-          </li>
-          <li>
-            <a
-              href="#transfer"
-              onClick={() => setTrimis(false)}
-              className="colt-mic-a block bg-hartie-calda px-5 py-4 font-titlu font-semibold text-cerneala transition hover:bg-hartie-umbra"
-            >
-              Transfer bancar
-              <span className="mt-1 block text-mic font-normal text-cerneala-moale">
-                Conturile asociației, cu buton de copiere.
-              </span>
-            </a>
-          </li>
-        </ul>
+          <ul className="grid gap-3">
+            <li>
+              <a
+                href={LINKURI_EXTERNE.galantom}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 colt-mic-a bg-caramiziu-500 px-5 py-4 font-titlu font-semibold text-hartie shadow-[0_14px_30px_-14px_rgba(247,79,34,0.9)] transition hover:bg-caramiziu-600"
+              >
+                <span className="flex size-11 shrink-0 items-center justify-center colt-mic-b bg-hartie/20">
+                  <Pictograma nume="inima" className="size-5" />
+                </span>
+                <span>
+                  Donează cu cardul pe Galantom
+                  <span className="mt-0.5 block text-mic font-normal opacity-90">
+                    Pagina de strângere de fonduri a asociației. O dată sau lunar.
+                  </span>
+                </span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="#sms"
+                onClick={() => setTrimis(false)}
+                className="flex items-center gap-4 colt-mic-b bg-miere-100 px-5 py-4 font-titlu font-semibold text-cerneala transition hover:bg-miere-200"
+              >
+                <span className="flex size-11 shrink-0 items-center justify-center colt-mic-a bg-miere-400 text-cerneala">
+                  <Pictograma nume="telefon" className="size-5" />
+                </span>
+                <span>
+                  Donează lunar prin SMS
+                  <span className="mt-0.5 block text-mic font-normal text-cerneala-moale">
+                    Trimiți un mesaj, fără formulare.
+                  </span>
+                </span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="#transfer"
+                onClick={() => setTrimis(false)}
+                className="flex items-center gap-4 colt-mic-a bg-turcoaz-50 px-5 py-4 font-titlu font-semibold text-cerneala transition hover:bg-turcoaz-100"
+              >
+                <span className="flex size-11 shrink-0 items-center justify-center colt-mic-b bg-turcoaz-500 text-hartie">
+                  <Pictograma nume="cladire" className="size-5" />
+                </span>
+                <span>
+                  Transfer bancar
+                  <span className="mt-0.5 block text-mic font-normal text-cerneala-moale">
+                    Conturile asociației, cu buton de copiere.
+                  </span>
+                </span>
+              </a>
+            </li>
+          </ul>
 
-        <p className="text-mic text-cerneala-moale">
-          Ai nevoie de ajutor? Scrie-ne la{" "}
-          <a
-            href={`mailto:${EMAIL.contact}`}
-            className="font-semibold underline underline-offset-2"
-          >
-            {EMAIL.contact}
-          </a>{" "}
-          sau sună-ne la{" "}
-          <a
-            href={`tel:${TELEFON_PRINCIPAL.apel}`}
-            className="font-semibold underline underline-offset-2"
-          >
-            {TELEFON_PRINCIPAL.afisat}
-          </a>
-          .
-        </p>
+          <p className="text-mic text-cerneala-moale">
+            Ai nevoie de ajutor? Scrie-ne la{" "}
+            <a
+              href={`mailto:${EMAIL.contact}`}
+              className="font-semibold underline underline-offset-2"
+            >
+              {EMAIL.contact}
+            </a>{" "}
+            sau sună-ne la{" "}
+            <a
+              href={`tel:${TELEFON_PRINCIPAL.apel}`}
+              className="font-semibold underline underline-offset-2"
+            >
+              {TELEFON_PRINCIPAL.afisat}
+            </a>
+            .
+          </p>
+        </div>
       </div>
     );
   }
@@ -151,248 +179,232 @@ export default function FormularDonatie({
     <form
       onSubmit={trimite}
       noValidate
-      className="colt-a grid gap-6 bg-hartie p-6 shadow-[0_22px_45px_-24px_rgba(247,79,34,0.5)] sm:p-8"
+      className="relative overflow-hidden colt-a border border-hartie-umbra bg-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.55)]"
     >
-      {/* Suma */}
-      <fieldset>
-        <legend className="mb-3 font-titlu text-mic font-semibold text-cerneala">
-          Suma{" "}
-          <span className="text-caramiziu-600" aria-hidden="true">
-            *
+      <div className="granulatie relative overflow-hidden bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 px-6 py-5 text-hartie sm:px-8">
+        <Decor semn="inima" strokeWidth={0.9} className="absolute -right-6 -bottom-10 size-32 text-hartie/20" />
+        <p className="relative flex items-center gap-3 font-titlu text-amplu font-bold">
+          <span className="flex size-10 items-center justify-center colt-mic-b bg-hartie/20">
+            <Pictograma nume="inima" className="size-5" />
           </span>
-        </legend>
-
-        <div className="flex flex-wrap gap-2.5">
-          {SUME.map((valoare) => (
-            <button
-              key={valoare}
-              type="button"
-              aria-pressed={suma === valoare}
-              onClick={() => {
-                setSuma(valoare);
-                setAltaSuma("");
-              }}
-              className={`rounded-full px-6 py-3 font-titlu font-semibold transition-all duration-200 ease-cald ${
-                suma === valoare
-                  ? "bg-caramiziu-500 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]"
-                  : "border-2 border-cerneala/15 bg-hartie text-cerneala hover:border-caramiziu-400"
-              }`}
-            >
-              {valoare} lei
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-3">
-          <label
-            htmlFor={`${id}-alta`}
-            className="mb-1.5 block font-titlu text-mic font-semibold text-cerneala"
-          >
-            Altă sumă (lei)
-          </label>
-          <input
-            id={`${id}-alta`}
-            name="alta"
-            type="text"
-            inputMode="decimal"
-            value={altaSuma}
-            onChange={(ev) => {
-              setAltaSuma(ev.target.value);
-              setSuma(null);
-            }}
-            aria-invalid={Boolean(erori.suma)}
-            aria-describedby={erori.suma ? `${id}-suma-eroare` : undefined}
-            className={`${erori.suma ? claseControlGresit : claseControl} sm:max-w-xs`}
-          />
-          {erori.suma && (
-            <p
-              id={`${id}-suma-eroare`}
-              className="mt-1.5 font-titlu text-mic font-semibold text-caramiziu-700"
-            >
-              {erori.suma}
-            </p>
-          )}
-        </div>
-      </fieldset>
-
-      {/* Frecvența — „Lunar” preselectat. */}
-      <fieldset>
-        <legend className="mb-3 font-titlu text-mic font-semibold text-cerneala">
-          Frecvența
-        </legend>
-        <div className="flex flex-wrap gap-2.5">
-          {[
-            { eticheta: "O dată", valoare: false },
-            { eticheta: "Lunar", valoare: true },
-          ].map((optiune) => (
-            <button
-              key={optiune.eticheta}
-              type="button"
-              aria-pressed={lunar === optiune.valoare}
-              onClick={() => setLunar(optiune.valoare)}
-              className={`rounded-full px-6 py-3 font-titlu font-semibold transition-all duration-200 ease-cald ${
-                lunar === optiune.valoare
-                  ? "bg-miere-400 text-cerneala shadow-[0_10px_22px_-10px_rgba(255,172,0,0.9)]"
-                  : "border-2 border-cerneala/15 bg-hartie text-cerneala hover:border-miere-400"
-              }`}
-            >
-              {optiune.eticheta}
-            </button>
-          ))}
-        </div>
-      </fieldset>
-
-      <Camp id={`${id}-destinatie`} eticheta="Destinația donației" obligatoriu>
-        <select
-          id={`${id}-destinatie`}
-          name="destinatie"
-          defaultValue={destinatieInitiala}
-          className={claseControl}
-        >
-          {DESTINATII_DONATIE.map((destinatie) => (
-            <option key={destinatie.id} value={destinatie.id}>
-              {destinatie.eticheta}
-            </option>
-          ))}
-        </select>
-      </Camp>
-
-      <div className="grid gap-5 sm:grid-cols-2">
-        <Camp id={`${id}-prenume`} eticheta="Prenume">
-          <input
-            id={`${id}-prenume`}
-            name="prenume"
-            type="text"
-            autoComplete="given-name"
-            className={claseControl}
-          />
-        </Camp>
-        <Camp id={`${id}-nume`} eticheta="Nume">
-          <input
-            id={`${id}-nume`}
-            name="nume"
-            type="text"
-            autoComplete="family-name"
-            className={claseControl}
-          />
-        </Camp>
-
-        <Camp
-          id={`${id}-email`}
-          eticheta="Email"
-          obligatoriu
-          nota="Aici primești confirmarea donației."
-          eroare={erori.email}
-        >
-          <input
-            id={`${id}-email`}
-            name="email"
-            type="email"
-            autoComplete="email"
-            aria-invalid={Boolean(erori.email)}
-            aria-describedby={
-              erori.email ? `${id}-email-eroare` : `${id}-email-nota`
-            }
-            className={erori.email ? claseControlGresit : claseControl}
-          />
-        </Camp>
-
-        <Camp id={`${id}-telefon`} eticheta="Telefon">
-          <input
-            id={`${id}-telefon`}
-            name="telefon"
-            type="tel"
-            autoComplete="tel"
-            className={claseControl}
-          />
-        </Camp>
+          Donează cu cardul
+        </p>
       </div>
 
-      <div className="grid gap-3">
-        <label className="flex items-start gap-3 text-mic text-cerneala-moale">
-          <input
-            name="buletin"
-            value="da"
-            type="checkbox"
-            className="mt-1 size-4 shrink-0 accent-caramiziu-500"
-          />
-          <span>
+      <div className="grid gap-6 p-6 sm:p-8">
+        {/* Suma */}
+        <fieldset>
+          <legend className="mb-3 font-titlu text-mic font-bold text-cerneala">
+            Suma{" "}
+            <span className="text-caramiziu-600" aria-hidden="true">
+              *
+            </span>
+          </legend>
+
+          <div className="grid grid-cols-3 gap-2.5">
+            {SUME.map((valoare, i) => (
+              <button
+                key={valoare}
+                type="button"
+                aria-pressed={suma === valoare}
+                onClick={() => {
+                  setSuma(valoare);
+                  setAltaSuma("");
+                }}
+                className={`flex min-h-16 flex-col items-center justify-center ${
+                  i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"
+                } px-3 py-2 font-titlu font-extrabold transition-all duration-200 ease-cald ${
+                  suma === valoare
+                    ? "bg-caramiziu-500 text-hartie shadow-[0_12px_26px_-12px_rgba(247,79,34,0.9)]"
+                    : "border-2 border-hartie-umbra bg-hartie text-cerneala hover:border-caramiziu-400"
+                }`}
+              >
+                <span className="text-h4 leading-none">{valoare}</span>
+                <span
+                  className={`mt-1 text-nota font-semibold ${
+                    suma === valoare ? "text-hartie/85" : "text-cerneala-slab"
+                  }`}
+                >
+                  lei
+                </span>
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-3">
+            <label
+              htmlFor={`${id}-alta`}
+              className="mb-2 block font-titlu text-mic font-bold text-cerneala"
+            >
+              Altă sumă (lei)
+            </label>
+            <input
+              id={`${id}-alta`}
+              name="alta"
+              type="text"
+              inputMode="decimal"
+              value={altaSuma}
+              onChange={(ev) => {
+                setAltaSuma(ev.target.value);
+                setSuma(null);
+              }}
+              aria-invalid={Boolean(erori.suma)}
+              aria-describedby={erori.suma ? `${id}-suma-eroare` : undefined}
+              className={`${erori.suma ? claseControlGresit : claseControl} sm:max-w-xs`}
+            />
+            <Eroare id={`${id}-suma-eroare`} text={erori.suma} />
+          </div>
+        </fieldset>
+
+        {/* Frecvența — „Lunar” preselectat. Un comutator cu două poziții. */}
+        <fieldset>
+          <legend className="mb-3 font-titlu text-mic font-bold text-cerneala">
+            Frecvența
+          </legend>
+          <div className="inline-grid grid-cols-2 gap-1 rounded-full border-2 border-hartie-umbra bg-hartie-calda p-1">
+            {[
+              { eticheta: "O dată", valoare: false },
+              { eticheta: "Lunar", valoare: true },
+            ].map((optiune) => (
+              <button
+                key={optiune.eticheta}
+                type="button"
+                aria-pressed={lunar === optiune.valoare}
+                onClick={() => setLunar(optiune.valoare)}
+                className={`min-h-11 rounded-full px-6 py-2 font-titlu font-bold transition-all duration-300 ease-cald ${
+                  lunar === optiune.valoare
+                    ? "bg-miere-400 text-cerneala shadow-[0_10px_22px_-10px_rgba(255,172,0,0.9)]"
+                    : "text-cerneala-moale hover:text-cerneala"
+                }`}
+              >
+                {optiune.eticheta}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+
+        <Optiuni
+          name="destinatie"
+          legenda="Destinația donației"
+          obligatoriu
+          defaultValue={destinatieInitiala}
+          optiuni={DESTINATII_DONATIE.map((destinatie) => ({
+            valoare: destinatie.id,
+            eticheta: destinatie.eticheta,
+          }))}
+        />
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Camp id={`${id}-prenume`} eticheta="Prenume">
+            <input
+              id={`${id}-prenume`}
+              name="prenume"
+              type="text"
+              autoComplete="given-name"
+              className={claseControl}
+            />
+          </Camp>
+          <Camp id={`${id}-nume`} eticheta="Nume">
+            <input
+              id={`${id}-nume`}
+              name="nume"
+              type="text"
+              autoComplete="family-name"
+              className={claseControl}
+            />
+          </Camp>
+
+          <Camp
+            id={`${id}-email`}
+            eticheta="Email"
+            obligatoriu
+            nota="Aici primești confirmarea donației."
+            eroare={erori.email}
+          >
+            <input
+              id={`${id}-email`}
+              name="email"
+              type="email"
+              autoComplete="email"
+              aria-invalid={Boolean(erori.email)}
+              aria-describedby={
+                erori.email ? `${id}-email-eroare` : `${id}-email-nota`
+              }
+              className={erori.email ? claseControlGresit : claseControl}
+            />
+          </Camp>
+
+          <Camp id={`${id}-telefon`} eticheta="Telefon">
+            <input
+              id={`${id}-telefon`}
+              name="telefon"
+              type="tel"
+              autoComplete="tel"
+              className={claseControl}
+            />
+          </Camp>
+        </div>
+
+        <div className="grid gap-3">
+          <Bifa name="buletin">
             Vreau să primesc ocazional vești despre activitatea asociației.
-          </span>
-        </label>
+          </Bifa>
+
+          <Bifa name="acord" obligatoriu eroare={erori.acord}>
+            Sunt de acord cu prelucrarea datelor mele, conform{" "}
+            <Link
+              href={RUTE.confidentialitate}
+              className="font-semibold text-cerneala underline underline-offset-2"
+            >
+              Politicii de confidențialitate
+            </Link>
+            .
+          </Bifa>
+        </div>
 
         <div>
-          <label className="flex items-start gap-3 text-mic text-cerneala-moale">
-            <input
-              name="acord"
-              value="da"
-              type="checkbox"
-              aria-invalid={Boolean(erori.acord)}
-              className="mt-1 size-4 shrink-0 accent-caramiziu-500"
-            />
-            <span>
-              Sunt de acord cu prelucrarea datelor mele, conform{" "}
-              <Link
-                href={RUTE.confidentialitate}
-                className="font-semibold underline underline-offset-2"
-              >
-                Politicii de confidențialitate
-              </Link>
-              .{" "}
-              <span className="text-caramiziu-600" aria-hidden="true">
-                *
-              </span>
-            </span>
-          </label>
-          {erori.acord && (
-            <p className="mt-1.5 font-titlu text-mic font-semibold text-caramiziu-700">
-              {erori.acord}
-            </p>
-          )}
-        </div>
-      </div>
-
-      <div>
-        <button
-          type="submit"
-          className="inline-flex w-full items-center justify-center rounded-full bg-caramiziu-500 px-8 py-4 font-titlu text-amplu font-semibold text-hartie shadow-[0_14px_30px_-12px_rgba(247,79,34,0.9)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:bg-caramiziu-600 motion-reduce:hover:translate-y-0 sm:w-auto"
-        >
-          {etichetaButon}
-        </button>
-
-        <p className="mt-3 flex items-center gap-2 text-mic text-cerneala-moale">
-          <svg
-            viewBox="0 0 24 24"
-            className="size-4 shrink-0 text-turcoaz-600"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.8}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
+          <button
+            type="submit"
+            className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-caramiziu-500 px-8 py-4 font-titlu text-amplu font-bold text-hartie shadow-[0_16px_32px_-12px_rgba(247,79,34,0.9)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:bg-caramiziu-600 motion-reduce:hover:translate-y-0"
           >
-            <rect x="4" y="10.5" width="16" height="10" rx="2.5" />
-            <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
-          </svg>
-          Plată securizată. Datele cardului nu trec prin site-ul nostru.
-        </p>
+            <Pictograma nume="inima" className="size-5" />
+            {etichetaButon}
+          </button>
 
-        {/* Pictogramele cardurilor acceptate, cerute la 2.2. Desenate, nu
-            siglele oficiale: acelea se pot folosi doar după ce procesatorul e
-            ales și ne dă dreptul să le afișăm. */}
-        <ul
-          aria-label="Carduri acceptate"
-          className="mt-3 flex flex-wrap items-center gap-2"
-        >
-          {["Visa", "Mastercard", "Maestro"].map((card) => (
-            <li
-              key={card}
-              className="rounded-md border border-hartie-umbra bg-hartie px-3 py-1.5 font-titlu text-nota font-bold text-cerneala-moale"
+          <p className="mt-4 flex items-center gap-2 text-mic text-cerneala-moale">
+            <svg
+              viewBox="0 0 24 24"
+              className="size-4 shrink-0 text-turcoaz-600"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.8}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
             >
-              {card}
-            </li>
-          ))}
-        </ul>
+              <rect x="4" y="10.5" width="16" height="10" rx="2.5" />
+              <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
+            </svg>
+            Plată securizată. Datele cardului nu trec prin site-ul nostru.
+          </p>
+
+          {/* Pictogramele cardurilor acceptate, cerute la 2.2. Desenate, nu
+              siglele oficiale: acelea se pot folosi doar după ce procesatorul e
+              ales și ne dă dreptul să le afișăm. */}
+          <ul
+            aria-label="Carduri acceptate"
+            className="mt-3 flex flex-wrap items-center gap-2"
+          >
+            {["Visa", "Mastercard", "Maestro"].map((card) => (
+              <li
+                key={card}
+                className="rounded-md border border-hartie-umbra bg-hartie-calda px-3 py-1.5 font-titlu text-nota font-bold text-cerneala-moale"
+              >
+                {card}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </form>
   );

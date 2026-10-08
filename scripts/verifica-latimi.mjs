@@ -7,7 +7,8 @@
  * găsește înainte să-l vadă cineva.
  *
  * Cere serverul pornit (npm run start) și Playwright instalat local.
- * Rulare:                node scripts/verifica-latimi.mjs
+ * Rulare:                node scripts/verifica-latimi.mjs [adresa]
+ *                        (implicit http://localhost:3000)
  */
 let chromium;
 try {
@@ -19,6 +20,7 @@ try {
   );
   process.exit(2);
 }
+const ADRESA = process.argv[2] ?? 'http://localhost:3000';
 const PAGINI = [
   '/', '/despre-noi', '/casa-teona', '/proiecte', '/sponsori-si-parteneri',
   '/redirectioneaza-3-5', '/directioneaza-20', '/suntem-in-presa',
@@ -31,7 +33,7 @@ let probleme=0;
 for (const w of [320,360,390,414,768,1024,1280,1440,1920]) {
  for (const ruta of PAGINI) {
   const pg=await (await b.newContext({viewport:{width:w,height:900}})).newPage();
-  await pg.goto('http://localhost:3000'+ruta,{waitUntil:'networkidle'});
+  await pg.goto(ADRESA+ruta,{waitUntil:'networkidle'});
   await pg.waitForTimeout(400);
   const r = await pg.evaluate(() => {
     const lat = document.documentElement.clientWidth;

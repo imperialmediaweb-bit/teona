@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ADRESE, ASOCIATIA, EMAIL, RUTE, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import Buton from "@/componente/Buton";
+import Decor from "@/componente/Decor";
 import Pictograma from "@/componente/Pictograma";
-import Val from "@/componente/Val";
+import Val, { VAL_PESTE } from "@/componente/Val";
 
 export const metadata: Metadata = {
   title: "Raport de activitate 2025",
@@ -31,6 +32,16 @@ export const metadata: Metadata = {
  * 2. Raportul listează 50 de sponsori; pe pagina Sponsori sunt 30, atâtea
  *    sigle există în arhivă. Lista de aici e cea completă.
  */
+
+/** Câmpurile de culoare ale celor șase cifre, pe rând: niciuna ca vecina ei. */
+const CAMPURI_CIFRE = [
+  "granulatie bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 text-hartie shadow-[0_24px_50px_-26px_rgba(247,79,34,0.8)]",
+  "border border-hartie-umbra bg-hartie text-caramiziu-500 shadow-[0_18px_38px_-24px_rgba(35,35,35,0.45)]",
+  "granulatie bg-miere-300 text-miere-900 shadow-[0_24px_50px_-26px_rgba(255,172,0,0.8)]",
+  "granulatie bg-turcoaz-100 text-turcoaz-700 shadow-[0_24px_50px_-26px_rgba(42,159,163,0.6)]",
+  "border border-hartie-umbra bg-hartie text-caramiziu-500 shadow-[0_18px_38px_-24px_rgba(35,35,35,0.45)]",
+  "granulatie bg-hartie-calda text-turcoaz-700 shadow-[0_18px_38px_-24px_rgba(42,159,163,0.4)]",
+] as const;
 
 const CIFRE_2025 = [
   { valoare: "4", eticheta: "tabere Respiro" },
@@ -248,10 +259,10 @@ function Tabel({
   return (
     <div>
       <h3 className="text-h4 text-cerneala">{titlu}</h3>
-      <div className="colt-a mt-5 overflow-hidden bg-hartie shadow-[0_18px_38px_-24px_rgba(35,35,35,0.5)]">
+      <div className="colt-a mt-5 overflow-hidden border border-hartie-umbra bg-hartie shadow-[0_18px_38px_-24px_rgba(35,35,35,0.5)]">
         <table className="w-full text-left">
           <thead>
-            <tr className="bg-hartie-umbra">
+            <tr className="bg-hartie-calda">
               <th scope="col" className="px-5 py-3 font-titlu text-nota font-bold tracking-wider text-cerneala-moale uppercase">
                 Categorie
               </th>
@@ -285,11 +296,16 @@ function Tabel({
 export default function Raport2025() {
   return (
     <>
-      <section className="granulatie bg-tenta-cald pt-10 pb-14 lg:pt-16">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+      <section className="granulatie relative isolate overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-12 lg:pb-32">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+          <span className="pata absolute -top-32 right-[-8%] size-[26rem] rounded-full bg-caramiziu-100/60 blur-3xl" />
+          <Decor semn="stea" className="pluteste-lent absolute top-10 right-[6%] hidden size-10 text-miere-400 lg:block" />
+          <Decor semn="unda" className="pluteste-lent absolute bottom-16 left-[3%] size-9 text-caramiziu-200 lg:size-12" />
+        </div>
+        <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <Link
             href={`${RUTE.despre}#transparenta`}
-            className="inline-flex items-center gap-2 font-titlu text-mic font-semibold text-caramiziu-600 transition hover:text-caramiziu-700"
+            className="inline-flex min-h-10 items-center gap-2 font-titlu text-mic font-semibold text-caramiziu-600 transition hover:text-caramiziu-700"
           >
             <Pictograma nume="sageata" className="size-4 rotate-180" />
             Transparență
@@ -307,21 +323,23 @@ export default function Raport2025() {
           </p>
         </div>
       </section>
-      <Val culoare="text-hartie" />
+      <Val culoare="text-hartie" className={VAL_PESTE} />
 
+      {/* Cifrele anului, în câmpuri de culoare care ies peste valul
+          antetului — ca banda de cifre de pe prima pagină. */}
       <section className="bg-hartie pb-16">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <h2 className="sr-only">Cifrele anului 2025</h2>
-          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          <ul className="relative z-20 -mt-6 grid grid-cols-2 gap-4 sm:-mt-10 sm:grid-cols-3 lg:-mt-16">
             {CIFRE_2025.map((cifra, i) => (
               <li
                 key={cifra.eticheta}
-                className={`${i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"} bg-hartie-calda px-5 py-5 text-center shadow-[0_14px_30px_-22px_rgba(35,35,35,0.5)]`}
+                className={`relative overflow-hidden ${i % 2 === 0 ? "colt-a" : "colt-b"} px-5 py-7 text-center ${CAMPURI_CIFRE[i]}`}
               >
-                <span className="block font-titlu text-h2 leading-none font-extrabold text-caramiziu-500">
+                <span className="block font-titlu text-[2.8rem] leading-none font-extrabold tracking-tight">
                   {cifra.valoare}
                 </span>
-                <span className="mt-2 block font-titlu text-nota font-semibold text-cerneala-moale">
+                <span className="mt-2 block font-titlu text-nota font-bold opacity-80">
                   {cifra.eticheta}
                 </span>
               </li>
@@ -354,31 +372,29 @@ export default function Raport2025() {
 
           <div className="mt-14 grid gap-12">
             {CAPITOLE.map((capitol) => (
-              <section key={capitol.numar}>
-                <h2 className="flex items-baseline gap-3 text-h3 text-cerneala">
-                  <span
-                    aria-hidden="true"
-                    className="font-titlu text-h4 font-extrabold text-caramiziu-300"
-                  >
-                    {capitol.numar}
-                  </span>
-                  {capitol.titlu}
-                </h2>
+              <section key={capitol.numar} className="relative">
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -top-8 -left-2 font-titlu text-[5.5rem] leading-none font-extrabold tracking-tight text-caramiziu-50 select-none"
+                >
+                  {String(capitol.numar).padStart(2, "0")}
+                </span>
+                <h2 className="relative text-h3 text-cerneala">{capitol.titlu}</h2>
 
                 {capitol.paragrafe?.map((paragraf) => (
-                  <p key={paragraf.slice(0, 30)} className="mt-4 text-cerneala-moale">
+                  <p key={paragraf.slice(0, 30)} className="relative mt-4 text-cerneala-moale">
                     {paragraf}
                   </p>
                 ))}
 
                 {capitol.liste?.map((lista) => (
-                  <div key={lista.titlu ?? lista.elemente[0]} className="mt-5">
+                  <div key={lista.titlu ?? lista.elemente[0]} className="relative mt-5">
                     {lista.titlu && (
                       <p className="font-titlu font-semibold text-cerneala">
                         {lista.titlu}
                       </p>
                     )}
-                    <ul className="mt-2 grid list-disc gap-1.5 pl-5 text-cerneala-moale">
+                    <ul className="mt-2 grid list-disc gap-1.5 pl-5 text-cerneala-moale marker:text-caramiziu-400">
                       {lista.elemente.map((element) => (
                         <li key={element}>{element}</li>
                       ))}
@@ -392,22 +408,34 @@ export default function Raport2025() {
       </section>
 
       {/* 8 — parteneriate */}
-      <Val culoare="text-hartie-calda" />
-      <section className="granulatie bg-hartie-calda pb-16">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <h2 className="flex items-baseline gap-3 text-h3 text-cerneala">
-            <span aria-hidden="true" className="font-titlu text-h4 font-extrabold text-caramiziu-300">
-              8
-            </span>
-            Parteneriate și susținere
-          </h2>
+      <Val culoare="text-hartie-calda" className={VAL_PESTE} />
+      <section className="granulatie relative overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-10 lg:pb-32">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <Decor semn="soare" className="pluteste-lent absolute top-12 right-[5%] size-9 text-miere-300 lg:size-12" />
+        </div>
+        <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-8 left-2 font-titlu text-[5.5rem] leading-none font-extrabold tracking-tight text-miere-100 select-none"
+          >
+            08
+          </span>
+          <h2 className="relative text-h3 text-cerneala">Parteneriate și susținere</h2>
 
           <h3 className="mt-7 font-titlu text-amplu font-bold text-cerneala">
             Parteneri instituționali
           </h3>
-          <ul className="mt-3 grid list-disc gap-1.5 pl-5 text-cerneala-moale">
-            {PARTENERI.map((partener) => (
-              <li key={partener}>{partener}</li>
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+            {PARTENERI.map((partener, i) => (
+              <li
+                key={partener}
+                className={`flex items-center gap-3 ${i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"} bg-hartie px-4 py-3 font-titlu text-mic font-bold text-cerneala shadow-[0_12px_26px_-18px_rgba(35,35,35,0.5)]`}
+              >
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-miere-100 text-miere-700">
+                  <Pictograma nume="cladire" className="size-4" />
+                </span>
+                {partener}
+              </li>
             ))}
           </ul>
 
@@ -418,7 +446,7 @@ export default function Raport2025() {
             {SPONSORI_RAPORT.map((sponsor) => (
               <li
                 key={sponsor}
-                className="rounded-full bg-hartie px-4 py-1.5 font-titlu text-nota font-semibold text-cerneala-moale shadow-[0_8px_18px_-14px_rgba(35,35,35,0.6)]"
+                className="rounded-full border border-hartie-umbra bg-hartie px-4 py-1.5 font-titlu text-nota font-semibold text-cerneala-moale shadow-[0_8px_18px_-14px_rgba(35,35,35,0.6)]"
               >
                 {sponsor}
               </li>
@@ -428,15 +456,16 @@ export default function Raport2025() {
       </section>
 
       {/* 9 — situația financiară */}
-      <Val culoare="text-hartie" />
-      <section className="bg-hartie pb-20 lg:pb-24">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <h2 className="flex items-baseline gap-3 text-h3 text-cerneala">
-            <span aria-hidden="true" className="font-titlu text-h4 font-extrabold text-caramiziu-300">
-              9
-            </span>
-            Situație financiară 2025
-          </h2>
+      <Val culoare="text-hartie" className={VAL_PESTE} />
+      <section className="bg-hartie pt-6 pb-24 lg:pt-10 lg:pb-32">
+        <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-8 left-2 font-titlu text-[5.5rem] leading-none font-extrabold tracking-tight text-turcoaz-50 select-none"
+          >
+            09
+          </span>
+          <h2 className="relative text-h3 text-cerneala">Situație financiară 2025</h2>
           <p className="mt-4 text-cerneala-moale">
             Cheltuielile pentru servicii terapeutice și activități sunt susținute
             integral din fonduri atrase — donații, sponsorizări și granturi —,
@@ -450,18 +479,25 @@ export default function Raport2025() {
             <Tabel titlu="Cheltuieli" randuri={CHELTUIELI} total="558.596" />
           </div>
 
-          <p className="colt-mic-a mt-8 bg-turcoaz-50 px-5 py-4 font-titlu font-semibold text-turcoaz-900">
-            Rezultat financiar 2025 (excedent):{" "}
-            <span className="tabular-nums">114.951 lei</span>
+          <p className="granulatie relative mt-8 overflow-hidden colt-a bg-turcoaz-100 px-6 py-6 font-titlu font-bold text-turcoaz-900 shadow-[0_24px_50px_-26px_rgba(42,159,163,0.6)]">
+            <Decor semn="spirala" strokeWidth={0.8} className="absolute -right-8 -bottom-8 size-32 text-turcoaz-200" />
+            <span className="relative block text-nota font-bold tracking-wider uppercase opacity-80">
+              Rezultat financiar 2025 (excedent)
+            </span>
+            <span className="relative mt-1 block text-h2 tabular-nums">114.951 lei</span>
           </p>
         </div>
       </section>
 
       {/* 11 — mulțumiri */}
-      <Val culoare="text-tenta-cald" />
-      <section className="granulatie bg-tenta-cald pb-20 lg:pb-24">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-h3 text-cerneala">Mulțumiri</h2>
+      <Val culoare="text-tenta-cald" className={VAL_PESTE} />
+      <section className="granulatie relative overflow-hidden bg-tenta-cald pt-6 pb-24 lg:pt-10 lg:pb-32">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <Decor semn="inima" className="pluteste-lent absolute top-12 right-[5%] size-9 text-caramiziu-200 lg:size-12" />
+        </div>
+        <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <p className="scris text-amplu text-caramiziu-600">Tuturor celor care au fost alături de noi</p>
+          <h2 className="mt-2 text-h2 text-cerneala">Mulțumiri</h2>
           <p className="mt-4 text-cerneala-moale">
             Mulțumim tuturor părinților, copiilor, voluntarilor, terapeuților,
             sponsorilor și partenerilor care au fost alături de noi.
@@ -472,7 +508,7 @@ export default function Raport2025() {
             singuri.
           </p>
 
-          <div className="colt-a mt-10 bg-hartie p-7 text-mic text-cerneala-moale shadow-[0_18px_38px_-24px_rgba(35,35,35,0.5)]">
+          <div className="colt-a mt-10 border border-hartie-umbra bg-hartie p-7 text-mic text-cerneala-moale shadow-[0_18px_38px_-24px_rgba(35,35,35,0.5)]">
             <p className="font-titlu font-bold text-cerneala">
               {ASOCIATIA.denumireLegala}
             </p>

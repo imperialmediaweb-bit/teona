@@ -52,18 +52,24 @@ export default function TextLegal({ text }: { text: string }) {
   const blocuri = imparte(text);
 
   return (
-    <div className="grid gap-5">
+    <div className="grid gap-5 text-[1.0625rem] leading-[1.75]">
       {blocuri.map((bloc, i) => {
         if (bloc.fel === "titlu") {
           return (
-            <h2 key={i} className="mt-6 text-h4 text-cerneala first:mt-0">
+            <h2
+              key={i}
+              className="mt-8 border-t border-hartie-umbra pt-7 text-h4 text-cerneala first:mt-0 first:border-t-0 first:pt-0"
+            >
               {bloc.text}
             </h2>
           );
         }
         if (bloc.fel === "lista") {
           return (
-            <ul key={i} className="grid list-disc gap-2 pl-5 text-cerneala-moale">
+            <ul
+              key={i}
+              className="grid list-disc gap-2 pl-5 text-cerneala-moale marker:text-caramiziu-400"
+            >
               {bloc.elemente.map((element) => (
                 <li key={element}>{element}</li>
               ))}

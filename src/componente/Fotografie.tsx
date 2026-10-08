@@ -12,6 +12,19 @@ import Image from "next/image";
  * pară tăiate din același șablon. Forma stă pe loc — se mișcă doar umbra.
  */
 
+/**
+ * Blocul de culoare de sub fotografie, decalat: poza nu mai plutește pe
+ * alb, ci stă pe o hârtie colorată pusă dedesubt. Iese din chenar în colțul
+ * opus colțului mare al pozei, ca cele două forme să nu se suprapună exact.
+ */
+const BLOCURI = {
+  caramiziu: "bg-caramiziu-100",
+  miere: "bg-miere-200",
+  turcoaz: "bg-turcoaz-100",
+} as const;
+
+export type Bloc = keyof typeof BLOCURI;
+
 const UMBRE = {
   caramiziu: "shadow-[0_22px_45px_-20px_rgba(247,79,34,0.55)]",
   miere: "shadow-[0_22px_45px_-20px_rgba(255,172,0,0.55)]",
@@ -32,6 +45,8 @@ export default function Fotografie({
   cuApropiere = true,
   prioritara = false,
   dimensiuni = "(min-width: 1024px) 460px, 92vw",
+  /** Hârtia colorată de dedesubt. Lipsă = poza stă direct pe fundal. */
+  bloc,
   className = "",
 }: {
   cale: string;
@@ -43,10 +58,21 @@ export default function Fotografie({
   cuApropiere?: boolean;
   prioritara?: boolean;
   dimensiuni?: string;
+  bloc?: Bloc;
   className?: string;
 }) {
   return (
     <figure className={`group relative ${className}`}>
+      {bloc && (
+        <span
+          aria-hidden="true"
+          className={`absolute ${
+            colt === "a"
+              ? "-top-4 -left-4 colt-b"
+              : "-right-4 -bottom-4 colt-a"
+          } h-[72%] w-[66%] ${BLOCURI[bloc]}`}
+        />
+      )}
       <div
         className={`relative overflow-hidden colt-${colt} bg-hartie-calda transition-all duration-500 ease-cald group-hover:-translate-y-1.5 motion-reduce:group-hover:translate-y-0 ${raport} ${UMBRE[umbra]}`}
       >
