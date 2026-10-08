@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import { EMAIL } from "@/date/asociatie";
+import Decor from "./Decor";
 
 type Stare =
   | { fel: "gol" }
@@ -58,10 +59,21 @@ export default function Newsletter() {
   return (
     <section
       aria-labelledby={`${id}-titlu`}
-      className="border-t border-hartie-umbra bg-hartie-calda"
+      className="granulatie relative overflow-hidden bg-tenta-turcoaz"
     >
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-16 lg:px-8 lg:py-20">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <Decor semn="stea" className="pluteste-lent absolute top-10 right-[8%] size-7 text-turcoaz-300 lg:size-10" />
+        <Decor semn="unda" className="pluteste-lent absolute bottom-10 left-[4%] size-9 text-turcoaz-300 lg:size-12" />
+      </div>
+
+      <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-16 lg:px-8 lg:py-20">
         <div>
+          <span className="colt-mic-a mb-5 inline-flex size-12 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_12px_26px_-12px_rgba(42,159,163,0.9)]">
+            <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M3.5 7a1.5 1.5 0 0 1 1.5-1.5h14A1.5 1.5 0 0 1 20.5 7v10a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 17V7z" />
+              <path d="M4 7l8 5.5L20 7" />
+            </svg>
+          </span>
           <h2 id={`${id}-titlu`} className="text-h2 text-cerneala">
             Rămâi aproape de noi
           </h2>
@@ -73,12 +85,12 @@ export default function Newsletter() {
         {stare.fel === "reusit" ? (
           <p
             role="status"
-            className="rounded-card border border-miere-300 bg-miere-50 px-6 py-5 font-titlu font-semibold text-miere-900"
+            className="colt-a bg-hartie px-7 py-6 font-titlu font-semibold text-turcoaz-800 shadow-[0_18px_40px_-24px_rgba(42,159,163,0.6)]"
           >
             Mulțumim! Verifică-ți emailul pentru a confirma abonarea.
           </p>
         ) : (
-          <form onSubmit={trimite} noValidate className="grid gap-4">
+          <form onSubmit={trimite} noValidate className="colt-a grid gap-4 bg-hartie p-6 shadow-[0_18px_40px_-24px_rgba(42,159,163,0.6)] sm:p-8">
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label
@@ -93,7 +105,7 @@ export default function Newsletter() {
                   type="email"
                   required
                   autoComplete="email"
-                  className="w-full rounded-moale border border-hartie-umbra bg-hartie px-4 py-3 text-corp transition outline-none focus:border-caramiziu-500"
+                  className="colt-mic-a w-full border-2 border-hartie-umbra bg-hartie px-4 py-3 text-corp transition outline-none focus:border-turcoaz-400"
                 />
               </div>
               <div>
@@ -109,7 +121,7 @@ export default function Newsletter() {
                   name="nume"
                   type="text"
                   autoComplete="name"
-                  className="w-full rounded-moale border border-hartie-umbra bg-hartie px-4 py-3 text-corp transition outline-none focus:border-caramiziu-500"
+                  className="colt-mic-a w-full border-2 border-hartie-umbra bg-hartie px-4 py-3 text-corp transition outline-none focus:border-turcoaz-400"
                 />
               </div>
             </div>
@@ -146,7 +158,7 @@ export default function Newsletter() {
             <button
               type="submit"
               disabled={stare.fel === "trimite"}
-              className="inline-flex w-fit items-center justify-center rounded-full bg-caramiziu-500 px-7 py-3 font-titlu font-semibold text-hartie shadow-[0_2px_0_0_var(--color-caramiziu-700)] transition hover:bg-caramiziu-600 disabled:opacity-60"
+              className="inline-flex w-fit items-center justify-center rounded-full bg-caramiziu-500 px-8 py-3.5 font-titlu font-semibold text-hartie shadow-[0_12px_26px_-12px_rgba(247,79,34,0.9)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:bg-caramiziu-600 disabled:opacity-60 motion-reduce:hover:translate-y-0"
             >
               {stare.fel === "trimite" ? "Se trimite…" : "Abonează-mă"}
             </button>

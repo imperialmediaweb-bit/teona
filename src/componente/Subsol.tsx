@@ -38,8 +38,12 @@ export default async function Subsol() {
   );
 
   return (
-    <footer className="bg-cerneala text-hartie/75">
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <footer className="granulatie relative overflow-hidden bg-caramiziu-900 text-hartie/75">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-32 -right-24 size-[26rem] rounded-full border-2 border-hartie/8"
+      />
+      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1.3fr]">
           <div>
             <Sigla className="text-[1.15rem]" />
@@ -129,7 +133,7 @@ export default async function Subsol() {
           </div>
         </div>
 
-        <div className="mt-14 border-t border-hartie/15 pt-7">
+        <div className="mt-14 border-t border-hartie/20 pt-7">
           <ul className="flex flex-wrap items-center gap-x-3 gap-y-2 text-nota">
             <li className="font-semibold text-hartie">{ASOCIATIA.denumire}</li>
             <li aria-hidden="true">·</li>
