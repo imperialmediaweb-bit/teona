@@ -2,50 +2,77 @@ import Image from "next/image";
 import { ASOCIATIA } from "@/date/asociatie";
 
 /** Semnul grafic, curat, cu fundal transparent. 512×512, fără franjuri. */
-const ARIPA = "/poze/2024/11/cropped-Screenshot11removebgpreview-2512x512-1.png";
+const ARIPA =
+  "/poze/2024/11/cropped-Screenshot11removebgpreview-2512x512-1.png";
 
 /**
- * Sigla asociației, refăcută.
+ * Sigla asociației: aripa și numele, ca un singur obiect.
  *
- * Fișierul folosit până acum (`WhatsApp_Image_…-removebg-preview.png`, 436×161)
- * e o poză de WhatsApp căreia i s-a scos fundalul automat: are franjuri albe pe
- * margini, textul e deja pixelat la mărimea lui naturală și culorile sunt
- * spălate de compresie — am măsurat #D07030 în loc de portocaliul real #F74F22.
- * `continut/brand.md` cerea de la început refacerea vectorială.
- *
- * Aici sigla e compusă din două bucăți:
- *
- *   · **aripa** — semnul grafic curat de 512×512, cu fundal transparent;
- *   · **numele** — text adevărat, în Nunito, culorile reale de brand.
- *
- * Avantajul nu e estetic, e practic: textul rămâne clar la orice mărime și pe
- * orice ecran, cântărește zero octeți în plus, se poate selecta și căuta, iar
+ * Fișierul folosit la început (`WhatsApp_Image_…-removebg-preview.png`, 436×161)
+ * e o poză de WhatsApp căreia i s-a scos fundalul automat: franjuri albe, text
+ * pixelat, culori spălate (#D07030 în loc de #F74F22). De aceea numele e text
+ * adevărat, în Nunito: clar la orice mărime, zero octeți în plus, iar
  * cititoarele de ecran îl citesc ca nume, nu ca „imagine”.
+ *
+ * Toate dimensiunile pornesc de la una singură: mărimea aripii, dată prin
+ * `font-size` pe înveliș (`className="text-[56px]"`). Aripa are `1em`, spațiul
+ * dintre ea și nume `0.2em`, rândurile numelui 0.27em și 0.4em. Așa
+ * proporțiile rămân aceleași în antet, în subsol și pe un ecran de 320 px —
+ * ca să se micșoreze sigla, se schimbă un singur număr.
+ *
+ * Numele nu mai e scris pe două rânduri egale. „Asociația” e mai mic și
+ * puțin răsfirat, „Teona Ariana” e gros și strâns: un rând explică, celălalt
+ * e numele. Înainte, două rânduri la fel de mari se citeau ca două lucruri
+ * puse alături; acum numele are o ierarhie și se ancorează de aripă.
  */
 export default function Sigla({
   className = "",
   /** Doar semnul grafic, fără nume — pentru spații înguste. */
   doarSemnul = false,
+  /**
+   * Pe fundalul închis al subsolului, portocaliul și galbenul de brand se
+   * pierd în roșul-brun. Aceleași culori, din aceeași scară, dar o treaptă
+   * mai deschise.
+   */
+  peFundalInchis = false,
 }: {
   className?: string;
   doarSemnul?: boolean;
+  peFundalInchis?: boolean;
 }) {
   return (
-    <span className={`inline-flex items-center gap-2.5 ${className}`}>
+    <span
+      className={`inline-flex items-center gap-[0.2em] leading-none ${className}`}
+    >
       <Image
         src={ARIPA}
         alt={doarSemnul ? ASOCIATIA.denumire : ""}
         aria-hidden={doarSemnul ? undefined : true}
         width={512}
         height={512}
+        // Cel mult 56 px pe ecran, deci ~112 px pe ecrane dense: ajunge cea
+        // mai mică variantă generată, nu fișierul de 512.
+        sizes="64px"
         priority
-        className="h-[2.6em] w-auto shrink-0"
+        className="size-[1em] shrink-0"
       />
 
       {!doarSemnul && (
-        <span className="font-titlu leading-[1.05] font-extrabold tracking-[-0.02em] whitespace-nowrap">
-          <span className="block text-caramiziu-500">Asociația</span>
-          <span className="block text-miere-400">Teona Ariana</span>
+        <span className="flex flex-col font-titlu whitespace-nowrap">
+          <span
+            className={`text-[0.27em] leading-[1.15] font-bold tracking-[0.03em] ${
+              peFundalInchis ? "text-caramiziu-300" : "text-caramiziu-500"
+            }`}
+          >
+            Asociația
+          </span>
+          <span
+            className={`text-[0.4em] leading-[1.05] font-extrabold tracking-[-0.025em] ${
+              peFundalInchis ? "text-miere-300" : "text-miere-400"
+            }`}
+          >
+            Teona Ariana
+          </span>
         </span>
       )}
     </span>

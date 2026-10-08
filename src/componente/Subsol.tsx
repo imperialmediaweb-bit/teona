@@ -13,7 +13,27 @@ import Sigla from "./Sigla";
 import DeschideSetariCookieuri from "./DeschideSetariCookieuri";
 import { anulCurent } from "@/lib/an";
 
-/** Subsolul (12.3). Identic pe toate paginile. */
+const titlu =
+  "font-titlu text-nota font-bold tracking-[0.1em] text-hartie uppercase";
+
+/**
+ * Linkurile din subsol au 36 px înălțime, dar zona de atins e lată: textul
+ * stă pe loc, iar `-mx-2 px-2` întinde ținta cu 8 px în fiecare parte, așa
+ * că și „Acasă” trece de 55 px. Cu 44 px pe înălțime fiecare, unsprezece
+ * linkuri pe o singură coloană făceau subsolul de un ecran și jumătate pe
+ * telefon.
+ */
+const linkLegal =
+  "-mx-2 inline-flex min-h-9 items-center px-2 transition-colors duration-200 hover:text-miere-300";
+const link = `${linkLegal} text-mic`;
+
+/**
+ * Subsolul (12.3). Identic pe toate paginile.
+ *
+ * Tot conținutul cerut, pe patru coloane la lățime mare și pe două pe telefon:
+ * sigla și fraza, paginile pe două coloane, contactul, adresele, rețelele,
+ * rândul legal. Nimic nu s-a scos; s-a schimbat doar cât spațiu ocupă.
+ */
 export default async function Subsol() {
   const anul = await anulCurent();
 
@@ -25,41 +45,45 @@ export default async function Subsol() {
 
   return (
     <footer className="granulatie relative overflow-hidden bg-caramiziu-900 text-hartie/75">
+      {/* Dunga de brand, de la portocaliu la galben: subsolul începe clar. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-32 -right-24 size-[26rem] rounded-full border-2 border-hartie/8"
+        className="h-1 bg-gradient-to-r from-caramiziu-500 via-miere-400 to-miere-300"
       />
-      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1.3fr]">
-          <div>
-            <Sigla className="text-[1.15rem]" />
-            <p className="mt-5 max-w-sm text-mic leading-relaxed">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-24 -right-24 size-80 rounded-full border-2 border-hartie/8"
+      />
+
+      <div className="relative mx-auto max-w-7xl px-4 pt-7 pb-7 sm:px-6 lg:px-8 lg:pt-12 lg:pb-7">
+        <div className="grid gap-x-6 gap-y-6 sm:grid-cols-2 lg:grid-cols-[1.1fr_1.5fr_0.9fr_1fr] lg:gap-x-8">
+          <div className="sm:col-span-2 lg:col-span-1">
+            <Sigla peFundalInchis className="text-[44px]" />
+            <p className="mt-3 text-mic leading-relaxed sm:max-w-xs">
               {ASOCIATIA.fraza}
             </p>
-            <p className="scris mt-5 text-amplu text-miere-300">
+            <p className="scris mt-3 text-amplu text-miere-300">
               „{ASOCIATIA.motto}”
             </p>
           </div>
 
-          <nav aria-label="Meniu subsol">
-            <h2 className="font-titlu text-nota font-bold tracking-wider text-hartie uppercase">
-              Pagini
-            </h2>
-            <ul className="mt-3 grid">
-              {linkuriMeniu.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="inline-flex min-h-11 items-center text-mic transition hover:text-miere-300"
-                  >
-                    {link.eticheta}
+          <nav
+            aria-label="Meniu subsol"
+            className="sm:col-span-2 lg:col-span-1"
+          >
+            <h2 className={titlu}>Pagini</h2>
+            <ul className="mt-2 grid grid-cols-2 gap-x-4 sm:grid-cols-3 lg:grid-cols-2">
+              {linkuriMeniu.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className={link}>
+                    {l.eticheta}
                   </Link>
                 </li>
               ))}
               <li>
                 <Link
                   href={RUTE.doneaza}
-                  className="inline-flex min-h-11 items-center text-mic font-semibold text-miere-300 transition hover:text-miere-200"
+                  className={`${link} font-semibold text-miere-300 hover:text-miere-200`}
                 >
                   Donează
                 </Link>
@@ -67,95 +91,89 @@ export default async function Subsol() {
             </ul>
           </nav>
 
-          <div>
-            <h2 className="font-titlu text-nota font-bold tracking-wider text-hartie uppercase">
-              Contact
-            </h2>
-            <ul className="mt-3 grid text-mic">
-              {TELEFOANE.map((telefon) => (
-                <li key={telefon.apel}>
+          {/* Pe telefon, contactul și adresele stau alături de la 360 px în
+              sus; sub 360, jumătatea de ecran nu mai cuprinde adresa de
+              e-mail. De la 640 învelișul dispare (`contents`) și cele două
+              coloane intră direct în grila mare. */}
+          <div className="grid gap-x-3 gap-y-6 min-[360px]:grid-cols-2 sm:contents">
+            <div>
+              <h2 className={titlu}>Contact</h2>
+              <ul className="mt-2 grid">
+                {TELEFOANE.map((telefon) => (
+                  <li key={telefon.apel}>
+                    <a href={`tel:${telefon.apel}`} className={link}>
+                      {telefon.afisat}
+                    </a>
+                  </li>
+                ))}
+                <li>
+                  {/* Adresa de e-mail n-are unde să se rupă; pe un ecran de
+                    320 px, cu două coloane, se rupe unde poate, nu împinge
+                    pagina lateral. */}
                   <a
-                    href={`tel:${telefon.apel}`}
-                    className="inline-flex min-h-11 items-center transition hover:text-miere-300"
+                    href={`mailto:${EMAIL.contact}`}
+                    className={`${link} [overflow-wrap:anywhere]`}
                   >
-                    {telefon.afisat}
+                    {EMAIL.contact}
                   </a>
                 </li>
-              ))}
-              <li>
-                <a
-                  href={`mailto:${EMAIL.contact}`}
-                  className="inline-flex min-h-11 items-center transition hover:text-miere-300"
-                >
-                  {EMAIL.contact}
-                </a>
-              </li>
-            </ul>
+              </ul>
+              <Retele
+                retele={RETELE_ASOCIATIE}
+                context={ASOCIATIA.denumire}
+                className="mt-3 text-hartie/75"
+              />
+            </div>
 
-            <ul className="mt-5 grid gap-3 text-mic">
-              <li>
-                <span className="block font-titlu font-semibold text-hartie">
-                  {ADRESE.casaTeona.nume}
-                </span>
-                {ADRESE.casaTeona.strada}, {ADRESE.casaTeona.oras}{" "}
-                {ADRESE.casaTeona.cod}
-              </li>
-              <li>
-                <span className="block font-titlu font-semibold text-hartie">
-                  {ADRESE.sediuSocial.nume}
-                </span>
-                {ADRESE.sediuSocial.strada}, {ADRESE.sediuSocial.oras}
-              </li>
-            </ul>
-
-            <h2 className="mt-7 font-titlu text-nota font-bold tracking-wider text-hartie uppercase">
-              Ne găsești pe
-            </h2>
-            <Retele
-              retele={RETELE_ASOCIATIE}
-              context={ASOCIATIA.denumire}
-              className="mt-3 text-hartie/75"
-            />
+            <div>
+              <h2 className={titlu}>Unde ne găsești</h2>
+              <ul className="mt-2 grid gap-3 text-mic leading-snug">
+                <li>
+                  <span className="block font-titlu font-semibold text-hartie">
+                    {ADRESE.casaTeona.nume}
+                  </span>
+                  {ADRESE.casaTeona.strada}, {ADRESE.casaTeona.oras}{" "}
+                  {ADRESE.casaTeona.cod}
+                </li>
+                <li>
+                  <span className="block font-titlu font-semibold text-hartie">
+                    {ADRESE.sediuSocial.nume}
+                  </span>
+                  {ADRESE.sediuSocial.strada}, {ADRESE.sediuSocial.oras}
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
-        <div className="mt-14 border-t border-hartie/20 pt-7">
-          <ul className="flex flex-wrap items-center gap-x-3 text-nota">
-            <li className="font-semibold text-hartie">{ASOCIATIA.denumire}</li>
-            <li aria-hidden="true">·</li>
-            <li>CIF {ASOCIATIA.cif}</li>
-            <li aria-hidden="true">·</li>
+        <div className="mt-6 flex flex-col gap-1 border-t border-hartie/15 pt-4 text-nota lg:mt-9 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
+          <p className="text-hartie/60">
+            © {anul}{" "}
+            <span className="font-semibold text-hartie/85">
+              {ASOCIATIA.denumire}
+            </span>
+            {" · "}CIF {ASOCIATIA.cif} · Toate drepturile rezervate.
+          </p>
+          <ul className="flex flex-wrap items-center gap-x-5">
             <li>
-              <Link
-                href={RUTE.confidentialitate}
-                className="inline-flex min-h-11 items-center transition hover:text-miere-300"
-              >
+              <Link href={RUTE.confidentialitate} className={linkLegal}>
                 Politica de confidențialitate
               </Link>
             </li>
-            <li aria-hidden="true">·</li>
             <li>
-              <Link href={RUTE.termeni} className="inline-flex min-h-11 items-center transition hover:text-miere-300">
+              <Link href={RUTE.termeni} className={linkLegal}>
                 Termeni și condiții
               </Link>
             </li>
-            <li aria-hidden="true">·</li>
             <li>
-              <Link
-                href={RUTE.cookieuri}
-                className="inline-flex min-h-11 items-center transition hover:text-miere-300"
-              >
+              <Link href={RUTE.cookieuri} className={linkLegal}>
                 Politica de cookie-uri
               </Link>
             </li>
-            <li aria-hidden="true">·</li>
             <li>
               <DeschideSetariCookieuri />
             </li>
           </ul>
-          <p className="mt-3 text-nota text-hartie/50">
-            © {anul} {ASOCIATIA.denumire}. Toate drepturile rezervate.
-          </p>
         </div>
       </div>
     </footer>
