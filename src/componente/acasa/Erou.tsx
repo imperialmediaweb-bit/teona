@@ -4,11 +4,12 @@ import Image from "next/image";
 import { useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 import { ASOCIATIA, LINKURI_EXTERNE, RUTE, SMS } from "@/date/asociatie";
-import Buton from "@/componente/Buton";
-import Decor from "@/componente/Decor";
+import Pictograma from "@/componente/Pictograma";
+import ButonEditorial from "./ButonEditorial";
+import { CONTINUT, GRILA, LINIE } from "./grila";
 
 /**
- * Fotografiile din sliderul de sus.
+ * Fotografiile din deschidere.
  *
  * Textul alternativ e scris după ce m-am uitat la fiecare poză — descrie ce se
  * vede, nu ce ne-am dori să se vadă. Prima poartă exact textul cerut de caiet
@@ -38,24 +39,25 @@ const FOTOGRAFII = [
   },
 ] as const;
 
-const INTERVAL = 7000;
+const INTERVAL = 8000;
 
 /**
- * Secțiunea principală (1.1).
+ * Secțiunea principală (1.1), ca prima pagină dublă a unei reviste.
  *
- * Fotografia nu mai stă sub text, ci lângă el. Varianta dinainte întindea poza
- * pe toată lățimea ecranului, o tăia într-o fâșie joasă și punea peste ea trei
- * straturi de portocaliu închis ca textul alb să se poată citi. Rezultatul:
- * o poză cafenie, ca una veche, și turtită. Clientul a spus-o exact așa.
+ * Stânga: titlul, cât de mare încape pe cinci coloane, și cele trei elemente
+ * cerute de caiet. Dreapta: fotografia, care pornește de la a șaptea coloană
+ * și iese până la marginea ecranului. Nu stă într-o ramă cu colțuri
+ * rotunjite și umbră colorată — e tăiată drept, ca o poză tipărită în
+ * sângerare. Sub ea, pe o linie, numărul pozei și legenda, ca o legendă
+ * foto de revistă.
  *
- * Aici poza stă în rama ei, în proporții apropiate de cele originale, fără
- * niciun voal — iarba e verde, cerul albastru, tricourile albe. Textul are
- * coloana lui, pe hârtie caldă, și nu mai are nevoie de niciun strat ca să
- * se vadă. Pe telefon poza vine prima, mare, apoi titlul.
+ * Pe telefon poza vine prima și ia toată lățimea, de la o margine la alta;
+ * titlul urmează dedesubt.
  *
- * Fotografia se schimbă singură, la șapte secunde: cea nouă apare lent peste
+ * Fotografia se schimbă singură, la opt secunde: cea nouă apare lent peste
  * cea veche, care rămâne pe loc până e acoperită. Fără apropiere, fără
  * deplasare — forma și conținutul nu se mișcă sub ochi, doar se înlocuiesc.
+ * Cu mouse-ul deasupra sau cu focalizarea înăuntru, schimbarea se oprește.
  */
 export default function Erou() {
   const fara_miscare = useReducedMotion();
@@ -90,174 +92,152 @@ export default function Erou() {
 
   return (
     <section
-      className="granulatie relative isolate overflow-hidden bg-hartie-calda"
+      className={`${GRILA} bg-hartie`}
       onMouseEnter={() => setOprit(true)}
       onMouseLeave={() => setOprit(false)}
       onFocusCapture={() => setOprit(true)}
       onBlurCapture={() => setOprit(false)}
     >
-      {/* Două pete de culoare, foarte spălate, în loc de un fundal plat.
-          Se mișcă la limita observabilului (vezi `.pata` în globals.css). */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-        <span className="pata absolute -top-32 right-[-8%] size-[30rem] rounded-full bg-miere-100/70 blur-3xl" />
-        <span className="pata pata-2 absolute bottom-[-10rem] left-[-8rem] size-[26rem] rounded-full bg-caramiziu-100/60 blur-3xl" />
-        <Decor semn="stea" className="pluteste-lent absolute top-5 right-[4%] hidden size-10 text-miere-400 lg:block" />
-        <Decor semn="soare" className="pluteste-lent absolute right-[3%] bottom-8 size-9 text-caramiziu-300 lg:bottom-14 lg:size-12" />
+      {/* Linia de sus: numele asociației și motto-ul, ca antetul unei pagini
+          tipărite. Textul de aici nu se citește ca titlu — e etichetă. */}
+      <div
+        className={`${CONTINUT} flex items-baseline justify-between gap-6 border-b ${LINIE} py-4`}
+      >
+        <p className="font-titlu text-nota font-bold tracking-[0.2em] text-cerneala-slab uppercase">
+          {ASOCIATIA.denumire}
+        </p>
+        <p className="scris text-corp text-caramiziu-600 sm:text-amplu">
+          „{ASOCIATIA.motto}”
+        </p>
       </div>
 
-      <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 pt-6 pb-24 sm:px-6 lg:grid-cols-[minmax(0,6fr)_minmax(0,7fr)] lg:gap-14 lg:px-8 lg:pt-16 lg:pb-32">
-        {/* Textul e primul în pagină (titlul rămâne primul lucru citit),
-            dar pe telefon se vede sub poză: clientul a cerut poza sus. */}
-        <div className="order-2 lg:order-1">
-          <p className="scris text-amplu text-caramiziu-600">„{ASOCIATIA.motto}”</p>
+      {/* Textul e primul în pagină (titlul rămâne primul lucru citit),
+          dar pe telefon se vede sub poză: clientul a cerut poza sus. */}
+      <div className="order-2 col-start-2 col-end-14 pt-10 pb-16 lg:order-1 lg:col-end-7 lg:row-start-2 lg:pt-16 lg:pr-12 lg:pb-20">
+        {/* Mărimea e dată de lățimea coloanei, nu de ecran: pe cinci
+            coloane, „aducem bucurie” umple rândul fără să se rupă. */}
+        <h1 className="text-[clamp(2.75rem,10.5vw,4.5rem)] leading-[0.95] tracking-[-0.035em] text-cerneala lg:text-[4.75rem] xl:text-[5.6rem]">
+          Împreună,
+          <br />
+          <span className="text-caramiziu-500">aducem bucurie</span>
+        </h1>
 
-          {/* Mărimea e aleasă ca „aducem bucurie” să stea pe un singur rând
-              în coloana lui, de la 1024 px în sus. */}
-          <h1 className="mt-3 text-h1 text-cerneala lg:text-[3.25rem] xl:text-[4rem]">
-            Împreună,
-            <br />
-            <span className="relative inline-block text-caramiziu-500">
-              aducem bucurie
-              <svg
-                viewBox="0 0 300 16"
-                preserveAspectRatio="none"
-                aria-hidden="true"
-                className="absolute -bottom-1 left-0 h-3 w-full text-miere-400 sm:-bottom-2 sm:h-4"
-              >
-                <path
-                  d="M3 11C70 4 150 3 215 6c30 1.5 55 4 82 5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="7"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </span>
-          </h1>
+        <p className="mt-8 max-w-md text-amplu leading-relaxed text-cerneala-moale lg:mt-10 lg:text-[1.375rem]">
+          Sprijinim copiii cu nevoi speciale și pe părinții lor prin tabere,
+          terapie prin joacă și consiliere. Alătură-te celor care schimbă vieți.
+        </p>
 
-          <p className="mt-7 max-w-xl text-amplu text-cerneala-moale">
-            Sprijinim copiii cu nevoi speciale și pe părinții lor prin tabere,
-            terapie prin joacă și consiliere. Alătură-te celor care schimbă vieți.
-          </p>
+        {/* Cele trei elemente din 1.1, în ordinea cerută: butonul, singur pe
+            rândul lui; dedesubt, pe aceeași linie, blocul SMS (informație,
+            nu buton — de aceea nu e nici link, nici <button>) și linkul
+            pentru ziua de naștere. Sub ele nu urmează niciun text: „zona
+            rămâne curată”. */}
+        <div className="mt-10 lg:mt-12">
+          <ButonEditorial href={RUTE.doneaza} marime="mare" className="w-full sm:w-auto sm:min-w-64">
+            Donează acum
+            <Pictograma nume="sageata" className="size-5" />
+          </ButonEditorial>
 
-          {/* Cele trei elemente din 1.1, în ordinea cerută. Blocul SMS e
-              informație, nu buton — de aceea nu e nici link, nici <button>.
-              Sub ele nu mai urmează niciun text: „zona rămâne curată”. */}
-          <div className="mt-9 flex flex-wrap items-stretch gap-3">
-            <Buton href={RUTE.doneaza} marime="mare">
-              Donează acum
-            </Buton>
-
-            <p className="flex flex-col justify-center rounded-full border-2 border-miere-300 bg-miere-50 px-6 py-2 leading-tight">
-              <span className="font-titlu font-bold text-cerneala">
+          <div className={`mt-8 grid gap-6 border-t ${LINIE} pt-6 sm:grid-cols-2`}>
+            <p className={`sm:border-r sm:pr-6 ${LINIE}`}>
+              <span className="block font-titlu text-nota font-bold tracking-[0.16em] text-cerneala-slab uppercase">
+                Prin SMS
+              </span>
+              <span className="mt-2 block font-titlu text-h4 leading-tight font-extrabold text-cerneala">
                 Trimite {SMS.text} la {SMS.numar}
               </span>
-              <span className="text-nota text-cerneala-moale">
+              <span className="mt-1 block text-mic text-cerneala-moale">
                 {SMS.sumaLunara} lunar, direct din telefon
               </span>
             </p>
 
-            <Buton
+            <a
               href={LINKURI_EXTERNE.galantomZiuaTa}
-              varianta="contur"
-              className="gap-3 text-left leading-tight"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block"
             >
-              <svg
-                viewBox="0 0 24 24"
-                className="size-6 shrink-0 text-caramiziu-500"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={1.6}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M4 10.5h16v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5v-8zM3.5 7.5h17v3h-17v-3zM12 7.5v12M12 7.5S10.5 3 8.2 3a2.1 2.1 0 0 0 0 4.5H12zM12 7.5S13.5 3 15.8 3a2.1 2.1 0 0 1 0 4.5H12z" />
-              </svg>
-              <span>
-                <span className="block">Donează-ți ziua de naștere</span>
-                <span className="block text-nota font-normal text-cerneala-moale">
-                  Strânge fonduri de ziua ta
-                </span>
+              <span className="block font-titlu text-nota font-bold tracking-[0.16em] text-cerneala-slab uppercase">
+                Pe Galantom
               </span>
-            </Buton>
+              <span className="mt-2 flex items-start gap-2 font-titlu text-h4 leading-tight font-extrabold text-caramiziu-600 transition-colors group-hover:text-caramiziu-700">
+                Donează-ți ziua de naștere
+                <Pictograma
+                  nume="sageata"
+                  className="mt-1.5 size-5 shrink-0 text-caramiziu-500"
+                />
+              </span>
+              <span className="mt-1 block text-mic text-cerneala-moale">
+                Strânge fonduri de ziua ta
+              </span>
+            </a>
           </div>
         </div>
+      </div>
 
-        <div className="order-1 lg:order-2">
-          <div className="relative">
-            {/*
-              Rama pozei: 4:3 pe telefon, 3:2 pe ecran lat. Pozele sunt 16:9
-              sau 4:3; la 3:2 niciuna nu pierde mai mult de o șesime, în loc
-              de jumătate ca înainte. Umbra e colorată, nu gri, ca la restul
-              fotografiilor din site.
-            */}
-            <div className="colt-a relative aspect-[4/3] overflow-hidden bg-hartie-umbra shadow-[0_32px_64px_-32px_rgba(247,79,34,0.5)] lg:aspect-[3/2]">
-              {FOTOGRAFII.map((f, i) => {
-                // Poza activă deasupra; cea dinainte rămâne întreagă sub ea
-                // cât timp cea nouă apare — fără clipire gri la mijloc.
-                const stare =
-                  i === activ
-                    ? "z-20 opacity-100"
-                    : i === anterior
-                      ? "z-10 opacity-100"
-                      : "z-0 opacity-0";
-                return (
-                  <Image
-                    key={f.cale}
-                    src={f.cale}
-                    alt={f.alt}
-                    aria-hidden={i !== activ || undefined}
-                    fill
-                    priority={i === 0}
-                    sizes="(min-width: 1280px) 640px, (min-width: 1024px) 52vw, 100vw"
-                    className={`object-cover transition-opacity duration-[1200ms] ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none ${stare}`}
-                  />
-                );
-              })}
-            </div>
-
-            <p
-              aria-live="polite"
-              className="colt-mic-b absolute -bottom-4 left-5 z-30 bg-caramiziu-500 px-5 py-2 shadow-[0_12px_28px_-12px_rgba(247,79,34,0.9)]"
-            >
-              <span className="scris text-amplu leading-none text-hartie">
-                {fotografie.legenda}
-              </span>
-            </p>
-          </div>
-
-          {/* Comenzile stau sub poză, nu peste ea. */}
-          <div className="mt-9 flex items-center justify-end gap-3 pr-1">
-            {FOTOGRAFII.map((f, i) => (
-              <button
+      <div className="order-1 col-start-1 col-end-15 lg:order-2 lg:col-start-7 lg:row-start-2 lg:pt-16">
+        {/*
+          Rama pozei: 4:3 pe telefon, 3:2 pe ecran lat. Pozele sunt 16:9
+          sau 4:3; la 3:2 niciuna nu pierde mai mult de o șesime. Fără
+          colțuri rotunjite, fără umbră: marginea pozei e marginea paginii.
+        */}
+        <div className="relative aspect-[4/3] overflow-hidden bg-hartie-umbra lg:aspect-[3/2]">
+          {FOTOGRAFII.map((f, i) => {
+            // Poza activă deasupra; cea dinainte rămâne întreagă sub ea
+            // cât timp cea nouă apare — fără clipire gri la mijloc.
+            const stare =
+              i === activ
+                ? "z-20 opacity-100"
+                : i === anterior
+                  ? "z-10 opacity-100"
+                  : "z-0 opacity-0";
+            return (
+              <Image
                 key={f.cale}
-                type="button"
-                onClick={() => mergiLa(i)}
-                aria-label={`Fotografia ${i + 1}: ${f.legenda}`}
-                aria-current={i === activ}
-                className="group py-2"
-              >
-                {/* Bara care se umple arată și unde ești, și cât mai e. */}
-                <span
-                  className={`block h-1.5 overflow-hidden rounded-full transition-all duration-500 ease-cald ${
-                    i === activ
-                      ? "w-16 bg-caramiziu-100"
-                      : "w-4 bg-cerneala/15 group-hover:bg-caramiziu-300"
-                  }`}
-                >
-                  {i === activ && (
-                    <span
-                      key={`${activ}-${oprit}`}
-                      className={`block h-full rounded-full bg-caramiziu-500 ${
-                        fara_miscare || oprit ? "w-full" : "umple"
-                      }`}
-                      style={{ animationDuration: `${INTERVAL}ms` }}
-                    />
-                  )}
-                </span>
-              </button>
-            ))}
+                src={f.cale}
+                alt={f.alt}
+                aria-hidden={i !== activ || undefined}
+                fill
+                priority={i === 0}
+                sizes="(min-width: 1024px) 60vw, 100vw"
+                className={`object-cover transition-opacity duration-[1400ms] ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none ${stare}`}
+              />
+            );
+          })}
+        </div>
+
+        {/* Legenda foto, pe o linie sub poză: numărul, numele, comenzile.
+            Se oprește la ultima coloană de conținut, nu la marginea
+            ecranului — doar poza are voie să iasă din grilă. Marginea din
+            dreapta e aceeași cu a grilei (vezi `grila.ts`). */}
+        <div
+          className={`mx-4 flex items-center justify-between gap-4 border-b ${LINIE} py-3 sm:mx-6 lg:ml-0 lg:mr-[max(2rem,calc((100vw-76rem)/2))]`}
+        >
+          <p aria-live="polite" className="flex items-baseline gap-3 font-titlu">
+            <span className="text-nota font-bold tracking-[0.2em] text-caramiziu-500 tabular-nums">
+              {String(activ + 1).padStart(2, "0")}&thinsp;/&thinsp;
+              {String(FOTOGRAFII.length).padStart(2, "0")}
+            </span>
+            <span className="text-mic font-bold text-cerneala">{fotografie.legenda}</span>
+          </p>
+
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => mergiLa(activ - 1)}
+              aria-label="Fotografia anterioară"
+              className="flex size-10 items-center justify-center text-cerneala transition-colors hover:text-caramiziu-600"
+            >
+              <Pictograma nume="sageata" className="size-5 rotate-180" />
+            </button>
+            <button
+              type="button"
+              onClick={() => mergiLa(activ + 1)}
+              aria-label="Fotografia următoare"
+              className="flex size-10 items-center justify-center text-cerneala transition-colors hover:text-caramiziu-600"
+            >
+              <Pictograma nume="sageata" className="size-5" />
+            </button>
           </div>
         </div>
       </div>
