@@ -1,0 +1,113 @@
+[
+ {
+  "id": 7715,
+  "titlu": "Donează pentru Casa Teona",
+  "continut": "",
+  "tipPret": "multi",
+  "sumaFixa": "25",
+  "obiectivPornit": "disabled",
+  "sumaObiectiv": "40000",
+  "afisareFormular": null,
+  "titluFormular": null,
+  "textButon": null,
+  "sumaPersonalizata": "enabled",
+  "minim": null,
+  "maxim": null,
+  "niveluri": [
+   {
+    "suma": "10",
+    "text": "10,00",
+    "implicit": true
+   },
+   {
+    "suma": "25",
+    "text": "25,00",
+    "implicit": false
+   },
+   {
+    "suma": "50",
+    "text": "50,00",
+    "implicit": false
+   },
+   {
+    "suma": "100",
+    "text": "100,00",
+    "implicit": false
+   }
+  ]
+ },
+ {
+  "id": 7733,
+  "titlu": "Donează pentru Taberele Respiro",
+  "continut": "",
+  "tipPret": "multi",
+  "sumaFixa": "25",
+  "obiectivPornit": "disabled",
+  "sumaObiectiv": "40000",
+  "afisareFormular": null,
+  "titluFormular": null,
+  "textButon": null,
+  "sumaPersonalizata": "enabled",
+  "minim": null,
+  "maxim": null,
+  "niveluri": [
+   {
+    "suma": "10",
+    "text": "10,00",
+    "implicit": true
+   },
+   {
+    "suma": "25",
+    "text": "25,00",
+    "implicit": false
+   },
+   {
+    "suma": "50",
+    "text": "50,00",
+    "implicit": false
+   },
+   {
+    "suma": "100",
+    "text": "100,00",
+    "implicit": false
+   }
+  ]
+ },
+ {
+  "id": 7739,
+  "titlu": "Donează pentru cauze umanitare",
+  "continut": "",
+  "tipPret": "multi",
+  "sumaFixa": "25",
+  "obiectivPornit": "disabled",
+  "sumaObiectiv": "40000",
+  "afisareFormular": null,
+  "titluFormular": null,
+  "textButon": null,
+  "sumaPersonalizata": "enabled",
+  "minim": null,
+  "maxim": null,
+  "niveluri": [
+   {
+    "suma": "10",
+    "text": "10,00",
+    "implicit": true
+   },
+   {
+    "suma": "25",
+    "text": "25,00",
+    "implicit": false
+   },
+   {
+    "suma": "50",
+    "text": "50,00",
+    "implicit": false
+   },
+   {
+    "suma": "100",
+    "text": "100,00",
+    "implicit": false
+   }
+  ]
+ }
+]

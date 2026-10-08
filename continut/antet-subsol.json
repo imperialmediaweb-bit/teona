@@ -1,0 +1,2048 @@
+[
+ {
+  "tip": "footer",
+  "id": "2007",
+  "titlu": "Footer Style 1",
+  "continut": [
+   {
+    "camp": "content_position",
+    "text": "bottom"
+   },
+   {
+    "camp": "background_background",
+    "text": "classic"
+   },
+   {
+    "camp": "background_image",
+    "adresa": "https://themepanthers.com/wp/risehand/el/wp-content/uploads/2024/01/footer-cta-bg-1.png"
+   },
+   {
+    "camp": "background_position",
+    "text": "bottom left"
+   },
+   {
+    "camp": "background_repeat",
+    "text": "no-repeat"
+   },
+   {
+    "camp": "title_small_heading",
+    "text": "Five Donation"
+   },
+   {
+    "camp": "title_heading",
+    "text": "Have any Donation or Contact Us"
+   },
+   {
+    "camp": "icon_fonts",
+    "text": "risehand-002-healthcare"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "sm_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "icon_fonts",
+    "text": "risehand-chevrons-right"
+   },
+   {
+    "camp": "button_text",
+    "text": "Join Organizations"
+   },
+   {
+    "camp": "icon_fonts",
+    "text": "risehand-chevrons-right"
+   },
+   {
+    "camp": "button_text",
+    "text": "Learn More"
+   },
+   {
+    "camp": "image",
+    "adresa": "https://themepanthers.com/wp/risehand/el/wp-content/uploads/2024/01/footer-cta-1-1.png"
+   },
+   {
+    "camp": "background_background",
+    "text": "classic"
+   },
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "logo_default",
+    "adresa": "https://themepanthers.com/wp/risehand/el/wp-content/uploads/2024/01/logo-1-2-1.png"
+   },
+   {
+    "camp": "contact_box_styles",
+    "text": "style_two"
+   },
+   {
+    "camp": "mail",
+    "text": "sendmail@qetus.com"
+   },
+   {
+    "camp": "phone",
+    "text": "+98 060 712 34"
+   },
+   {
+    "camp": "title_heading",
+    "text": "Company"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "About us"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Appointment"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Volunteers"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Careers"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Contact Us"
+   },
+   {
+    "camp": "title_heading",
+    "text": "Causes"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "title_heading",
+    "text": "Gallery"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "subscribe_type",
+    "text": "light"
+   },
+   {
+    "camp": "title",
+    "text": "Get Every Single Updates Join Our Newsletters"
+   },
+   {
+    "camp": "content",
+    "text": "[mc4wp_form]"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "content_position",
+    "text": "middle"
+   },
+   {
+    "camp": "editor_risehand",
+    "text": "Copyright © 2024 Steelthemes . All Rights Reserved."
+   },
+   {
+    "camp": "media_repeater[].icon_fonts",
+    "text": "risehand-facebook"
+   },
+   {
+    "camp": "media_repeater[].icon_text",
+    "text": "fa fa-facebook"
+   },
+   {
+    "camp": "media_repeater[].tool_tip",
+    "text": "Facebook"
+   },
+   {
+    "camp": "media_repeater[].icon_fonts",
+    "text": "risehand-twitter"
+   },
+   {
+    "camp": "media_repeater[].icon_text",
+    "text": "fa fa-facebook"
+   },
+   {
+    "camp": "media_repeater[].tool_tip",
+    "text": "Facebook"
+   },
+   {
+    "camp": "media_repeater[].icon_fonts",
+    "text": "risehand-instagram1"
+   },
+   {
+    "camp": "media_repeater[].icon_text",
+    "text": "fa fa-facebook"
+   },
+   {
+    "camp": "media_repeater[].tool_tip",
+    "text": "Facebook"
+   },
+   {
+    "camp": "media_repeater[].icon_fonts",
+    "text": "risehand-slack2"
+   },
+   {
+    "camp": "media_repeater[].icon_text",
+    "text": "fa fa-facebook"
+   },
+   {
+    "camp": "media_repeater[].tool_tip",
+    "text": "Facebook"
+   },
+   {
+    "camp": "media_repeater[].icon_fonts",
+    "text": "risehand-linkedin"
+   },
+   {
+    "camp": "media_repeater[].icon_text",
+    "text": "fa fa-facebook"
+   },
+   {
+    "camp": "media_repeater[].tool_tip",
+    "text": "Facebook"
+   }
+  ]
+ },
+ {
+  "tip": "footer",
+  "id": "2362",
+  "titlu": "Footer Style 2",
+  "continut": [
+   {
+    "camp": "content_position",
+    "text": "bottom"
+   },
+   {
+    "camp": "background_background",
+    "text": "classic"
+   },
+   {
+    "camp": "background_image",
+    "adresa": "https://themepanthers.com/wp/risehand/el/wp-content/uploads/2024/01/footer-2-bg-1.png"
+   },
+   {
+    "camp": "background_position",
+    "text": "bottom left"
+   },
+   {
+    "camp": "background_repeat",
+    "text": "no-repeat"
+   },
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "content_position",
+    "text": "middle"
+   },
+   {
+    "camp": "title_heading",
+    "text": "Contactează-ne pe adresa de email."
+   },
+   {
+    "camp": "icon_fonts",
+    "text": "risehand-002-healthcare"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "sm_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "icontype",
+    "text": "disable_icon"
+   },
+   {
+    "camp": "header_extra_items",
+    "text": "mailid"
+   },
+   {
+    "camp": "icon_fonts",
+    "text": "risehand-018-conversation"
+   },
+   {
+    "camp": "contact_us_title",
+    "text": "Need help? Call Us:"
+   },
+   {
+    "camp": "contact_us_number",
+    "text": "+1800900122"
+   },
+   {
+    "camp": "mailtitle",
+    "text": "Email::"
+   },
+   {
+    "camp": "getmailid",
+    "text": "contact[@]teona-ariana.ro"
+   },
+   {
+    "camp": "addresstitle",
+    "text": "Just Mail Us:"
+   },
+   {
+    "camp": "iconboxstyle",
+    "text": "style_four"
+   },
+   {
+    "camp": "icon_fonts",
+    "text": "risehand-015-donate"
+   },
+   {
+    "camp": "icon_box_heading",
+    "text": "Susține campaniile noastre"
+   },
+   {
+    "camp": "icon_box_description",
+    "text": "Implică-te și ajută copiii cu dizabilități să aibă o șansă la un viitor mai bun. Orice gest contează!"
+   },
+   {
+    "camp": "button_text",
+    "text": "Donează"
+   },
+   {
+    "camp": "link_box",
+    "adresa": "https://www.teona-ariana.ro/campanii/"
+   },
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "contact_box_styles",
+    "text": "style_two"
+   },
+   {
+    "camp": "box_color",
+    "text": "light"
+   },
+   {
+    "camp": "contact_image",
+    "adresa": "https://www.teona-ariana.ro/wp-content/uploads/2024/01/Screenshot_46-removebg-preview-1.png"
+   },
+   {
+    "camp": "heading",
+    "text": "General Enquires"
+   },
+   {
+    "camp": "address",
+    "text": "Strada Zamca 22, Suceava, 720215"
+   },
+   {
+    "camp": "mail",
+    "text": "contact[@]teona-ariana.ro"
+   },
+   {
+    "camp": "title_heading",
+    "text": "Info"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "list_v1_repeater[].list_items",
+    "text": "Despre"
+   },
+   {
+    "camp": "list_v1_repeater[].button_link",
+    "adresa": "https://www.teona-ariana.ro/despre/"
+   },
+   {
+    "camp": "list_v1_repeater[].list_items",
+    "text": "Proiecte"
+   },
+   {
+    "camp": "list_v1_repeater[].button_link",
+    "adresa": "https://www.teona-ariana.ro/proiecte/"
+   },
+   {
+    "camp": "list_v1_repeater[].list_items",
+    "text": "Blog"
+   },
+   {
+    "camp": "list_v1_repeater[].button_link",
+    "adresa": "https://www.teona-ariana.ro/blog/"
+   },
+   {
+    "camp": "list_v1_repeater[].list_items",
+    "text": "Evenimente"
+   },
+   {
+    "camp": "list_v1_repeater[].button_link",
+    "adresa": "https://www.teona-ariana.ro/events/"
+   },
+   {
+    "camp": "list_v1_repeater[].list_items",
+    "text": "Campanii"
+   },
+   {
+    "camp": "list_v1_repeater[].button_link",
+    "adresa": "https://www.teona-ariana.ro/campanii/"
+   },
+   {
+    "camp": "sm_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "list_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "title_heading",
+    "text": "Resurse"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "list_v1_repeater[].list_items",
+    "text": "Redirecționează 3,5%"
+   },
+   {
+    "camp": "list_v1_repeater[].button_link",
+    "adresa": "https://www.teona-ariana.ro/35-2/"
+   },
+   {
+    "camp": "list_v1_repeater[].list_items",
+    "text": "Direcționează 20%"
+   },
+   {
+    "camp": "list_v1_repeater[].button_link",
+    "adresa": "https://www.teona-ariana.ro/directioneaza-20/"
+   },
+   {
+    "camp": "list_v1_repeater[].list_items",
+    "text": "Devino Voluntar"
+   },
+   {
+    "camp": "list_v1_repeater[].button_link",
+    "adresa": "https://www.teona-ariana.ro/devino-voluntar/"
+   },
+   {
+    "camp": "list_v1_repeater[].list_items",
+    "text": "Sponsori"
+   },
+   {
+    "camp": "list_v1_repeater[].button_link",
+    "adresa": "https://www.teona-ariana.ro/sponsori/"
+   },
+   {
+    "camp": "list_v1_repeater[].list_items",
+    "text": "Suntem în Presă"
+   },
+   {
+    "camp": "list_v1_repeater[].button_link",
+    "adresa": "https://www.teona-ariana.ro/suntem-in-presa/"
+   },
+   {
+    "camp": "list_v1_repeater[].list_items",
+    "text": "Echipa"
+   },
+   {
+    "camp": "list_v1_repeater[].button_link",
+    "adresa": "https://www.teona-ariana.ro/echipa/"
+   },
+   {
+    "camp": "sm_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "list_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "title_heading",
+    "text": "Date"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "list_v1_repeater[].list_items",
+    "text": "Cookies"
+   },
+   {
+    "camp": "list_v1_repeater[].button_link",
+    "adresa": "https://www.teona-ariana.ro/cookies/"
+   },
+   {
+    "camp": "list_v1_repeater[].list_items",
+    "text": "GDPR"
+   },
+   {
+    "camp": "list_v1_repeater[].button_link",
+    "adresa": "https://www.teona-ariana.ro/gdpr/"
+   },
+   {
+    "camp": "list_v1_repeater[].list_items",
+    "text": "Politica de Confidențialitate"
+   },
+   {
+    "camp": "list_v1_repeater[].button_link",
+    "adresa": "https://www.teona-ariana.ro/politica-de-confidentialitate/"
+   },
+   {
+    "camp": "list_v1_repeater[].list_items",
+    "text": "Termeni și Condiții"
+   },
+   {
+    "camp": "list_v1_repeater[].button_link",
+    "adresa": "https://www.teona-ariana.ro/termeni-si-conditii/"
+   },
+   {
+    "camp": "list_v1_repeater[].list_items",
+    "text": "Intrebari Frecvente"
+   },
+   {
+    "camp": "list_v1_repeater[].button_link",
+    "adresa": "https://www.teona-ariana.ro/faqs/"
+   },
+   {
+    "camp": "sm_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "list_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "title_heading",
+    "text": "Galerie imagini"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "content_position",
+    "text": "middle"
+   },
+   {
+    "camp": "editor_risehand",
+    "text": "Copyright © 2024 teona-ariana.ro."
+   },
+   {
+    "camp": "media_repeater[].icon_fonts",
+    "text": "risehand-facebook"
+   },
+   {
+    "camp": "media_repeater[].icon_text",
+    "text": "fa fa-facebook"
+   },
+   {
+    "camp": "media_repeater[].tool_tip",
+    "text": "Facebook"
+   },
+   {
+    "camp": "media_repeater[].media_link",
+    "adresa": "https://www.facebook.com/asociatia.teona.ariana"
+   },
+   {
+    "camp": "media_repeater[].icon_fonts",
+    "text": "risehand-instagram"
+   },
+   {
+    "camp": "media_repeater[].icon_text",
+    "text": "fa fa-facebook"
+   },
+   {
+    "camp": "media_repeater[].tool_tip",
+    "text": "Instagram"
+   },
+   {
+    "camp": "media_repeater[].media_link",
+    "adresa": "https://www.instagram.com/teonaariana_sv"
+   },
+   {
+    "camp": "media_repeater[].icon_fonts",
+    "text": "risehand-tiktok"
+   },
+   {
+    "camp": "media_repeater[].icon_text",
+    "text": "fa fa-facebook"
+   },
+   {
+    "camp": "media_repeater[].tool_tip",
+    "text": "TikTok"
+   },
+   {
+    "camp": "media_repeater[].media_link",
+    "adresa": "https://www.tiktok.com/@teonaarianasv"
+   }
+  ]
+ },
+ {
+  "tip": "footer",
+  "id": "2713",
+  "titlu": "Footer Style 3",
+  "continut": [
+   {
+    "camp": "content_position",
+    "text": "middle"
+   },
+   {
+    "camp": "background_background",
+    "text": "classic"
+   },
+   {
+    "camp": "background_image",
+    "adresa": "https://themepanthers.com/wp/risehand/el/wp-content/uploads/2024/01/footer-cta-bg-1.png"
+   },
+   {
+    "camp": "background_position",
+    "text": "bottom left"
+   },
+   {
+    "camp": "background_repeat",
+    "text": "no-repeat"
+   },
+   {
+    "camp": "title_small_heading",
+    "text": "Five Donation"
+   },
+   {
+    "camp": "title_heading",
+    "text": "Have any Donation or Contact Us"
+   },
+   {
+    "camp": "icon_fonts",
+    "text": "risehand-002-healthcare"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "sm_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "header_extra_items",
+    "text": "mailid"
+   },
+   {
+    "camp": "icon_fonts",
+    "text": "risehand-018-conversation"
+   },
+   {
+    "camp": "contact_us_title",
+    "text": "Need help? Call Us:"
+   },
+   {
+    "camp": "contact_us_number",
+    "text": "+1800900122"
+   },
+   {
+    "camp": "mailtitle",
+    "text": "Just Mail Us:"
+   },
+   {
+    "camp": "getmailid",
+    "text": "support@gmail.com"
+   },
+   {
+    "camp": "addresstitle",
+    "text": "Just Mail Us:"
+   },
+   {
+    "camp": "contact_title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "contct_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "icon_fonts",
+    "text": "risehand-phone"
+   },
+   {
+    "camp": "contact_us_title",
+    "text": "Need help? Call Us:"
+   },
+   {
+    "camp": "contact_us_number",
+    "text": "+1800900122"
+   },
+   {
+    "camp": "mailtitle",
+    "text": "Just Mail Us:"
+   },
+   {
+    "camp": "getmailid",
+    "text": "support@gmail.com"
+   },
+   {
+    "camp": "addresstitle",
+    "text": "Just Mail Us:"
+   },
+   {
+    "camp": "contact_title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "contct_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "iconboxstyle",
+    "text": "style_four"
+   },
+   {
+    "camp": "icon_fonts",
+    "text": "risehand-004-gift"
+   },
+   {
+    "camp": "icon_box_heading",
+    "text": "Give a Gift For People’s"
+   },
+   {
+    "camp": "icon_box_description",
+    "text": "In short, People give gifts as a way of showing thoughtfulness, love and affection. When we give gifts, it brings joy or pleasure."
+   },
+   {
+    "camp": "button_text",
+    "text": "Read More"
+   },
+   {
+    "camp": "background_background",
+    "text": "classic"
+   },
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "title_heading",
+    "text": "Recent News"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "title_heading",
+    "text": "Services"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Donation Online"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Donor Centres"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Volunteering"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Your Philanthropy"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Senior Care"
+   },
+   {
+    "camp": "title_heading",
+    "text": "Company"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "About us"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Appointment"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Volunteers"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Careers"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Contact Us"
+   },
+   {
+    "camp": "title_heading",
+    "text": "Donations"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Donor Wall"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Make Donations"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Donation History"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Donation’s Details"
+   },
+   {
+    "camp": "title_heading",
+    "text": "Gallery"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "subscribe_type",
+    "text": "light"
+   },
+   {
+    "camp": "title",
+    "text": "Get Every Single Updates Join Our Newsletters"
+   },
+   {
+    "camp": "content",
+    "text": "[mc4wp_form]"
+   },
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "content_position",
+    "text": "middle"
+   },
+   {
+    "camp": "editor_risehand",
+    "text": "Copyright © 2024 Steelthemes . All Rights Reserved."
+   },
+   {
+    "camp": "media_repeater[].icon_fonts",
+    "text": "risehand-facebook"
+   },
+   {
+    "camp": "media_repeater[].icon_text",
+    "text": "fa fa-facebook"
+   },
+   {
+    "camp": "media_repeater[].tool_tip",
+    "text": "Facebook"
+   },
+   {
+    "camp": "media_repeater[].icon_fonts",
+    "text": "risehand-twitter"
+   },
+   {
+    "camp": "media_repeater[].icon_text",
+    "text": "fa fa-facebook"
+   },
+   {
+    "camp": "media_repeater[].tool_tip",
+    "text": "Facebook"
+   },
+   {
+    "camp": "media_repeater[].icon_fonts",
+    "text": "risehand-instagram1"
+   },
+   {
+    "camp": "media_repeater[].icon_text",
+    "text": "fa fa-facebook"
+   },
+   {
+    "camp": "media_repeater[].tool_tip",
+    "text": "Facebook"
+   },
+   {
+    "camp": "media_repeater[].icon_fonts",
+    "text": "risehand-slack2"
+   },
+   {
+    "camp": "media_repeater[].icon_text",
+    "text": "fa fa-facebook"
+   },
+   {
+    "camp": "media_repeater[].tool_tip",
+    "text": "Facebook"
+   },
+   {
+    "camp": "media_repeater[].icon_fonts",
+    "text": "risehand-linkedin"
+   },
+   {
+    "camp": "media_repeater[].icon_text",
+    "text": "fa fa-facebook"
+   },
+   {
+    "camp": "media_repeater[].tool_tip",
+    "text": "Facebook"
+   }
+  ]
+ },
+ {
+  "tip": "footer",
+  "id": "2918",
+  "titlu": "Footer Style 4",
+  "continut": [
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "background_background",
+    "text": "classic"
+   },
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "background_background",
+    "text": "classic"
+   },
+   {
+    "camp": "hide_tablet",
+    "text": "hidden-tablet"
+   },
+   {
+    "camp": "hide_mobile_extra",
+    "text": "hidden-mobile_extra"
+   },
+   {
+    "camp": "hide_mobile",
+    "text": "hidden-mobile"
+   },
+   {
+    "camp": "background_background",
+    "text": "classic"
+   },
+   {
+    "camp": "differnet_types",
+    "text": "type_two"
+   },
+   {
+    "camp": "icon_fonts",
+    "text": "risehand-mail2"
+   },
+   {
+    "camp": "contact_us_title",
+    "text": "Just Mail Us :"
+   },
+   {
+    "camp": "contact_us_number",
+    "text": "support@gmail.com"
+   },
+   {
+    "camp": "mailtitle",
+    "text": "Just Mail Us:"
+   },
+   {
+    "camp": "getmailid",
+    "text": "support@gmail.com"
+   },
+   {
+    "camp": "addresstitle",
+    "text": "Just Mail Us:"
+   },
+   {
+    "camp": "background_background",
+    "text": "classic"
+   },
+   {
+    "camp": "differnet_types",
+    "text": "type_two"
+   },
+   {
+    "camp": "icon_fonts",
+    "text": "risehand-mail2"
+   },
+   {
+    "camp": "contact_us_title",
+    "text": "Need help? Call Us:"
+   },
+   {
+    "camp": "contact_us_number",
+    "text": "+1800900122"
+   },
+   {
+    "camp": "mailtitle",
+    "text": "Just Mail Us:"
+   },
+   {
+    "camp": "getmailid",
+    "text": "support@gmail.com"
+   },
+   {
+    "camp": "addresstitle",
+    "text": "Just Mail Us:"
+   },
+   {
+    "camp": "content_position",
+    "text": "space-evenly"
+   },
+   {
+    "camp": "background_background",
+    "text": "classic"
+   },
+   {
+    "camp": "hide_tablet",
+    "text": "hidden-tablet"
+   },
+   {
+    "camp": "hide_mobile_extra",
+    "text": "hidden-mobile_extra"
+   },
+   {
+    "camp": "hide_mobile",
+    "text": "hidden-mobile"
+   },
+   {
+    "camp": "logo_default",
+    "adresa": "https://themepanthers.com/wp/risehand/el/wp-content/uploads/2024/01/logo-8r-1.png"
+   },
+   {
+    "camp": "hide_tablet",
+    "text": "hidden-tablet"
+   },
+   {
+    "camp": "hide_mobile_extra",
+    "text": "hidden-mobile_extra"
+   },
+   {
+    "camp": "hide_mobile",
+    "text": "hidden-mobile"
+   },
+   {
+    "camp": "background_background",
+    "text": "classic"
+   },
+   {
+    "camp": "background_image",
+    "adresa": "https://themepanthers.com/wp/risehand/el/wp-content/uploads/2024/01/home-5-footer-bg-1.png"
+   },
+   {
+    "camp": "background_position",
+    "text": "top center"
+   },
+   {
+    "camp": "background_repeat",
+    "text": "no-repeat"
+   },
+   {
+    "camp": "background_size",
+    "text": "cover"
+   },
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "title_heading",
+    "text": "About Our Company"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "editor_risehand",
+    "text": "It has been determined through research that when we feel to help, and that someone authentically needs our assistance."
+   },
+   {
+    "camp": "subscribe_style_two",
+    "text": "style_two"
+   },
+   {
+    "camp": "title",
+    "text": "Raise Your Helping Hand"
+   },
+   {
+    "camp": "description",
+    "text": "Sorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Risus commodo vive maecenas accumsan lacus vel facilisis."
+   },
+   {
+    "camp": "content",
+    "text": "[mc4wp_form]"
+   },
+   {
+    "camp": "title_heading",
+    "text": "Company"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "About us"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Appointment"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Volunteers"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Careers"
+   },
+   {
+    "camp": "list_v1_repeater[].description",
+    "text": "Contact Us"
+   },
+   {
+    "camp": "title_heading",
+    "text": "Causes"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "title_heading",
+    "text": "Gallery"
+   },
+   {
+    "camp": "title_typo_typography",
+    "text": "custom"
+   },
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "content_position",
+    "text": "middle"
+   },
+   {
+    "camp": "editor_risehand",
+    "text": "Copyright © 2024 Steelthemes . All Rights Reserved."
+   },
+   {
+    "camp": "media_repeater[].icon_fonts",
+    "text": "risehand-facebook"
+   },
+   {
+    "camp": "media_repeater[].icon_text",
+    "text": "fa fa-facebook"
+   },
+   {
+    "camp": "media_repeater[].tool_tip",
+    "text": "Facebook"
+   },
+   {
+    "camp": "media_repeater[].icon_fonts",
+    "text": "risehand-twitter"
+   },
+   {
+    "camp": "media_repeater[].icon_text",
+    "text": "fa fa-facebook"
+   },
+   {
+    "camp": "media_repeater[].tool_tip",
+    "text": "Facebook"
+   },
+   {
+    "camp": "media_repeater[].icon_fonts",
+    "text": "risehand-instagram1"
+   },
+   {
+    "camp": "media_repeater[].icon_text",
+    "text": "fa fa-facebook"
+   },
+   {
+    "camp": "media_repeater[].tool_tip",
+    "text": "Facebook"
+   },
+   {
+    "camp": "media_repeater[].icon_fonts",
+    "text": "risehand-slack2"
+   },
+   {
+    "camp": "media_repeater[].icon_text",
+    "text": "fa fa-facebook"
+   },
+   {
+    "camp": "media_repeater[].tool_tip",
+    "text": "Facebook"
+   },
+   {
+    "camp": "media_repeater[].icon_fonts",
+    "text": "risehand-linkedin"
+   },
+   {
+    "camp": "media_repeater[].icon_text",
+    "text": "fa fa-facebook"
+   },
+   {
+    "camp": "media_repeater[].tool_tip",
+    "text": "Facebook"
+   }
+  ]
+ },
+ {
+  "tip": "header",
+  "id": "1601",
+  "titlu": "Header 1",
+  "continut": [
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "background_background",
+    "text": "classic"
+   },
+   {
+    "camp": "header_layout",
+    "text": "full-container"
+   },
+   {
+    "camp": "navigations",
+    "text": "menu-1"
+   },
+   {
+    "camp": "address_title",
+    "text": "Adresă"
+   },
+   {
+    "camp": "address",
+    "text": "Strada Zamca 22, Suceava, 720215"
+   },
+   {
+    "camp": "email_title",
+    "text": "Email"
+   },
+   {
+    "camp": "email_address",
+    "text": "contact[@]teona-ariana.ro"
+   },
+   {
+    "camp": "phone_title",
+    "text": "Telefon"
+   },
+   {
+    "camp": "button_one",
+    "text": "Devino Voluntar"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-facebook-circle"
+   },
+   {
+    "camp": "social_media_repeater[].socail_media_link",
+    "adresa": "https://www.facebook.com/asociatia.teona.ariana"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-instagram"
+   },
+   {
+    "camp": "social_media_repeater[].socail_media_link",
+    "adresa": "https://www.instagram.com/teonaariana_sv/"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-tiktok"
+   },
+   {
+    "camp": "social_media_repeater[].socail_media_link",
+    "adresa": "https://www.tiktok.com/@teonaarianasv"
+   },
+   {
+    "camp": "lang_title",
+    "text": "English"
+   },
+   {
+    "camp": "language_repeater[].language_text",
+    "text": "Français"
+   },
+   {
+    "camp": "language_repeater[].language_text",
+    "text": "Deutsch"
+   },
+   {
+    "camp": "language_repeater[].language_text",
+    "text": "Pусский"
+   },
+   {
+    "camp": "button_text",
+    "text": "Donează"
+   },
+   {
+    "camp": "about_company_modal",
+    "text": "Denounce with righteous indignation and dislike men who are beguiled and demoralized by the charms pleasure moment so blinded desire that they cannot foresee the pain and trouble."
+   },
+   {
+    "camp": "form_title",
+    "text": "Need Any Help? Or Looking For an Agent"
+   },
+   {
+    "camp": "mobile_mail_number",
+    "text": "sendmail@example.com"
+   },
+   {
+    "camp": "working_hours_panels",
+    "text": "Working Hours : Sun-monday, 09am-5pm"
+   },
+   {
+    "camp": "copy_right_modal",
+    "text": "Copyright © 2024. All Rights Reserved."
+   },
+   {
+    "camp": "form_enable",
+    "text": "yes"
+   },
+   {
+    "camp": "form_short_code",
+    "text": "[contact-form-7 id=\"7be7a04\" title=\"Option Panel Contact Form\"]"
+   },
+   {
+    "camp": "contact_panel_enable",
+    "text": "yes"
+   },
+   {
+    "camp": "mode",
+    "text": "dark"
+   },
+   {
+    "camp": "logo_default",
+    "adresa": "https://www.teona-ariana.ro/wp-content/uploads/2024/01/Screenshot_45-removebg-preview-3.png"
+   },
+   {
+    "camp": "button_link",
+    "adresa": "https://www.teona-ariana.ro/devino-voluntar/"
+   },
+   {
+    "camp": "mbutton_link",
+    "adresa": "https://www.teona-ariana.ro/campanii/"
+   }
+  ]
+ },
+ {
+  "tip": "header",
+  "id": "1627",
+  "titlu": "Header 2",
+  "continut": [
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "background_background",
+    "text": "classic"
+   },
+   {
+    "camp": "box_shadow_box_shadow_type",
+    "text": "yes"
+   },
+   {
+    "camp": "header_layout",
+    "text": "full-container"
+   },
+   {
+    "camp": "mode",
+    "text": "dark"
+   },
+   {
+    "camp": "navigations",
+    "text": "menu-1"
+   },
+   {
+    "camp": "logo_default",
+    "adresa": "https://www.teona-ariana.ro/wp-content/uploads/2024/03/WhatsApp_Image_2024-11-15_at_11.32.41_AM-removebg-preview.png"
+   },
+   {
+    "camp": "address_title",
+    "text": "Adresă"
+   },
+   {
+    "camp": "address",
+    "text": "Strada Zamca 22, Suceava, 720215"
+   },
+   {
+    "camp": "email_title",
+    "text": "Email"
+   },
+   {
+    "camp": "email_address",
+    "text": "contact[@]teona-ariana.ro"
+   },
+   {
+    "camp": "phone_title",
+    "text": "Telefon"
+   },
+   {
+    "camp": "button_one",
+    "text": "Devino Voluntar"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-facebook-circle"
+   },
+   {
+    "camp": "social_media_repeater[].socail_media_link",
+    "adresa": "https://www.facebook.com/asociatia.teona.ariana"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-instagram"
+   },
+   {
+    "camp": "social_media_repeater[].socail_media_link",
+    "adresa": "https://www.instagram.com/teonaariana_sv/"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-tiktok"
+   },
+   {
+    "camp": "social_media_repeater[].socail_media_link",
+    "adresa": "https://www.tiktok.com/@teonaarianasv"
+   },
+   {
+    "camp": "lang_title",
+    "text": "English"
+   },
+   {
+    "camp": "language_repeater[].language_text",
+    "text": "Français"
+   },
+   {
+    "camp": "language_repeater[].language_text",
+    "text": "Deutsch"
+   },
+   {
+    "camp": "language_repeater[].language_text",
+    "text": "Pусский"
+   },
+   {
+    "camp": "language_shortcode",
+    "text": "[gtranslate]"
+   },
+   {
+    "camp": "button_text",
+    "text": "Donează"
+   },
+   {
+    "camp": "about_company_modal",
+    "text": "Denounce with righteous indignation and dislike men who are beguiled and demoralized by the charms pleasure moment so blinded desire that they cannot foresee the pain and trouble."
+   },
+   {
+    "camp": "form_title",
+    "text": "Need Any Help? Or Looking For an Agent"
+   },
+   {
+    "camp": "mobile_mail_number",
+    "text": "sendmail@example.com"
+   },
+   {
+    "camp": "working_hours_panels",
+    "text": "Working Hours : Sun-monday, 09am-5pm"
+   },
+   {
+    "camp": "copy_right_modal",
+    "text": "Copyright © 2024. All Rights Reserved."
+   },
+   {
+    "camp": "language_type",
+    "text": "using_short_code"
+   },
+   {
+    "camp": "form_enable",
+    "text": "yes"
+   },
+   {
+    "camp": "form_short_code",
+    "text": "[contact-form-7 id=\"7be7a04\" title=\"Option Panel Contact Form\"]"
+   },
+   {
+    "camp": "contact_panel_enable",
+    "text": "yes"
+   },
+   {
+    "camp": "button_link",
+    "adresa": "https://www.teona-ariana.ro/devino-voluntar/"
+   },
+   {
+    "camp": "mbutton_link",
+    "adresa": "https://www.teona-ariana.ro/campanii/"
+   }
+  ]
+ },
+ {
+  "tip": "header",
+  "id": "1642",
+  "titlu": "Header 3",
+  "continut": [
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "background_background",
+    "text": "classic"
+   },
+   {
+    "camp": "css_classes",
+    "text": "position-absolute w-100"
+   },
+   {
+    "camp": "header_layout",
+    "text": "full-container"
+   },
+   {
+    "camp": "navigations",
+    "text": "menu-1"
+   },
+   {
+    "camp": "logo_default",
+    "adresa": "https://themepanthers.com/wp/risehand/el/wp-content/uploads/2024/01/logo-4-1.png"
+   },
+   {
+    "camp": "address_title",
+    "text": "Location"
+   },
+   {
+    "camp": "email_title",
+    "text": "Email"
+   },
+   {
+    "camp": "email_address",
+    "text": "sendmail@risehand.com"
+   },
+   {
+    "camp": "phone_title",
+    "text": "Phone"
+   },
+   {
+    "camp": "phone_number",
+    "text": "+98 060 712 34"
+   },
+   {
+    "camp": "button_one",
+    "text": "Become a Volunteer"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-facebook-circle"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-twitter"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-skype1"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-telegram1"
+   },
+   {
+    "camp": "lang_title",
+    "text": "English"
+   },
+   {
+    "camp": "language_repeater[].language_text",
+    "text": "Français"
+   },
+   {
+    "camp": "language_repeater[].language_text",
+    "text": "Deutsch"
+   },
+   {
+    "camp": "language_repeater[].language_text",
+    "text": "Pусский"
+   },
+   {
+    "camp": "language_shortcode",
+    "text": "[gtranslate]"
+   },
+   {
+    "camp": "button_text",
+    "text": "Became Vendor"
+   },
+   {
+    "camp": "about_company_modal",
+    "text": "Denounce with righteous indignation and dislike men who are beguiled and demoralized by the charms pleasure moment so blinded desire that they cannot foresee the pain and trouble."
+   },
+   {
+    "camp": "form_title",
+    "text": "Need Any Help? Or Looking For an Agent"
+   },
+   {
+    "camp": "mobile_mail_number",
+    "text": "sendmail@example.com"
+   },
+   {
+    "camp": "working_hours_panels",
+    "text": "Working Hours : Sun-monday, 09am-5pm"
+   },
+   {
+    "camp": "copy_right_modal",
+    "text": "Copyright © 2024. All Rights Reserved."
+   },
+   {
+    "camp": "language_type",
+    "text": "using_short_code"
+   },
+   {
+    "camp": "form_enable",
+    "text": "yes"
+   },
+   {
+    "camp": "form_short_code",
+    "text": "[contact-form-7 id=\"7be7a04\" title=\"Option Panel Contact Form\"]"
+   },
+   {
+    "camp": "contact_panel_enable",
+    "text": "yes"
+   }
+  ]
+ },
+ {
+  "tip": "header",
+  "id": "1681",
+  "titlu": "Header 4",
+  "continut": [
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "background_background",
+    "text": "classic"
+   },
+   {
+    "camp": "header_layout",
+    "text": "full-container"
+   },
+   {
+    "camp": "navigations",
+    "text": "menu-1"
+   },
+   {
+    "camp": "logo_default",
+    "adresa": "https://themepanthers.com/wp/risehand/el/wp-content/uploads/2024/01/logo-1-3-1.png"
+   },
+   {
+    "camp": "address_title",
+    "text": "Location"
+   },
+   {
+    "camp": "email_title",
+    "text": "Email"
+   },
+   {
+    "camp": "email_address",
+    "text": "sendmail@risehand.com"
+   },
+   {
+    "camp": "phone_title",
+    "text": "Phone"
+   },
+   {
+    "camp": "phone_number",
+    "text": "+98 060 712 34"
+   },
+   {
+    "camp": "button_one",
+    "text": "Become a Volunteer"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-facebook-circle"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-twitter"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-skype1"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-telegram1"
+   },
+   {
+    "camp": "lang_title",
+    "text": "English"
+   },
+   {
+    "camp": "language_repeater[].language_text",
+    "text": "Français"
+   },
+   {
+    "camp": "language_repeater[].language_text",
+    "text": "Deutsch"
+   },
+   {
+    "camp": "language_repeater[].language_text",
+    "text": "Pусский"
+   },
+   {
+    "camp": "language_shortcode",
+    "text": "[gtranslate]"
+   },
+   {
+    "camp": "button_text",
+    "text": "Became Vendor"
+   },
+   {
+    "camp": "about_company_modal",
+    "text": "Denounce with righteous indignation and dislike men who are beguiled and demoralized by the charms pleasure moment so blinded desire that they cannot foresee the pain and trouble."
+   },
+   {
+    "camp": "form_title",
+    "text": "Need Any Help? Or Looking For an Agent"
+   },
+   {
+    "camp": "mobile_mail_number",
+    "text": "sendmail@example.com"
+   },
+   {
+    "camp": "working_hours_panels",
+    "text": "Working Hours : Sun-monday, 09am-5pm"
+   },
+   {
+    "camp": "copy_right_modal",
+    "text": "Copyright © 2024. All Rights Reserved."
+   },
+   {
+    "camp": "language_type",
+    "text": "using_short_code"
+   },
+   {
+    "camp": "mode",
+    "text": "dark"
+   },
+   {
+    "camp": "form_enable",
+    "text": "yes"
+   },
+   {
+    "camp": "form_short_code",
+    "text": "[contact-form-7 id=\"7be7a04\" title=\"Option Panel Contact Form\"]"
+   },
+   {
+    "camp": "contact_panel_enable",
+    "text": "yes"
+   }
+  ]
+ },
+ {
+  "tip": "header",
+  "id": "4911",
+  "titlu": "Header 1 Sticky",
+  "continut": [
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "background_background",
+    "text": "classic"
+   },
+   {
+    "camp": "header_layout",
+    "text": "full-container"
+   },
+   {
+    "camp": "navigations",
+    "text": "menu-1"
+   },
+   {
+    "camp": "address_title",
+    "text": "Location"
+   },
+   {
+    "camp": "email_title",
+    "text": "Email"
+   },
+   {
+    "camp": "email_address",
+    "text": "sendmail@risehand.com"
+   },
+   {
+    "camp": "phone_title",
+    "text": "Phone"
+   },
+   {
+    "camp": "phone_number",
+    "text": "+98 060 712 34"
+   },
+   {
+    "camp": "button_one",
+    "text": "Become a Volunteer"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-facebook-circle"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-twitter"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-skype1"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-telegram1"
+   },
+   {
+    "camp": "lang_title",
+    "text": "English"
+   },
+   {
+    "camp": "language_repeater[].language_text",
+    "text": "Français"
+   },
+   {
+    "camp": "language_repeater[].language_text",
+    "text": "Deutsch"
+   },
+   {
+    "camp": "language_repeater[].language_text",
+    "text": "Pусский"
+   },
+   {
+    "camp": "language_shortcode",
+    "text": "[gtranslate]"
+   },
+   {
+    "camp": "button_text",
+    "text": "Donează"
+   },
+   {
+    "camp": "about_company_modal",
+    "text": "Denounce with righteous indignation and dislike men who are beguiled and demoralized by the charms pleasure moment so blinded desire that they cannot foresee the pain and trouble."
+   },
+   {
+    "camp": "form_title",
+    "text": "Need Any Help? Or Looking For an Agent"
+   },
+   {
+    "camp": "mobile_mail_number",
+    "text": "sendmail@example.com"
+   },
+   {
+    "camp": "working_hours_panels",
+    "text": "Working Hours : Sun-monday, 09am-5pm"
+   },
+   {
+    "camp": "copy_right_modal",
+    "text": "Copyright © 2024. All Rights Reserved."
+   },
+   {
+    "camp": "language_type",
+    "text": "using_short_code"
+   },
+   {
+    "camp": "form_enable",
+    "text": "yes"
+   },
+   {
+    "camp": "form_short_code",
+    "text": "[contact-form-7 id=\"7be7a04\" title=\"Option Panel Contact Form\"]"
+   },
+   {
+    "camp": "contact_panel_enable",
+    "text": "yes"
+   },
+   {
+    "camp": "logo_default",
+    "adresa": "https://www.teona-ariana.ro/wp-content/uploads/2024/03/WhatsApp_Image_2024-11-15_at_11.32.41_AM-removebg-preview.png"
+   },
+   {
+    "camp": "mbutton_link",
+    "adresa": "https://www.teona-ariana.ro/campanii/"
+   }
+  ]
+ },
+ {
+  "tip": "header",
+  "id": "4917",
+  "titlu": "Header 3 Sticky",
+  "continut": [
+   {
+    "camp": "layout",
+    "text": "full_width"
+   },
+   {
+    "camp": "background_background",
+    "text": "classic"
+   },
+   {
+    "camp": "header_layout",
+    "text": "full-container"
+   },
+   {
+    "camp": "navigations",
+    "text": "menu-1"
+   },
+   {
+    "camp": "logo_default",
+    "adresa": "https://themepanthers.com/wp/risehand/el/wp-content/uploads/2024/01/logo-8r-1.png"
+   },
+   {
+    "camp": "address_title",
+    "text": "Location"
+   },
+   {
+    "camp": "email_title",
+    "text": "Email"
+   },
+   {
+    "camp": "email_address",
+    "text": "sendmail@risehand.com"
+   },
+   {
+    "camp": "phone_title",
+    "text": "Phone"
+   },
+   {
+    "camp": "phone_number",
+    "text": "+98 060 712 34"
+   },
+   {
+    "camp": "button_one",
+    "text": "Become a Volunteer"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-facebook-circle"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-twitter"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-skype1"
+   },
+   {
+    "camp": "social_media_repeater[].social_media_icon",
+    "text": "risehand-telegram1"
+   },
+   {
+    "camp": "lang_title",
+    "text": "English"
+   },
+   {
+    "camp": "language_repeater[].language_text",
+    "text": "Français"
+   },
+   {
+    "camp": "language_repeater[].language_text",
+    "text": "Deutsch"
+   },
+   {
+    "camp": "language_repeater[].language_text",
+    "text": "Pусский"
+   },
+   {
+    "camp": "language_shortcode",
+    "text": "[gtranslate]"
+   },
+   {
+    "camp": "button_text",
+    "text": "Became Vendor"
+   },
+   {
+    "camp": "about_company_modal",
+    "text": "Denounce with righteous indignation and dislike men who are beguiled and demoralized by the charms pleasure moment so blinded desire that they cannot foresee the pain and trouble."
+   },
+   {
+    "camp": "form_title",
+    "text": "Need Any Help? Or Looking For an Agent"
+   },
+   {
+    "camp": "mobile_mail_number",
+    "text": "sendmail@example.com"
+   },
+   {
+    "camp": "working_hours_panels",
+    "text": "Working Hours : Sun-monday, 09am-5pm"
+   },
+   {
+    "camp": "copy_right_modal",
+    "text": "Copyright © 2024. All Rights Reserved."
+   },
+   {
+    "camp": "language_type",
+    "text": "using_short_code"
+   },
+   {
+    "camp": "form_enable",
+    "text": "yes"
+   },
+   {
+    "camp": "form_short_code",
+    "text": "[contact-form-7 id=\"7be7a04\" title=\"Option Panel Contact Form\"]"
+   },
+   {
+    "camp": "contact_panel_enable",
+    "text": "yes"
+   }
+  ]
+ }
+]
