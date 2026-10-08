@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { ASOCIATIA, RUTE, SMS } from "@/date/asociatie";
 import { SIGLE_SPONSORI } from "@/date/sponsori";
 import Aparitie from "@/componente/Aparitie";
+import Decor from "@/componente/Decor";
 import Fotografie, { type Umbra } from "@/componente/Fotografie";
 import Buton from "@/componente/Buton";
 import Cifre from "@/componente/Cifre";
@@ -176,8 +177,14 @@ export default function PrimaPagina() {
       {/* 1.2 — bara cu cifre, fără titlu. Pe hârtie caldă, nu pe o bandă
           întunecată cu contoare: aia e bara de statistici a oricărui șablon. */}
       <Val culoare="text-hartie-calda" />
-      <section className="granulatie bg-hartie-calda pt-6 pb-16 lg:pb-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+      <section className="granulatie relative overflow-hidden bg-hartie-calda pt-6 pb-16 lg:pb-20">
+        {/* Semne desenate, ca pe marginea unui caiet. Decor, nu conținut. */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <Decor semn="stea" className="pluteste-lent absolute top-8 left-[6%] size-7 text-miere-300 lg:size-9" />
+          <Decor semn="spirala" className="pluteste-lent absolute right-[8%] bottom-10 size-8 text-turcoaz-300 lg:size-11" />
+          <Decor semn="unda" className="pluteste-lent absolute top-1/3 right-[4%] size-9 text-caramiziu-200 lg:size-12" />
+        </div>
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="sr-only">Rezultatele noastre</h2>
           <Cifre />
         </div>
@@ -185,8 +192,12 @@ export default function PrimaPagina() {
 
       {/* 1.3 — Cum poți să ne susții */}
       <Val culoare="text-hartie" />
-      <section className="bg-hartie pb-20 lg:pb-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden bg-hartie pb-20 lg:pb-28">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <Decor semn="inima" className="pluteste-lent absolute top-24 right-[5%] size-8 text-caramiziu-200 lg:size-11" />
+          <Decor semn="soare" className="pluteste-lent absolute bottom-16 left-[3%] size-9 text-miere-200 lg:size-12" />
+        </div>
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <p className="scris text-amplu text-turcoaz-600">
               Cinci feluri. Alege-l pe al tău.
@@ -202,12 +213,12 @@ export default function PrimaPagina() {
                   <Aparitie intarziere={i * 0.05} className="h-full">
                     <article className="group relative h-full">
                       <div
-                        className={`relative flex h-full flex-col gap-5 rounded-[1.75rem] bg-hartie p-6 transition-all duration-400 ease-cald group-hover:-translate-y-2 motion-reduce:group-hover:translate-y-0 ${accent.umbra} ${
+                        className={`relative flex h-full flex-col gap-5 ${i % 2 === 0 ? "colt-a" : "colt-b"} bg-hartie p-6 transition-all duration-400 ease-cald group-hover:-translate-y-2 motion-reduce:group-hover:translate-y-0 ${accent.umbra} ${
                           i === 0 ? "sm:p-8 lg:flex-row lg:items-center lg:gap-7" : ""
                         }`}
                       >
                         <span
-                          className={`flex shrink-0 items-center justify-center rounded-[1.1rem] transition-all duration-400 ease-cald group-hover:-rotate-6 group-hover:scale-110 group-hover:text-hartie motion-reduce:group-hover:scale-100 motion-reduce:group-hover:rotate-0 ${accent.chip} ${accent.plin} ${
+                          className={`flex shrink-0 items-center justify-center ${i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"} transition-all duration-400 ease-cald group-hover:-rotate-6 group-hover:scale-110 group-hover:text-hartie motion-reduce:group-hover:scale-100 motion-reduce:group-hover:rotate-0 ${accent.chip} ${accent.plin} ${
                             i === 0 ? "size-16" : "size-14"
                           }`}
                         >
@@ -256,8 +267,12 @@ export default function PrimaPagina() {
 
       {/* 1.4 — Campaniile noastre. Fotografii în arcade, nu carduri cu poză sus. */}
       <Val culoare="text-tenta-cald" />
-      <section className="granulatie bg-tenta-cald pb-20 lg:pb-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="granulatie relative overflow-hidden bg-tenta-cald pb-20 lg:pb-28">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <Decor semn="stea" className="pluteste-lent absolute top-16 right-[7%] size-8 text-caramiziu-300 lg:size-11" />
+          <Decor semn="unda" className="pluteste-lent absolute bottom-24 left-[4%] size-10 text-miere-300 lg:size-14" />
+        </div>
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <p className="scris text-amplu text-caramiziu-600">
               Unde ajunge donația ta
@@ -276,13 +291,14 @@ export default function PrimaPagina() {
                         alt={campanie.poza.alt}
                         legenda={campanie.poza.legenda}
                         umbra={ACCENTE[i % 3].fotografie}
+                        colt={i % 2 === 0 ? "a" : "b"}
                         raport="aspect-[4/5]"
                         dimensiuni="(min-width: 1024px) 380px, 92vw"
                       />
                     ) : (
                       // Fără chipuri recognoscibile: până vine o fotografie
                       // potrivită, locul ei îl ține motto-ul, nu o poză de arhivă.
-                      <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 shadow-[0_22px_45px_-20px_rgba(247,79,34,0.6)] transition-transform duration-500 ease-cald group-hover:-translate-y-1.5 motion-reduce:group-hover:translate-y-0">
+                      <div className="relative aspect-[4/5] overflow-hidden colt-b bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 shadow-[0_22px_45px_-20px_rgba(247,79,34,0.6)] transition-transform duration-500 ease-cald group-hover:-translate-y-1.5 motion-reduce:group-hover:translate-y-0">
                         <span
                           aria-hidden="true"
                           className="absolute -top-16 -right-16 size-56 rounded-full border-2 border-hartie/25"
@@ -330,19 +346,20 @@ export default function PrimaPagina() {
                 alt="Trei copii desenează pe o tablă albă pe care scrie „Casa Teona” cu verde"
                 legenda="Casa Teona"
                 umbra="turcoaz"
+                colt="a"
                 raport="aspect-[4/5]"
                 dimensiuni="(min-width: 1024px) 420px, 88vw"
                 className="w-[80%]"
               />
               {/* Clădirea, mai mică, suprapusă — ca o poză pusă peste alta. */}
               <div className="absolute right-0 bottom-6 w-[44%]">
-                <div className="relative aspect-square overflow-hidden rounded-[1.5rem] border-[6px] border-hartie bg-hartie shadow-[0_20px_40px_-18px_rgba(255,172,0,0.7)]">
+                <div className="relative aspect-square overflow-hidden colt-b border-[6px] border-hartie bg-hartie shadow-[0_20px_40px_-18px_rgba(255,172,0,0.7)]">
                   <Image
                     src="/poze/2024/11/poza3_enhanced.webp"
                     alt="Clădirea Casa Teona din Suceava, cu firma „Casa TEONA” deasupra intrării"
                     fill
                     sizes="(min-width: 1024px) 240px, 44vw"
-                    className="rounded-[1.1rem] object-cover"
+                    className="object-cover"
                   />
                 </div>
               </div>
@@ -359,9 +376,9 @@ export default function PrimaPagina() {
               {PUNCTE_CASA.map((punct) => (
                 <li
                   key={punct.text}
-                  className="flex items-center gap-4 rounded-card border-2 border-turcoaz-100 bg-turcoaz-50/60 p-4"
+                  className="colt-a flex items-center gap-4 bg-turcoaz-50 p-4 shadow-[0_12px_28px_-20px_rgba(42,159,163,0.9)]"
                 >
-                  <span className="flex size-11 shrink-0 items-center justify-center rounded-[0.9rem] bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
+                  <span className="colt-mic-a flex size-11 shrink-0 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
                     <Pictograma nume={punct.pictograma} className="size-5" />
                   </span>
                   <span className="text-amplu text-cerneala">{punct.text}</span>
@@ -379,8 +396,12 @@ export default function PrimaPagina() {
       <FasieDeFotografii />
 
       {/* 1.7 — Ce am realizat împreună în ultimul an. Statice, fără animații. */}
-      <section className="granulatie bg-tenta-miere py-20 lg:py-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="granulatie relative overflow-hidden bg-tenta-miere py-20 lg:py-28">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <Decor semn="spirala" className="pluteste-lent absolute top-14 left-[5%] size-9 text-miere-400/70 lg:size-12" />
+          <Decor semn="stea" className="pluteste-lent absolute right-[6%] bottom-16 size-7 text-caramiziu-300 lg:size-10" />
+        </div>
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div className="max-w-2xl">
               <p className="scris text-amplu text-miere-700">Anul care a trecut</p>
@@ -399,7 +420,7 @@ export default function PrimaPagina() {
                 key={realizare.titlu}
                 className={i === 0 ? "sm:col-span-2" : undefined}
               >
-                <article className="group flex h-full gap-5 rounded-[1.5rem] bg-hartie p-6 shadow-[0_16px_34px_-20px_rgba(35,35,35,0.4)] transition-transform duration-400 ease-cald hover:-translate-y-1.5 motion-reduce:hover:translate-y-0">
+                <article className={`group flex h-full gap-5 ${i % 2 === 0 ? "colt-a" : "colt-b"} bg-hartie p-6 shadow-[0_16px_34px_-20px_rgba(35,35,35,0.4)] transition-transform duration-400 ease-cald hover:-translate-y-1.5 motion-reduce:hover:translate-y-0`}>
                   <span
                     aria-hidden="true"
                     className={`font-titlu text-h2 leading-none font-extrabold ${ACCENTE[i % 3].numar}`}
@@ -439,7 +460,7 @@ export default function PrimaPagina() {
           <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
             {SIGLE_SPONSORI.map((sigla) => (
               <li key={sigla.nume}>
-                <div className="flex h-24 items-center justify-center rounded-[1.25rem] bg-hartie p-4 shadow-[0_10px_26px_-18px_rgba(35,35,35,0.45)] transition-all duration-300 ease-cald hover:-translate-y-1 hover:shadow-[0_16px_32px_-16px_rgba(247,79,34,0.4)] motion-reduce:hover:translate-y-0">
+                <div className="colt-mic-a flex h-24 items-center justify-center bg-hartie p-4 shadow-[0_10px_26px_-18px_rgba(35,35,35,0.45)] transition-all duration-300 ease-cald hover:-translate-y-1 hover:shadow-[0_16px_32px_-16px_rgba(247,79,34,0.4)] motion-reduce:hover:translate-y-0">
                   <Image
                     src={sigla.cale}
                     alt={sigla.nume}

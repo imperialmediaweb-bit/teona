@@ -259,6 +259,65 @@
     }
   }
 
+  /*
+    Colțuri decupate de mână.
+
+    Colțurile egale, rotunjite la aceeași rază, arată a formular. Aici fiecare
+    colț are raza lui, așa cum ar ieși dacă ai decupa hârtia cu foarfeca: forma
+    rămâne liniștită și previzibilă, dar nu mai e perfectă. Două variante, care
+    alternează, ca să nu pară toate tăiate din același șablon.
+
+    Deliberat **nu** sunt forme organice care se schimbă la derulare: pentru un
+    copil care se bazează pe repere stabile, un contur care se mișcă e zgomot.
+    Forma stă pe loc; se mișcă doar umbra.
+  */
+  .colt-a {
+    border-radius: 2.25rem 0.9rem 2.25rem 0.9rem;
+  }
+
+  .colt-b {
+    border-radius: 0.9rem 2.25rem 0.9rem 2.25rem;
+  }
+
+  .colt-mic-a {
+    border-radius: 1.4rem 0.6rem 1.4rem 0.6rem;
+  }
+
+  .colt-mic-b {
+    border-radius: 0.6rem 1.4rem 0.6rem 1.4rem;
+  }
+
+  /* Semnele desenate plutesc, fiecare în ritmul lui. */
+  .pluteste-lent {
+    animation: saltlent 7s ease-in-out infinite;
+  }
+
+  .pluteste-lent:nth-of-type(2n) {
+    animation-duration: 9s;
+    animation-delay: -2.5s;
+  }
+
+  .pluteste-lent:nth-of-type(3n) {
+    animation-duration: 11s;
+    animation-delay: -5s;
+  }
+
+  @keyframes saltlent {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+    50% {
+      transform: translate3d(0, -10px, 0) rotate(6deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pluteste-lent {
+      animation: none;
+    }
+  }
+
   /* Linia scrisă de mână, cu Kalam — liantul vizual al site-ului. */
   .scris {
     font-family: var(--font-scris);

@@ -7,8 +7,9 @@ import Image from "next/image";
  * ca lumina să pară că vine de sus. O umbră gri peste o pagină caldă o face
  * să pară murdară; una portocalie o face să pară luminată.
  *
- * Colțurile sunt rotunjite generos, dar rămân colțuri: nici arcade, nici
- * cercuri. Fotografia se vede întreagă și nu capătă un aer de altceva.
+ * Colțurile sunt decupate de mână: fiecare are raza lui, ca și cum ai fi tăiat
+ * hârtia cu foarfeca. Două variante care alternează, ca pozele vecine să nu
+ * pară tăiate din același șablon. Forma stă pe loc — se mișcă doar umbra.
  */
 
 const UMBRE = {
@@ -26,6 +27,8 @@ export default function Fotografie({
   legenda,
   umbra = "neutru",
   raport = "aspect-[4/3]",
+  /** Varianta de colțuri. Alternează între fotografiile vecine. */
+  colt = "a",
   cuApropiere = true,
   prioritara = false,
   dimensiuni = "(min-width: 1024px) 460px, 92vw",
@@ -36,6 +39,7 @@ export default function Fotografie({
   legenda?: string;
   umbra?: Umbra;
   raport?: string;
+  colt?: "a" | "b";
   cuApropiere?: boolean;
   prioritara?: boolean;
   dimensiuni?: string;
@@ -44,7 +48,7 @@ export default function Fotografie({
   return (
     <figure className={`group relative ${className}`}>
       <div
-        className={`relative overflow-hidden rounded-[1.75rem] bg-hartie-calda transition-all duration-500 ease-cald group-hover:-translate-y-1.5 motion-reduce:group-hover:translate-y-0 ${raport} ${UMBRE[umbra]}`}
+        className={`relative overflow-hidden colt-${colt} bg-hartie-calda transition-all duration-500 ease-cald group-hover:-translate-y-1.5 motion-reduce:group-hover:translate-y-0 ${raport} ${UMBRE[umbra]}`}
       >
         <Image
           src={cale}
