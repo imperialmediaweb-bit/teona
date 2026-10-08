@@ -4,32 +4,13 @@ import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { RUTE } from "@/date/asociatie";
 import {
-  CHEIE_ACORD,
   EVENIMENT_REDESCHIDE,
+  EVENIMENT_SALVAT,
+  abonareLaAcord,
+  areAcord,
   citesteAcord,
   scrieAcord,
 } from "@/lib/cookieuri";
-
-const SALVAT = "teona:acord-cookieuri-salvat";
-
-function abonareLaAcord(reciteste: () => void) {
-  window.addEventListener(SALVAT, reciteste);
-  // Altă filă a aceluiași sit: `storage` se declanșează doar acolo, nu aici.
-  window.addEventListener("storage", reciteste);
-  return () => {
-    window.removeEventListener(SALVAT, reciteste);
-    window.removeEventListener("storage", reciteste);
-  };
-}
-
-/** „1” dacă există un acord salvat, „0” dacă nu. Șir, ca să fie comparabil. */
-function areAcord() {
-  try {
-    return localStorage.getItem(CHEIE_ACORD) ? "1" : "0";
-  } catch {
-    return "0";
-  }
-}
 
 /**
  * Bannerul de cookie-uri (12.5).
@@ -68,7 +49,7 @@ export default function BannerCookieuri() {
     scrieAcord(alegere);
     setRedeschis(false);
     setAratSetari(false);
-    window.dispatchEvent(new Event(SALVAT));
+    window.dispatchEvent(new Event(EVENIMENT_SALVAT));
   }
 
   return (
@@ -76,9 +57,9 @@ export default function BannerCookieuri() {
       role="dialog"
       aria-modal="false"
       aria-labelledby="cookieuri-titlu"
-      className="fixed inset-x-0 bottom-0 z-[60] p-3 sm:p-5"
+      className="fixed inset-x-0 bottom-0 z-[60] p-2.5 sm:p-5"
     >
-      <div className="mx-auto max-w-3xl rounded-card border border-hartie-umbra bg-hartie p-5 shadow-[0_24px_60px_-20px_rgba(35,35,35,0.4)] sm:p-7">
+      <div className="mx-auto max-h-[80dvh] max-w-3xl overflow-y-auto rounded-card border border-hartie-umbra bg-hartie p-5 shadow-[0_24px_60px_-20px_rgba(35,35,35,0.4)] sm:p-7">
         <h2 id="cookieuri-titlu" className="text-h4 text-cerneala">
           Cookie-uri
         </h2>

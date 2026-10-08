@@ -17,6 +17,30 @@ export type Sigla = {
 export const SIGLE_SPONSORI: ReadonlyArray<Sigla> = [
   { nume: "EGGER", cale: "/poze/2024/11/05LG_EG_egger_cmyk-Small.jpg" },
   {
+    nume: "nolte Küchen",
+    cale: "/poze/2024/11/WhatsApp-Image-2024-10-25-at-11.42.15.jpeg",
+  },
+  {
+    nume: "Sab Clean",
+    cale: "/poze/2024/11/452416396_122103578816434704_6686589108493791862_n.jpg",
+  },
+  {
+    nume: "FD Figurina",
+    cale: "/poze/2024/11/333042059_897342214910553_1125039654881115746_n.jpg",
+  },
+  {
+    nume: "Copilul din Soare",
+    cale: "/poze/2024/11/308670940_449656227198245_5309278592595544474_n.png",
+  },
+  {
+    nume: "Rocast Nord",
+    cale: "/poze/2024/11/305967823_494038079397459_503575458591392637_n.png",
+  },
+  {
+    nume: "Dasmar Termo",
+    cale: "/poze/2024/11/291279579_5288997921221101_1835757406614018145_n.jpg",
+  },
+  {
     nume: "Best Distribution",
     cale: "/poze/2024/11/Best-Distribution-logo-cu-alb-blending-2-copy.png",
   },

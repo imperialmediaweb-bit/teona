@@ -110,12 +110,74 @@
 }
 
 @layer components {
+  /*
+    Hârtie cu granulație.
+
+    Fundalurile plate arată a șablon. Un strat foarte fin de zgomot, generat de
+    browser dintr-un SVG (nu dintr-o imagine de descărcat), dă secțiunilor calde
+    senzația de hârtie. La 3,5% nu se vede ca textură, se simte doar ca adâncime.
+  */
+  .granulatie {
+    position: relative;
+  }
+
+  .granulatie::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
   /* Linia scrisă de mână, cu Kalam — liantul vizual al site-ului. */
   .scris {
     font-family: var(--font-scris);
     font-weight: 400;
     letter-spacing: 0;
     line-height: 1.3;
+  }
+
+  /*
+    Apariția la derulare (componenta `Aparitie`).
+
+    Conținutul e vizibil din start. Animația se adaugă doar unde browserul
+    știe `animation-timeline: view()` — adică se poate lega de poziția
+    elementului în fereastră fără JavaScript. Unde nu știe, pagina arată
+    normal: nimic ascuns, nimic de așteptat.
+  */
+  .aparitie {
+    --treapta: 0;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .aparitie {
+        animation: apare linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry calc(55% + var(--treapta) * 6%);
+      }
+    }
+  }
+
+  /*
+    Se mișcă, dar nu dispare.
+
+    Prima variantă pornea de la `opacity: 0`. Asta înseamnă că tot ce e sub
+    prima vizualizare e invizibil până ajunge derularea acolo — și rămâne așa
+    dacă animația nu pornește din orice motiv. Pe site-ul unei asociații,
+    textul nu are voie să depindă de o animație ca să poată fi citit.
+
+    Deci doar deplasare. În cel mai rău caz, un bloc stă cu 14 pixeli mai jos
+    decât ar trebui. Nimic nu e ascuns, niciodată.
+  */
+  @keyframes apare {
+    from {
+      transform: translate3d(0, 0.875rem, 0);
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
   }
 
   /* Subliniere desenată, nu chenar: apare sub cuvântul accentuat din titluri. */

@@ -105,11 +105,19 @@ for (const cale of PAGINI) {
     nota(cale, "link fără atribut href", `${fara_href.length} bucăți`);
   }
 
-  // Imagini fără text alternativ
+  // Imagini fără text alternativ.
+  //
+  // `alt=""` e corect pentru o imagine pur decorativă — o copie dintr-o bandă
+  // care se repetă, de pildă — dar numai dacă e spus limpede, cu
+  // `aria-hidden="true"` pe aceeași etichetă. Un `alt` gol nemarcat rămâne o
+  // scăpare și e semnalat.
   for (const [eticheta] of html.matchAll(/<img\b[^>]*>/gi)) {
     const alt = eticheta.match(/\balt="([^"]*)"/i);
+    const decorativa = /\baria-hidden="true"/i.test(eticheta);
     if (!alt) nota(cale, "imagine fără atribut alt", eticheta.slice(0, 80));
-    else if (!alt[1].trim()) nota(cale, "imagine cu alt gol", eticheta.slice(0, 80));
+    else if (!alt[1].trim() && !decorativa) {
+      nota(cale, "imagine cu alt gol, nemarcată ca decorativă", eticheta.slice(0, 90));
+    }
   }
 }
 

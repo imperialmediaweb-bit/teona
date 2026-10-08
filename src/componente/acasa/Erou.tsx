@@ -122,30 +122,53 @@ export default function Erou() {
           </p>
 
           {/* Cele trei elemente din 1.1, în ordinea cerută. Blocul SMS e
-              informație, nu buton — de aceea nu e nici link, nici <button>. */}
-          <div className="mt-9 flex flex-wrap items-center gap-3">
+              informație, nu buton — de aceea nu e nici link, nici <button>.
+              Donația și SMS-ul stau pe primul rând, ziua de naștere pe al
+              doilea: înghesuite toate trei, se rupeau oricum, dar urât. */}
+          <div className="mt-9 flex flex-wrap items-stretch gap-3">
             <Buton href={RUTE.doneaza} marime="mare">
               Donează acum
             </Buton>
 
-            <p className="rounded-full border border-hartie/25 bg-hartie/10 px-5 py-3 text-hartie backdrop-blur-sm">
+            <p className="flex flex-col justify-center rounded-full border border-hartie/25 bg-hartie/10 px-6 py-2.5 text-hartie backdrop-blur-sm">
               <span className="font-titlu font-bold text-miere-300">
                 Trimite {SMS.text} la {SMS.numar}
               </span>
-              <span className="block text-mic text-hartie/75">
+              <span className="text-mic text-hartie/75">
                 {SMS.sumaLunara} lunar, direct din telefon
               </span>
             </p>
-
-            <Buton href={LINKURI_EXTERNE.galantomZiuaTa} varianta="contur">
-              <span>
-                Donează-ți ziua de naștere
-                <span className="block text-nota font-normal text-cerneala-moale">
-                  Strânge fonduri de ziua ta
-                </span>
-              </span>
-            </Buton>
           </div>
+
+          <a
+            href={LINKURI_EXTERNE.galantomZiuaTa}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group mt-5 inline-flex items-center gap-3 text-hartie"
+          >
+            <span className="flex size-10 items-center justify-center rounded-full border border-hartie/30 transition group-hover:border-miere-300 group-hover:bg-miere-300 group-hover:text-cerneala">
+              <svg
+                viewBox="0 0 24 24"
+                className="size-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.75}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M4 10.5h16v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5v-8zM3.5 7.5h17v3h-17v-3zM12 7.5v12M12 7.5S10.5 3 8.2 3a2.1 2.1 0 0 0 0 4.5H12zM12 7.5S13.5 3 15.8 3a2.1 2.1 0 0 1 0 4.5H12z" />
+              </svg>
+            </span>
+            <span>
+              <span className="block font-titlu font-bold underline-offset-4 group-hover:underline">
+                Donează-ți ziua de naștere
+              </span>
+              <span className="block text-mic text-hartie/70">
+                Strânge fonduri de ziua ta
+              </span>
+            </span>
+          </a>
         </div>
 
         {/* Comenzile sliderului. Legenda spune ce se vede în poza curentă. */}
