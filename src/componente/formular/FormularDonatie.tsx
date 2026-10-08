@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useState } from "react";
+import { Suspense, useId, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   DESTINATII_DONATIE,
@@ -37,11 +38,58 @@ type Erori = Partial<Record<"suma" | "email" | "acord", string>>;
  * Galantom, SMS și transfer bancar. Un donator care a ajuns până la butonul
  * de donație nu trebuie lăsat în gol.
  */
-export default function FormularDonatie({
+/**
+ * Destinația aleasă deja, din adresa paginii.
+ *
+ * Butoanele „Susține” de la campaniile de pe prima pagină și „Sprijină Casa
+ * Teona” trimit la `/doneaza?destinatie=tabere`, `?destinatie=casa-teona` și
+ * așa mai departe — caietul cere la 1.4 ca donatorul să ajungă cu destinația
+ * deja aleasă. Până acum parametrul era trimis, dar nimeni nu-l citea: omul
+ * apăsa „Susține” la Casa Teona și nimerea pe „Oriunde e nevoie”.
+ *
+ * Valoarea din adresă nu e de încredere — o poate scrie oricine în bara
+ * browserului — deci se acceptă doar dacă e una dintre destinațiile existente.
+ *
+ * Numele începe cu „use” pentru că înăuntru cheamă un hook React, iar regula
+ * lui React e că numai componentele și hook-urile pot face asta.
+ */
+function useDestinatiaDinAdresa(implicita: string): string {
+  const cautat = useSearchParams().get("destinatie");
+  const exista = DESTINATII_DONATIE.some((d) => d.id === cautat);
+  return exista && cautat ? cautat : implicita;
+}
+
+/**
+ * `useSearchParams` cere o graniță `Suspense` ca pagina să poată rămâne
+ * pregenerată. O ținem aici, nu în pagină: așa componenta se poate pune
+ * oriunde, fără ca cel care o folosește să trebuiască să știe asta.
+ */
+export default function FormularDonatie(proprietati: {
+  destinatieInitiala?: string;
+}) {
+  return (
+    <Suspense fallback={<ScheletFormular />}>
+      <Formular {...proprietati} />
+    </Suspense>
+  );
+}
+
+/** Umbra formularului, cât se așteaptă adresa. Aceeași formă, ca să nu sară. */
+function ScheletFormular() {
+  return (
+    <div
+      aria-hidden="true"
+      className="colt-a min-h-[32rem] bg-hartie shadow-[0_22px_45px_-24px_rgba(247,79,34,0.5)]"
+    />
+  );
+}
+
+function Formular({
   destinatieInitiala = "oriunde",
 }: {
   destinatieInitiala?: string;
 }) {
+  const destinatia = useDestinatiaDinAdresa(destinatieInitiala);
   const id = useId();
   const [suma, setSuma] = useState<number | null>(null);
   const [altaSuma, setAltaSuma] = useState("");
@@ -287,7 +335,7 @@ export default function FormularDonatie({
           name="destinatie"
           legenda="Destinația donației"
           obligatoriu
-          defaultValue={destinatieInitiala}
+          defaultValue={destinatia}
           optiuni={DESTINATII_DONATIE.map((destinatie) => ({
             valoare: destinatie.id,
             eticheta: destinatie.eticheta,
