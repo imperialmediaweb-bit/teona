@@ -15,13 +15,13 @@ deocamdată încă rulează pe domeniul real.
 La lansare:
 
 - [ ] În Railway → serviciul site → Variables: pune `ADRESA_SITE` pe
-      `https://teona-ariana.ro` (sau șterge variabila; valoarea implicită din
+      `https://www.teona-ariana.ro` (sau șterge variabila; valoarea implicită din
       `src/app/seo.tsx` e tot domeniul real).
 - [ ] Așteaptă redeploy-ul și verifică:
-      `curl https://teona-ariana.ro/robots.txt` → trebuie `Allow: /`
-      `curl -s https://teona-ariana.ro/ | grep 'name="robots"'` → **nimic**
-- [ ] `curl -s https://teona-ariana.ro/ | grep canonical` → `https://teona-ariana.ro`
-- [ ] Trimite `https://teona-ariana.ro/sitemap.xml` în Google Search Console.
+      `curl https://www.teona-ariana.ro/robots.txt` → trebuie `Allow: /`
+      `curl -s https://www.teona-ariana.ro/ | grep 'name="robots"'` → **nimic**
+- [ ] `curl -s https://www.teona-ariana.ro/ | grep canonical` → `https://www.teona-ariana.ro`
+- [ ] Trimite `https://www.teona-ariana.ro/sitemap.xml` în Google Search Console.
 
 **Dacă se uită pasul ăsta, site-ul nou e invizibil în Google.**
 

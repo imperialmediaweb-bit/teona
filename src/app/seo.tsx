@@ -27,7 +27,7 @@ import {
  * cădea pe `http://localhost:3000` și previzualizările distribuite pe rețele
  * arătau o adresă care nu există.
  *
- * Valoarea implicită e domeniul final, `teona-ariana.ro`, pentru că e singura
+ * Valoarea implicită e domeniul final, `www.teona-ariana.ro`, pentru că e singura
  * valoare care nu trebuie ținută minte la lansare: dacă variabila lipsește,
  * site-ul se descrie corect.
  *
@@ -38,14 +38,26 @@ import {
  *     ADRESA_SITE=https://site-production-641f.up.railway.app
  *
  * LA LANSARE: se șterge variabila din Railway (sau se pune
- * `https://teona-ariana.ro`). Cât timp adresa nu e cea finală, `robots.txt`
+ * `https://www.teona-ariana.ro`). Cât timp adresa nu e cea finală, `robots.txt`
  * și eticheta `robots` cer motoarelor să NU indexeze — vezi `INDEXABIL`.
  */
 export const ADRESA_SITE = (
-  process.env.ADRESA_SITE?.trim() || "https://teona-ariana.ro"
+  process.env.ADRESA_SITE?.trim() || "https://www.teona-ariana.ro"
 ).replace(/\/+$/, "");
 
-/** Domeniul pe care site-ul are voie să fie indexat. */
+/**
+ * Domeniul pe care site-ul are voie să fie indexat.
+ *
+ * Verificat pe site-ul viu: `teona-ariana.ro`, cu sau fără `http`, se
+ * redirecționează la `https://www.teona-ariana.ro`. Deci adresa canonică e
+ * cea cu `www`, iar valoarea implicită de mai sus o folosește pe ea — altfel
+ * fiecare pagină ar fi declarat drept canonică o adresă care, cerută, duce
+ * în altă parte.
+ *
+ * Verificarea de mai jos acceptă și forma fără `www`, pentru cazul în care
+ * cineva pune `ADRESA_SITE` așa din obișnuință: site-ul tot pe domeniul lui
+ * e, și n-are rost să se stingă indexarea pentru trei litere.
+ */
 const DOMENIU_FINAL = "teona-ariana.ro";
 
 /**

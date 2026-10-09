@@ -138,7 +138,7 @@ dovedește nimic — adresa ei o poate deschide oricine. În panoul Stripe,
 adresa de notificare e:
 
 ```
-https://teona-ariana.ro/api/donatii/stripe/webhook
+https://www.teona-ariana.ro/api/donatii/stripe/webhook
 ```
 
 cu evenimentele `checkout.session.completed` și `invoice.paid`. Al doilea e
