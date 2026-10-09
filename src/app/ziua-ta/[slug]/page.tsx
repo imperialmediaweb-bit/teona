@@ -24,13 +24,6 @@ type Proprietati = {
  * care a creat-o vine cu jetonul primit la trimitere.
  */
 async function ia(proprietati: Proprietati) {
-  /*
-    Pagina citește din baza de date la fiecare cerere, deci nu poate fi
-    pregătită dinainte. `connection()` spune asta explicit: campaniile apar
-    și se schimbă după ce site-ul a fost construit, iar o pagină memorată ar
-    arăta o campanie ștearsă sau ar ascunde una tocmai aprobată.
-  */
-  await connection();
   const { slug } = await proprietati.params;
   const { jeton } = await proprietati.searchParams;
   const publica = await campaniePublicata(slug);
@@ -54,6 +47,9 @@ async function ia(proprietati: Proprietati) {
 export async function generateMetadata(
   proprietati: Proprietati,
 ): Promise<Metadata> {
+  // Și metadatele se calculează la cerere: titlul și poza de previzualizare
+  // vin din baza de date, deci nu pot fi pregătite dinainte.
+  await connection();
   const gasita = await ia(proprietati);
   if (!gasita)
     return {
@@ -107,9 +103,17 @@ function scrieData(zi: string): string {
 }
 
 /*
-  Conținutul se citește din baza de date la cerere, deci stă într-un
-  `<Suspense>`: `cacheComponents` oprește construirea dacă o pagină cere date
-  pe care nu le poate ști dinainte, în afara unui înveliș ca ăsta.
+  Conținutul stă într-un `<Suspense>` pentru că `cacheComponents` cere
+  fiecărei rute un înveliș care se poate pregăti dinainte, iar aici totul se
+  citește din baza de date la cerere.
+
+  Prețul, măsurat: o campanie care nu există răspunde cu **codul 200** și cu
+  pagina de 404 în corp, nu cu codul 404 — învelișul pleacă spre browser
+  înainte să se știe dacă există rândul. Conținutul nepublicat nu se scurge
+  (fără jeton se vede tot pagina de „Campanie negăsită”), iar `/ziua-ta/` e
+  `noindex` și interzis în `robots.txt`, deci niciun motor de căutare nu
+  ajunge aici. Am încercat varianta fără `<Suspense>`, cu `connection()`
+  prima instrucțiune și în metadate: construirea se oprește.
 */
 export default function PaginaCampaniei(proprietati: Proprietati) {
   return (
@@ -120,6 +124,7 @@ export default function PaginaCampaniei(proprietati: Proprietati) {
 }
 
 async function Continut(proprietati: Proprietati) {
+  await connection();
   const gasita = await ia(proprietati);
   if (!gasita) notFound();
   const { campanie, previzualizare } = gasita;

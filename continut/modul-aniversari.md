@@ -79,6 +79,29 @@ mai randează, dar fișierul e acolo. Dacă asociația vrea ștergere automată 
 respingere, se adaugă — nu e făcut acum pentru că o poză ștearsă din greșeală
 nu se mai poate recupera, iar o respingere poate fi răzgândită.
 
+## O limită care nu e intenționată
+
+O campanie care nu există răspunde cu **codul 200** și cu pagina de „Campanie
+negăsită" în corp, în loc să răspundă cu codul 404.
+
+Cauza: Next.js cu `cacheComponents` cere fiecărei rute un înveliș care se
+poate pregăti dinainte, iar aici tot conținutul se citește din baza de date la
+cerere. Învelișul pleacă spre browser înainte să se știe dacă rândul există,
+iar după ce a plecat codul HTTP nu se mai poate schimba. Am încercat varianta
+fără înveliș, cu `connection()` ca primă instrucțiune și în metadate:
+construirea se oprește.
+
+Ce **nu** e afectat, verificat pe site-ul live:
+
+- conținutul nepublicat nu se scurge — fără jeton, sau cu un jeton greșit, se
+  vede pagina de „Campanie negăsită", nu campania;
+- paginile sunt `noindex` și interzise în `robots.txt`, deci niciun motor de
+  căutare nu ajunge acolo;
+- previzualizarea pe Facebook și WhatsApp funcționează normal.
+
+Aceeași problemă există deja la `/proiecte/<adresă inexistentă>`, din același
+motiv. Se rezolvă împreună, dacă merită.
+
 ## Limite puse intenționat
 
 - O poză: cel mult 6 MB, doar JPG, PNG sau WebP. Se verifică primii octeți ai
