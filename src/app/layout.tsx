@@ -138,7 +138,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Subsol />
 
         {/* Spațiu cât butonul plutitor, ca să nu acopere sfârșitul subsolului. */}
-        <div aria-hidden="true" className="h-20 sm:hidden" />
+        <div aria-hidden="true" className="doar-site h-20 sm:hidden" />
 
         <Suspense>
           <ButonDoneazaMobil />

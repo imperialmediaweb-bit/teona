@@ -172,6 +172,22 @@
 
 @layer components {
   /*
+    Panoul de administrare, fără decorul site-ului.
+
+    Paginile de sub `/admin` își aduc propriul cadru; bara de anunț, meniul
+    public, formularul de newsletter, subsolul și butonul plutitor de donație
+    n-au ce căuta deasupra unui tabel cu nume, e-maile și sume de donatori.
+
+    Se face din CSS, nu din JavaScript și nici citind calea în aranjament:
+    `headers()` într-un aranjament rădăcină face **toate** paginile dinamice
+    și pierde generarea statică a întregului site. `:has()` nu costă nimic și
+    nu produce nicio clipire la încărcare.
+  */
+  body:has(#panou-admin) .doar-site {
+    display: none;
+  }
+
+  /*
     Hârtie cu granulație.
 
     Fundalurile plate arată a șablon. Un strat foarte fin de zgomot, generat de

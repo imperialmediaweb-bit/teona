@@ -199,3 +199,88 @@ păstrează în baza de date și oamenii se urcă mai târziu. Nimic nu se pierd
 
 Până atunci formularul spune cinstit că plata cu cardul se activează în
 curând și arată căile care funcționează acum: Galantom, SMS, transfer bancar.
+
+---
+
+# CRM-ul de donatori și campaniile de e-mail
+
+## CRM: `/admin/donatori`
+
+Donatorii **nu se țin într-un tabel al lor**, ci se calculează din donații, la
+fiecare citire. Motivul e prozaic: un tabel separat trebuie ținut în pas cu
+donațiile, iar fiecare loc în care cineva uită actualizarea produce un donator
+cu un total greșit. Calculul din sursă nu poate rămâne în urmă.
+
+Ce se vede: total strâns, cât luna asta, câți donatori, câți lunari. Apoi
+lista, cu căutare după nume sau e-mail și cinci filtre — toți, donatori
+lunari, cu acord de buletin, fără acord, și **cu acord dar neurcați în listă**
+(cazul celor care au donat înainte să existe cheia MailerLite).
+
+### Dreptul la ștergere, făcut cum trebuie
+
+Butonul „Uită-l” **nu șterge donația**. Asociația are obligația legală să
+păstreze evidența contabilă, iar o donație ștearsă ar lăsa o gaură în ea. Se
+șterge ce face donația identificabilă — nume, e-mail, telefon — și rămâne
+suma, data și destinația. Omul dispare din evidență; banii rămân în
+contabilitate. Operația nu se poate anula.
+
+## Campanii de e-mail: `/admin/email`
+
+Se completează subiectul, expeditorul, grupul, titlul, textul (un rând gol
+între paragrafe), adresa unei poze, și se bifează butoanele dorite: 20 / 50 /
+100 de lei, „donează cât vrei tu", „redirecționează 3,5%". Adresele butoanelor
+se construiesc singure din rutele site-ului — nimeni nu scrie o adresă de mână
+și nimeni n-o poate greși.
+
+Datele asociației, adresa, telefoanele și linkul de dezabonare intră automat
+în subsol. MailerLite oricum refuză un HTML propriu fără link de dezabonare.
+
+### Butonul creează o ciornă. Nu trimite.
+
+Endpointul de trimitere există și ar fi fost o linie în plus. N-am pus-o
+intenționat: **un e-mail plecat spre toată lista nu se poate opri, corecta sau
+retrage.** Un om trebuie să deschidă ciorna în MailerLite, să-și trimită o
+probă pe adresa lui, să se uite cum arată pe telefon, și abia apoi să apese.
+Pentru o asociație de copii, un mesaj greșit plecat la mii de oameni costă mai
+mult decât cele două minute economisite.
+
+Dacă după câteva campanii asociația vrea totuși trimitere dintr-un singur
+buton, se adaugă — dar să fie o decizie, nu o scăpare.
+
+### Șablonul de e-mail
+
+HTML-ul de e-mail nu e HTML-ul de site: Outlook randează cu motorul Word,
+Gmail taie `<style>` din `<head>`, iar `flex` și `grid` nu există nicăieri. De
+aceea tabele pentru așezare, stiluri scrise în linie, lățime fixă de 600 px și
+butoane construite din celule de tabel — un `<a>` cu spațiere apare în Outlook
+ca text subliniat, fără buton.
+
+Portocaliul butoanelor din e-mail e cel închis, nu cel de brand: alb pe
+`#F74F22` dă 3,44:1, sub pragul de accesibilitate.
+
+## Ce trebuie verificat în contul MailerLite
+
+1. **Adresa expeditorului trebuie să fie deja verificată** în MailerLite. Una
+   neverificată face cererea să pice.
+2. **Trimiterea propriului HTML** (câmpul `content`) e, după documentația lor,
+   legată de planul Advanced. Sursele se contrazic și planurile se schimbă —
+   de verificat pe contul vostru. Dacă răspunsul vine cu o eroare despre plan,
+   campania se creează goală și se umple din editorul lor.
+3. **MailerLite are program pentru ONG-uri**: 30% reducere la planurile
+   plătite, cu dovada statutului depusă în primele 14 zile de la crearea
+   contului. Mai au și un program prin care aleg anual aproximativ 60 de
+   organizații care primesc gratuit planul Advanced pe doi ani. Merită cerut
+   înainte de a plăti.
+
+Variabile: `MAILERLITE_API_KEY`, `MAILERLITE_GROUP_ID`.
+
+## Panoul, despărțit de site
+
+Paginile de sub `/admin` nu mai primesc bara de anunț, meniul public,
+formularul de newsletter, subsolul și butonul plutitor de donație. Un tabel cu
+e-maile de donatori sub un buton „Donează" e derutant, nu util.
+
+Despărțirea se face dintr-o regulă CSS (`body:has(#panou-admin) .doar-site`),
+nu citind calea în aranjament: `headers()` într-un aranjament rădăcină face
+**toate** paginile dinamice și pierde generarea statică a întregului site. Am
+încercat, am măsurat, am revenit.

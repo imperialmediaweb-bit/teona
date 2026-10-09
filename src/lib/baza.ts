@@ -113,6 +113,13 @@ const DEFINITIE = `
   );
   CREATE INDEX IF NOT EXISTS apasari_dupa_ce ON apasari (ce, cand DESC);
 
+  /* Notițele asociației despre un donator. Restul se calculează din donații. */
+  CREATE TABLE IF NOT EXISTS note_donatori (
+    email     text PRIMARY KEY,
+    text      text NOT NULL,
+    scris_la  timestamptz NOT NULL DEFAULT now()
+  );
+
   CREATE TABLE IF NOT EXISTS evenimente_plati (
     procesator  text NOT NULL,
     eveniment   text NOT NULL,

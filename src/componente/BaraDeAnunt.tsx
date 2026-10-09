@@ -49,7 +49,7 @@ export default function BaraDeAnunt() {
   }
 
   return (
-    <div className="relative bg-cerneala text-hartie">
+    <div className="doar-site relative bg-cerneala text-hartie">
       <div className="mx-auto flex max-w-7xl items-center justify-center gap-3 px-4 py-2.5 pr-12 text-center sm:pr-4">
         <p className="text-mic">
           Trimite{" "}

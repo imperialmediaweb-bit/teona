@@ -227,7 +227,7 @@ export default function Antet() {
 
   return (
     <header
-      className={`sticky top-0 z-50 bg-hartie transition-shadow duration-300 ease-cald ${
+      className={`doar-site sticky top-0 z-50 bg-hartie transition-shadow duration-300 ease-cald ${
         compact
           ? "shadow-[0_1px_0_0_var(--color-hartie-umbra),0_14px_34px_-24px_rgba(35,35,35,0.5)]"
           : ""

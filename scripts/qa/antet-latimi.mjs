@@ -31,12 +31,19 @@ for (const w of [1279, 1280, 1300, 1340, 1366, 1400, 1440, 1470, 1500, 1536, 160
     const randSus = doneaza.closest("header > div");
     const peTelefon = !nav.offsetParent;
 
-    const cs = nav ? getComputedStyle(nav) : null;
-    const intrari = peTelefon ? [] : [...nav.children].slice(1);
-    const folosit = intrari.reduce((a, e) => a + e.getBoundingClientRect().width, 0);
-    const disponibil = peTelefon
-      ? 0
-      : nav.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    /*
+      Meniul stă acum într-o pistă care se strânge pe conținut, deci lățimea
+      ei nu mai spune nimic: ar da mereu rezervă zero. Se măsoară față de
+      containerul din jur, care chiar are o limită.
+    */
+    const invelis = peTelefon ? null : nav.parentElement;
+    const cs = invelis ? getComputedStyle(invelis) : null;
+    const folosit = peTelefon ? 0 : nav.getBoundingClientRect().width;
+    const disponibil = invelis
+      ? invelis.clientWidth -
+        parseFloat(cs.paddingLeft) -
+        parseFloat(cs.paddingRight)
+      : 0;
 
     return {
       peTelefon,

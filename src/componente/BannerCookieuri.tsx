@@ -61,7 +61,7 @@ export default function BannerCookieuri() {
       role="dialog"
       aria-modal="false"
       aria-labelledby="cookieuri-titlu"
-      className="fixed inset-x-0 bottom-0 z-[60] p-2.5 sm:p-5"
+      className="doar-site fixed inset-x-0 bottom-0 z-[60] p-2.5 sm:p-5"
     >
       <div className="mx-auto max-h-[80dvh] max-w-3xl overflow-y-auto rounded-card border border-hartie-umbra bg-hartie p-5 shadow-[0_24px_60px_-20px_rgba(35,35,35,0.4)] sm:p-7">
         <h2 id="cookieuri-titlu" className="text-h4 text-cerneala">

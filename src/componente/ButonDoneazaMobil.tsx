@@ -30,7 +30,7 @@ export default function ButonDoneazaMobil() {
   if (acord === "0") return null;
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 p-4 sm:hidden">
+    <div className="doar-site pointer-events-none fixed inset-x-0 bottom-0 z-40 p-4 sm:hidden">
       <Link
         href={RUTE.doneaza}
         className="pointer-events-auto flex w-full items-center justify-center gap-2 rounded-full bg-caramiziu-500 px-6 py-4 font-titlu text-amplu font-bold text-hartie shadow-[0_8px_30px_-6px_rgba(247,79,34,0.6)] transition active:translate-y-px"

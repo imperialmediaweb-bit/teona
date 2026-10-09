@@ -44,7 +44,7 @@ export default async function Subsol() {
   );
 
   return (
-    <footer className="granulatie relative overflow-hidden bg-caramiziu-900 text-hartie/75">
+    <footer className="doar-site granulatie relative overflow-hidden bg-caramiziu-900 text-hartie/75">
       {/* Dunga de brand, de la portocaliu la galben: subsolul începe clar. */}
       <div
         aria-hidden="true"

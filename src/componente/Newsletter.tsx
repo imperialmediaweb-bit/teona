@@ -59,7 +59,7 @@ export default function Newsletter() {
   return (
     <section
       aria-labelledby={`${id}-titlu`}
-      className="granulatie relative overflow-hidden bg-tenta-turcoaz"
+      className="doar-site granulatie relative overflow-hidden bg-tenta-turcoaz"
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <Decor
