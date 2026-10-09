@@ -134,6 +134,7 @@ export const RUTE = {
   cookieuri: "/politica-de-cookieuri",
   raport2025: "/raport-de-activitate-2025",
   ziuaTa: "/doneaza-ti-ziua",
+  multumim: "/multumim",
 } as const;
 
 /** Meniul principal, în ordinea cerută de caietul de sarcini (12.1). */

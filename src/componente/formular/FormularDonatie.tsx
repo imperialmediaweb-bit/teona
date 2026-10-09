@@ -13,6 +13,7 @@ import {
 import Decor from "../Decor";
 import Pictograma from "../Pictograma";
 import { citesteSuma, scrieSuma } from "@/lib/suma";
+import { SUMA_MAXIMA, SUMA_MINIMA } from "@/date/plati";
 import Camp, {
   Bifa,
   Eroare,
@@ -23,7 +24,7 @@ import Camp, {
 
 const SUME = [20, 50, 100] as const;
 
-type Erori = Partial<Record<"suma" | "email" | "acord", string>>;
+type Erori = Partial<Record<"suma" | "email" | "acord" | "general", string>>;
 
 /**
  * Formularul de donație cu cardul (2.2).
@@ -96,7 +97,13 @@ function Formular({
   const [altaSuma, setAltaSuma] = useState("");
   const [lunar, setLunar] = useState(true);
   const [erori, setErori] = useState<Erori>({});
-  const [trimis, setTrimis] = useState(false);
+  const [seTrimite, setSeTrimite] = useState(false);
+  /*
+    `faraPlata` înseamnă: serverul ne-a spus că procesatorul nu e pornit. Nu e
+    o eroare a donatorului, deci nu arătăm un mesaj roșu — arătăm căile care
+    chiar funcționează acum.
+  */
+  const [faraPlata, setFaraPlata] = useState(false);
 
   // „1.000” e o mie, nu unu. `Number()` brut citea punctul ca separator
   // zecimal și butonul scria „Donează 1 lei lunar”.
@@ -112,7 +119,7 @@ function Formular({
     ? `Donează ${scrieSuma(sumaAleasa)}${lunar ? " lunar" : ""}`
     : `Donează${lunar ? " lunar" : ""}`;
 
-  function trimite(ev: React.FormEvent<HTMLFormElement>) {
+  async function trimite(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
     const date = new FormData(ev.currentTarget);
     const gasite: Erori = {};
@@ -121,6 +128,10 @@ function Formular({
       gasite.suma = "Alege sau scrie suma pe care vrei să o donezi.";
     } else if (!sumaValida) {
       gasite.suma = "Introdu o sumă validă, în lei.";
+    } else if (sumaAleasa !== null && sumaAleasa < SUMA_MINIMA) {
+      gasite.suma = `Suma minimă e de ${SUMA_MINIMA} lei.`;
+    } else if (sumaAleasa !== null && sumaAleasa > SUMA_MAXIMA) {
+      gasite.suma = "Pentru donații mai mari, sună-ne — e mai bine să vorbim.";
     }
 
     const email = String(date.get("email") ?? "").trim();
@@ -131,10 +142,61 @@ function Formular({
       gasite.acord = "Bifează acordul pentru a continua.";
 
     setErori(gasite);
-    if (Object.keys(gasite).length === 0) setTrimis(true);
+    if (Object.keys(gasite).length > 0) return;
+
+    setSeTrimite(true);
+    try {
+      const raspuns = await fetch("/api/donatii/stripe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lei: sumaAleasa,
+          frecventa: lunar ? "lunar" : "o-data",
+          destinatie: date.get("destinatie"),
+          email,
+          prenume: date.get("prenume"),
+          nume: date.get("nume"),
+          telefon: date.get("telefon"),
+          buletin: date.get("buletin") === "da" ? "da" : "nu",
+          acord: "da",
+          site_web: date.get("site_web") ?? "",
+        }),
+      });
+
+      if (raspuns.status === 503) {
+        // Procesatorul nu e pornit încă. Arătăm căile care merg.
+        setFaraPlata(true);
+        return;
+      }
+
+      const corp = (await raspuns.json().catch(() => ({}))) as {
+        adresa?: string;
+        mesaj?: string;
+      };
+
+      if (!raspuns.ok || !corp.adresa) {
+        setErori({
+          general:
+            corp.mesaj ??
+            "Nu am putut porni plata. Încearcă din nou peste câteva minute.",
+        });
+        return;
+      }
+
+      // Plata se face pe pagina procesatorului: niciun număr de card nu
+      // trece prin serverul asociației.
+      window.location.href = corp.adresa;
+    } catch {
+      setErori({
+        general:
+          "Nu am putut porni plata. Verifică legătura la internet și încearcă din nou.",
+      });
+    } finally {
+      setSeTrimite(false);
+    }
   }
 
-  if (trimis) {
+  if (faraPlata) {
     return (
       <div
         role="status"
@@ -147,14 +209,15 @@ function Formular({
             className="absolute -top-8 -right-8 size-32 text-miere-100"
           />
           <h3 className="relative text-h4 text-miere-900">
-            Plata cu cardul direct pe site se conectează acum
+            Plata cu cardul se activează în curând
           </h3>
         </div>
         <div className="grid gap-5 p-7 sm:p-9">
           <p className="text-cerneala-moale">
-            Alegem împreună cu asociația procesatorul de plăți, înainte de
-            lansare. Nu îți luăm datele cardului până atunci. Dar poți dona
-            chiar acum, pe una dintre căile care funcționează:
+            Procesatorul e pregătit, dar contul asociației e încă în
+            verificare la bancă. Nu îți cerem datele cardului până nu
+            funcționează totul. Poți dona chiar acum, pe una dintre căile
+            care merg:
           </p>
 
           <ul className="grid gap-3">
@@ -180,7 +243,7 @@ function Formular({
             <li>
               <a
                 href="#sms"
-                onClick={() => setTrimis(false)}
+                onClick={() => setFaraPlata(false)}
                 className="flex items-center gap-4 colt-mic-b bg-miere-100 px-5 py-4 font-titlu font-semibold text-cerneala transition hover:bg-miere-200"
               >
                 <span className="flex size-11 shrink-0 items-center justify-center colt-mic-a bg-miere-400 text-cerneala">
@@ -197,7 +260,7 @@ function Formular({
             <li>
               <a
                 href="#transfer"
-                onClick={() => setTrimis(false)}
+                onClick={() => setFaraPlata(false)}
                 className="flex items-center gap-4 colt-mic-a bg-turcoaz-50 px-5 py-4 font-titlu font-semibold text-cerneala transition hover:bg-turcoaz-100"
               >
                 <span className="flex size-11 shrink-0 items-center justify-center colt-mic-b bg-turcoaz-500 text-hartie">
@@ -238,9 +301,23 @@ function Formular({
   return (
     <form
       onSubmit={trimite}
+      action="/api/donatii/stripe"
+      method="post"
       noValidate
       className="relative overflow-hidden colt-a border border-hartie-umbra bg-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.55)]"
     >
+      {/* Capcana pentru roboți: ascunsă și de ochi, și de cititoarele de ecran. */}
+      <p className="hidden" aria-hidden="true">
+        <label htmlFor="don-site-web">Nu completa acest câmp</label>
+        <input
+          id="don-site-web"
+          name="site_web"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </p>
+
       <div className="granulatie relative overflow-hidden bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 px-6 py-5 text-hartie sm:px-8">
         <Decor
           semn="inima"
@@ -429,11 +506,21 @@ function Formular({
         <div>
           <button
             type="submit"
-            className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-caramiziu-500 px-8 py-4 font-titlu text-amplu font-bold text-hartie shadow-[0_16px_32px_-12px_rgba(247,79,34,0.9)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:bg-caramiziu-600 motion-reduce:hover:translate-y-0"
+            disabled={seTrimite}
+            className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-caramiziu-500 px-8 py-4 font-titlu text-amplu font-bold text-hartie shadow-[0_16px_32px_-12px_rgba(247,79,34,0.9)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:bg-caramiziu-600 disabled:cursor-not-allowed disabled:opacity-70 motion-reduce:hover:translate-y-0"
           >
             <Pictograma nume="inima" className="size-5" />
-            {etichetaButon}
+            {seTrimite ? "Te ducem la plată…" : etichetaButon}
           </button>
+
+          {erori.general && (
+            <p
+              role="alert"
+              className="mt-4 colt-mic-a border border-caramiziu-200 bg-caramiziu-50 p-4 font-titlu font-semibold text-caramiziu-800"
+            >
+              {erori.general}
+            </p>
+          )}
 
           <p className="mt-4 flex items-center gap-2 text-mic text-cerneala-moale">
             <svg

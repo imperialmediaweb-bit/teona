@@ -401,6 +401,46 @@ export default function Doneaza() {
               </section>
             </Aparitie>
 
+            {/*
+              Revolut — apare numai dacă asociația a pus `REVOLUT_LINK` în
+              mediu. Scris cinstit ca ce este: un link, nu o plată integrată.
+              Site-ul nu află niciodată că s-a donat prin el, deci nu putem
+              număra decât apăsările, iar butonul trece printr-o rută a
+              noastră tocmai ca să le numere.
+            */}
+            {process.env.REVOLUT_LINK && (
+              <Aparitie intarziere={0.08} className="h-full">
+                <section
+                  id="revolut"
+                  className="granulatie relative flex h-full scroll-mt-32 flex-col overflow-hidden colt-a bg-cerneala p-7 text-hartie shadow-[0_30px_60px_-28px_rgba(35,35,35,0.7)] sm:p-9"
+                >
+                  <span className="colt-mic-b relative flex size-14 items-center justify-center bg-hartie/15 text-hartie">
+                    <Pictograma nume="telefon" className="size-7" />
+                  </span>
+                  <h3 className="relative mt-5 text-h3 text-hartie">
+                    Revolut
+                  </h3>
+                  <p className="relative mt-3 text-amplu text-hartie/80">
+                    Donezi din aplicația Revolut, în câteva secunde.
+                  </p>
+                  <p className="relative mt-4 text-mic text-hartie/70">
+                    Plata se face în aplicația Revolut, nu pe site-ul nostru.
+                    Confirmarea o vezi acolo, iar pentru o chitanță din partea
+                    asociației scrie-ne la {EMAIL.contact}.
+                  </p>
+                  <div className="relative mt-auto pt-7">
+                    <a
+                      href="/api/donatii/revolut"
+                      className="inline-flex min-h-12 items-center gap-2 rounded-full bg-hartie px-6 py-3 font-titlu font-bold text-cerneala transition-colors hover:bg-miere-300"
+                    >
+                      Deschide Revolut
+                      <Pictograma nume="sageata" className="size-5" />
+                    </a>
+                  </div>
+                </section>
+              </Aparitie>
+            )}
+
             {/* Ziua de naștere — cu fotografia copiilor în cerc, pe iarbă. */}
             <Aparitie intarziere={0.1} className="h-full">
               <section

@@ -14,9 +14,14 @@ import { ADRESA_SITE } from "./seo";
  * Pagina 404 nu intră; e marcată `noindex` în `not-found.tsx`.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const pagini = Object.values(RUTE).map((cale) => ({
-    url: `${ADRESA_SITE}${cale}`,
-  }));
+  /*
+    Pagina de mulțumire e `noindex` — se ajunge la ea doar după o plată. O
+    adresă `noindex` trecută în sitemap e un semnal contradictoriu pentru
+    Google: o dată îi spunem „uite-o”, apoi „n-o indexa”.
+  */
+  const pagini = Object.values(RUTE)
+    .filter((cale) => cale !== RUTE.multumim)
+    .map((cale) => ({ url: `${ADRESA_SITE}${cale}` }));
 
   const proiecte = proiecteAfisate().map((proiect) => ({
     url: `${ADRESA_SITE}/proiecte/${proiect.slug}`,

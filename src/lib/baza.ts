@@ -68,6 +68,57 @@ const DEFINITIE = `
   );
   CREATE INDEX IF NOT EXISTS campanii_dupa_stare
     ON campanii_aniversare (stare, creat_la DESC);
+
+  CREATE TABLE IF NOT EXISTS donatii (
+    id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    procesator      text NOT NULL,
+    referinta       text NOT NULL,
+    suma_bani       bigint NOT NULL,
+    moneda          text NOT NULL,
+    frecventa       text NOT NULL,
+    destinatie      text NOT NULL,
+    email           text,
+    prenume         text,
+    nume            text,
+    telefon         text,
+    acord_buletin   boolean NOT NULL DEFAULT false,
+    dus_la_buletin  boolean NOT NULL DEFAULT false,
+    stare           text NOT NULL DEFAULT 'initiata',
+    campanie_slug   text,
+    creat_la        timestamptz NOT NULL DEFAULT now(),
+    platita_la      timestamptz,
+    UNIQUE (procesator, referinta)
+  );
+  CREATE INDEX IF NOT EXISTS donatii_dupa_stare
+    ON donatii (stare, creat_la DESC);
+
+  /*
+    Evenimentele deja prelucrate.
+
+    Procesatoarele retrimit același eveniment până primesc 200, iar o rețea
+    proastă poate face ca al doilea să sosească înainte ca primul să se
+    termine. Fără tabelul ăsta, o donație s-ar putea număra de două ori.
+  */
+  /*
+    Apăsările pe linkurile care duc în afara site-ului — Revolut, Galantom.
+
+    Pentru metodele care nu trec prin site, asta e tot ce se poate număra:
+    intenția, nu donația. Caietul (12.8) cere oricum urmărirea click-urilor
+    către Galantom și a copierii IBAN-ului, deci tabelul servește la amândouă.
+  */
+  CREATE TABLE IF NOT EXISTS apasari (
+    id    bigserial PRIMARY KEY,
+    ce    text NOT NULL,
+    cand  timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS apasari_dupa_ce ON apasari (ce, cand DESC);
+
+  CREATE TABLE IF NOT EXISTS evenimente_plati (
+    procesator  text NOT NULL,
+    eveniment   text NOT NULL,
+    primit_la   timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (procesator, eveniment)
+  );
 `;
 
 async function pregateste(): Promise<void> {

@@ -112,3 +112,90 @@ motiv. Se rezolvă împreună, dacă merită.
 - Paginile de campanie sunt `noindex` și excluse din `robots.txt`: sunt
   despre oameni și trec repede. Distribuirea pe Facebook nu e afectată —
   rețelele citesc `og:`, nu `robots.txt`.
+
+---
+
+# Plăți: Stripe, PayPal, Revolut
+
+## Ce e scris și ce lipsește
+
+Codul e complet pentru toate trei. Niciuna nu funcționează fără chei, și
+fiecare se aprinde singură când își găsește cheile în mediu — fără chei,
+metoda nu apare pe site. Nu există buton care să dea eroare.
+
+### Stripe — plata cu cardul, în lei
+
+Prin **Stripe Checkout**, pagina găzduită de ei. Niciun număr de card nu
+trece prin serverul asociației, deci site-ul nu intră în sfera PCI-DSS.
+Apple Pay și Google Pay apar singure pe telefoanele care le au. Donația
+lunară e un abonament Stripe adevărat, nu o plată pe care o programăm noi.
+
+Variabile: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`.
+
+**Webhookul e obligatoriu**, nu opțional. O donație se consideră încasată
+numai când sosește de la Stripe un mesaj semnat. Pagina de mulțumire nu
+dovedește nimic — adresa ei o poate deschide oricine. În panoul Stripe,
+adresa de notificare e:
+
+```
+https://teona-ariana.ro/api/donatii/stripe/webhook
+```
+
+cu evenimentele `checkout.session.completed` și `invoice.paid`. Al doilea e
+pentru reînnoirile lunare: fiecare lună e o donație nouă în evidență, altfel
+un om care dă în fiecare lună ar apărea cu o singură donație.
+
+### PayPal — în euro
+
+Pentru donatorii din străinătate. **Nu convertim nimic**: PayPal nu suportă
+leul, iar un buton care scrie „100 lei" și debitează 19,65 € ar strica
+exact încrederea de care depinde o asociație.
+
+Variabile: `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_WEBHOOK_ID`,
+iar `PAYPAL_MOD=live` când se trece de la testare la real (implicit e
+sandbox, deci nu se încasează nimic din greșeală).
+
+### Revolut — un link, nu o integrare
+
+Blocul apare numai dacă se pune `REVOLUT_LINK`. E scris pe pagină ca ce
+este: plata se face în aplicația Revolut, nu pe site.
+
+**Ce nu se poate, oricât am vrea:** banii nu trec prin site, deci site-ul nu
+află niciodată că s-a plătit, cât, sau de către cine. Butonul trece printr-o
+rută a noastră care numără **apăsările** — adică intenția, nu donația. Nu
+există raport de donații Revolut și nu poate exista.
+
+**Două lucruri de verificat înainte de a pune linkul:**
+
+- un link `revolut.me` primește cel mult ~250 £ pe săptămână prin card și
+  cel mult 20 de plăți pe săptămână. O campanie care merge bine lovește
+  plafonul și donațiile pică;
+- dacă linkul e al unei **persoane**, nu al asociației, banii intră într-un
+  cont personal. Pentru o asociație cu CIF, asta strică și contabilitatea, și
+  încrederea. Revolut Business exclude explicit organizațiile caritabile, deci
+  un cont de firmă pe asociație probabil nici nu se poate deschide.
+
+## Lista de buletin — regula care nu se negociază
+
+Pe formularul de donație există deja o bifă separată, **nebifată din start**:
+„Vreau să primesc ocazional vești despre activitatea asociației."
+
+Numai cine o bifează ajunge în MailerLite. O donație nu e acord de marketing.
+Din același motiv nu există nicăieri o funcție care să urce donatorii
+existenți — ei n-au dat un asemenea acord, deci nu pot fi adăugați
+retroactiv.
+
+Variabile: `MAILERLITE_API_KEY`, `MAILERLITE_GROUP_ID`. Până vin, acordul se
+păstrează în baza de date și oamenii se urcă mai târziu. Nimic nu se pierde.
+
+## Ce trebuie făcut, în ordine
+
+1. Cont **Stripe** pe asociație (CIF 43533953). Verificarea durează — începeți-o
+   înainte de restul.
+2. După verificare: cheile în Railway, apoi webhookul în panoul Stripe.
+3. Cont **PayPal Business** pe asociație, apoi cheile și webhookul.
+4. Cont **MailerLite**, cheia și identificatorul grupului.
+5. Revolut, **dacă** se decide că merită, cu cele două verificări de mai sus.
+
+Până atunci formularul spune cinstit că plata cu cardul se activează în
+curând și arată căile care funcționează acum: Galantom, SMS, transfer bancar.
