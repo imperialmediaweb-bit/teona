@@ -50,9 +50,9 @@ export default function Sigla({
         aria-hidden={doarSemnul ? undefined : true}
         width={512}
         height={512}
-        // Cel mult 56 px pe ecran, deci ~112 px pe ecrane dense: ajunge cea
-        // mai mică variantă generată, nu fișierul de 512.
-        sizes="64px"
+        // Cel mult 64 px pe ecran, deci ~128 px pe ecrane dense: ajunge o
+        // variantă mică, nu fișierul de 512.
+        sizes="80px"
         priority
         className="size-[1em] shrink-0"
       />

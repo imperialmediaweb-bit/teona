@@ -117,6 +117,17 @@
     scroll-padding-top: 7rem;
   }
 
+  /*
+    De la 1280 px antetul are două rânduri — sigla și contactul sus, meniul
+    dedesubt — deci e mai înalt chiar și strâns. Măsurat: 153 px desfăcut,
+    112 px strâns, deci 8,5rem (136 px) ține ancorele sub el în ambele stări.
+  */
+  @media (min-width: 1280px) {
+    html {
+      scroll-padding-top: 8.5rem;
+    }
+  }
+
   body {
     background-color: var(--color-hartie);
     color: var(--color-cerneala);
@@ -238,34 +249,36 @@
     }
   }
 
-  /* Submeniul coboară, nu apare dintr-odată. */
-  .submeniu {
-    animation: coboara 220ms var(--ease-cald) both;
+  /*
+    Inima de pe butonul Donează bate cât stă mouse-ul pe el.
+
+    Două bătăi scurte și o pauză, ca o inimă adevărată, nu o pulsație egală.
+    Doar la hover: o inimă care bate încontinuu într-un antet lipit sus ar
+    trage ochiul de la conținut la fiecare pagină.
+  */
+  .group:hover .bate-la-hover {
+    animation: bataie 1.2s var(--ease-cald) infinite;
   }
 
-  @keyframes coboara {
-    from {
-      opacity: 0;
-      transform: translate3d(0, -6px, 0);
+  @keyframes bataie {
+    0%,
+    45%,
+    100% {
+      transform: scale(1);
     }
-  }
-
-  /* Intrările meniului de telefon vin pe rând, la 40 ms una după alta. */
-  .intrare-meniu {
-    animation: intra 300ms var(--ease-cald) both;
-    animation-delay: calc(var(--rand, 0) * 40ms);
-  }
-
-  @keyframes intra {
-    from {
-      opacity: 0;
-      transform: translate3d(-10px, 0, 0);
+    12% {
+      transform: scale(1.22);
+    }
+    24% {
+      transform: scale(1);
+    }
+    34% {
+      transform: scale(1.14);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .submeniu,
-    .intrare-meniu {
+    .group:hover .bate-la-hover {
       animation: none;
     }
   }

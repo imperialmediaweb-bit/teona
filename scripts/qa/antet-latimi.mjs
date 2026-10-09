@@ -1,16 +1,63 @@
+/*
+  Antetul la lățimile unde se sparg lucrurile.
+
+  De la 1280 px antetul are două rânduri: sigla și contactul sus, meniul pe
+  banda de dedesubt. Testul verifică, la fiecare lățime, că nimic nu iese din
+  container și că meniul nu are nevoie de derulare pe orizontală — nouă
+  etichete lungi în română sunt exact la limită, deci se măsoară, nu se
+  presupune.
+*/
 import { browser, BAZA } from "./comun.mjs";
+
 const b = await browser();
-const ctx = await b.newContext({ viewport: { width: 1280, height: 300 } });
-await ctx.addInitScript(() => localStorage.setItem("teona:acord-cookieuri", JSON.stringify({ necesare: true, statistici: false, marketing: false, laData: new Date().toISOString() })));
+const ctx = await b.newContext({ viewport: { width: 1280, height: 400 } });
+await ctx.addInitScript(() =>
+  localStorage.setItem(
+    "teona:acord-cookieuri",
+    JSON.stringify({ necesare: true, statistici: false, marketing: false, laData: new Date().toISOString() }),
+  ),
+);
 const page = await ctx.newPage();
-for (const w of [1279, 1280, 1300, 1340, 1366, 1400, 1440, 1470, 1500, 1536, 1600]) {
-  await page.setViewportSize({ width: w, height: 300 });
-  await page.goto(BAZA + "/casa-teona", { waitUntil: "networkidle" });
+let rele = 0;
+
+for (const w of [1279, 1280, 1300, 1340, 1366, 1400, 1440, 1470, 1500, 1536, 1600, 1920]) {
+  await page.setViewportSize({ width: w, height: 400 });
+  await page.goto(BAZA + "/casa-teona", { waitUntil: "load" });
+  await page.evaluate(() => document.fonts.ready);
+
   const r = await page.evaluate(() => {
-    const h = document.querySelector("header > div"); const d = h.querySelector("div.ml-auto"); const nav = h.querySelector("nav");
-    return { container: Math.round(h.getBoundingClientRect().right), doneazaDreapta: Math.round(d.getBoundingClientRect().right), navLatime: Math.round(nav.getBoundingClientRect().width), navDisplay: getComputedStyle(nav).display, scrollW: document.documentElement.scrollWidth, clientW: document.documentElement.clientWidth };
+    const nav = document.querySelector('nav[aria-label="Meniu principal"]');
+    const doneaza = document.querySelector('header a[aria-label="Donează"]');
+    const randSus = doneaza.closest("header > div");
+    const peTelefon = !nav.offsetParent;
+
+    const cs = nav ? getComputedStyle(nav) : null;
+    const intrari = peTelefon ? [] : [...nav.children].slice(1);
+    const folosit = intrari.reduce((a, e) => a + e.getBoundingClientRect().width, 0);
+    const disponibil = peTelefon
+      ? 0
+      : nav.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+
+    return {
+      peTelefon,
+      rezervaMeniu: peTelefon ? null : Math.round(disponibil - folosit),
+      doneazaIese:
+        Math.round(doneaza.getBoundingClientRect().right) >
+        Math.round(randSus.getBoundingClientRect().right) + 1,
+      derulareLaterala: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      inaltime: Math.round(document.querySelector("header").getBoundingClientRect().height),
+    };
   });
-  console.log(w, JSON.stringify(r), r.scrollW > r.clientW ? "← DERULARE ORIZONTALĂ, Donează tăiat" : r.doneazaDreapta > r.container ? "← Donează iese din container" : "ok");
-  if (w === 1280) await page.screenshot({ path: "/tmp/claude-0/-home-user-teona/4a139e8f-245b-53d8-993d-5496bf182b26/scratchpad/antet-1280-curat.png", clip: { x: 0, y: 0, width: w, height: 90 } });
+
+  const rau = r.derulareLaterala || r.doneazaIese || (r.rezervaMeniu !== null && r.rezervaMeniu < 0);
+  if (rau) rele++;
+  console.log(
+    `${String(w).padStart(4)}px  antet ${String(r.inaltime).padStart(3)}px  ` +
+      (r.peTelefon ? "meniu de telefon" : `rezervă meniu ${String(r.rezervaMeniu).padStart(4)}px`) +
+      `  ${rau ? `✗${r.derulareLaterala ? " derulare laterală" : ""}${r.doneazaIese ? " Donează iese" : ""}${r.rezervaMeniu < 0 ? " meniul nu încape" : ""}` : "✓"}`,
+  );
 }
+
 await b.close();
+console.log(rele === 0 ? "\nAntetul încape la toate lățimile." : `\n${rele} lățimi cu probleme.`);
+process.exit(rele === 0 ? 0 : 1);

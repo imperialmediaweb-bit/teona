@@ -44,7 +44,7 @@ log("Proiecte fără JS: carduri vizibile =", await page.locator('#lista-proiect
 await ctx.close();
 const ctx2 = await b.newContext({ viewport: { width: 1280, height: 900 } });
 const p2 = await ctx2.newPage();
-for (const s of ["/proiecte/pastram-amintirile-frumoase-in-inimile-noastre-multumim-pentru-implicare", "/proiecte/daruieste-din-inima-si-ajuta-o-inima-bolnava", "/proiecte/prima-tabara-respiro-asociatia-teona-ariana"]) {
+for (const s of ["/proiecte/pastram-amintirile-frumoase-in-inimile-noastre-multumim-pentru-implicare", "/proiecte/daruieste-din-inima-si-ajuta-o-inima-bolnava", "/proiecte/tabara-respiro-dedicata-copiilor-cu-sindrom-down-si-autism-30-septembrie"]) {
   await p2.goto(BAZA + s, { waitUntil: "networkidle" });
   const t = await p2.evaluate(() => ({ imgMain: document.querySelectorAll("main img").length, fotografii: document.querySelector("main")?.innerText.match(/\d+ fotografii/)?.[0] ?? "(fără mențiune)", text: [...document.querySelectorAll("main p")].map((p) => p.innerText.replace(/\s+/g, " ")).find((t) => t.includes("Descrierea")) }));
   log(s.slice(0, 60), JSON.stringify(t));

@@ -3,7 +3,7 @@ import { browser, BAZA, urmaresteErori } from "./comun.mjs";
 const b = await browser();
 const log = (...a) => console.log(...a);
 const ACORD = () => localStorage.setItem("teona:acord-cookieuri", JSON.stringify({ necesare: true, statistici: false, marketing: false, laData: new Date().toISOString() }));
-const PAGINI = ["/", "/despre-noi", "/casa-teona", "/proiecte", "/sponsori-si-parteneri", "/redirectioneaza-3-5", "/directioneaza-20", "/suntem-in-presa", "/devino-voluntar", "/contact", "/doneaza", "/politica-de-confidentialitate", "/termeni-si-conditii", "/politica-de-cookieuri", "/raport-de-activitate-2025", "/proiecte/prima-tabara-respiro-asociatia-teona-ariana", "/pagina-inexistenta"];
+const PAGINI = ["/", "/despre-noi", "/casa-teona", "/proiecte", "/sponsori-si-parteneri", "/redirectioneaza-3-5", "/directioneaza-20", "/suntem-in-presa", "/devino-voluntar", "/contact", "/doneaza", "/politica-de-confidentialitate", "/termeni-si-conditii", "/politica-de-cookieuri", "/raport-de-activitate-2025", "/proiecte/tabara-respiro-dedicata-copiilor-cu-sindrom-down-si-autism-30-septembrie", "/pagina-inexistenta"];
 
 log("=== Navigare cu tastatura ===");
 {

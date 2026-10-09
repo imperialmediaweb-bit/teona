@@ -91,7 +91,7 @@ log("\n=== Butoanele Copiază, listă completă ===");
 
 log("\n=== HTML: 404 încorporat, og:image, metadataBase ===");
 {
-  const html = await (await fetch(BAZA + "/proiecte/prima-tabara-respiro-asociatia-teona-ariana")).text();
+  const html = await (await fetch(BAZA + "/proiecte/tabara-respiro-dedicata-copiilor-cu-sindrom-down-si-autism-30-septembrie")).text();
   const i = html.indexOf("Pagina nu a fost găsită");
   log("Pagină validă de proiect conține „Pagina nu a fost găsită”?", i >= 0, i >= 0 ? "context: …" + html.slice(Math.max(0, i - 400), i + 80).replace(/\s+/g, " ").slice(-480) : "");
   const h = await (await fetch(BAZA + "/")).text();
