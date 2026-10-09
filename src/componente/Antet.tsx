@@ -14,11 +14,9 @@ import {
   RUTE,
   ASOCIATIA,
   TELEFOANE,
-  EMAIL,
-  RETELE_ASOCIATIE,
+  TELEFON_PRINCIPAL,
 } from "@/date/asociatie";
 import Pictograma from "./Pictograma";
-import Retele from "./Retele";
 import Sigla from "./Sigla";
 
 /**
@@ -45,7 +43,21 @@ function abonareLaDerulare(reciteste: () => void) {
   return () => window.removeEventListener("scroll", reciteste);
 }
 
-type Pastila = { stanga: number; latime: number; accent: number } | null;
+/**
+ * Pastila ține minte și starea antetului în care a fost măsurată.
+ *
+ * Când antetul se strânge, intrările își schimbă mărimea, deci poziția
+ * măsurată înainte nu mai e bună. În loc s-o ștergem dintr-un efect — ceea ce
+ * cere încă o randare — o comparăm la randare cu starea curentă: dacă nu se
+ * potrivesc, pastila nu se desenează, iar următoarea trecere cu mouse-ul o
+ * remăsoară.
+ */
+type Pastila = {
+  stanga: number;
+  latime: number;
+  accent: number;
+  laCompact: boolean;
+} | null;
 
 /**
  * Cele trei culori ale mărcii, pe rând, pentru intrările din meniu.
@@ -152,15 +164,17 @@ export default function Antet() {
       if (!container || !tinta) return setPastila(null);
       const c = container.getBoundingClientRect();
       const t = tinta.getBoundingClientRect();
-      setPastila({ stanga: t.left - c.left, latime: t.width, accent });
+      setPastila({
+        stanga: t.left - c.left,
+        latime: t.width,
+        accent,
+        laCompact: compact,
+      });
     },
-    [],
+    [compact],
   );
 
-  // Intrările își schimbă mărimea când antetul se strânge, deci pastila
-  // măsurată înainte ar rămâne pe lângă. O stingem și se remăsoară la
-  // următoarea trecere cu mouse-ul.
-  useEffect(() => setPastila(null), [compact]);
+  const pastilaDeDesenat = pastila?.laCompact === compact ? pastila : null;
 
   // Cu meniul de ecran mic deschis, pagina din spate nu se derulează.
   useEffect(() => {
@@ -197,9 +211,19 @@ export default function Antet() {
 
   // Rândul de jos (meniul propriu-zis) are tot spațiul lui, deci literele pot
   // fi de 17 px. Strâns, coboară la 15 px și la o pastilă mai joasă.
-  const intrareDesktop = `relative flex items-center gap-1.5 rounded-full font-titlu font-bold whitespace-nowrap transition-[color,padding,font-size] duration-300 ease-cald ${
-    compact ? "px-3 py-2 text-mic" : "px-4 py-2.5 text-corp"
+  const intrareDesktop = `relative flex items-center gap-1.5 rounded-full font-titlu font-bold whitespace-nowrap transition-[color,background-color,padding,font-size] duration-300 ease-cald ${
+    compact ? "px-3 py-1.5 text-mic" : "px-4 py-2 text-corp"
   }`;
+
+  /*
+    Pagina curentă e o pastilă plină, nu o liniuță sub text: pe o pistă albă,
+    un singur element colorat se vede dintr-o privire. Portocaliul e cel
+    închis (`caramiziu-700`), nu cel de brand: alb pe #F74F22 dă 3,44:1, sub
+    pragul AA, iar textul meniului are 17 px, adică prea puțin pentru
+    excepția de „text mare”. Pe 700 raportul urcă la 5,90:1.
+  */
+  const INTRARE_ACTIVA =
+    "bg-caramiziu-700 text-hartie shadow-[0_8px_18px_-8px_rgba(184,43,9,0.95)]";
 
   return (
     <header
@@ -238,47 +262,40 @@ export default function Antet() {
           />
         </Link>
 
-        {/* Contactul, de la 1280 px în sus. Un telefon la vedere scutește un
-            drum până la pagina de contact — e cel mai cerut lucru de pe
-            site-ul unei asociații. */}
-        <div className="ml-auto hidden items-center gap-5 xl:flex">
-          <div className="flex items-center gap-2 text-mic">
-            <span className="grid size-9 place-items-center rounded-full bg-tenta-cald text-caramiziu-600">
-              <Pictograma nume="telefon" className="size-[18px]" />
-            </span>
-            <span className="flex flex-col leading-tight">
-              {TELEFOANE.map((telefon) => (
-                <a
-                  key={telefon.apel}
-                  href={`tel:${telefon.apel}`}
-                  className="font-titlu font-bold text-cerneala transition-colors hover:text-caramiziu-600"
-                >
-                  {telefon.afisat}
-                </a>
-              ))}
-            </span>
-          </div>
+        {/*
+          Un singur telefon în antet, nu toate datele de contact.
 
-          <a
-            href={`mailto:${EMAIL.contact}`}
-            className="group/mail flex items-center gap-2 text-mic"
-          >
-            <span className="grid size-9 place-items-center rounded-full bg-tenta-turcoaz text-turcoaz-600">
-              <Pictograma nume="plic" className="size-[18px]" />
+          Înainte stăteau aici două numere unul sub altul la 15 px, plus
+          e-mailul, plus trei pictograme de rețele: șase lucruri mărunte
+          înghesuite care se citeau ca un bloc de text, nu ca un îndemn să
+          suni. Acum e un singur număr, mare, cu eticheta lui — iar al doilea
+          număr, e-mailul și rețelele sunt în subsol și pe pagina de contact,
+          unde caietul le cere oricum (12.3). Rețelele chiar n-aveau ce căuta
+          sus: trimit omul de pe site, exact în locul de unde vrem să nu
+          plece.
+        */}
+        <a
+          href={`tel:${TELEFON_PRINCIPAL.apel}`}
+          className="group/tel ml-auto hidden items-center gap-3 rounded-full py-1.5 pr-5 pl-1.5 transition-colors duration-200 hover:bg-tenta-cald xl:flex"
+        >
+          <span className="grid size-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 text-hartie shadow-[0_10px_20px_-10px_rgba(247,79,34,0.95)]">
+            <Pictograma nume="telefon" className="size-5" />
+          </span>
+          <span className="flex flex-col leading-none">
+            <span className="font-titlu text-nota font-bold tracking-[0.1em] text-cerneala-slab uppercase">
+              Sună-ne
             </span>
-            <span className="font-titlu font-bold text-cerneala transition-colors group-hover/mail:text-turcoaz-700">
-              {EMAIL.contact}
+            <span className="mt-1 font-titlu text-amplu font-extrabold text-cerneala transition-colors group-hover/tel:text-caramiziu-700">
+              {TELEFON_PRINCIPAL.afisat}
             </span>
-          </a>
+          </span>
+        </a>
 
-          <Retele
-            retele={RETELE_ASOCIATIE}
-            context={ASOCIATIA.denumire}
-            className="text-cerneala-moale"
+        <div className="ml-auto flex items-center gap-1.5 xl:ml-0 xl:gap-4">
+          <span
+            aria-hidden="true"
+            className="hidden h-8 w-px bg-hartie-umbra xl:block"
           />
-        </div>
-
-        <div className="ml-auto flex items-center gap-1.5 xl:ml-0">
           {/*
             Alb pe portocaliul de brand (#F74F22) dă 3,44:1 — sub pragul AA de
             4,5:1 pentru text normal. De la 18,66 px aldin, WCAG cere doar
@@ -331,161 +348,164 @@ export default function Antet() {
         </div>
       </div>
 
-      {/* ——— Rândul de jos: meniul, de la 1280 px în sus ——— */}
+      {/* ——— Rândul de jos: meniul, de la 1280 px în sus ———
+
+          Meniul stă într-o pistă albă rotunjită, pe o bandă pastel. Înainte
+          erau nouă cuvinte răsfirate pe un fundal aproape alb: se citeau ca
+          un rând de text rămas acolo, nu ca un meniu. Pista le adună într-un
+          singur obiect, iar banda colorată din spate o scoate în evidență —
+          culoarea tare rămâne, ca peste tot pe site, doar pe bucăți mici. */}
       <div
-        className={`hidden border-t border-hartie-umbra bg-gradient-to-r from-caramiziu-50 via-miere-50 to-turcoaz-50 transition-[padding] duration-300 ease-cald xl:block ${
-          compact ? "py-0.5" : "py-1.5"
+        className={`hidden border-t border-hartie-umbra bg-gradient-to-r from-caramiziu-100 via-miere-100 to-turcoaz-100 transition-[padding] duration-300 ease-cald xl:block ${
+          compact ? "py-1" : "py-2"
         }`}
       >
-        <nav
-          ref={navigatie}
-          aria-label="Meniu principal"
-          onMouseLeave={() => setPastila(null)}
-          className="relative mx-auto flex max-w-7xl items-center justify-center px-8"
-        >
-          {/* Pastila care alunecă. Decorativă: nu intră în ordinea de citire.
+        <div className="mx-auto flex max-w-7xl justify-center px-4">
+          <nav
+            ref={navigatie}
+            aria-label="Meniu principal"
+            onMouseLeave={() => setPastila(null)}
+            className={`relative flex items-center rounded-full border border-hartie/80 bg-hartie shadow-[0_12px_34px_-18px_rgba(35,35,35,0.5)] transition-[padding] duration-300 ease-cald ${
+              compact ? "p-1" : "p-1.5"
+            }`}
+          >
+            {/* Pastila care alunecă. Decorativă: nu intră în ordinea de citire.
               Se scalează pe orizontală când nu are unde să stea, ca să nu
               pornească niciodată de la invizibil. */}
-          <span
-            aria-hidden="true"
-            /*
+            <span
+              aria-hidden="true"
+              /*
               Fără `-z-10`: un copil cu z-index negativ se desenează sub
               fundalul blocului părinte, iar banda meniului are fundal, deci
               pastila dispărea complet sub el. Lăsată pe `auto`, se desenează
               în ordinea din DOM — prima, deci sub etichete, exact unde
               trebuie.
             */
-            className={`pointer-events-none absolute inset-y-0 rounded-full shadow-[0_6px_16px_-10px_rgba(35,35,35,0.6)] transition-[left,width,transform,background-color] duration-300 ease-cald motion-reduce:transition-none ${
-              ACCENTE[pastila?.accent ?? 0].tenta
-            }`}
-            style={{
-              left: pastila?.stanga ?? 0,
-              width: pastila?.latime ?? 0,
-              transform: pastila ? "scaleX(1)" : "scaleX(0)",
-            }}
-          />
+              className={`pointer-events-none absolute inset-y-0 rounded-full shadow-[0_6px_16px_-10px_rgba(35,35,35,0.6)] transition-[left,width,transform,background-color] duration-300 ease-cald motion-reduce:transition-none ${
+                ACCENTE[pastilaDeDesenat?.accent ?? 0].tenta
+              }`}
+              style={{
+                left: pastilaDeDesenat?.stanga ?? 0,
+                width: pastilaDeDesenat?.latime ?? 0,
+                transform: pastilaDeDesenat ? "scaleX(1)" : "scaleX(0)",
+              }}
+            />
 
-          {MENIU.map((element, i) => {
-            const accent = ACCENTE[i % ACCENTE.length];
+            {MENIU.map((element, i) => {
+              const accent = ACCENTE[i % ACCENTE.length];
 
-            return element.subpagini ? (
-              <div
-                key={element.eticheta}
-                className="relative"
-                onMouseEnter={(ev) => {
-                  setSubmeniuDeschis(element.eticheta);
-                  mutaPastila(
-                    ev.currentTarget.firstElementChild as HTMLElement,
-                    i % ACCENTE.length,
-                  );
-                }}
-                onMouseLeave={() => setSubmeniuDeschis(null)}
-                onKeyDown={(ev) => {
-                  if (ev.key === "Escape") setSubmeniuDeschis(null);
-                }}
-                onBlur={(ev) => {
-                  // Tastatura a plecat din grup: submeniul se închide singur.
-                  if (!ev.currentTarget.contains(ev.relatedTarget as Node)) {
-                    setSubmeniuDeschis(null);
-                  }
-                }}
-              >
-                <button
-                  type="button"
-                  aria-expanded={submeniuDeschis === element.eticheta}
-                  onFocus={(ev) => mutaPastila(ev.currentTarget, i % ACCENTE.length)}
-                  onClick={() =>
-                    setSubmeniuDeschis(
+              return element.subpagini ? (
+                <div
+                  key={element.eticheta}
+                  className="relative"
+                  onMouseEnter={(ev) => {
+                    setSubmeniuDeschis(element.eticheta);
+                    mutaPastila(
+                      ev.currentTarget.firstElementChild as HTMLElement,
+                      i % ACCENTE.length,
+                    );
+                  }}
+                  onMouseLeave={() => setSubmeniuDeschis(null)}
+                  onKeyDown={(ev) => {
+                    if (ev.key === "Escape") setSubmeniuDeschis(null);
+                  }}
+                  onBlur={(ev) => {
+                    // Tastatura a plecat din grup: submeniul se închide singur.
+                    if (!ev.currentTarget.contains(ev.relatedTarget as Node)) {
+                      setSubmeniuDeschis(null);
+                    }
+                  }}
+                >
+                  <button
+                    type="button"
+                    aria-expanded={submeniuDeschis === element.eticheta}
+                    onFocus={(ev) =>
+                      mutaPastila(ev.currentTarget, i % ACCENTE.length)
+                    }
+                    onClick={() =>
+                      setSubmeniuDeschis(
+                        submeniuDeschis === element.eticheta
+                          ? null
+                          : element.eticheta,
+                      )
+                    }
+                    className={`${intrareDesktop} ${
+                      element.subpagini.some((s) => activ(s.href))
+                        ? INTRARE_ACTIVA
+                        : `${accent.text} text-cerneala`
+                    }`}
+                  >
+                    {element.eticheta}
+                    <Sageata
+                      className={`size-3 transition-transform duration-300 ease-cald motion-reduce:transition-none ${
+                        submeniuDeschis === element.eticheta ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {/* Submeniul stă mereu în pagină; deschis, coboară 6 px la
+                    locul lui. `visibility` ține linkurile în afara ordinii de
+                    tabulare cât e închis. */}
+                  <div
+                    className={`absolute top-full left-1/2 w-72 -translate-x-1/2 pt-2.5 transition-[transform,visibility] duration-200 ease-cald motion-reduce:transition-none ${
                       submeniuDeschis === element.eticheta
-                        ? null
-                        : element.eticheta,
-                    )
+                        ? "visible translate-y-0"
+                        : "invisible -translate-y-1.5"
+                    }`}
+                  >
+                    <div className="overflow-hidden rounded-card border border-hartie-umbra bg-hartie p-2 shadow-[0_24px_60px_-26px_rgba(35,35,35,0.55)]">
+                      {element.subpagini.map((sub, j) => (
+                        <Link
+                          key={sub.href}
+                          href={sub.href}
+                          aria-current={activ(sub.href) ? "page" : undefined}
+                          className={`flex items-center gap-3 rounded-moale px-3.5 py-3 font-titlu font-bold whitespace-nowrap transition-[background-color,color,padding-left] duration-200 hover:pl-4.5 ${
+                            activ(sub.href)
+                              ? "bg-tenta-cald text-caramiziu-700"
+                              : j % 2 === 0
+                                ? "text-cerneala hover:bg-tenta-miere hover:text-miere-700"
+                                : "text-cerneala hover:bg-tenta-turcoaz hover:text-turcoaz-700"
+                          }`}
+                        >
+                          <span
+                            aria-hidden="true"
+                            className={`size-2 shrink-0 rounded-full ${
+                              activ(sub.href)
+                                ? "bg-caramiziu-500"
+                                : j % 2 === 0
+                                  ? "bg-miere-400"
+                                  : "bg-turcoaz-400"
+                            }`}
+                          />
+                          {sub.eticheta}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <Link
+                  key={element.href}
+                  href={element.href!}
+                  aria-current={activ(element.href!) ? "page" : undefined}
+                  onMouseEnter={(ev) =>
+                    mutaPastila(ev.currentTarget, i % ACCENTE.length)
                   }
-                  className={`${intrareDesktop} ${accent.text} ${
-                    element.subpagini.some((s) => activ(s.href)) ||
-                    submeniuDeschis === element.eticheta
-                      ? "text-caramiziu-700"
-                      : "text-cerneala"
+                  onFocus={(ev) =>
+                    mutaPastila(ev.currentTarget, i % ACCENTE.length)
+                  }
+                  className={`${intrareDesktop} ${
+                    activ(element.href!)
+                      ? INTRARE_ACTIVA
+                      : `${accent.text} text-cerneala`
                   }`}
                 >
                   {element.eticheta}
-                  <Sageata
-                    className={`size-3 transition-transform duration-300 ease-cald motion-reduce:transition-none ${
-                      submeniuDeschis === element.eticheta ? "rotate-180" : ""
-                    }`}
-                  />
-                  {element.subpagini.some((s) => activ(s.href)) && (
-                    <span
-                      aria-hidden="true"
-                      className="absolute -bottom-0.5 left-1/2 h-[3px] w-7 -translate-x-1/2 rounded-full bg-gradient-to-r from-caramiziu-500 to-miere-400"
-                    />
-                  )}
-                </button>
-
-                {/* Submeniul stă mereu în pagină; deschis, coboară 6 px la
-                    locul lui. `visibility` ține linkurile în afara ordinii de
-                    tabulare cât e închis. */}
-                <div
-                  className={`absolute top-full left-1/2 w-72 -translate-x-1/2 pt-2.5 transition-[transform,visibility] duration-200 ease-cald motion-reduce:transition-none ${
-                    submeniuDeschis === element.eticheta
-                      ? "visible translate-y-0"
-                      : "invisible -translate-y-1.5"
-                  }`}
-                >
-                  <div className="overflow-hidden rounded-card border border-hartie-umbra bg-hartie p-2 shadow-[0_24px_60px_-26px_rgba(35,35,35,0.55)]">
-                    {element.subpagini.map((sub, j) => (
-                      <Link
-                        key={sub.href}
-                        href={sub.href}
-                        aria-current={activ(sub.href) ? "page" : undefined}
-                        className={`flex items-center gap-3 rounded-moale px-3.5 py-3 font-titlu font-bold whitespace-nowrap transition-[background-color,color,padding-left] duration-200 hover:pl-4.5 ${
-                          activ(sub.href)
-                            ? "bg-tenta-cald text-caramiziu-700"
-                            : j % 2 === 0
-                              ? "text-cerneala hover:bg-tenta-miere hover:text-miere-700"
-                              : "text-cerneala hover:bg-tenta-turcoaz hover:text-turcoaz-700"
-                        }`}
-                      >
-                        <span
-                          aria-hidden="true"
-                          className={`size-2 shrink-0 rounded-full ${
-                            activ(sub.href)
-                              ? "bg-caramiziu-500"
-                              : j % 2 === 0
-                                ? "bg-miere-400"
-                                : "bg-turcoaz-400"
-                          }`}
-                        />
-                        {sub.eticheta}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <Link
-                key={element.href}
-                href={element.href!}
-                aria-current={activ(element.href!) ? "page" : undefined}
-                onMouseEnter={(ev) => mutaPastila(ev.currentTarget, i % ACCENTE.length)}
-                onFocus={(ev) => mutaPastila(ev.currentTarget, i % ACCENTE.length)}
-                className={`${intrareDesktop} ${accent.text} ${
-                  activ(element.href!) ? "text-caramiziu-700" : "text-cerneala"
-                }`}
-              >
-                {element.eticheta}
-                {/* Pagina curentă are liniuța ei, care rămâne pe loc și când
-                    pastila pleacă în altă parte. */}
-                {activ(element.href!) && (
-                  <span
-                    aria-hidden="true"
-                    className="absolute -bottom-0.5 left-1/2 h-[3px] w-7 -translate-x-1/2 rounded-full bg-gradient-to-r from-caramiziu-500 to-miere-400"
-                  />
-                )}
-              </Link>
-            );
-          })}
-        </nav>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
       </div>
 
       {/* Meniul de ecran mic. Stă în pagină tot timpul, cu înălțimea 0 când e

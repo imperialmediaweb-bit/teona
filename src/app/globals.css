@@ -119,12 +119,14 @@
 
   /*
     De la 1280 px antetul are două rânduri — sigla și contactul sus, meniul
-    dedesubt — deci e mai înalt chiar și strâns. Măsurat: 153 px desfăcut,
-    112 px strâns, deci 8,5rem (136 px) ține ancorele sub el în ambele stări.
+    dedesubt — deci e mai înalt chiar și strâns. Măsurat: 167 px desfăcut,
+    132 px strâns. 10rem (160 px) lasă loc peste cea mai înaltă stare în care
+    poate fi antetul când cade o ancoră — cel strâns — plus o margine, ca
+    titlul să nu stea lipit sub meniu.
   */
   @media (min-width: 1280px) {
     html {
-      scroll-padding-top: 8.5rem;
+      scroll-padding-top: 10rem;
     }
   }
 
