@@ -62,14 +62,29 @@ export default function Newsletter() {
       className="granulatie relative overflow-hidden bg-tenta-turcoaz"
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <Decor semn="stea" className="pluteste-lent absolute top-10 right-[8%] size-7 text-turcoaz-300 lg:size-10" />
-        <Decor semn="unda" className="pluteste-lent absolute bottom-10 left-[4%] size-9 text-turcoaz-300 lg:size-12" />
+        <Decor
+          semn="stea"
+          className="pluteste-lent absolute top-10 right-[8%] size-7 text-turcoaz-300 lg:size-10"
+        />
+        <Decor
+          semn="unda"
+          className="pluteste-lent absolute bottom-10 left-[4%] size-9 text-turcoaz-300 lg:size-12"
+        />
       </div>
 
       <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-16 lg:px-8 lg:py-20">
         <div>
           <span className="colt-mic-a mb-5 inline-flex size-12 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_12px_26px_-12px_rgba(42,159,163,0.9)]">
-            <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg
+              viewBox="0 0 24 24"
+              className="size-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.75}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <path d="M3.5 7a1.5 1.5 0 0 1 1.5-1.5h14A1.5 1.5 0 0 1 20.5 7v10a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 17V7z" />
               <path d="M4 7l8 5.5L20 7" />
             </svg>
@@ -90,7 +105,11 @@ export default function Newsletter() {
             Mulțumim! Verifică-ți emailul pentru a confirma abonarea.
           </p>
         ) : (
-          <form onSubmit={trimite} noValidate className="colt-a grid gap-4 bg-hartie p-6 shadow-[0_18px_40px_-24px_rgba(42,159,163,0.6)] sm:p-8">
+          <form
+            onSubmit={trimite}
+            noValidate
+            className="colt-a grid gap-4 bg-hartie p-6 shadow-[0_18px_40px_-24px_rgba(42,159,163,0.6)] sm:p-8"
+          >
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label
@@ -114,7 +133,9 @@ export default function Newsletter() {
                   className="mb-1.5 block font-titlu text-mic font-semibold"
                 >
                   Nume{" "}
-                  <span className="font-normal text-cerneala-slab">(opțional)</span>
+                  <span className="font-normal text-cerneala-slab">
+                    (opțional)
+                  </span>
                 </label>
                 <input
                   id={`${id}-nume`}
@@ -135,8 +156,9 @@ export default function Newsletter() {
                 className="mt-1 size-4 shrink-0 accent-caramiziu-500"
               />
               <span>
-                Sunt de acord să primesc mesaje de la Asociația Teona Ariana. Mă pot
-                dezabona oricând. <span className="text-caramiziu-600">*</span>
+                Sunt de acord să primesc mesaje de la Asociația Teona Ariana. Mă
+                pot dezabona oricând.{" "}
+                <span className="text-caramiziu-600">*</span>
               </span>
             </label>
 

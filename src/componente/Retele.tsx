@@ -30,7 +30,11 @@ type Proprietati = {
   className?: string;
 };
 
-export default function Retele({ retele, context, className = "" }: Proprietati) {
+export default function Retele({
+  retele,
+  context,
+  className = "",
+}: Proprietati) {
   return (
     <ul className={`flex items-center gap-2 ${className}`}>
       {retele.map((retea) => (

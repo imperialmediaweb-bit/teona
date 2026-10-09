@@ -42,7 +42,8 @@ const CAI_DE_CONTACT: ReadonlyArray<{
     eticheta: "Telefon",
     valoare: TELEFOANE[0].afisat,
     href: `tel:${TELEFOANE[0].apel}`,
-    clase: "granulatie bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 text-hartie shadow-[0_28px_56px_-26px_rgba(247,79,34,0.85)]",
+    clase:
+      "granulatie bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 text-hartie shadow-[0_28px_56px_-26px_rgba(247,79,34,0.85)]",
     pictogramaClase: "bg-hartie/20 text-hartie",
   },
   {
@@ -50,7 +51,8 @@ const CAI_DE_CONTACT: ReadonlyArray<{
     eticheta: "Telefon",
     valoare: TELEFOANE[1].afisat,
     href: `tel:${TELEFOANE[1].apel}`,
-    clase: "granulatie bg-miere-300 text-miere-900 shadow-[0_28px_56px_-26px_rgba(255,172,0,0.85)]",
+    clase:
+      "granulatie bg-miere-300 text-miere-900 shadow-[0_28px_56px_-26px_rgba(255,172,0,0.85)]",
     pictogramaClase: "bg-cerneala/10 text-cerneala",
   },
   {
@@ -58,8 +60,10 @@ const CAI_DE_CONTACT: ReadonlyArray<{
     eticheta: "Email",
     valoare: EMAIL.contact,
     href: `mailto:${EMAIL.contact}`,
-    clase: "granulatie bg-turcoaz-100 text-turcoaz-900 shadow-[0_28px_56px_-26px_rgba(42,159,163,0.6)]",
-    pictogramaClase: "bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
+    clase:
+      "granulatie bg-turcoaz-100 text-turcoaz-900 shadow-[0_28px_56px_-26px_rgba(42,159,163,0.6)]",
+    pictogramaClase:
+      "bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
   },
 ];
 
@@ -153,7 +157,9 @@ export default function Contact() {
                     className="object-cover"
                   />
                   <span className="colt-mic-b absolute top-4 left-4 bg-caramiziu-500 px-4 py-1.5 shadow-[0_10px_24px_-10px_rgba(247,79,34,0.9)]">
-                    <span className="scris text-corp leading-none text-hartie">{casaTeona.nume}</span>
+                    <span className="scris text-corp leading-none text-hartie">
+                      {casaTeona.nume}
+                    </span>
                   </span>
                 </div>
                 <div className="flex flex-1 flex-col p-6 sm:p-7">
@@ -176,11 +182,17 @@ export default function Contact() {
 
             <Aparitie intarziere={0.08} className="lg:col-span-5">
               <article className="granulatie relative flex h-full flex-col overflow-hidden colt-b bg-hartie-calda p-6 shadow-[0_24px_50px_-26px_rgba(35,35,35,0.4)] sm:p-7">
-                <Decor semn="soare" strokeWidth={0.8} className="absolute -top-10 -right-10 size-40 text-miere-200" />
+                <Decor
+                  semn="soare"
+                  strokeWidth={0.8}
+                  className="absolute -top-10 -right-10 size-40 text-miere-200"
+                />
                 <span className="colt-mic-a relative flex size-12 items-center justify-center bg-miere-400 text-cerneala shadow-[0_10px_22px_-10px_rgba(255,172,0,0.9)]">
                   <Pictograma nume="cladire" className="size-6" />
                 </span>
-                <h3 className="relative mt-5 text-h4 text-cerneala">{sediuSocial.nume}</h3>
+                <h3 className="relative mt-5 text-h4 text-cerneala">
+                  {sediuSocial.nume}
+                </h3>
                 <p className="relative mt-3 font-titlu text-amplu font-bold text-cerneala">
                   {sediuSocial.strada}, {sediuSocial.oras}
                 </p>
@@ -196,9 +208,18 @@ export default function Contact() {
       {/* 10.4 — formularul */}
       <Val culoare="text-tenta-cald" className={VAL_PESTE} />
       <section className="granulatie relative overflow-hidden bg-tenta-cald pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="stea" className="pluteste-lent absolute top-16 right-[6%] size-8 text-miere-300 lg:size-11" />
-          <Decor semn="unda" className="pluteste-lent absolute bottom-24 left-[3%] size-9 text-caramiziu-200 lg:size-12" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="stea"
+            className="pluteste-lent absolute top-16 right-[6%] size-8 text-miere-300 lg:size-11"
+          />
+          <Decor
+            semn="unda"
+            className="pluteste-lent absolute bottom-24 left-[3%] size-9 text-caramiziu-200 lg:size-12"
+          />
         </div>
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:px-8">
           <div>
@@ -287,15 +308,29 @@ export default function Contact() {
       {/* 10.6 — date oficiale */}
       <Val culoare="text-hartie-calda" className={VAL_PESTE} />
       <section className="granulatie relative overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="spirala" className="pluteste-lent absolute top-14 left-[3%] size-9 text-turcoaz-200 lg:size-12" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="spirala"
+            className="pluteste-lent absolute top-14 left-[3%] size-9 text-turcoaz-200 lg:size-12"
+          />
         </div>
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
           <div>
             <TitluSectiune titlu="Date oficiale" />
             <div className="mt-8 grid gap-3">
-              <DeCopiat eticheta="Denumire" valoare={ASOCIATIA.denumireLegala} />
-              <DeCopiat eticheta="CIF" valoare={ASOCIATIA.cif} culoare="miere" colt="b" />
+              <DeCopiat
+                eticheta="Denumire"
+                valoare={ASOCIATIA.denumireLegala}
+              />
+              <DeCopiat
+                eticheta="CIF"
+                valoare={ASOCIATIA.cif}
+                culoare="miere"
+                colt="b"
+              />
             </div>
 
             <p className="mt-7 text-cerneala-moale">

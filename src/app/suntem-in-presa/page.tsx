@@ -117,12 +117,18 @@ const PASTILE = [
   "bg-turcoaz-500 text-hartie",
 ] as const;
 
-const LINII = ["border-t-caramiziu-400", "border-t-miere-400", "border-t-turcoaz-400"] as const;
+const LINII = [
+  "border-t-caramiziu-400",
+  "border-t-miere-400",
+  "border-t-turcoaz-400",
+] as const;
 
 export default function SuntemInPresa() {
   return (
     <>
-      <JsonLd date={jsonLdFir([{ nume: "Suntem în presă", cale: RUTE.media }])} />
+      <JsonLd
+        date={jsonLdFir([{ nume: "Suntem în presă", cale: RUTE.media }])}
+      />
       <AntetPagina
         scris="Presa, alături de misiunea noastră"
         titlu="Suntem în presă"
@@ -142,9 +148,18 @@ export default function SuntemInPresa() {
       />
 
       <section className="relative overflow-hidden bg-hartie pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="unda" className="pluteste-lent absolute top-20 right-[3%] size-10 text-turcoaz-200 lg:size-14" />
-          <Decor semn="stea" className="pluteste-lent absolute bottom-32 left-[2%] size-8 text-miere-300 lg:size-11" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="unda"
+            className="pluteste-lent absolute top-20 right-[3%] size-10 text-turcoaz-200 lg:size-14"
+          />
+          <Decor
+            semn="stea"
+            className="pluteste-lent absolute bottom-32 left-[2%] size-8 text-miere-300 lg:size-11"
+          />
         </div>
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <TitluSectiune
@@ -160,7 +175,10 @@ export default function SuntemInPresa() {
               // lista se citește ca o cronologie, nu ca un teanc de carduri.
               const anNou = i === 0 || APARITII[i - 1].an !== aparitie.an;
               return (
-                <li key={`${aparitie.data}-${aparitie.publicatie}`} className="grid gap-5">
+                <li
+                  key={`${aparitie.data}-${aparitie.publicatie}`}
+                  className="grid gap-5"
+                >
                   {anNou && (
                     <p
                       aria-hidden="true"
@@ -191,8 +209,12 @@ export default function SuntemInPresa() {
 
                       <div className="min-w-0">
                         <p className="flex flex-wrap items-center gap-2">
-                          <span className={`rounded-full px-3.5 py-1 ${PASTILE[i % 3]}`}>
-                            <span className="scris text-mic leading-none">{aparitie.data}</span>
+                          <span
+                            className={`rounded-full px-3.5 py-1 ${PASTILE[i % 3]}`}
+                          >
+                            <span className="scris text-mic leading-none">
+                              {aparitie.data}
+                            </span>
                           </span>
                           <span className="font-titlu text-nota font-bold tracking-wider text-cerneala-slab uppercase">
                             {publicatie.nume}
@@ -216,7 +238,10 @@ export default function SuntemInPresa() {
                         // Fără buton: adresa salvată nu mai funcționează, iar
                         // caietul interzice linkurile care nu duc nicăieri.
                         <span className="inline-flex w-fit shrink-0 items-center gap-2 rounded-full bg-miere-100 px-4 py-2 font-titlu text-nota font-semibold text-miere-800">
-                          <span aria-hidden="true" className="size-2 rounded-full bg-miere-500" />
+                          <span
+                            aria-hidden="true"
+                            className="size-2 rounded-full bg-miere-500"
+                          />
                           Link în curs de actualizare
                         </span>
                       )}

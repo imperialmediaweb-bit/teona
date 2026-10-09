@@ -15,7 +15,17 @@ export default function robots(): MetadataRoute.Robots {
   }
 
   return {
-    rules: { userAgent: "*", allow: "/", disallow: "/api/" },
+    rules: {
+      userAgent: "*",
+      allow: "/",
+      // `/api/` — rutele formularelor. `/admin/` — zona de verificare a
+      // campaniilor. `/ziua-ta/` — paginile personale de campanie: fiecare
+      // are deja `noindex` în metadate, dar sunt pagini despre oameni, iar
+      // regula asta le ține în afara căutărilor și dacă cineva uită
+      // vreodată metadata. Distribuirea pe Facebook nu e afectată: rețelele
+      // citesc `og:`, nu `robots.txt`.
+      disallow: ["/api/", "/admin/", "/ziua-ta/"],
+    },
     sitemap: `${ADRESA_SITE}/sitemap.xml`,
   };
 }

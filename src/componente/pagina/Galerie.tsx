@@ -76,11 +76,19 @@ function forme(n: number, primaMare: boolean): Forma[] {
 
       celula = [
         latTelefon ? "col-span-2" : "",
-        foarteLatEcran ? "lg:col-span-4" : latEcran ? "lg:col-span-2" : "lg:col-span-1",
+        foarteLatEcran
+          ? "lg:col-span-4"
+          : latEcran
+            ? "lg:col-span-2"
+            : "lg:col-span-1",
       ].join(" ");
       raport = [
         latTelefon ? "aspect-[2/1]" : "aspect-square",
-        foarteLatEcran ? "lg:aspect-[4/1]" : latEcran ? LAT : "lg:aspect-square",
+        foarteLatEcran
+          ? "lg:aspect-[4/1]"
+          : latEcran
+            ? LAT
+            : "lg:aspect-square",
       ].join(" ");
       dimensiuni = foarteLatEcran
         ? "(min-width: 1024px) 1280px, 94vw"
@@ -113,8 +121,14 @@ export default function Galerie({
   return (
     <section className="relative overflow-hidden bg-hartie pt-10 pb-24 lg:pt-16 lg:pb-32">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <Decor semn="soare" className="pluteste-lent absolute top-12 right-[5%] size-9 text-miere-300 lg:size-12" />
-        <Decor semn="stea" className="pluteste-lent absolute bottom-16 left-[3%] size-7 text-caramiziu-200 lg:size-10" />
+        <Decor
+          semn="soare"
+          className="pluteste-lent absolute top-12 right-[5%] size-9 text-miere-300 lg:size-12"
+        />
+        <Decor
+          semn="stea"
+          className="pluteste-lent absolute bottom-16 left-[3%] size-7 text-caramiziu-200 lg:size-10"
+        />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

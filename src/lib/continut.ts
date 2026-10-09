@@ -109,7 +109,8 @@ function reparaAdanc<T>(nod: T): T {
   return nod;
 }
 
-const citesteReparat = <T>(fisier: string): T => reparaAdanc(citeste<T>(fisier));
+const citesteReparat = <T>(fisier: string): T =>
+  reparaAdanc(citeste<T>(fisier));
 
 export const pagini = () => citesteReparat<Pagina[]>("pagini.json");
 export const proiecte = () => citesteReparat<Proiect[]>("proiecte.json");

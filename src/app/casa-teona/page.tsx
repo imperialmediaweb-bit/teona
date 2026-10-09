@@ -36,7 +36,8 @@ const BLOCURI: ReadonlyArray<{
   {
     titlu: "Jocuri și ateliere",
     pictograma: "senzorial",
-    pictogramaClase: "bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
+    pictogramaClase:
+      "bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
     paragrafe: [
       "Zilele la Casa Teona sunt pline de activități. Copiii se joacă prin jocuri senzoriale, care îi ajută să-și descopere simțurile și să se liniștească. Desenează, pictează și lucrează în ateliere creative, unde contează mai mult cât se bucură decât cât de bine le iese. Învață prin joacă, pentru că așa învață cel mai bine, și își fac prieteni cu care se simt în largul lor.",
     ],
@@ -50,7 +51,8 @@ const BLOCURI: ReadonlyArray<{
   {
     titlu: "Petreceri",
     pictograma: "joaca",
-    pictogramaClase: "bg-miere-400 text-cerneala shadow-[0_10px_22px_-10px_rgba(255,172,0,0.9)]",
+    pictogramaClase:
+      "bg-miere-400 text-cerneala shadow-[0_10px_22px_-10px_rgba(255,172,0,0.9)]",
     paragrafe: [
       "Pentru mulți dintre copiii noștri, o petrecere obișnuită nu e ușor de organizat, iar aici găsesc un spațiu al lor, cu baloane, tort și oameni care se bucură împreună cu ei. Pentru un copil, să se simtă sărbătorit contează foarte mult.",
     ],
@@ -68,7 +70,8 @@ const BLOCURI: ReadonlyArray<{
   {
     titlu: "Întâlnirile cu părinții",
     pictograma: "familie",
-    pictogramaClase: "bg-caramiziu-500 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]",
+    pictogramaClase:
+      "bg-caramiziu-500 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]",
     paragrafe: [
       "Părinții sunt la fel de importanți ca și copiii. Mulți dintre ei duc zilnic o încărcătură pe care puțini o văd. De aceea, la Casa Teona au loc întâlniri de terapie de grup pentru părinți, în care pot vorbi deschis despre ce îi preocupă, pot primi consiliere și pot descoperi că alți părinți trec prin aceleași lucruri. Uneori, simplul fapt de a fi ascultat și înțeles face o mare diferență.",
       "Casa Teona înseamnă, în același timp, joacă, încredere, sprijin și apartenență la o comunitate. Este locul în care copiii pot fi copii, iar părinții pot respira. Dacă vrei să ne cunoști mai bine, să ne vizitezi sau să ne sprijini, ne bucurăm să te primim.",
@@ -124,7 +127,9 @@ export default function CasaTeona() {
 
   return (
     <>
-      <JsonLd date={jsonLdFir([{ nume: "Casa Teona", cale: RUTE.casaTeona }])} />
+      <JsonLd
+        date={jsonLdFir([{ nume: "Casa Teona", cale: RUTE.casaTeona }])}
+      />
       <AntetPagina
         scris="Aici nu există ritm greșit"
         titlu="Casa Teona"
@@ -163,9 +168,18 @@ export default function CasaTeona() {
           le reteza exact partea ieșită — primul rând de text apărea tăiat
           pe jumătate. */}
       <section className="relative bg-hartie pb-24 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="soare" className="pluteste-lent absolute top-40 right-[3%] size-9 text-miere-300 lg:size-12" />
-          <Decor semn="unda" className="pluteste-lent absolute bottom-40 left-[2%] size-10 text-turcoaz-200 lg:size-14" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="soare"
+            className="pluteste-lent absolute top-40 right-[3%] size-9 text-miere-300 lg:size-12"
+          />
+          <Decor
+            semn="unda"
+            className="pluteste-lent absolute bottom-40 left-[2%] size-10 text-turcoaz-200 lg:size-14"
+          />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -224,8 +238,14 @@ export default function CasaTeona() {
       {/* 4.3 — cum poți veni */}
       <Val culoare="text-tenta-turcoaz" className={VAL_PESTE} />
       <section className="granulatie relative overflow-hidden bg-tenta-turcoaz pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="spirala" className="pluteste-lent absolute top-14 right-[6%] size-9 text-turcoaz-300 lg:size-12" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="spirala"
+            className="pluteste-lent absolute top-14 right-[6%] size-9 text-turcoaz-300 lg:size-12"
+          />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-16">
@@ -272,7 +292,11 @@ export default function CasaTeona() {
                 un părinte vine să-l afle. */}
             <div className="lg:col-span-5">
               <div className="granulatie relative overflow-hidden colt-a bg-turcoaz-500 p-7 text-hartie shadow-[0_30px_60px_-28px_rgba(42,159,163,0.8)] sm:p-8">
-                <Decor semn="soare" strokeWidth={0.8} className="absolute -top-10 -right-10 size-44 text-hartie/15" />
+                <Decor
+                  semn="soare"
+                  strokeWidth={0.8}
+                  className="absolute -top-10 -right-10 size-44 text-hartie/15"
+                />
                 <span className="colt-mic-b relative flex size-12 items-center justify-center bg-hartie/20">
                   <Pictograma nume="respiro" className="size-6" />
                 </span>
@@ -296,17 +320,19 @@ export default function CasaTeona() {
 
       {/* 4.4 */}
       <Val culoare="text-hartie" className={VAL_PESTE} />
-      <Galerie
-        scris="Din zilele noastre"
-        titlu="Galerie foto"
-        poze={GALERIE}
-      />
+      <Galerie scris="Din zilele noastre" titlu="Galerie foto" poze={GALERIE} />
 
       {/* 4.5 — unde ne găsiți */}
       <Val culoare="text-hartie-calda" className={VAL_PESTE} />
       <section className="granulatie relative overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="stea" className="pluteste-lent absolute top-14 left-[3%] size-8 text-miere-300 lg:size-11" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="stea"
+            className="pluteste-lent absolute top-14 left-[3%] size-8 text-miere-300 lg:size-11"
+          />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <TitluSectiune titlu="Unde ne găsiți" />
@@ -376,8 +402,15 @@ export default function CasaTeona() {
                 terțe înainte de orice acord — ci un card cu adresa scrisă mare
                 și butonul care deschide harta în aplicația omului. */}
             <div className="granulatie relative flex flex-col overflow-hidden colt-b bg-turcoaz-100 p-7 shadow-[0_24px_50px_-26px_rgba(42,159,163,0.6)] sm:p-9 lg:col-span-5">
-              <Decor semn="unda" strokeWidth={0.8} className="absolute -right-10 -bottom-8 size-44 text-turcoaz-200" />
-              <Decor semn="stea" className="absolute top-6 right-8 size-8 text-turcoaz-300" />
+              <Decor
+                semn="unda"
+                strokeWidth={0.8}
+                className="absolute -right-10 -bottom-8 size-44 text-turcoaz-200"
+              />
+              <Decor
+                semn="stea"
+                className="absolute top-6 right-8 size-8 text-turcoaz-300"
+              />
               <span className="colt-mic-a relative flex size-14 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
                 <Pictograma nume="harta" className="size-7" />
               </span>

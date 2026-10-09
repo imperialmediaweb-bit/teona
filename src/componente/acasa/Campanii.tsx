@@ -60,16 +60,27 @@ export default function Campanii() {
   return (
     <section className="granulatie relative overflow-hidden bg-tenta-cald pt-10 pb-28 lg:pt-16 lg:pb-36">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <Decor semn="stea" className="pluteste-lent absolute top-16 right-[7%] size-8 text-caramiziu-300 lg:size-11" />
-        <Decor semn="unda" className="pluteste-lent absolute bottom-28 left-[4%] size-10 text-miere-300 lg:size-14" />
-        <Decor semn="soare" className="pluteste-lent absolute top-1/3 right-[2%] hidden size-14 text-miere-200 lg:block" />
+        <Decor
+          semn="stea"
+          className="pluteste-lent absolute top-16 right-[7%] size-8 text-caramiziu-300 lg:size-11"
+        />
+        <Decor
+          semn="unda"
+          className="pluteste-lent absolute bottom-28 left-[4%] size-10 text-miere-300 lg:size-14"
+        />
+        <Decor
+          semn="soare"
+          className="pluteste-lent absolute top-1/3 right-[2%] hidden size-14 text-miere-200 lg:block"
+        />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <p className="scris text-amplu text-caramiziu-600">
           Schimbăm vieți, construim speranță.
         </p>
-        <h2 className="mt-2 max-w-2xl text-h2 text-cerneala">Campaniile noastre</h2>
+        <h2 className="mt-2 max-w-2xl text-h2 text-cerneala">
+          Campaniile noastre
+        </h2>
 
         <ul className="mt-14 grid gap-x-7 gap-y-14 sm:grid-cols-2 lg:grid-cols-12">
           {CAMPANII.map((campanie, i) => {
@@ -77,13 +88,17 @@ export default function Campanii() {
             return (
               <li
                 key={campanie.titlu}
-                className={mare ? "sm:col-span-2 lg:col-span-6" : "lg:col-span-3"}
+                className={
+                  mare ? "sm:col-span-2 lg:col-span-6" : "lg:col-span-3"
+                }
               >
                 <Aparitie intarziere={i * 0.07} className="h-full">
                   <article className="group flex h-full flex-col">
                     <div
                       className={`relative overflow-hidden ${i % 2 === 0 ? "colt-a" : "colt-b"} bg-hartie-calda transition-transform duration-500 ease-cald group-hover:-translate-y-1.5 motion-reduce:group-hover:translate-y-0 ${
-                        mare ? "aspect-[4/3] sm:aspect-[16/9] lg:aspect-[16/10]" : "aspect-[4/3] lg:aspect-[4/5]"
+                        mare
+                          ? "aspect-[4/3] sm:aspect-[16/9] lg:aspect-[16/10]"
+                          : "aspect-[4/3] lg:aspect-[4/5]"
                       } ${UMBRE[i]}`}
                     >
                       {campanie.poza ? (
@@ -138,10 +153,14 @@ export default function Campanii() {
                         mare ? "lg:mr-10 lg:ml-10 lg:p-8" : ""
                       }`}
                     >
-                      <h3 className={`text-cerneala ${mare ? "text-h3" : "text-h4"}`}>
+                      <h3
+                        className={`text-cerneala ${mare ? "text-h3" : "text-h4"}`}
+                      >
                         {campanie.titlu}
                       </h3>
-                      <p className={`mt-2 flex-1 text-cerneala-moale ${mare ? "max-w-lg text-corp" : "text-mic"}`}>
+                      <p
+                        className={`mt-2 flex-1 text-cerneala-moale ${mare ? "max-w-lg text-corp" : "text-mic"}`}
+                      >
                         {campanie.text}
                       </p>
                       <Buton

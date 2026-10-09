@@ -37,9 +37,18 @@ export default function Proiecte() {
       />
 
       <section className="relative overflow-hidden bg-hartie pt-4 pb-24 lg:pt-8 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="stea" className="pluteste-lent absolute top-24 right-[4%] size-9 text-miere-300 lg:size-12" />
-          <Decor semn="unda" className="pluteste-lent absolute bottom-32 left-[2%] size-10 text-turcoaz-200 lg:size-14" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="stea"
+            className="pluteste-lent absolute top-24 right-[4%] size-9 text-miere-300 lg:size-12"
+          />
+          <Decor
+            semn="unda"
+            className="pluteste-lent absolute bottom-32 left-[2%] size-10 text-turcoaz-200 lg:size-14"
+          />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="sr-only">Proiectele noastre, pe categorii</h2>

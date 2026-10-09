@@ -20,7 +20,11 @@ export default function ButonDoneazaMobil() {
   const cale = usePathname();
   // „necunoscut” pe server: butonul intră în HTML, ca să existe și fără
   // JavaScript. Dacă bannerul chiar e deschis, dispare la prima randare.
-  const acord = useSyncExternalStore(abonareLaAcord, areAcord, () => "1" as const);
+  const acord = useSyncExternalStore(
+    abonareLaAcord,
+    areAcord,
+    () => "1" as const,
+  );
 
   if (cale.startsWith(RUTE.doneaza)) return null;
   if (acord === "0") return null;

@@ -31,7 +31,11 @@ function citeste(): "inchisa" | "vizibila" {
  * apare fără JavaScript — acceptabil pentru un anunț, nu pentru conținut.
  */
 export default function BaraDeAnunt() {
-  const stare = useSyncExternalStore(aboneaza, citeste, () => "necunoscut" as const);
+  const stare = useSyncExternalStore(
+    aboneaza,
+    citeste,
+    () => "necunoscut" as const,
+  );
 
   if (stare !== "vizibila") return null;
 

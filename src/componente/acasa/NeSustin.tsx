@@ -27,13 +27,20 @@ const POZA = {
 } as const;
 
 /** Linia colorată de sus a fiecărei cutii, în cele trei culori, pe rând. */
-const LINII = ["border-t-caramiziu-400", "border-t-miere-400", "border-t-turcoaz-400"] as const;
+const LINII = [
+  "border-t-caramiziu-400",
+  "border-t-miere-400",
+  "border-t-turcoaz-400",
+] as const;
 
 export default function NeSustin() {
   return (
     <section className="granulatie relative overflow-hidden bg-hartie-calda pt-8 pb-24 lg:pt-12 lg:pb-32">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <Decor semn="soare" className="pluteste-lent absolute top-10 right-[5%] size-10 text-miere-300 lg:size-14" />
+        <Decor
+          semn="soare"
+          className="pluteste-lent absolute top-10 right-[5%] size-10 text-miere-300 lg:size-14"
+        />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -78,11 +85,7 @@ export default function NeSustin() {
               ))}
             </ul>
 
-            <Buton
-              href={RUTE.sponsori}
-              varianta="contur"
-              className="mt-8"
-            >
+            <Buton href={RUTE.sponsori} varianta="contur" className="mt-8">
               Vezi toți sponsorii
               <Pictograma nume="sageata" className="size-4" />
             </Buton>

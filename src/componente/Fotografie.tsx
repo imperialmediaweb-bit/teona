@@ -67,9 +67,7 @@ export default function Fotografie({
         <span
           aria-hidden="true"
           className={`absolute ${
-            colt === "a"
-              ? "-top-4 -left-4 colt-b"
-              : "-right-4 -bottom-4 colt-a"
+            colt === "a" ? "-top-4 -left-4 colt-b" : "-right-4 -bottom-4 colt-a"
           } h-[72%] w-[66%] ${BLOCURI[bloc]}`}
         />
       )}

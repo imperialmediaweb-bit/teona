@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
-import { ASOCIATIA, LINKURI_EXTERNE, RUTE, SMS } from "@/date/asociatie";
+import { ASOCIATIA, RUTE, SMS } from "@/date/asociatie";
 import Buton from "@/componente/Buton";
 import Decor from "@/componente/Decor";
 
@@ -98,18 +98,29 @@ export default function Erou() {
     >
       {/* Două pete de culoare, foarte spălate, în loc de un fundal plat.
           Se mișcă la limita observabilului (vezi `.pata` în globals.css). */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10"
+      >
         <span className="pata absolute -top-32 right-[-8%] size-[30rem] rounded-full bg-miere-100/70 blur-3xl" />
         <span className="pata pata-2 absolute bottom-[-10rem] left-[-8rem] size-[26rem] rounded-full bg-caramiziu-100/60 blur-3xl" />
-        <Decor semn="stea" className="pluteste-lent absolute top-5 right-[4%] hidden size-10 text-miere-400 lg:block" />
-        <Decor semn="soare" className="pluteste-lent absolute right-[3%] bottom-8 size-9 text-caramiziu-300 lg:bottom-14 lg:size-12" />
+        <Decor
+          semn="stea"
+          className="pluteste-lent absolute top-5 right-[4%] hidden size-10 text-miere-400 lg:block"
+        />
+        <Decor
+          semn="soare"
+          className="pluteste-lent absolute right-[3%] bottom-8 size-9 text-caramiziu-300 lg:bottom-14 lg:size-12"
+        />
       </div>
 
       <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 pt-6 pb-24 sm:px-6 lg:grid-cols-[minmax(0,6fr)_minmax(0,7fr)] lg:gap-14 lg:px-8 lg:pt-16 lg:pb-32">
         {/* Textul e primul în pagină (titlul rămâne primul lucru citit),
             dar pe telefon se vede sub poză: clientul a cerut poza sus. */}
         <div className="order-2 lg:order-1">
-          <p className="scris text-amplu text-caramiziu-600">„{ASOCIATIA.motto}”</p>
+          <p className="scris text-amplu text-caramiziu-600">
+            „{ASOCIATIA.motto}”
+          </p>
 
           {/* Mărimea e aleasă ca „aducem bucurie” să stea pe un singur rând
               în coloana lui, de la 1024 px în sus. */}
@@ -137,7 +148,8 @@ export default function Erou() {
 
           <p className="mt-7 max-w-xl text-amplu text-cerneala-moale">
             Sprijinim copiii cu nevoi speciale și pe părinții lor prin tabere,
-            terapie prin joacă și consiliere. Alătură-te celor care schimbă vieți.
+            terapie prin joacă și consiliere. Alătură-te celor care schimbă
+            vieți.
           </p>
 
           {/* Cele trei elemente din 1.1, în ordinea cerută. Blocul SMS e
@@ -158,7 +170,7 @@ export default function Erou() {
             </p>
 
             <Buton
-              href={LINKURI_EXTERNE.galantomZiuaTa}
+              href={RUTE.ziuaTa}
               varianta="contur"
               className="gap-3 text-left leading-tight"
             >

@@ -60,7 +60,8 @@ export const ADRESE = {
     strada: "Strada Zamca 22",
     oras: "Suceava",
     cod: "720215",
-    harta: "https://www.google.com/maps/search/?api=1&query=Strada+Zamca+22%2C+Suceava+720215",
+    harta:
+      "https://www.google.com/maps/search/?api=1&query=Strada+Zamca+22%2C+Suceava+720215",
     program: "Luni–vineri, 9:00–17:00",
     acces: "Acces gratuit, pe bază de programare",
   },
@@ -73,8 +74,16 @@ export const ADRESE = {
 
 export const CONTURI = [
   { banca: "BCR", moneda: "RON", iban: "RO16 RNCB 0234 1852 3366 0001" },
-  { banca: "UniCredit Bank", moneda: "RON", iban: "RO57 BACX 0000 0021 0940 3001" },
-  { banca: "UniCredit Bank", moneda: "EUR", iban: "RO30 BACX 0000 0021 0940 3002" },
+  {
+    banca: "UniCredit Bank",
+    moneda: "RON",
+    iban: "RO57 BACX 0000 0021 0940 3001",
+  },
+  {
+    banca: "UniCredit Bank",
+    moneda: "EUR",
+    iban: "RO30 BACX 0000 0021 0940 3002",
+  },
 ] as const;
 
 export const SMS = {
@@ -124,6 +133,7 @@ export const RUTE = {
   termeni: "/termeni-si-conditii",
   cookieuri: "/politica-de-cookieuri",
   raport2025: "/raport-de-activitate-2025",
+  ziuaTa: "/doneaza-ti-ziua",
 } as const;
 
 /** Meniul principal, în ordinea cerută de caietul de sarcini (12.1). */

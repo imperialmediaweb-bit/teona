@@ -124,7 +124,8 @@ export function problemeRamase(text: string): string[] {
 
   const gresite = new Set<string>();
   for (const [cuvant] of text.matchAll(CUVANT)) {
-    if (!CODURI.has(cuvant) && CUVINTE[cuvant.toLowerCase()]) gresite.add(cuvant);
+    if (!CODURI.has(cuvant) && CUVINTE[cuvant.toLowerCase()])
+      gresite.add(cuvant);
   }
   if (gresite.size > 0) {
     probleme.push(`cuvinte fără diacritice: ${[...gresite].join(", ")}`);

@@ -30,7 +30,10 @@ export function laBan(suma: number): number {
  * „1250000,50”. Punctul e separator de mii când grupează câte trei cifre;
  * virgula e mereu zecimală. Câmpul gol nu e eroare — omul încă n-a scris.
  */
-export function citesteSuma(brut: string): { suma: number | null; eroare?: string } {
+export function citesteSuma(brut: string): {
+  suma: number | null;
+  eroare?: string;
+} {
   let text = brut.trim().replace(/\s/g, "").replace(/lei$/i, "");
   if (text === "") return { suma: null };
 
@@ -41,7 +44,10 @@ export function citesteSuma(brut: string): { suma: number | null; eroare?: strin
   }
 
   if (!/^-?\d+(\.\d+)?$/.test(text)) {
-    return { suma: null, eroare: "Scrie suma doar în cifre, de exemplu 250.000." };
+    return {
+      suma: null,
+      eroare: "Scrie suma doar în cifre, de exemplu 250.000.",
+    };
   }
 
   const suma = Number(text);
@@ -51,9 +57,9 @@ export function citesteSuma(brut: string): { suma: number | null; eroare?: strin
   if (suma > LIMITA) {
     return {
       suma: null,
-      eroare: "Suma e mai mare decât orice cifră reală. Verifică dacă n-a intrat un zero în plus.",
+      eroare:
+        "Suma e mai mare decât orice cifră reală. Verifică dacă n-a intrat un zero în plus.",
     };
   }
   return { suma };
 }
-

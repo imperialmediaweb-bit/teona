@@ -38,7 +38,10 @@ export async function POST(cerere: Request) {
   const corp = citire.corp;
 
   if (esteRobot(corp)) {
-    return raspuns("Mulțumim! Verifică-ți emailul pentru a confirma abonarea.", 200);
+    return raspuns(
+      "Mulțumim! Verifică-ți emailul pentru a confirma abonarea.",
+      200,
+    );
   }
 
   if (!email(corp.email)) {

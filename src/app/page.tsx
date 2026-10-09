@@ -17,7 +17,9 @@ import Campanii from "@/componente/acasa/Campanii";
 import FasieDeFotografii from "@/componente/acasa/FasieDeFotografii";
 import NeSustin from "@/componente/acasa/NeSustin";
 import Realizari from "@/componente/acasa/Realizari";
-import Testimoniale, { type Testimonial } from "@/componente/acasa/Testimoniale";
+import Testimoniale, {
+  type Testimonial,
+} from "@/componente/acasa/Testimoniale";
 import { metadate } from "./seo";
 
 export const metadata: Metadata = metadate({
@@ -38,10 +40,14 @@ export const metadata: Metadata = metadate({
  */
 const VAL_PESTE = "relative z-10 -mt-10 sm:-mt-14 lg:-mt-20";
 
-const PUNCTE_CASA: ReadonlyArray<{ text: string; pictograma: NumePictograma }> = [
-  { text: "Joacă și activități adaptate fiecărui copil", pictograma: "joaca" },
-  { text: "Sprijin pentru întreaga familie", pictograma: "familie" },
-];
+const PUNCTE_CASA: ReadonlyArray<{ text: string; pictograma: NumePictograma }> =
+  [
+    {
+      text: "Joacă și activități adaptate fiecărui copil",
+      pictograma: "joaca",
+    },
+    { text: "Sprijin pentru întreaga familie", pictograma: "familie" },
+  ];
 
 function citesteTestimoniale(): Testimonial[] {
   return JSON.parse(
@@ -73,8 +79,14 @@ export default function PrimaPagina() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="sr-only">Rezultatele noastre</h2>
           <div className="granulatie relative z-20 -mt-6 colt-a border border-hartie-umbra bg-hartie px-5 py-10 shadow-[0_34px_70px_-30px_rgba(247,79,34,0.45)] sm:-mt-10 lg:-mt-16 lg:px-12 lg:py-12">
-            <Decor semn="unda" className="absolute top-4 right-6 size-8 text-miere-300 lg:size-10" />
-            <Decor semn="stea" className="absolute bottom-4 left-6 size-6 text-caramiziu-200 lg:size-8" />
+            <Decor
+              semn="unda"
+              className="absolute top-4 right-6 size-8 text-miere-300 lg:size-10"
+            />
+            <Decor
+              semn="stea"
+              className="absolute bottom-4 left-6 size-6 text-caramiziu-200 lg:size-8"
+            />
             <Cifre />
           </div>
         </div>
@@ -90,8 +102,14 @@ export default function PrimaPagina() {
       {/* 1.5 — Casa Teona */}
       <Val culoare="text-hartie" className={VAL_PESTE} />
       <section className="relative overflow-hidden bg-hartie pt-10 pb-24 lg:pt-16 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="soare" className="pluteste-lent absolute top-12 left-[3%] size-9 text-miere-300 lg:size-12" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="soare"
+            className="pluteste-lent absolute top-12 left-[3%] size-9 text-miere-300 lg:size-12"
+          />
         </div>
         <div className="relative mx-auto grid max-w-7xl items-center gap-16 px-4 sm:px-6 lg:grid-cols-2 lg:gap-20 lg:px-8">
           <Aparitie>
@@ -129,7 +147,8 @@ export default function PrimaPagina() {
 
           <Aparitie intarziere={0.1}>
             <p className="scris text-amplu text-turcoaz-700">
-              Ne dedicăm îmbunătățirii calității vieții copiilor cu nevoi speciale.
+              Ne dedicăm îmbunătățirii calității vieții copiilor cu nevoi
+              speciale.
             </p>
             <h2 className="mt-2 text-h2 text-cerneala">Casa Teona</h2>
 
@@ -139,10 +158,14 @@ export default function PrimaPagina() {
                   key={punct.text}
                   className={`${i % 2 === 0 ? "colt-a" : "colt-b"} flex items-center gap-4 border border-turcoaz-100 bg-turcoaz-50 p-4 shadow-[0_16px_32px_-20px_rgba(42,159,163,0.9)] sm:p-5`}
                 >
-                  <span className={`${i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"} flex size-12 shrink-0 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]`}>
+                  <span
+                    className={`${i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"} flex size-12 shrink-0 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]`}
+                  >
                     <Pictograma nume={punct.pictograma} className="size-6" />
                   </span>
-                  <span className="font-titlu text-amplu font-bold text-cerneala">{punct.text}</span>
+                  <span className="font-titlu text-amplu font-bold text-cerneala">
+                    {punct.text}
+                  </span>
                 </li>
               ))}
             </ul>

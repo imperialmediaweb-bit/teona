@@ -34,7 +34,10 @@ export default function IndemnFinal({
       <Val culoare="text-caramiziu-500" className={peste ? VAL_PESTE : ""} />
       <section className="granulatie relative overflow-hidden bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-700 pb-20 lg:pb-24">
         {/* Cercuri mari, abia vizibile, în loc de un fundal plat. */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
           <span className="absolute -top-40 -right-24 size-[34rem] rounded-full border-2 border-hartie/15" />
           <span className="absolute -bottom-52 -left-20 size-[30rem] rounded-full border-2 border-hartie/15" />
         </div>

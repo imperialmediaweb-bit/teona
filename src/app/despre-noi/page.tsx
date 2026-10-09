@@ -102,7 +102,10 @@ const MISIUNE: ReadonlyArray<{
     titlu: "Valori",
     pictograma: "maini",
     valori: [
-      { nume: "Incluziune", text: "fiecare copil e primit exact așa cum este." },
+      {
+        nume: "Incluziune",
+        text: "fiecare copil e primit exact așa cum este.",
+      },
       { nume: "Empatie", text: "ascultăm înainte să ajutăm." },
       {
         nume: "Implicare",
@@ -202,7 +205,11 @@ const VOLUNTARI = [
 ] as const;
 
 /** Linia colorată de sus a fiecărei cutii cu parteneri, în cele trei culori. */
-const LINII = ["border-t-caramiziu-400", "border-t-miere-400", "border-t-turcoaz-400"] as const;
+const LINII = [
+  "border-t-caramiziu-400",
+  "border-t-miere-400",
+  "border-t-turcoaz-400",
+] as const;
 
 /** Inițialele, pentru cardurile fără fotografie. */
 function initiale(nume: string) {
@@ -234,9 +241,18 @@ export default function DespreNoi() {
 
       {/* 3.2 — Povestea noastră */}
       <section className="relative overflow-hidden bg-hartie pt-10 pb-24 lg:pt-16 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="spirala" className="pluteste-lent absolute top-20 right-[4%] size-10 text-turcoaz-200 lg:size-14" />
-          <Decor semn="stea" className="pluteste-lent absolute top-[55%] left-[2%] size-9 text-miere-300 lg:size-12" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="spirala"
+            className="pluteste-lent absolute top-20 right-[4%] size-10 text-turcoaz-200 lg:size-14"
+          />
+          <Decor
+            semn="stea"
+            className="pluteste-lent absolute top-[55%] left-[2%] size-9 text-miere-300 lg:size-12"
+          />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -273,7 +289,9 @@ export default function DespreNoi() {
                     >
                       {String(i + 1).padStart(2, "0")}
                     </span>
-                    <h3 className="relative text-h3 text-cerneala">{bloc.titlu}</h3>
+                    <h3 className="relative text-h3 text-cerneala">
+                      {bloc.titlu}
+                    </h3>
                     <div className="relative mt-5 grid gap-4 text-cerneala-moale">
                       {bloc.paragrafe.map((paragraf) => (
                         <p key={paragraf.slice(0, 40)}>{paragraf}</p>
@@ -290,9 +308,18 @@ export default function DespreNoi() {
       {/* 3.3 — Misiune, viziune, valori */}
       <Val culoare="text-tenta-turcoaz" className={VAL_PESTE} />
       <section className="granulatie relative overflow-hidden bg-tenta-turcoaz pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="spirala" className="pluteste-lent absolute top-16 left-[4%] size-9 text-turcoaz-300 lg:size-12" />
-          <Decor semn="inima" className="pluteste-lent absolute right-[6%] bottom-20 size-8 text-caramiziu-200 lg:size-11" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="spirala"
+            className="pluteste-lent absolute top-16 left-[4%] size-9 text-turcoaz-300 lg:size-12"
+          />
+          <Decor
+            semn="inima"
+            className="pluteste-lent absolute right-[6%] bottom-20 size-8 text-caramiziu-200 lg:size-11"
+          />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -307,10 +334,17 @@ export default function DespreNoi() {
                     className="absolute -right-16 -bottom-20 size-56 rounded-full border-2 border-hartie/20"
                   />
                   <span className="colt-mic-b relative flex size-14 items-center justify-center bg-hartie/20 text-hartie">
-                    <Pictograma nume={MISIUNE[0].pictograma} className="size-7" />
+                    <Pictograma
+                      nume={MISIUNE[0].pictograma}
+                      className="size-7"
+                    />
                   </span>
-                  <h3 className="relative mt-6 text-h3 text-hartie">{MISIUNE[0].titlu}</h3>
-                  <p className="relative mt-3 text-corp text-hartie/90">{MISIUNE[0].text}</p>
+                  <h3 className="relative mt-6 text-h3 text-hartie">
+                    {MISIUNE[0].titlu}
+                  </h3>
+                  <p className="relative mt-3 text-corp text-hartie/90">
+                    {MISIUNE[0].text}
+                  </p>
                 </article>
               </Aparitie>
             </li>
@@ -325,10 +359,17 @@ export default function DespreNoi() {
                     className="absolute -top-10 -right-12 size-52 text-turcoaz-100"
                   />
                   <span className="colt-mic-a relative flex size-14 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
-                    <Pictograma nume={MISIUNE[1].pictograma} className="size-7" />
+                    <Pictograma
+                      nume={MISIUNE[1].pictograma}
+                      className="size-7"
+                    />
                   </span>
-                  <h3 className="relative mt-6 text-h3 text-cerneala">{MISIUNE[1].titlu}</h3>
-                  <p className="relative mt-3 text-corp text-cerneala-moale">{MISIUNE[1].text}</p>
+                  <h3 className="relative mt-6 text-h3 text-cerneala">
+                    {MISIUNE[1].titlu}
+                  </h3>
+                  <p className="relative mt-3 text-corp text-cerneala-moale">
+                    {MISIUNE[1].text}
+                  </p>
                 </article>
               </Aparitie>
             </li>
@@ -343,13 +384,21 @@ export default function DespreNoi() {
                     className="absolute -top-10 -right-10 size-44 text-miere-200/80"
                   />
                   <span className="colt-mic-b relative flex size-14 items-center justify-center bg-cerneala/10 text-cerneala">
-                    <Pictograma nume={MISIUNE[2].pictograma} className="size-7" />
+                    <Pictograma
+                      nume={MISIUNE[2].pictograma}
+                      className="size-7"
+                    />
                   </span>
-                  <h3 className="relative mt-6 text-h3 text-miere-900">{MISIUNE[2].titlu}</h3>
+                  <h3 className="relative mt-6 text-h3 text-miere-900">
+                    {MISIUNE[2].titlu}
+                  </h3>
                   <ul className="relative mt-4 grid gap-3">
                     {MISIUNE[2].valori?.map((valoare) => (
                       <li key={valoare.nume} className="flex items-start gap-3">
-                        <Decor semn="stea" className="mt-1 size-5 shrink-0 text-miere-800" />
+                        <Decor
+                          semn="stea"
+                          className="mt-1 size-5 shrink-0 text-miere-800"
+                        />
                         <span className="text-corp text-miere-900/85">
                           <span className="font-titlu font-bold text-miere-900">
                             {valoare.nume}:
@@ -369,11 +418,20 @@ export default function DespreNoi() {
       {/* 3.4 — Echipa */}
       <Val culoare="text-hartie" className={VAL_PESTE} />
       <section className="relative overflow-hidden bg-hartie pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="soare" className="pluteste-lent absolute top-14 right-[5%] size-9 text-miere-300 lg:size-12" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="soare"
+            className="pluteste-lent absolute top-14 right-[5%] size-9 text-miere-300 lg:size-12"
+          />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <TitluSectiune scris="Oamenii din spatele asociației" titlu="Echipa" />
+          <TitluSectiune
+            scris="Oamenii din spatele asociației"
+            titlu="Echipa"
+          />
 
           <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {ECHIPA.map((membru, i) => (
@@ -443,10 +501,20 @@ export default function DespreNoi() {
       <Val culoare="text-hartie-calda" className={VAL_PESTE} />
       <section className="granulatie relative overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-10 lg:pb-32">
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <TitluSectiune scris="Până acum, împreună" titlu="Rezultate" centrat />
+          <TitluSectiune
+            scris="Până acum, împreună"
+            titlu="Rezultate"
+            centrat
+          />
           <div className="relative mt-10 colt-a border border-hartie-umbra bg-hartie px-5 py-10 shadow-[0_34px_70px_-30px_rgba(247,79,34,0.45)] lg:px-12 lg:py-12">
-            <Decor semn="unda" className="absolute top-4 right-6 size-8 text-miere-300 lg:size-10" />
-            <Decor semn="stea" className="absolute bottom-4 left-6 size-6 text-caramiziu-200 lg:size-8" />
+            <Decor
+              semn="unda"
+              className="absolute top-4 right-6 size-8 text-miere-300 lg:size-10"
+            />
+            <Decor
+              semn="stea"
+              className="absolute bottom-4 left-6 size-6 text-caramiziu-200 lg:size-8"
+            />
             <Cifre />
           </div>
         </div>
@@ -501,22 +569,24 @@ export default function DespreNoi() {
                   key={coloana}
                   className={`grid gap-4 ${coloana === 1 ? "pt-10" : ""}`}
                 >
-                  {VOLUNTARI.filter((_, i) => i % 2 === coloana).map((poza, j) => (
-                    <figure
-                      key={poza.cale}
-                      className={`group relative overflow-hidden ${
-                        (coloana + j) % 2 === 0 ? "colt-a" : "colt-b"
-                      } ${j === coloana ? "aspect-[4/5]" : "aspect-square"} bg-hartie-calda shadow-[0_22px_44px_-22px_rgba(255,172,0,0.6)]`}
-                    >
-                      <Image
-                        src={poza.cale}
-                        alt={poza.alt}
-                        fill
-                        sizes="(min-width: 1024px) 300px, 46vw"
-                        className="object-cover transition-transform duration-[1100ms] ease-cald group-hover:scale-[1.06] motion-reduce:group-hover:scale-100"
-                      />
-                    </figure>
-                  ))}
+                  {VOLUNTARI.filter((_, i) => i % 2 === coloana).map(
+                    (poza, j) => (
+                      <figure
+                        key={poza.cale}
+                        className={`group relative overflow-hidden ${
+                          (coloana + j) % 2 === 0 ? "colt-a" : "colt-b"
+                        } ${j === coloana ? "aspect-[4/5]" : "aspect-square"} bg-hartie-calda shadow-[0_22px_44px_-22px_rgba(255,172,0,0.6)]`}
+                      >
+                        <Image
+                          src={poza.cale}
+                          alt={poza.alt}
+                          fill
+                          sizes="(min-width: 1024px) 300px, 46vw"
+                          className="object-cover transition-transform duration-[1100ms] ease-cald group-hover:scale-[1.06] motion-reduce:group-hover:scale-100"
+                        />
+                      </figure>
+                    ),
+                  )}
                 </div>
               ))}
             </div>
@@ -527,8 +597,14 @@ export default function DespreNoi() {
       {/* 3.7 — Parteneri instituționali */}
       <Val culoare="text-tenta-miere" className={VAL_PESTE} />
       <section className="granulatie relative overflow-hidden bg-tenta-miere pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="soare" className="pluteste-lent absolute top-10 right-[5%] size-10 text-miere-300 lg:size-14" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="soare"
+            className="pluteste-lent absolute top-10 right-[5%] size-10 text-miere-300 lg:size-14"
+          />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <TitluSectiune

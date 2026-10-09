@@ -10,7 +10,8 @@ const variante: Record<Varianta, string> = {
     "bg-miere-400 text-cerneala hover:bg-miere-300 shadow-[0_2px_0_0_var(--color-miere-600)] hover:shadow-[0_1px_0_0_var(--color-miere-600)] hover:translate-y-px",
   contur:
     "border-2 border-cerneala/15 text-cerneala hover:border-caramiziu-500 hover:text-caramiziu-600 bg-hartie",
-  discret: "text-caramiziu-600 hover:text-caramiziu-700 underline-offset-4 hover:underline",
+  discret:
+    "text-caramiziu-600 hover:text-caramiziu-700 underline-offset-4 hover:underline",
 };
 
 const marimi = {

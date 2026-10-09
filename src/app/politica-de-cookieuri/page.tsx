@@ -13,7 +13,11 @@ export const metadata: Metadata = metadate({
 export default function Pagina() {
   return (
     <>
-      <JsonLd date={jsonLdFir([{ nume: "Politica de cookie-uri", cale: RUTE.cookieuri }])} />
+      <JsonLd
+        date={jsonLdFir([
+          { nume: "Politica de cookie-uri", cale: RUTE.cookieuri },
+        ])}
+      />
       <CadruLegal titlu="Politica de cookie-uri" slugVechi="cookies" />
     </>
   );

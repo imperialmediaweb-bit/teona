@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { Kalam, Nunito, Nunito_Sans } from "next/font/google";
 import { ASOCIATIA } from "@/date/asociatie";
 import Antet from "@/componente/Antet";
@@ -117,7 +118,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </a>
 
         <BaraDeAnunt />
-        <Antet />
+        {/*
+          Antetul și butonul plutitor citesc calea paginii curente, ca să
+          marcheze intrarea activă. Pe o rută care se randează la cerere —
+          paginile de campanie aniversară — calea nu e cunoscută dinainte,
+          iar `cacheComponents` oprește construirea dacă o componentă o cere
+          în afara unui `<Suspense>`. Învelișul le lasă să se randeze după ce
+          calea e știută, fără să schimbe nimic pentru paginile obișnuite.
+        */}
+        <Suspense>
+          <Antet />
+        </Suspense>
 
         <main id="continut" className="flex-1">
           {children}
@@ -129,7 +140,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {/* Spațiu cât butonul plutitor, ca să nu acopere sfârșitul subsolului. */}
         <div aria-hidden="true" className="h-20 sm:hidden" />
 
-        <ButonDoneazaMobil />
+        <Suspense>
+          <ButonDoneazaMobil />
+        </Suspense>
         <BannerCookieuri />
       </body>
     </html>

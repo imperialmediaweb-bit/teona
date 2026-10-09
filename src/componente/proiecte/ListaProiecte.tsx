@@ -84,7 +84,9 @@ export default function ListaProiecte({
               {categorie.eticheta}
               <span
                 className={`ml-2 rounded-full px-2 py-0.5 text-nota ${
-                  activa ? "bg-hartie/20 text-hartie" : "bg-hartie-umbra text-cerneala-moale"
+                  activa
+                    ? "bg-hartie/20 text-hartie"
+                    : "bg-hartie-umbra text-cerneala-moale"
                 }`}
               >
                 {cate}
@@ -97,8 +99,15 @@ export default function ListaProiecte({
       <div id="lista-proiecte" role="tabpanel" className="mt-12">
         {alese.length === 0 ? (
           <div className="granulatie relative overflow-hidden colt-a bg-miere-100 px-7 py-10 shadow-[0_24px_50px_-26px_rgba(255,172,0,0.7)] sm:px-10">
-            <Decor semn="soare" strokeWidth={0.8} className="absolute -top-10 -right-10 size-40 text-miere-300" />
-            <Decor semn="stea" className="absolute bottom-6 left-[55%] size-8 text-caramiziu-300" />
+            <Decor
+              semn="soare"
+              strokeWidth={0.8}
+              className="absolute -top-10 -right-10 size-40 text-miere-300"
+            />
+            <Decor
+              semn="stea"
+              className="absolute bottom-6 left-[55%] size-8 text-caramiziu-300"
+            />
             <p className="relative max-w-xl font-titlu text-h4 font-bold text-miere-900">
               Pregătim această secțiune.
             </p>
@@ -114,9 +123,14 @@ export default function ListaProiecte({
               return (
                 <li
                   key={proiect.slug}
-                  className={mare ? "sm:col-span-2 lg:col-span-6" : "lg:col-span-3"}
+                  className={
+                    mare ? "sm:col-span-2 lg:col-span-6" : "lg:col-span-3"
+                  }
                 >
-                  <Aparitie intarziere={Math.min(i, 5) * 0.04} className="h-full">
+                  <Aparitie
+                    intarziere={Math.min(i, 5) * 0.04}
+                    className="h-full"
+                  >
                     <Link
                       href={`/proiecte/${proiect.slug}`}
                       className="group flex h-full flex-col"
@@ -148,15 +162,24 @@ export default function ListaProiecte({
                           />
                         ) : (
                           <span className="absolute inset-0 bg-miere-100">
-                            <Decor semn="soare" strokeWidth={0.9} className="absolute -right-10 -bottom-10 size-48 text-miere-300" />
-                            <Decor semn="stea" className="absolute top-8 left-8 size-10 text-caramiziu-300" />
+                            <Decor
+                              semn="soare"
+                              strokeWidth={0.9}
+                              className="absolute -right-10 -bottom-10 size-48 text-miere-300"
+                            />
+                            <Decor
+                              semn="stea"
+                              className="absolute top-8 left-8 size-10 text-caramiziu-300"
+                            />
                           </span>
                         )}
                         <span
                           className={`absolute top-4 left-4 rounded-full px-4 py-1.5 shadow-[0_10px_24px_-10px_rgba(35,35,35,0.5)] ${PASTILE[i % 3]}`}
                         >
                           <span className="scris text-corp leading-none">
-                            <time dateTime={proiect.data}>{proiect.dataCitita}</time>
+                            <time dateTime={proiect.data}>
+                              {proiect.dataCitita}
+                            </time>
                           </span>
                         </span>
                       </div>

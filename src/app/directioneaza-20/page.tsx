@@ -64,7 +64,8 @@ const CAI: ReadonlyArray<{
     text: "Pentru anul în curs, prin contract de sponsorizare.",
     pictograma: "cladire",
     card: "granulatie bg-turcoaz-100 text-cerneala shadow-[0_30px_60px_-28px_rgba(42,159,163,0.6)]",
-    pictogramaClase: "bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
+    pictogramaClase:
+      "bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
     numar: "bg-turcoaz-500 text-hartie",
     pasi: [
       "Calculezi suma.",
@@ -97,10 +98,10 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
     intrebare: "Ce este Declarația 177?",
     raspuns: (
       <p>
-        Este declarația prin care o firmă cere ANAF să redirecționeze
-        către o asociație sumele de sponsorizare la care avea dreptul în
-        anii anteriori, dar pe care nu le-a folosit. Banii nu ies în
-        plus din firmă: sunt sume care altfel rămân la stat.
+        Este declarația prin care o firmă cere ANAF să redirecționeze către o
+        asociație sumele de sponsorizare la care avea dreptul în anii anteriori,
+        dar pe care nu le-a folosit. Banii nu ies în plus din firmă: sunt sume
+        care altfel rămân la stat.
       </p>
     ),
   },
@@ -108,9 +109,9 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
     intrebare: "Cum funcționează?",
     raspuns: (
       <p>
-        Firma calculează suma de sponsorizare rămasă nealocată, semnează
-        un contract de sponsorizare cu asociația și depune Declarația
-        177 la ANAF. ANAF virează apoi suma direct în contul asociației.
+        Firma calculează suma de sponsorizare rămasă nealocată, semnează un
+        contract de sponsorizare cu asociația și depune Declarația 177 la ANAF.
+        ANAF virează apoi suma direct în contul asociației.
       </p>
     ),
   },
@@ -119,14 +120,13 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
     raspuns: (
       <>
         <p>
-          Firma trebuie să fie plătitoare de impozit pe profit sau pe
-          veniturile microîntreprinderilor, să aibă un contract de
-          sponsorizare încheiat cu asociația și să nu aibă obligații
-          fiscale restante.
+          Firma trebuie să fie plătitoare de impozit pe profit sau pe veniturile
+          microîntreprinderilor, să aibă un contract de sponsorizare încheiat cu
+          asociația și să nu aibă obligații fiscale restante.
         </p>
         <p>
-          Suma care poate fi direcționată și termenele se stabilesc
-          împreună cu contabilitatea firmei, pentru anul fiscal în curs.
+          Suma care poate fi direcționată și termenele se stabilesc împreună cu
+          contabilitatea firmei, pentru anul fiscal în curs.
         </p>
       </>
     ),
@@ -135,9 +135,9 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
     intrebare: "Cum se depune?",
     raspuns: (
       <p>
-        Declarația se depune electronic, prin Spațiul Privat Virtual sau
-        prin portalul ANAF, de către firmă. Noi îți trimitem contractul
-        semnat și datele asociației de care ai nevoie pentru completare.
+        Declarația se depune electronic, prin Spațiul Privat Virtual sau prin
+        portalul ANAF, de către firmă. Noi îți trimitem contractul semnat și
+        datele asociației de care ai nevoie pentru completare.
       </p>
     ),
   },
@@ -146,7 +146,11 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
 export default function Directioneaza20() {
   return (
     <>
-      <JsonLd date={jsonLdFir([{ nume: "Direcționează 20%", cale: RUTE.directionare20 }])} />
+      <JsonLd
+        date={jsonLdFir([
+          { nume: "Direcționează 20%", cale: RUTE.directionare20 },
+        ])}
+      />
       <AntetPagina
         scris="Pentru firme"
         titlu="Direcționează până la 20% din impozitul pe profit"
@@ -181,15 +185,29 @@ export default function Directioneaza20() {
 
       {/* 8.2 */}
       <section className="relative overflow-hidden bg-hartie pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="stea" className="pluteste-lent absolute top-16 right-[4%] size-9 text-miere-300 lg:size-12" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="stea"
+            className="pluteste-lent absolute top-16 right-[4%] size-9 text-miere-300 lg:size-12"
+          />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <TitluSectiune scris="Alege calea potrivită firmei tale" titlu="Două căi" culoare="turcoaz" />
+          <TitluSectiune
+            scris="Alege calea potrivită firmei tale"
+            titlu="Două căi"
+            culoare="turcoaz"
+          />
 
           <div className="mt-12 grid gap-6 lg:grid-cols-2 lg:gap-8">
             {CAI.map((cale, i) => (
-              <Aparitie key={cale.titlu} intarziere={i * 0.06} className="h-full">
+              <Aparitie
+                key={cale.titlu}
+                intarziere={i * 0.06}
+                className="h-full"
+              >
                 <section
                   className={`relative flex h-full flex-col overflow-hidden ${
                     i % 2 === 0 ? "colt-a" : "colt-b"
@@ -209,10 +227,14 @@ export default function Directioneaza20() {
                   >
                     <Pictograma nume={cale.pictograma} className="size-7" />
                   </span>
-                  <h3 className={`relative mt-6 text-h3 ${i === 0 ? "text-hartie" : "text-turcoaz-900"}`}>
+                  <h3
+                    className={`relative mt-6 text-h3 ${i === 0 ? "text-hartie" : "text-turcoaz-900"}`}
+                  >
                     {cale.titlu}
                   </h3>
-                  <p className={`relative mt-2 text-amplu ${i === 0 ? "text-hartie/90" : "text-turcoaz-900/80"}`}>
+                  <p
+                    className={`relative mt-2 text-amplu ${i === 0 ? "text-hartie/90" : "text-turcoaz-900/80"}`}
+                  >
                     {cale.text}
                   </p>
 
@@ -230,7 +252,9 @@ export default function Directioneaza20() {
                         >
                           {j + 1}
                         </span>
-                        <span className={`font-titlu text-corp font-bold ${i === 0 ? "text-hartie" : "text-cerneala"}`}>
+                        <span
+                          className={`font-titlu text-corp font-bold ${i === 0 ? "text-hartie" : "text-cerneala"}`}
+                        >
                           {pas}
                         </span>
                       </li>
@@ -238,7 +262,9 @@ export default function Directioneaza20() {
                   </ol>
 
                   {/* Termenul vine de la asociație — vezi comentariul de la CAI. */}
-                  <p className={`relative mt-6 text-nota ${i === 0 ? "text-hartie/80" : "text-turcoaz-900/70"}`}>
+                  <p
+                    className={`relative mt-6 text-nota ${i === 0 ? "text-hartie/80" : "text-turcoaz-900/70"}`}
+                  >
                     Termenul de depunere îl confirmăm împreună cu contabilitatea
                     firmei tale, pentru anul fiscal în curs.
                   </p>
@@ -255,13 +281,22 @@ export default function Directioneaza20() {
         id="documente"
         className="granulatie relative scroll-mt-32 overflow-hidden bg-tenta-cald pt-6 pb-24 lg:pt-10 lg:pb-32"
       >
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="spirala" className="pluteste-lent absolute top-14 right-[5%] size-9 text-caramiziu-200 lg:size-12" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="spirala"
+            className="pluteste-lent absolute top-14 right-[5%] size-9 text-caramiziu-200 lg:size-12"
+          />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
             <div className="lg:col-span-5">
-              <TitluSectiune scris="Modelele asociației" titlu="Documente de descărcat" />
+              <TitluSectiune
+                scris="Modelele asociației"
+                titlu="Documente de descărcat"
+              />
               <p className="mt-6 text-amplu text-cerneala-moale">
                 Vrei un contract personalizat? Scrie-ne la{" "}
                 <a
@@ -336,8 +371,14 @@ export default function Directioneaza20() {
       {/* 8.6 */}
       <Val culoare="text-hartie-calda" className={VAL_PESTE} />
       <section className="granulatie relative overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="soare" className="pluteste-lent absolute top-12 right-[5%] size-10 text-miere-300 lg:size-14" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="soare"
+            className="pluteste-lent absolute top-12 right-[5%] size-10 text-miere-300 lg:size-14"
+          />
         </div>
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:gap-16 lg:px-8">
           <Fotografie
@@ -352,23 +393,26 @@ export default function Directioneaza20() {
             className="mx-auto w-full max-w-xl lg:col-span-5 lg:max-w-none"
           />
           <div className="lg:col-span-7">
-            <TitluSectiune scris="Unde ajung banii" titlu="De ce Asociația Teona Ariana" />
+            <TitluSectiune
+              scris="Unde ajung banii"
+              titlu="De ce Asociația Teona Ariana"
+            />
             <div className="mt-6 grid gap-4 text-amplu text-cerneala-moale">
               <p>
-                Pentru copiii cu nevoi speciale și pentru familiile lor, o zi bună
-                nu vine de la sine. De aceea organizăm tabere în care copiii se
-                joacă, își fac prieteni și descoperă că pot, iar părinții respiră
-                și află că nu sunt singuri. Am organizat 33 de tabere și am avut
-                alături peste 1.500 de participanți.
+                Pentru copiii cu nevoi speciale și pentru familiile lor, o zi
+                bună nu vine de la sine. De aceea organizăm tabere în care
+                copiii se joacă, își fac prieteni și descoperă că pot, iar
+                părinții respiră și află că nu sunt singuri. Am organizat 33 de
+                tabere și am avut alături peste 1.500 de participanți.
               </p>
               <p>
-                Bucuria nu ține doar câteva zile pe an. La Casa Teona, copiii vin
-                pe tot parcursul anului la jocuri și ateliere, iar părinții găsesc
-                consiliere și întâlniri de grup.
+                Bucuria nu ține doar câteva zile pe an. La Casa Teona, copiii
+                vin pe tot parcursul anului la jocuri și ateliere, iar părinții
+                găsesc consiliere și întâlniri de grup.
               </p>
               <p>
-                Fiecare sumă direcționată ajută la acest lucru: tabere, activități
-                și un loc sigur pentru copii și familiile lor.
+                Fiecare sumă direcționată ajută la acest lucru: tabere,
+                activități și un loc sigur pentru copii și familiile lor.
               </p>
             </div>
 
@@ -383,11 +427,20 @@ export default function Directioneaza20() {
       {/* 8.7 */}
       <Val culoare="text-hartie" className={VAL_PESTE} />
       <section className="relative overflow-hidden bg-hartie pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="unda" className="pluteste-lent absolute bottom-24 left-[3%] size-10 text-turcoaz-200 lg:size-14" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="unda"
+            className="pluteste-lent absolute bottom-24 left-[3%] size-10 text-turcoaz-200 lg:size-14"
+          />
         </div>
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <TitluSectiune scris="Vorbim direct" titlu="Contact și date de cont" />
+          <TitluSectiune
+            scris="Vorbim direct"
+            titlu="Contact și date de cont"
+          />
 
           <ul className="mt-12 grid gap-5 sm:grid-cols-2">
             {CONTACT_FIRME.map((persoana, i) => (
@@ -424,7 +477,10 @@ export default function Directioneaza20() {
                         href={`tel:${persoana.telefon.apel}`}
                         className="flex min-h-10 items-center gap-2 font-titlu text-corp font-bold text-cerneala transition hover:text-caramiziu-600"
                       >
-                        <Pictograma nume="telefon" className="size-4 shrink-0" />
+                        <Pictograma
+                          nume="telefon"
+                          className="size-4 shrink-0"
+                        />
                         {persoana.telefon.afisat}
                       </a>
                     </div>
@@ -436,7 +492,12 @@ export default function Directioneaza20() {
 
           <div className="mt-10 grid gap-3">
             <DeCopiat eticheta="Titular" valoare={ASOCIATIA.denumireLegala} />
-            <DeCopiat eticheta="CIF" valoare={ASOCIATIA.cif} culoare="miere" colt="b" />
+            <DeCopiat
+              eticheta="CIF"
+              valoare={ASOCIATIA.cif}
+              culoare="miere"
+              colt="b"
+            />
             {CONTURI.map((cont, i) => (
               <DeCopiat
                 key={cont.iban}

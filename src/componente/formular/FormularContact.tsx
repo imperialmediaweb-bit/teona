@@ -14,8 +14,16 @@ import Camp, {
 
 /** 10.4 — alegerile din „Sunt interesat de”, în ordinea din caiet. */
 const INTERESE = [
-  { valoare: "Donații și sponsorizări", eticheta: "Donații și sponsorizări", pictograma: "inima" },
-  { valoare: "Parteneriat pentru firme", eticheta: "Parteneriat pentru firme", pictograma: "cladire" },
+  {
+    valoare: "Donații și sponsorizări",
+    eticheta: "Donații și sponsorizări",
+    pictograma: "inima",
+  },
+  {
+    valoare: "Parteneriat pentru firme",
+    eticheta: "Parteneriat pentru firme",
+    pictograma: "cladire",
+  },
   { valoare: "Voluntariat", eticheta: "Voluntariat", pictograma: "familie" },
   { valoare: "Casa Teona", eticheta: "Casa Teona", pictograma: "joaca" },
   { valoare: "Altceva", eticheta: "Altceva", pictograma: "comunicare" },
@@ -48,10 +56,12 @@ export default function FormularContact() {
     const email = String(date.get("email") ?? "").trim();
     const mesaj = String(date.get("mesaj") ?? "").trim();
 
-    if (nume.length < 2) gasite.nume = "Scrie-ți numele, ca să știm cui să răspundem.";
+    if (nume.length < 2)
+      gasite.nume = "Scrie-ți numele, ca să știm cui să răspundem.";
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
       gasite.email = "Introdu o adresă de e-mail validă.";
-    if (mesaj.length < 5) gasite.mesaj = "Scrie-ne câteva cuvinte despre ce ai nevoie.";
+    if (mesaj.length < 5)
+      gasite.mesaj = "Scrie-ne câteva cuvinte despre ce ai nevoie.";
     if (date.get("acord") !== "da")
       gasite.acord = "Bifează acordul pentru a continua.";
 
@@ -80,7 +90,9 @@ export default function FormularContact() {
           acord: date.get("acord") === "da",
         }),
       });
-      const corp = (await raspuns.json().catch(() => ({}))) as { mesaj?: string };
+      const corp = (await raspuns.json().catch(() => ({}))) as {
+        mesaj?: string;
+      };
       if (!raspuns.ok) {
         setStare({
           fel: "eroare",
@@ -103,9 +115,22 @@ export default function FormularContact() {
         role="status"
         className="granulatie relative overflow-hidden colt-a bg-turcoaz-100 p-8 shadow-[0_24px_50px_-26px_rgba(42,159,163,0.7)] sm:p-10"
       >
-        <Decor semn="stea" strokeWidth={0.8} className="absolute -top-8 -right-8 size-36 text-turcoaz-200" />
+        <Decor
+          semn="stea"
+          strokeWidth={0.8}
+          className="absolute -top-8 -right-8 size-36 text-turcoaz-200"
+        />
         <span className="relative flex size-14 items-center justify-center colt-mic-a bg-turcoaz-500 text-hartie shadow-[0_12px_26px_-12px_rgba(42,159,163,0.9)]">
-          <svg viewBox="0 0 24 24" className="size-7" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            className="size-7"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2.2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
             <path d="M5 12.5l4.5 4.5L19 7.5" />
           </svg>
         </span>
@@ -125,7 +150,11 @@ export default function FormularContact() {
       {/* Capul formularului: un câmp de culoare, ca formularul să nu fie o
           cutie albă pe hârtie albă. */}
       <div className="granulatie relative overflow-hidden bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 px-6 py-5 text-hartie sm:px-8">
-        <Decor semn="unda" strokeWidth={0.9} className="absolute -right-6 -bottom-8 size-28 text-hartie/20" />
+        <Decor
+          semn="unda"
+          strokeWidth={0.9}
+          className="absolute -right-6 -bottom-8 size-28 text-hartie/20"
+        />
         <p className="relative flex items-center gap-3 font-titlu text-amplu font-bold">
           <span className="flex size-10 items-center justify-center colt-mic-b bg-hartie/20">
             <Pictograma nume="plic" className="size-5" />
@@ -136,7 +165,12 @@ export default function FormularContact() {
 
       <div className="grid gap-5 p-6 sm:p-8">
         <div className="grid gap-5 sm:grid-cols-2">
-          <Camp id={`${id}-nume`} eticheta="Nume" obligatoriu eroare={erori.nume}>
+          <Camp
+            id={`${id}-nume`}
+            eticheta="Nume"
+            obligatoriu
+            eroare={erori.nume}
+          >
             <input
               id={`${id}-nume`}
               name="nume"
@@ -148,7 +182,12 @@ export default function FormularContact() {
             />
           </Camp>
 
-          <Camp id={`${id}-email`} eticheta="Email" obligatoriu eroare={erori.email}>
+          <Camp
+            id={`${id}-email`}
+            eticheta="Email"
+            obligatoriu
+            eroare={erori.email}
+          >
             <input
               id={`${id}-email`}
               name="email"
@@ -160,7 +199,11 @@ export default function FormularContact() {
             />
           </Camp>
 
-          <Camp id={`${id}-telefon`} eticheta="Telefon" className="sm:col-span-2">
+          <Camp
+            id={`${id}-telefon`}
+            eticheta="Telefon"
+            className="sm:col-span-2"
+          >
             <input
               id={`${id}-telefon`}
               name="telefon"
@@ -179,7 +222,12 @@ export default function FormularContact() {
           obligatoriu
         />
 
-        <Camp id={`${id}-mesaj`} eticheta="Mesaj" obligatoriu eroare={erori.mesaj}>
+        <Camp
+          id={`${id}-mesaj`}
+          eticheta="Mesaj"
+          obligatoriu
+          eroare={erori.mesaj}
+        >
           <textarea
             id={`${id}-mesaj`}
             name="mesaj"

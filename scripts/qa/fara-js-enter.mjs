@@ -23,13 +23,28 @@ await nf.locator('input[name="acord"]').check();
 await nf.locator("button").click();
 await page.waitForTimeout(1500);
 log("Newsletter fără JS, clic Abonează-mă → URL:", page.url());
-// Donație
+// Donație. Formularul e în spatele unui <Suspense> și citește destinația din
+// adresă, deci fără JS randarea se oprește la schelet: câmpurile nu există.
+// Testul constată asta, nu crapă pe ea — e o constatare de raportat, nu o
+// eroare de script.
 await page.goto(BAZA + "/doneaza", { waitUntil: "load" });
-await page.fill('input[name="alta"]', "50");
-await page.fill('input[name="email"]', "ana@example.com");
-await page.press('input[name="email"]', "Enter");
-await page.waitForTimeout(1500);
-log("Donație fără JS, Enter → URL:", page.url());
+const areCampuri = await page
+  .locator('input[name="alta"]')
+  .count()
+  .then((n) => n > 0);
+if (areCampuri) {
+  await page.fill('input[name="alta"]', "50");
+  await page.fill('input[name="email"]', "ana@example.com");
+  await page.press('input[name="email"]', "Enter");
+  await page.waitForTimeout(1500);
+  log("Donație fără JS, Enter → URL:", page.url());
+} else {
+  log(
+    "Donație fără JS: formularul NU se randează (doar scheletul).",
+    "Celelalte modalități de pe pagină — SMS, transfer bancar, Galantom —",
+    "sunt text normal și se văd.",
+  );
+}
 // Voluntar
 await page.goto(BAZA + "/devino-voluntar", { waitUntil: "load" });
 await page.fill('input[name="nume"]', "Ion Pop");
@@ -61,7 +76,23 @@ log("Card „Păstrăm…” în listă:", JSON.stringify(await p2.$eval('#lista
 for (const w of [1280, 1440]) {
   await p2.setViewportSize({ width: w, height: 300 });
   await p2.goto(BAZA + "/", { waitUntil: "networkidle" });
-  const r = await p2.evaluate(() => { const h = document.querySelector("header > div"); const d = h.querySelector("div.ml-auto"); const fam = getComputedStyle(document.querySelector("header nav a")).fontFamily; return { headerRight: Math.round(h.getBoundingClientRect().right), doneazaRight: Math.round(d.getBoundingClientRect().right), scrollW: document.documentElement.scrollWidth, clientW: document.documentElement.clientWidth, font: fam.slice(0, 60) }; });
+  // Selectoare după rol și etichetă, nu după poziția în arbore: antetul are
+  // acum două rânduri și o panglică decorativă, iar un `header > div` ia
+  // panglica.
+  const r = await p2.evaluate(() => {
+    const doneaza = document.querySelector('header a[aria-label="Donează"]');
+    const rand = doneaza.closest("header > div");
+    const fam = getComputedStyle(
+      document.querySelector('nav[aria-label="Meniu principal"] a'),
+    ).fontFamily;
+    return {
+      randDreapta: Math.round(rand.getBoundingClientRect().right),
+      doneazaDreapta: Math.round(doneaza.getBoundingClientRect().right),
+      scrollW: document.documentElement.scrollWidth,
+      clientW: document.documentElement.clientWidth,
+      font: fam.slice(0, 60),
+    };
+  });
   log(`Antet la ${w}:`, JSON.stringify(r));
   await p2.screenshot({ path: `/tmp/claude-0/-home-user-teona/4a139e8f-245b-53d8-993d-5496bf182b26/scratchpad/antet-${w}.png`, clip: { x: 0, y: 0, width: w, height: 130 } });
 }

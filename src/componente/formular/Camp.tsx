@@ -122,7 +122,9 @@ export function Bifa({
     <div className={className}>
       <label
         className={`flex min-h-12 cursor-pointer items-start gap-3 colt-mic-b border-2 px-4 py-3 text-mic text-cerneala-moale transition-colors duration-200 has-checked:border-turcoaz-400 has-checked:bg-turcoaz-50 has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramiziu-500 ${
-          eroare ? "border-caramiziu-500 bg-caramiziu-50" : "border-hartie-umbra bg-hartie"
+          eroare
+            ? "border-caramiziu-500 bg-caramiziu-50"
+            : "border-hartie-umbra bg-hartie"
         }`}
       >
         <input

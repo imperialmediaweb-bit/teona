@@ -61,26 +61,31 @@ export const REDIRECTIONARI: ReadonlyArray<{ de_la: string; la: string }> = [
   // întreagă, deci duc acolo.
   { de_la: "/blog", la: "/proiecte" },
   {
-    de_la: "/2024/11/18/redirectioneaza-35-catre-asociatia-teona-ariana-un-singur-click-pentru-o-diferenta-reala",
+    de_la:
+      "/2024/11/18/redirectioneaza-35-catre-asociatia-teona-ariana-un-singur-click-pentru-o-diferenta-reala",
     la: "/redirectioneaza-3-5",
   },
   {
-    de_la: "/2024/11/16/directioneaza-20-din-impozitul-firmei-catre-asociatia-teona-ariana",
+    de_la:
+      "/2024/11/16/directioneaza-20-din-impozitul-firmei-catre-asociatia-teona-ariana",
     la: "/directioneaza-20",
   },
   {
-    de_la: "/2024/11/18/fii-voluntar-la-asociatia-teona-ariana-bucuria-de-a-schimba-vieti",
+    de_la:
+      "/2024/11/18/fii-voluntar-la-asociatia-teona-ariana-bucuria-de-a-schimba-vieti",
     la: "/devino-voluntar",
   },
   {
-    de_la: "/2024/11/17/casa-teona-un-loc-al-sperantei-pentru-copiii-cu-dizabilitati",
+    de_la:
+      "/2024/11/17/casa-teona-un-loc-al-sperantei-pentru-copiii-cu-dizabilitati",
     la: "/casa-teona",
   },
   // Celelalte două articole sunt povești ale unor copii. Nu le republicăm ca
   // atare — una dintre ele dă numele și diagnosticele unui copil — așa că duc
   // la pagina de proiecte, până când asociația decide ce se publică din ele.
   {
-    de_la: "/2025/03/18/dintr-o-inima-de-copil-pentru-inima-de-copil-povestea-stefaniei-fetita-care-a-transformat-creativitatea-in-generozitate",
+    de_la:
+      "/2025/03/18/dintr-o-inima-de-copil-pentru-inima-de-copil-povestea-stefaniei-fetita-care-a-transformat-creativitatea-in-generozitate",
     la: "/proiecte",
   },
   { de_la: "/2025/04/26/povestea-lui-tudor", la: "/proiecte" },

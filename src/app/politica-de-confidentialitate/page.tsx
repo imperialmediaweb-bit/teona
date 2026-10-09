@@ -13,8 +13,18 @@ export const metadata: Metadata = metadate({
 export default function Pagina() {
   return (
     <>
-      <JsonLd date={jsonLdFir([{ nume: "Politica de confidențialitate", cale: RUTE.confidentialitate }])} />
-      <CadruLegal titlu="Politica de confidențialitate" slugVechi="politica-de-confidentialitate" />
+      <JsonLd
+        date={jsonLdFir([
+          {
+            nume: "Politica de confidențialitate",
+            cale: RUTE.confidentialitate,
+          },
+        ])}
+      />
+      <CadruLegal
+        titlu="Politica de confidențialitate"
+        slugVechi="politica-de-confidentialitate"
+      />
     </>
   );
 }

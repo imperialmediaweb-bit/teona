@@ -43,7 +43,8 @@ const UNDE: ReadonlyArray<{
   {
     pictograma: "plic",
     titlu: "Pe email",
-    clase: "bg-caramiziu-500 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]",
+    clase:
+      "bg-caramiziu-500 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]",
     text: (
       <>
         Scanat sau fotografiat, la{" "}
@@ -60,7 +61,8 @@ const UNDE: ReadonlyArray<{
   {
     pictograma: "harta",
     titlu: "În persoană",
-    clase: "bg-miere-400 text-cerneala shadow-[0_10px_22px_-10px_rgba(255,172,0,0.9)]",
+    clase:
+      "bg-miere-400 text-cerneala shadow-[0_10px_22px_-10px_rgba(255,172,0,0.9)]",
     text: (
       <>
         La Casa Teona, {ADRESE.casaTeona.strada}, {ADRESE.casaTeona.oras}.{" "}
@@ -71,7 +73,8 @@ const UNDE: ReadonlyArray<{
   {
     pictograma: "comunicare",
     titlu: "Primești confirmare",
-    clase: "bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
+    clase:
+      "bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
     text: "Îți confirmăm că am primit formularul și, ulterior, că a fost depus la ANAF.",
   },
 ];
@@ -85,9 +88,9 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
     intrebare: "Ce înseamnă să redirecționez?",
     raspuns: (
       <p>
-        Înseamnă că alegi ca 3,5% din impozitul pe venit, pe care oricum
-        îl plătești statului, să ajungă la Asociația Teona Ariana. Faci
-        asta completând Formularul 230 și îl depui o singură dată pe an.
+        Înseamnă că alegi ca 3,5% din impozitul pe venit, pe care oricum îl
+        plătești statului, să ajungă la Asociația Teona Ariana. Faci asta
+        completând Formularul 230 și îl depui o singură dată pe an.
       </p>
     ),
   },
@@ -95,10 +98,9 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
     intrebare: "Mă costă ceva?",
     raspuns: (
       <p>
-        Nu. Nu plătești nimic în plus și nu pierzi nimic. Statul îți ia
-        oricum impozitul pe venit, iar prin Formularul 230 alegi doar
-        unde merge 3,5% din el. Dacă nu completezi formularul, acei bani
-        rămân la stat.
+        Nu. Nu plătești nimic în plus și nu pierzi nimic. Statul îți ia oricum
+        impozitul pe venit, iar prin Formularul 230 alegi doar unde merge 3,5%
+        din el. Dacă nu completezi formularul, acei bani rămân la stat.
       </p>
     ),
   },
@@ -106,10 +108,10 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
     intrebare: "Pot anula sau modifica?",
     raspuns: (
       <p>
-        Da, până la termenul de depunere. Dacă te răzgândești, depui un
-        nou Formular 230 și cel mai recent formular depus în termen este
-        cel luat în calcul. După termen, alegerea făcută rămâne valabilă
-        pentru anul respectiv.
+        Da, până la termenul de depunere. Dacă te răzgândești, depui un nou
+        Formular 230 și cel mai recent formular depus în termen este cel luat în
+        calcul. După termen, alegerea făcută rămâne valabilă pentru anul
+        respectiv.
       </p>
     ),
   },
@@ -118,9 +120,9 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
     raspuns: (
       <p>
         Formularul 230 se depune în fiecare an, până la 25 mai, pentru
-        veniturile din anul anterior. Tu trebuie doar să îl completezi,
-        cu datele tale și semnătura. Noi ne ocupăm de restul: îl depunem
-        pentru tine, la termen.
+        veniturile din anul anterior. Tu trebuie doar să îl completezi, cu
+        datele tale și semnătura. Noi ne ocupăm de restul: îl depunem pentru
+        tine, la termen.
       </p>
     ),
   },
@@ -132,7 +134,11 @@ export default async function Redirectioneaza35() {
 
   return (
     <>
-      <JsonLd date={jsonLdFir([{ nume: "Redirecționează 3,5%", cale: RUTE.redirectionare35 }])} />
+      <JsonLd
+        date={jsonLdFir([
+          { nume: "Redirecționează 3,5%", cale: RUTE.redirectionare35 },
+        ])}
+      />
       <AntetPagina
         scris="Un formular, o dată pe an"
         titlu="Redirecționează 3,5% din impozitul tău"
@@ -171,9 +177,9 @@ export default async function Redirectioneaza35() {
                 3,5%
               </span>
               <p className="relative max-w-2xl font-titlu text-h4 leading-snug font-bold text-cerneala sm:text-h3">
-                Redirecționarea nu te costă nimic. Impozitul pe venit îl plătești
-                oricum, iar prin Formularul 230 alegi ca 3,5% din el să meargă la
-                o asociație în care ai încredere.
+                Redirecționarea nu te costă nimic. Impozitul pe venit îl
+                plătești oricum, iar prin Formularul 230 alegi ca 3,5% din el să
+                meargă la o asociație în care ai încredere.
               </p>
             </div>
 
@@ -204,16 +210,28 @@ export default async function Redirectioneaza35() {
       {/* 7.3 — trei pași */}
       <Val culoare="text-hartie-calda" className={VAL_PESTE} />
       <section className="granulatie relative overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="stea" className="pluteste-lent absolute top-12 right-[6%] size-8 text-miere-300 lg:size-11" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="stea"
+            className="pluteste-lent absolute top-12 right-[6%] size-8 text-miere-300 lg:size-11"
+          />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <TitluSectiune scris="Simplu ca o scrisoare" titlu="Trei pași" />
           <Pasi
             className="mt-12"
             pasi={[
-              { text: "Completezi Formularul 230 cu datele tale.", pictograma: "document" },
-              { text: "Semnezi formularul și declarația de consimțământ.", pictograma: "maini" },
+              {
+                text: "Completezi Formularul 230 cu datele tale.",
+                pictograma: "document",
+              },
+              {
+                text: "Semnezi formularul și declarația de consimțământ.",
+                pictograma: "maini",
+              },
               {
                 text: "Ni-l trimiți nouă. Asociația îl depune la ANAF, în numele tău, înainte de termen.",
                 pictograma: "plic",
@@ -226,8 +244,14 @@ export default async function Redirectioneaza35() {
       {/* 7.4 — unde se trimit formularele */}
       <Val culoare="text-hartie" className={VAL_PESTE} />
       <section className="relative overflow-hidden bg-hartie pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="unda" className="pluteste-lent absolute bottom-24 left-[3%] size-10 text-turcoaz-200 lg:size-14" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="unda"
+            className="pluteste-lent absolute bottom-24 left-[3%] size-10 text-turcoaz-200 lg:size-14"
+          />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <TitluSectiune titlu="Unde trimiți formularul" />
@@ -249,7 +273,9 @@ export default async function Redirectioneaza35() {
                       <Pictograma nume={loc.pictograma} className="size-7" />
                     </span>
                     <h3 className="mt-6 text-h4 text-cerneala">{loc.titlu}</h3>
-                    <p className="mt-2 text-corp text-cerneala-moale">{loc.text}</p>
+                    <p className="mt-2 text-corp text-cerneala-moale">
+                      {loc.text}
+                    </p>
                   </div>
                 </Aparitie>
               </li>
@@ -268,8 +294,9 @@ export default async function Redirectioneaza35() {
               <Pictograma nume="maini" className="size-5" />
             </span>
             <span className="pt-1.5">
-              Datele tale sunt folosite doar pentru depunerea Formularului 230 la
-              ANAF, în numele tău. Nu le folosim în alt scop și nu le dăm nimănui.
+              Datele tale sunt folosite doar pentru depunerea Formularului 230
+              la ANAF, în numele tău. Nu le folosim în alt scop și nu le dăm
+              nimănui.
             </span>
           </p>
         </div>
@@ -281,11 +308,20 @@ export default async function Redirectioneaza35() {
         id="documente"
         className="granulatie relative scroll-mt-32 overflow-hidden bg-tenta-cald pt-6 pb-24 lg:pt-10 lg:pb-32"
       >
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="spirala" className="pluteste-lent absolute top-14 right-[5%] size-9 text-caramiziu-200 lg:size-12" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="spirala"
+            className="pluteste-lent absolute top-14 right-[5%] size-9 text-caramiziu-200 lg:size-12"
+          />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <TitluSectiune scris="Tot ce ai nevoie, într-un loc" titlu="Documente de descărcat" />
+          <TitluSectiune
+            scris="Tot ce ai nevoie, într-un loc"
+            titlu="Documente de descărcat"
+          />
 
           <ul className="mt-12 grid gap-5 lg:grid-cols-3">
             <li>
@@ -351,19 +387,22 @@ export default async function Redirectioneaza35() {
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
             <div className="lg:col-span-7">
-              <TitluSectiune scris="Unde ajung banii" titlu="De ce Asociația Teona Ariana" />
+              <TitluSectiune
+                scris="Unde ajung banii"
+                titlu="De ce Asociația Teona Ariana"
+              />
               <div className="mt-6 grid gap-4 text-amplu text-cerneala-moale">
                 <p>
-                  Pentru copiii cu nevoi speciale și pentru familiile lor, o zi bună
-                  nu vine de la sine. De aceea organizăm tabere în care copiii se
-                  joacă, își fac prieteni și descoperă că pot, iar părinții respiră
-                  și află că nu sunt singuri. Am organizat 33 de tabere și am avut
-                  alături peste 1.500 de participanți.
+                  Pentru copiii cu nevoi speciale și pentru familiile lor, o zi
+                  bună nu vine de la sine. De aceea organizăm tabere în care
+                  copiii se joacă, își fac prieteni și descoperă că pot, iar
+                  părinții respiră și află că nu sunt singuri. Am organizat 33
+                  de tabere și am avut alături peste 1.500 de participanți.
                 </p>
                 <p>
-                  Bucuria nu ține doar câteva zile pe an. La Casa Teona, copiii vin
-                  pe tot parcursul anului la jocuri și ateliere, iar părinții găsesc
-                  consiliere și întâlniri de grup.
+                  Bucuria nu ține doar câteva zile pe an. La Casa Teona, copiii
+                  vin pe tot parcursul anului la jocuri și ateliere, iar
+                  părinții găsesc consiliere și întâlniri de grup.
                 </p>
                 <p>
                   Fiecare sumă redirecționată ajută la acest lucru: tabere,
@@ -385,8 +424,14 @@ export default async function Redirectioneaza35() {
           </div>
 
           <div className="relative mt-16 colt-a border border-hartie-umbra bg-hartie px-5 py-10 shadow-[0_34px_70px_-30px_rgba(247,79,34,0.45)] lg:mt-20 lg:px-12 lg:py-12">
-            <Decor semn="unda" className="absolute top-4 right-6 size-8 text-miere-300 lg:size-10" />
-            <Decor semn="stea" className="absolute bottom-4 left-6 size-6 text-caramiziu-200 lg:size-8" />
+            <Decor
+              semn="unda"
+              className="absolute top-4 right-6 size-8 text-miere-300 lg:size-10"
+            />
+            <Decor
+              semn="stea"
+              className="absolute bottom-4 left-6 size-6 text-caramiziu-200 lg:size-8"
+            />
             <h3 className="sr-only">Rezultatele noastre</h3>
             <Cifre />
           </div>
@@ -409,15 +454,29 @@ export default async function Redirectioneaza35() {
       {/* 7.8 — datele asociației */}
       <Val culoare="text-hartie-calda" className={VAL_PESTE} />
       <section className="granulatie relative overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="soare" className="pluteste-lent absolute top-12 right-[5%] size-9 text-miere-300 lg:size-12" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="soare"
+            className="pluteste-lent absolute top-12 right-[5%] size-9 text-miere-300 lg:size-12"
+          />
         </div>
         <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <TitluSectiune scris="Pentru Formularul 230" titlu="Datele asociației" />
+          <TitluSectiune
+            scris="Pentru Formularul 230"
+            titlu="Datele asociației"
+          />
 
           <div className="mt-10 grid gap-3">
             <DeCopiat eticheta="Denumire" valoare={ASOCIATIA.denumireLegala} />
-            <DeCopiat eticheta="CIF" valoare={ASOCIATIA.cif} culoare="miere" colt="b" />
+            <DeCopiat
+              eticheta="CIF"
+              valoare={ASOCIATIA.cif}
+              culoare="miere"
+              colt="b"
+            />
             <DeCopiat
               eticheta={`IBAN ${bcr.banca} (${bcr.moneda})`}
               valoare={bcr.iban}

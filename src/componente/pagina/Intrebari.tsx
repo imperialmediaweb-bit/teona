@@ -69,7 +69,10 @@ export default function Intrebari({
   return (
     <section className="relative overflow-hidden bg-hartie pt-10 pb-24 lg:pt-16 lg:pb-32">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <Decor semn="spirala" className="pluteste-lent absolute top-16 right-[4%] size-9 text-turcoaz-200 lg:size-12" />
+        <Decor
+          semn="spirala"
+          className="pluteste-lent absolute top-16 right-[4%] size-9 text-turcoaz-200 lg:size-12"
+        />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

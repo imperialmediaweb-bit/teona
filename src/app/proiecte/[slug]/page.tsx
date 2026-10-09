@@ -40,7 +40,8 @@ export async function generateMetadata({
   const { slug } = await params;
   const proiect = proiectDupaSlug(slug);
   // Un slug inexistent ajunge la 404; pagina aceea nu se indexează.
-  if (!proiect) return { title: "Proiect", robots: { index: false, follow: false } };
+  if (!proiect)
+    return { title: "Proiect", robots: { index: false, follow: false } };
 
   // Fără dată: `data` e data postării în WordPress, care nu e mereu data
   // taberei (câteva proiecte au fost publicate abia în noiembrie 2024).
@@ -91,10 +92,19 @@ export default async function PaginaProiect({
         ])}
       />
       <section className="granulatie relative isolate overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-12 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10"
+        >
           <span className="pata absolute -top-32 right-[-8%] size-[26rem] rounded-full bg-miere-100/70 blur-3xl" />
-          <Decor semn="stea" className="pluteste-lent absolute top-10 right-[6%] hidden size-10 text-miere-400 lg:block" />
-          <Decor semn="unda" className="pluteste-lent absolute bottom-16 left-[3%] size-9 text-caramiziu-200 lg:size-12" />
+          <Decor
+            semn="stea"
+            className="pluteste-lent absolute top-10 right-[6%] hidden size-10 text-miere-400 lg:block"
+          />
+          <Decor
+            semn="unda"
+            className="pluteste-lent absolute bottom-16 left-[3%] size-9 text-caramiziu-200 lg:size-12"
+          />
         </div>
 
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -123,7 +133,9 @@ export default async function PaginaProiect({
               </span>
             )}
           </div>
-          <h1 className="mt-4 max-w-4xl text-h1 text-cerneala">{proiect.titlu}</h1>
+          <h1 className="mt-4 max-w-4xl text-h1 text-cerneala">
+            {proiect.titlu}
+          </h1>
         </div>
       </section>
 
@@ -153,14 +165,19 @@ export default async function PaginaProiect({
           {/* Locul descrierii. Vizibil, nu ascuns: cine deschide pagina vede
               că textul e în pregătire, nu că site-ul e gol. */}
           <div className="granulatie relative mt-12 overflow-hidden colt-b bg-miere-100 px-7 py-7 shadow-[0_24px_50px_-26px_rgba(255,172,0,0.7)] sm:px-9 lg:mt-16">
-            <Decor semn="soare" strokeWidth={0.8} className="absolute -top-10 -right-10 size-40 text-miere-300/80" />
+            <Decor
+              semn="soare"
+              strokeWidth={0.8}
+              className="absolute -top-10 -right-10 size-40 text-miere-300/80"
+            />
             <p className="relative flex items-start gap-4 text-amplu text-miere-900">
               <span className="colt-mic-a flex size-11 shrink-0 items-center justify-center bg-miere-400 text-cerneala">
                 <Pictograma nume="document" className="size-5" />
               </span>
               <span>
                 Descrierea acestui proiect se scrie împreună cu asociația.
-                {toatePozele.length > 0 && " Până atunci, îl poți vedea în fotografii."}
+                {toatePozele.length > 0 &&
+                  " Până atunci, îl poți vedea în fotografii."}
               </span>
             </p>
           </div>

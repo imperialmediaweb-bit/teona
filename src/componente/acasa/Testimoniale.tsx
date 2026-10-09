@@ -66,11 +66,11 @@ export default function Testimoniale({
           <AnimatePresence mode="wait" initial={false}>
             <motion.figure
               key={activ}
-              initial={
-                fara_miscare ? false : { opacity: 0, x: directie * 24 }
-              }
+              initial={fara_miscare ? false : { opacity: 0, x: directie * 24 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={fara_miscare ? undefined : { opacity: 0, x: directie * -24 }}
+              exit={
+                fara_miscare ? undefined : { opacity: 0, x: directie * -24 }
+              }
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               className="text-center"
             >

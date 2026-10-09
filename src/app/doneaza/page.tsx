@@ -6,7 +6,6 @@ import {
   ASOCIATIA,
   CONTURI,
   EMAIL,
-  LINKURI_EXTERNE,
   RUTE,
   SMS,
   TELEFON_PRINCIPAL,
@@ -41,7 +40,11 @@ const SCURTATURI: ReadonlyArray<{
 }> = [
   { href: "#sms", eticheta: "Donează lunar prin SMS", pictograma: "telefon" },
   { href: "#transfer", eticheta: "Transfer bancar", pictograma: "cladire" },
-  { href: "#ziua-ta", eticheta: "Donează-ți ziua de naștere", pictograma: "joaca" },
+  {
+    href: "#ziua-ta",
+    eticheta: "Donează-ți ziua de naștere",
+    pictograma: "joaca",
+  },
   { href: "#firme", eticheta: "Pentru firme", pictograma: "document" },
 ];
 
@@ -54,9 +57,9 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
     intrebare: "Pot dona lunar și opri oricând?",
     raspuns: (
       <p>
-        Da. Poți dona lunar prin SMS sau prin card, iar donația lunară
-        se oprește oricând, fără motivare și fără penalități. Dacă ai
-        nevoie de ajutor, scrie-ne la{" "}
+        Da. Poți dona lunar prin SMS sau prin card, iar donația lunară se
+        oprește oricând, fără motivare și fără penalități. Dacă ai nevoie de
+        ajutor, scrie-ne la{" "}
         <a
           href={`mailto:${EMAIL.contact}`}
           className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
@@ -71,11 +74,10 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
     intrebare: "Primesc confirmare pentru donație?",
     raspuns: (
       <p>
-        Da. Donațiile făcute online îți aduc o confirmare pe e-mail din
-        partea platformei de plată. Pentru donațiile prin transfer
-        bancar, extrasul tău de cont este dovada plății. Dacă ai nevoie
-        de o confirmare scrisă din partea asociației, scrie-ne la{" "}
-        {EMAIL.contact} și ți-o trimitem.
+        Da. Donațiile făcute online îți aduc o confirmare pe e-mail din partea
+        platformei de plată. Pentru donațiile prin transfer bancar, extrasul tău
+        de cont este dovada plății. Dacă ai nevoie de o confirmare scrisă din
+        partea asociației, scrie-ne la {EMAIL.contact} și ți-o trimitem.
       </p>
     ),
   },
@@ -83,18 +85,18 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
     intrebare: "Donația se poate deduce?",
     raspuns: (
       <p>
-        Donația făcută de o persoană fizică nu se deduce din impozitul
-        pe venit. Există însă o variantă care nu te costă nimic: poți
-        redirecționa 3,5% din impozitul pe venit către asociație, fără
-        să plătești în plus. Detalii găsești la pagina{" "}
+        Donația făcută de o persoană fizică nu se deduce din impozitul pe venit.
+        Există însă o variantă care nu te costă nimic: poți redirecționa 3,5%
+        din impozitul pe venit către asociație, fără să plătești în plus.
+        Detalii găsești la pagina{" "}
         <Link
           href={RUTE.redirectionare35}
           className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
         >
           Redirecționează 3,5%
         </Link>
-        . Companiile pot beneficia de facilități fiscale prin contract
-        de sponsorizare, în condițiile legii.
+        . Companiile pot beneficia de facilități fiscale prin contract de
+        sponsorizare, în condițiile legii.
       </p>
     ),
   },
@@ -103,10 +105,9 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
     raspuns: (
       <>
         <p>
-          Poți dona prin transfer bancar în contul asociației sau poți
-          încheia un contract de sponsorizare, care îți permite să
-          beneficiezi de facilitățile fiscale prevăzute de lege. Date
-          pentru plată:
+          Poți dona prin transfer bancar în contul asociației sau poți încheia
+          un contract de sponsorizare, care îți permite să beneficiezi de
+          facilitățile fiscale prevăzute de lege. Date pentru plată:
         </p>
         <ul className="grid gap-1.5">
           <li>Titular: {ASOCIATIA.denumireLegala}</li>
@@ -119,10 +120,10 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
           ))}
         </ul>
         <p>
-          Pentru un contract de sponsorizare, scrie-ne la{" "}
-          {EMAIL.contact} sau sună-ne la {TELEFON_PRINCIPAL.afisat}. Ne
-          ocupăm împreună de toate documentele. De asemenea, poți
-          direcționa până la 20% din impozitul pe profit, la pagina{" "}
+          Pentru un contract de sponsorizare, scrie-ne la {EMAIL.contact} sau
+          sună-ne la {TELEFON_PRINCIPAL.afisat}. Ne ocupăm împreună de toate
+          documentele. De asemenea, poți direcționa până la 20% din impozitul pe
+          profit, la pagina{" "}
           <Link
             href={RUTE.directionare20}
             className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
@@ -151,30 +152,28 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
     raspuns: (
       <>
         <p>
-          Banii strânși merg către copiii și familiile din programele
-          noastre și către activitatea de zi cu zi a asociației. Sunt
-          folosiți pentru:
+          Banii strânși merg către copiii și familiile din programele noastre și
+          către activitatea de zi cu zi a asociației. Sunt folosiți pentru:
         </p>
         <ul className="grid list-disc gap-1.5 pl-5">
           <li>
-            taberele pentru copii cu nevoi speciale, pentru copii
-            premianți din sistemul de protecție a copilului și pentru
-            copii care au trecut prin cancer (cazare, masă, transport,
-            activități);
+            taberele pentru copii cu nevoi speciale, pentru copii premianți din
+            sistemul de protecție a copilului și pentru copii care au trecut
+            prin cancer (cazare, masă, transport, activități);
           </li>
           <li>
-            activitățile de la Casa Teona: activități pentru copii și
-            grupuri de sprijin pentru părinți;
+            activitățile de la Casa Teona: activități pentru copii și grupuri de
+            sprijin pentru părinți;
           </li>
           <li>
-            cheltuielile administrative ale centrului Casa Teona
-            (întreținere, utilități și funcționare), care păstrează
-            deschisă casa pentru copii și familii;
+            cheltuielile administrative ale centrului Casa Teona (întreținere,
+            utilități și funcționare), care păstrează deschisă casa pentru copii
+            și familii;
           </li>
           <li>
             cazurile umanitare: în aceste situații nu dăm bani direct
-            beneficiarilor. Plătim noi facturile clinicilor și
-            medicamentele, iar banii ajung exact unde este nevoie.
+            beneficiarilor. Plătim noi facturile clinicilor și medicamentele,
+            iar banii ajung exact unde este nevoie.
           </li>
         </ul>
       </>
@@ -188,16 +187,27 @@ export default function Doneaza() {
       <JsonLd date={jsonLdFir([{ nume: "Donează", cale: RUTE.doneaza }])} />
       {/* 2.1 — antet, cu formularul de card (2.2) în prim-plan, în dreapta. */}
       <section className="granulatie relative isolate overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-14 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10"
+        >
           <span className="pata absolute -top-32 right-[-8%] size-[28rem] rounded-full bg-caramiziu-100/60 blur-3xl" />
           <span className="pata pata-2 absolute bottom-[-8rem] left-[-8rem] size-[24rem] rounded-full bg-miere-100/70 blur-3xl" />
-          <Decor semn="inima" className="pluteste-lent absolute top-10 right-[5%] hidden size-10 text-caramiziu-200 lg:block" />
-          <Decor semn="stea" className="pluteste-lent absolute bottom-24 left-[4%] size-8 text-miere-300 lg:size-11" />
+          <Decor
+            semn="inima"
+            className="pluteste-lent absolute top-10 right-[5%] hidden size-10 text-caramiziu-200 lg:block"
+          />
+          <Decor
+            semn="stea"
+            className="pluteste-lent absolute bottom-24 left-[4%] size-8 text-miere-300 lg:size-11"
+          />
         </div>
 
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:px-8">
           <div className="lg:pt-4">
-            <p className="scris text-amplu text-caramiziu-600">„{ASOCIATIA.motto}”</p>
+            <p className="scris text-amplu text-caramiziu-600">
+              „{ASOCIATIA.motto}”
+            </p>
             <h1 className="mt-3 text-h1 text-cerneala">Donează</h1>
             <p className="mt-6 max-w-xl text-amplu text-cerneala-moale">
               Alege modul care ți se potrivește. Donația ta ne ajută enorm să
@@ -238,7 +248,9 @@ export default function Doneaza() {
                 />
               </div>
               <figcaption className="colt-mic-b absolute -bottom-3.5 left-5 bg-caramiziu-500 px-4 py-1.5 shadow-[0_10px_24px_-10px_rgba(247,79,34,0.9)]">
-                <span className="scris text-corp leading-none text-hartie">La Casa Teona</span>
+                <span className="scris text-corp leading-none text-hartie">
+                  La Casa Teona
+                </span>
               </figcaption>
             </figure>
           </div>
@@ -254,12 +266,24 @@ export default function Doneaza() {
       {/* 2.3 — alte modalități: patru blocuri, niciunul ca vecinul lui. */}
       <Val culoare="text-hartie" className={VAL_PESTE} />
       <section className="relative overflow-hidden bg-hartie pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="spirala" className="pluteste-lent absolute top-16 right-[4%] size-10 text-turcoaz-200 lg:size-14" />
-          <Decor semn="unda" className="pluteste-lent absolute bottom-40 left-[2%] size-10 text-miere-300 lg:size-14" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="spirala"
+            className="pluteste-lent absolute top-16 right-[4%] size-10 text-turcoaz-200 lg:size-14"
+          />
+          <Decor
+            semn="unda"
+            className="pluteste-lent absolute bottom-40 left-[2%] size-10 text-miere-300 lg:size-14"
+          />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <TitluSectiune scris="Fără card? Se poate și așa." titlu="Alte modalități de a dona" />
+          <TitluSectiune
+            scris="Fără card? Se poate și așa."
+            titlu="Alte modalități de a dona"
+          />
 
           <div className="mt-12 grid gap-6 lg:grid-cols-2">
             {/* SMS — câmp de miere, cu codul scris cât cardul. */}
@@ -268,11 +292,17 @@ export default function Doneaza() {
                 id="sms"
                 className="granulatie relative flex h-full scroll-mt-32 flex-col overflow-hidden colt-a bg-miere-300 p-7 shadow-[0_30px_60px_-28px_rgba(255,172,0,0.9)] sm:p-9"
               >
-                <Decor semn="stea" strokeWidth={0.8} className="absolute -top-12 -right-12 size-52 text-miere-200/80" />
+                <Decor
+                  semn="stea"
+                  strokeWidth={0.8}
+                  className="absolute -top-12 -right-12 size-52 text-miere-200/80"
+                />
                 <span className="colt-mic-b relative flex size-14 items-center justify-center bg-cerneala/10 text-cerneala">
                   <Pictograma nume="telefon" className="size-7" />
                 </span>
-                <h3 className="relative mt-5 text-h3 text-miere-900">Donează lunar prin SMS</h3>
+                <h3 className="relative mt-5 text-h3 text-miere-900">
+                  Donează lunar prin SMS
+                </h3>
                 {/*
                   Cuvântul-cheie se scrie SUSTIN, fără diacritice. Scris
                   „SUSȚIN”, operatorul nu-l mai recunoaște și donația nu se
@@ -283,12 +313,20 @@ export default function Doneaza() {
                   className="relative mt-5 font-titlu text-[3.2rem] leading-none font-extrabold tracking-tight text-hartie sm:text-[3.8rem]"
                 >
                   {SMS.text}
-                  <span className="mt-1 block text-[1.5rem] text-miere-900/80">la {SMS.numar}</span>
+                  <span className="mt-1 block text-[1.5rem] text-miere-900/80">
+                    la {SMS.numar}
+                  </span>
                 </p>
                 <p className="relative mt-4 text-amplu text-miere-900">
-                  Trimite <strong className="font-titlu font-extrabold">{SMS.text}</strong> la{" "}
-                  <strong className="font-titlu font-extrabold">{SMS.numar}</strong> și donezi{" "}
-                  {SMS.sumaLunara} lunar
+                  Trimite{" "}
+                  <strong className="font-titlu font-extrabold">
+                    {SMS.text}
+                  </strong>{" "}
+                  la{" "}
+                  <strong className="font-titlu font-extrabold">
+                    {SMS.numar}
+                  </strong>{" "}
+                  și donezi {SMS.sumaLunara} lunar
                 </p>
 
                 <div className="relative mt-5 grid gap-3 text-mic text-miere-900/85">
@@ -298,11 +336,11 @@ export default function Doneaza() {
                   </p>
                   <p>
                     Pentru a activa donația lunară, este nevoie de confirmare.
-                    Mesajul de abonare și cel de confirmare sunt complet gratuite
-                    și nu implică niciun cost suplimentar. Odată confirmată
-                    abonarea, contribuția lunară este de 5 euro, aceasta fiind
-                    taxată automat prin SMS. Dacă dorești să oprești donațiile,
-                    trimite textul{" "}
+                    Mesajul de abonare și cel de confirmare sunt complet
+                    gratuite și nu implică niciun cost suplimentar. Odată
+                    confirmată abonarea, contribuția lunară este de 5 euro,
+                    aceasta fiind taxată automat prin SMS. Dacă dorești să
+                    oprești donațiile, trimite textul{" "}
                     <strong className="font-titlu font-bold text-miere-900">
                       {SMS.textOprire}
                     </strong>{" "}
@@ -329,11 +367,17 @@ export default function Doneaza() {
                 id="transfer"
                 className="granulatie relative flex h-full scroll-mt-32 flex-col overflow-hidden colt-b bg-turcoaz-100 p-7 shadow-[0_30px_60px_-28px_rgba(42,159,163,0.6)] sm:p-9"
               >
-                <Decor semn="spirala" strokeWidth={0.8} className="absolute -right-12 -bottom-12 size-48 text-turcoaz-200" />
+                <Decor
+                  semn="spirala"
+                  strokeWidth={0.8}
+                  className="absolute -right-12 -bottom-12 size-48 text-turcoaz-200"
+                />
                 <span className="colt-mic-a relative flex size-14 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
                   <Pictograma nume="cladire" className="size-7" />
                 </span>
-                <h3 className="relative mt-5 text-h3 text-turcoaz-900">Transfer bancar</h3>
+                <h3 className="relative mt-5 text-h3 text-turcoaz-900">
+                  Transfer bancar
+                </h3>
                 <p className="relative mt-3 text-amplu text-turcoaz-900/80">
                   Donezi direct în contul asociației.
                 </p>
@@ -376,13 +420,15 @@ export default function Doneaza() {
                   </span>
                 </div>
                 <div className="flex flex-1 flex-col p-7 sm:p-9">
-                  <h3 className="text-h3 text-cerneala">Donează-ți ziua de naștere</h3>
+                  <h3 className="text-h3 text-cerneala">
+                    Donează-ți ziua de naștere
+                  </h3>
                   <p className="mt-3 flex-1 text-cerneala-moale">
                     Creează o pagină de strângere de fonduri pentru ziua ta și
                     invită prietenii să te sprijine.
                   </p>
                   <Buton
-                    href={LINKURI_EXTERNE.galantomZiuaTa}
+                    href={RUTE.ziuaTa}
                     varianta="secundar"
                     className="mt-6 self-start"
                   >
@@ -412,9 +458,9 @@ export default function Doneaza() {
                   Redirecționează 3,5% din impozit
                 </h3>
                 <p className="relative mt-3 flex-1 text-hartie/90">
-                  Nu te costă nimic în plus: completezi formularul și o parte din
-                  impozitul pe venit ajunge la copii. Termenul este 25 mai, în
-                  fiecare an.
+                  Nu te costă nimic în plus: completezi formularul și o parte
+                  din impozitul pe venit ajunge la copii. Termenul este 25 mai,
+                  în fiecare an.
                 </p>
                 <Buton
                   href={RUTE.redirectionare35}
@@ -435,8 +481,14 @@ export default function Doneaza() {
         id="firme"
         className="granulatie relative scroll-mt-32 overflow-hidden bg-tenta-turcoaz pt-6 pb-24 lg:pt-10 lg:pb-32"
       >
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="soare" className="pluteste-lent absolute top-14 right-[5%] size-10 text-miere-300 lg:size-14" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="soare"
+            className="pluteste-lent absolute top-14 right-[5%] size-10 text-miere-300 lg:size-14"
+          />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <TitluSectiune
@@ -510,7 +562,8 @@ export default function Doneaza() {
               Scrie-ne
             </Buton>
             <p className="text-cerneala-moale">
-              Vrei un contract personalizat? Ne ocupăm împreună de toate documentele.
+              Vrei un contract personalizat? Ne ocupăm împreună de toate
+              documentele.
             </p>
           </div>
         </div>

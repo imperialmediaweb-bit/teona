@@ -141,7 +141,11 @@ function Formular({
         className="relative overflow-hidden colt-a border border-hartie-umbra bg-hartie shadow-[0_26px_52px_-26px_rgba(247,79,34,0.5)]"
       >
         <div className="granulatie relative overflow-hidden bg-miere-300 px-7 py-6 sm:px-9">
-          <Decor semn="stea" strokeWidth={0.8} className="absolute -top-8 -right-8 size-32 text-miere-100" />
+          <Decor
+            semn="stea"
+            strokeWidth={0.8}
+            className="absolute -top-8 -right-8 size-32 text-miere-100"
+          />
           <h3 className="relative text-h4 text-miere-900">
             Plata cu cardul direct pe site se conectează acum
           </h3>
@@ -149,8 +153,8 @@ function Formular({
         <div className="grid gap-5 p-7 sm:p-9">
           <p className="text-cerneala-moale">
             Alegem împreună cu asociația procesatorul de plăți, înainte de
-            lansare. Nu îți luăm datele cardului până atunci. Dar poți dona chiar
-            acum, pe una dintre căile care funcționează:
+            lansare. Nu îți luăm datele cardului până atunci. Dar poți dona
+            chiar acum, pe una dintre căile care funcționează:
           </p>
 
           <ul className="grid gap-3">
@@ -167,7 +171,8 @@ function Formular({
                 <span>
                   Donează cu cardul pe Galantom
                   <span className="mt-0.5 block text-mic font-normal opacity-90">
-                    Pagina de strângere de fonduri a asociației. O dată sau lunar.
+                    Pagina de strângere de fonduri a asociației. O dată sau
+                    lunar.
                   </span>
                 </span>
               </a>
@@ -237,7 +242,11 @@ function Formular({
       className="relative overflow-hidden colt-a border border-hartie-umbra bg-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.55)]"
     >
       <div className="granulatie relative overflow-hidden bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 px-6 py-5 text-hartie sm:px-8">
-        <Decor semn="inima" strokeWidth={0.9} className="absolute -right-6 -bottom-10 size-32 text-hartie/20" />
+        <Decor
+          semn="inima"
+          strokeWidth={0.9}
+          className="absolute -right-6 -bottom-10 size-32 text-hartie/20"
+        />
         <p className="relative flex items-center gap-3 font-titlu text-amplu font-bold">
           <span className="flex size-10 items-center justify-center colt-mic-b bg-hartie/20">
             <Pictograma nume="inima" className="size-5" />

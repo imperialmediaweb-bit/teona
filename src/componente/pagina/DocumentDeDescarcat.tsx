@@ -76,7 +76,10 @@ export default function DocumentDeDescarcat({
           </span>
         ) : (
           <span className="mt-5 inline-flex w-fit items-center gap-2 rounded-full bg-miere-100 px-3 py-1.5 font-titlu text-nota font-semibold text-miere-800">
-            <span aria-hidden="true" className="size-2 rounded-full bg-miere-500" />
+            <span
+              aria-hidden="true"
+              className="size-2 rounded-full bg-miere-500"
+            />
             În pregătire la asociație
           </span>
         )}

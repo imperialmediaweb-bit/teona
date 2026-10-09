@@ -54,7 +54,10 @@ export function citesteAcord(): Acord | null {
   }
 }
 
-export function scrieAcord(alegere: { statistici: boolean; marketing: boolean }) {
+export function scrieAcord(alegere: {
+  statistici: boolean;
+  marketing: boolean;
+}) {
   const acord: Acord = {
     necesare: true,
     statistici: alegere.statistici,

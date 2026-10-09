@@ -34,8 +34,18 @@ export type { IdCategorie, ProiectAfisat } from "./proiecte-tipuri";
 const CATEGORII_UMANITARE = new Set(["Cazuri medicale", "Strângere Fonduri"]);
 
 const LUNI = [
-  "ianuarie", "februarie", "martie", "aprilie", "mai", "iunie",
-  "iulie", "august", "septembrie", "octombrie", "noiembrie", "decembrie",
+  "ianuarie",
+  "februarie",
+  "martie",
+  "aprilie",
+  "mai",
+  "iunie",
+  "iulie",
+  "august",
+  "septembrie",
+  "octombrie",
+  "noiembrie",
+  "decembrie",
 ];
 
 function dataCitita(iso: string): string {
@@ -80,7 +90,9 @@ export function proiecteAfisate(): ProiectAfisat[] {
       if (folosite.has(slug)) slug = `${slug}-${data}`;
       folosite.add(slug);
 
-      const umanitar = proiect.categorii.some((c) => CATEGORII_UMANITARE.has(c));
+      const umanitar = proiect.categorii.some((c) =>
+        CATEGORII_UMANITARE.has(c),
+      );
       const categorie: IdCategorie = umanitar
         ? "umanitare"
         : an >= 2026
@@ -100,7 +112,8 @@ export function proiecteAfisate(): ProiectAfisat[] {
         data,
         dataCitita: dataCitita(data),
         categorie,
-        coperta: pozaCareExista(pozaLocala(proiect.pozaPrincipala)) ?? poze[0] ?? null,
+        coperta:
+          pozaCareExista(pozaLocala(proiect.pozaPrincipala)) ?? poze[0] ?? null,
         poze,
       };
     })

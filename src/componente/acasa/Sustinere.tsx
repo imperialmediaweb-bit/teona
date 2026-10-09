@@ -48,15 +48,26 @@ export default function Sustinere() {
   return (
     <section className="relative overflow-hidden bg-hartie pt-14 pb-24 lg:pt-20 lg:pb-32">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <Decor semn="spirala" className="pluteste-lent absolute top-12 right-[4%] size-10 text-turcoaz-200 lg:size-14" />
-        <Decor semn="stea" className="pluteste-lent absolute bottom-24 left-[2%] size-9 text-miere-300 lg:size-12" />
-        <Decor semn="unda" className="pluteste-lent absolute top-1/2 left-[46%] hidden size-12 text-caramiziu-200 lg:block" />
+        <Decor
+          semn="spirala"
+          className="pluteste-lent absolute top-12 right-[4%] size-10 text-turcoaz-200 lg:size-14"
+        />
+        <Decor
+          semn="stea"
+          className="pluteste-lent absolute bottom-24 left-[2%] size-9 text-miere-300 lg:size-12"
+        />
+        <Decor
+          semn="unda"
+          className="pluteste-lent absolute top-1/2 left-[46%] hidden size-12 text-caramiziu-200 lg:block"
+        />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Caietul, la 1.3: „Titlul secțiunii: «Cum poți să ne susții».
             Fără frază introductivă.” */}
-        <h2 className="max-w-2xl text-h2 text-cerneala">Cum poți să ne susții</h2>
+        <h2 className="max-w-2xl text-h2 text-cerneala">
+          Cum poți să ne susții
+        </h2>
 
         <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:grid-rows-2">
           {/* Cardul 1 · Donează — mare, portocaliu, cu fotografie. */}
@@ -137,8 +148,8 @@ export default function Sustinere() {
                   Donează lunar prin SMS
                 </h3>
                 <p className="relative mt-2 flex-1 text-mic text-miere-900/85">
-                  Trimite {SMS.text} la {SMS.numar} și donezi {SMS.sumaLunara} pe
-                  lună, fără formulare.
+                  Trimite {SMS.text} la {SMS.numar} și donezi {SMS.sumaLunara}{" "}
+                  pe lună, fără formulare.
                 </p>
                 <Buton
                   href={`${RUTE.doneaza}#sms`}
@@ -251,7 +262,8 @@ export default function Sustinere() {
                 <div className="flex flex-1 flex-col p-6 sm:p-7">
                   <h3 className="text-h4 text-cerneala">Devino voluntar</h3>
                   <p className="mt-2 flex-1 text-mic text-cerneala-moale">
-                    Alătură-te celor peste 300 de voluntari care ne sunt alături.
+                    Alătură-te celor peste 300 de voluntari care ne sunt
+                    alături.
                   </p>
                   <Buton
                     href={RUTE.voluntar}

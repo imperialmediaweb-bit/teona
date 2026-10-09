@@ -37,7 +37,11 @@ function imparte(text: string): Bloc[] {
       continue;
     }
 
-    if (TITLU.test(continut) && continut.length < 120 && !/\.\s/.test(continut.slice(3))) {
+    if (
+      TITLU.test(continut) &&
+      continut.length < 120 &&
+      !/\.\s/.test(continut.slice(3))
+    ) {
       blocuri.push({ fel: "titlu", text: continut });
       continue;
     }

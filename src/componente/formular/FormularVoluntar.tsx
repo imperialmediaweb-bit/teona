@@ -55,7 +55,8 @@ function varsta(nastere: Date, azi: Date): number {
   let ani = azi.getFullYear() - nastere.getFullYear();
   const inainteDeZi =
     azi.getMonth() < nastere.getMonth() ||
-    (azi.getMonth() === nastere.getMonth() && azi.getDate() < nastere.getDate());
+    (azi.getMonth() === nastere.getMonth() &&
+      azi.getDate() < nastere.getDate());
   if (inainteDeZi) ani -= 1;
   return ani;
 }
@@ -178,11 +179,14 @@ export default function FormularVoluntar() {
           acord: true,
         }),
       });
-      const corp = (await raspuns.json().catch(() => ({}))) as { mesaj?: string };
+      const corp = (await raspuns.json().catch(() => ({}))) as {
+        mesaj?: string;
+      };
       if (!raspuns.ok) {
         setStare({
           fel: "eroare",
-          mesaj: corp.mesaj ?? "Nu am putut trimite formularul. Încearcă din nou.",
+          mesaj:
+            corp.mesaj ?? "Nu am putut trimite formularul. Încearcă din nou.",
         });
         return;
       }
@@ -203,10 +207,26 @@ export default function FormularVoluntar() {
         className="relative scroll-mt-32 overflow-hidden colt-a border border-hartie-umbra bg-hartie shadow-[0_30px_60px_-28px_rgba(42,159,163,0.6)]"
       >
         <div className="granulatie relative overflow-hidden bg-gradient-to-br from-turcoaz-400 to-turcoaz-600 px-7 pt-10 pb-12 text-hartie sm:px-10">
-          <Decor semn="stea" strokeWidth={0.8} className="absolute -top-10 -right-8 size-40 text-hartie/20" />
-          <Decor semn="soare" className="pluteste-lent absolute bottom-6 right-[12%] size-10 text-hartie/40" />
+          <Decor
+            semn="stea"
+            strokeWidth={0.8}
+            className="absolute -top-10 -right-8 size-40 text-hartie/20"
+          />
+          <Decor
+            semn="soare"
+            className="pluteste-lent absolute bottom-6 right-[12%] size-10 text-hartie/40"
+          />
           <span className="relative flex size-16 items-center justify-center colt-mic-b bg-hartie text-turcoaz-600 shadow-[0_16px_32px_-14px_rgba(35,35,35,0.4)]">
-            <svg viewBox="0 0 24 24" className="size-8" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg
+              viewBox="0 0 24 24"
+              className="size-8"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.4}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <path d="M5 12.5l4.5 4.5L19 7.5" />
             </svg>
           </span>
@@ -225,19 +245,21 @@ export default function FormularVoluntar() {
             Până atunci, ne găsești pe Facebook și Instagram.
           </p>
           <ul className="mt-4 flex flex-wrap gap-3">
-            {RETELE_ASOCIATIE.filter((r) => r.nume !== "TikTok").map((retea) => (
-              <li key={retea.nume}>
-                <a
-                  href={retea.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-cerneala/15 px-5 py-2 font-titlu text-mic font-semibold text-cerneala transition hover:border-caramiziu-500 hover:text-caramiziu-600"
-                >
-                  <PictogramaRetea nume={retea.nume} className="size-5" />
-                  {retea.nume}
-                </a>
-              </li>
-            ))}
+            {RETELE_ASOCIATIE.filter((r) => r.nume !== "TikTok").map(
+              (retea) => (
+                <li key={retea.nume}>
+                  <a
+                    href={retea.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-cerneala/15 px-5 py-2 font-titlu text-mic font-semibold text-cerneala transition hover:border-caramiziu-500 hover:text-caramiziu-600"
+                  >
+                    <PictogramaRetea nume={retea.nume} className="size-5" />
+                    {retea.nume}
+                  </a>
+                </li>
+              ),
+            )}
           </ul>
         </div>
       </div>
@@ -254,7 +276,11 @@ export default function FormularVoluntar() {
     >
       {/* Firul pașilor: unde ești și cât mai e. */}
       <ol className="granulatie relative grid grid-cols-3 gap-2 overflow-hidden bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 px-4 py-5 text-hartie sm:px-7">
-        <Decor semn="unda" strokeWidth={0.9} className="absolute -right-8 -bottom-10 size-36 text-hartie/15" />
+        <Decor
+          semn="unda"
+          strokeWidth={0.9}
+          className="absolute -right-8 -bottom-10 size-36 text-hartie/15"
+        />
         {PASI.map((p, i) => {
           const facut = i < pas;
           const activ = i === pas;
@@ -276,7 +302,16 @@ export default function FormularVoluntar() {
                 }`}
               >
                 {facut ? (
-                  <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="size-4"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2.6}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
                     <path d="M5 12.5l4.5 4.5L19 7.5" />
                   </svg>
                 ) : (
@@ -328,19 +363,28 @@ export default function FormularVoluntar() {
                     type="text"
                     autoComplete="name"
                     aria-invalid={Boolean(erori.nume)}
-                    aria-describedby={erori.nume ? `${id}-nume-eroare` : undefined}
+                    aria-describedby={
+                      erori.nume ? `${id}-nume-eroare` : undefined
+                    }
                     className={erori.nume ? claseControlGresit : claseControl}
                   />
                 </Camp>
 
-                <Camp id={`${id}-email`} eticheta="Email" obligatoriu eroare={erori.email}>
+                <Camp
+                  id={`${id}-email`}
+                  eticheta="Email"
+                  obligatoriu
+                  eroare={erori.email}
+                >
                   <input
                     id={`${id}-email`}
                     name="email"
                     type="email"
                     autoComplete="email"
                     aria-invalid={Boolean(erori.email)}
-                    aria-describedby={erori.email ? `${id}-email-eroare` : undefined}
+                    aria-describedby={
+                      erori.email ? `${id}-email-eroare` : undefined
+                    }
                     className={erori.email ? claseControlGresit : claseControl}
                   />
                 </Camp>
@@ -369,9 +413,13 @@ export default function FormularVoluntar() {
                     autoComplete="bday"
                     aria-invalid={Boolean(erori.nastere)}
                     aria-describedby={
-                      erori.nastere ? `${id}-nastere-eroare` : `${id}-nastere-nota`
+                      erori.nastere
+                        ? `${id}-nastere-eroare`
+                        : `${id}-nastere-nota`
                     }
-                    className={erori.nastere ? claseControlGresit : claseControl}
+                    className={
+                      erori.nastere ? claseControlGresit : claseControl
+                    }
                   />
                 </Camp>
 
@@ -395,8 +443,16 @@ export default function FormularVoluntar() {
                   obligatoriu
                   defaultValue="Nu"
                   optiuni={[
-                    { valoare: "Da", eticheta: "Da", descriere: "Am mai fost voluntar." },
-                    { valoare: "Nu", eticheta: "Nu", descriere: "Ar fi prima dată." },
+                    {
+                      valoare: "Da",
+                      eticheta: "Da",
+                      descriere: "Am mai fost voluntar.",
+                    },
+                    {
+                      valoare: "Nu",
+                      eticheta: "Nu",
+                      descriere: "Ar fi prima dată.",
+                    },
                   ]}
                 />
 
@@ -451,7 +507,10 @@ export default function FormularVoluntar() {
 
             {i === 2 && (
               <div className="grid gap-5">
-                <Camp id={`${id}-motiv`} eticheta="De ce vrei să devii voluntar?">
+                <Camp
+                  id={`${id}-motiv`}
+                  eticheta="De ce vrei să devii voluntar?"
+                >
                   <textarea
                     id={`${id}-motiv`}
                     name="motiv"
@@ -477,9 +536,9 @@ export default function FormularVoluntar() {
                 </Camp>
 
                 <Bifa name="acord" obligatoriu eroare={erori.acord}>
-                  Sunt de acord ca Asociația Teona Ariana să-mi prelucreze datele
-                  personale pentru a mă contacta în legătură cu activitatea de
-                  voluntariat.
+                  Sunt de acord ca Asociația Teona Ariana să-mi prelucreze
+                  datele personale pentru a mă contacta în legătură cu
+                  activitatea de voluntariat.
                 </Bifa>
               </div>
             )}
@@ -526,7 +585,11 @@ export default function FormularVoluntar() {
           )}
 
           {pas < PASI.length - 1 ? (
-            <button type="button" onClick={continua} className={claseButonTrimite}>
+            <button
+              type="button"
+              onClick={continua}
+              className={claseButonTrimite}
+            >
               Continuă
               <Pictograma nume="sageata" className="size-4" />
             </button>

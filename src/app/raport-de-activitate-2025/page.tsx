@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
 import Link from "next/link";
-import { ADRESE, ASOCIATIA, EMAIL, RUTE, TELEFON_PRINCIPAL } from "@/date/asociatie";
+import {
+  ADRESE,
+  ASOCIATIA,
+  EMAIL,
+  RUTE,
+  TELEFON_PRINCIPAL,
+} from "@/date/asociatie";
 import Buton from "@/componente/Buton";
 import Decor from "@/componente/Decor";
 import Pictograma from "@/componente/Pictograma";
@@ -61,7 +67,10 @@ const VENITURI = [
 ] as const;
 
 const CHELTUIELI = [
-  { categorie: "Chirie, utilități, întreținere spațiu Casa Teona", suma: "195.398" },
+  {
+    categorie: "Chirie, utilități, întreținere spațiu Casa Teona",
+    suma: "195.398",
+  },
   { categorie: "Salarii", suma: "141.496" },
   { categorie: "Organizare tabere Respiro", suma: "154.756" },
   { categorie: "Comunicare și promovare", suma: "8.965" },
@@ -236,17 +245,50 @@ const PARTENERI = [
 ] as const;
 
 const SPONSORI_RAPORT = [
-  "Egger România", "GE Healthcare", "ElectroAxa", "Destine Broker de Asigurare",
-  "Dasmar Thermo", "Asociația Copilul din Soare", "Imperial Media", "Auto Adria",
-  "Autodel Holding", "Best Distribution", "Casa Group", "CBC Phoenix",
-  "Celestin", "Denis Shoes", "EdCris", "Estrella Nord", "Evesicran",
-  "FD Figurina", "Ferovali", "Fundația Assist",
-  "Fundația Social Culturală Victoria", "General Consulting", "Global Design",
-  "Granit CGH", "IT Cont Group", "Kriti Spedition", "Lincor Trans", "Lusek",
-  "Marelvi", "Netcom Activ", "Manaz", "OscarShop", "Pasalimani", "Rocast Nord",
-  "Romoldova", "Set Corporation", "Sistem Conect", "Taco Loco", "Tarsin",
-  "Yulidey Spedition", "Bukovina Gerüstbau", "Alex Macoveiciuc Fotograf",
-  "Cofetăria Scala", "NGGS",
+  "Egger România",
+  "GE Healthcare",
+  "ElectroAxa",
+  "Destine Broker de Asigurare",
+  "Dasmar Thermo",
+  "Asociația Copilul din Soare",
+  "Imperial Media",
+  "Auto Adria",
+  "Autodel Holding",
+  "Best Distribution",
+  "Casa Group",
+  "CBC Phoenix",
+  "Celestin",
+  "Denis Shoes",
+  "EdCris",
+  "Estrella Nord",
+  "Evesicran",
+  "FD Figurina",
+  "Ferovali",
+  "Fundația Assist",
+  "Fundația Social Culturală Victoria",
+  "General Consulting",
+  "Global Design",
+  "Granit CGH",
+  "IT Cont Group",
+  "Kriti Spedition",
+  "Lincor Trans",
+  "Lusek",
+  "Marelvi",
+  "Netcom Activ",
+  "Manaz",
+  "OscarShop",
+  "Pasalimani",
+  "Rocast Nord",
+  "Romoldova",
+  "Set Corporation",
+  "Sistem Conect",
+  "Taco Loco",
+  "Tarsin",
+  "Yulidey Spedition",
+  "Bukovina Gerüstbau",
+  "Alex Macoveiciuc Fotograf",
+  "Cofetăria Scala",
+  "NGGS",
 ] as const;
 
 function Tabel({
@@ -265,10 +307,16 @@ function Tabel({
         <table className="w-full text-left">
           <thead>
             <tr className="bg-hartie-calda">
-              <th scope="col" className="px-5 py-3 font-titlu text-nota font-bold tracking-wider text-cerneala-moale uppercase">
+              <th
+                scope="col"
+                className="px-5 py-3 font-titlu text-nota font-bold tracking-wider text-cerneala-moale uppercase"
+              >
                 Categorie
               </th>
-              <th scope="col" className="px-5 py-3 text-right font-titlu text-nota font-bold tracking-wider text-cerneala-moale uppercase">
+              <th
+                scope="col"
+                className="px-5 py-3 text-right font-titlu text-nota font-bold tracking-wider text-cerneala-moale uppercase"
+              >
                 Sumă (lei)
               </th>
             </tr>
@@ -276,14 +324,18 @@ function Tabel({
           <tbody>
             {randuri.map((rand) => (
               <tr key={rand.categorie} className="border-t border-hartie-umbra">
-                <td className="px-5 py-3 text-mic text-cerneala">{rand.categorie}</td>
+                <td className="px-5 py-3 text-mic text-cerneala">
+                  {rand.categorie}
+                </td>
                 <td className="px-5 py-3 text-right font-titlu text-mic font-semibold tabular-nums text-cerneala">
                   {rand.suma}
                 </td>
               </tr>
             ))}
             <tr className="border-t-2 border-caramiziu-200 bg-tenta-cald">
-              <td className="px-5 py-3.5 font-titlu font-bold text-cerneala">Total</td>
+              <td className="px-5 py-3.5 font-titlu font-bold text-cerneala">
+                Total
+              </td>
               <td className="px-5 py-3.5 text-right font-titlu font-extrabold tabular-nums text-caramiziu-600">
                 {total}
               </td>
@@ -305,10 +357,19 @@ export default function Raport2025() {
         ])}
       />
       <section className="granulatie relative isolate overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-12 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10"
+        >
           <span className="pata absolute -top-32 right-[-8%] size-[26rem] rounded-full bg-caramiziu-100/60 blur-3xl" />
-          <Decor semn="stea" className="pluteste-lent absolute top-10 right-[6%] hidden size-10 text-miere-400 lg:block" />
-          <Decor semn="unda" className="pluteste-lent absolute bottom-16 left-[3%] size-9 text-caramiziu-200 lg:size-12" />
+          <Decor
+            semn="stea"
+            className="pluteste-lent absolute top-10 right-[6%] hidden size-10 text-miere-400 lg:block"
+          />
+          <Decor
+            semn="unda"
+            className="pluteste-lent absolute bottom-16 left-[3%] size-9 text-caramiziu-200 lg:size-12"
+          />
         </div>
         <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <Link
@@ -387,16 +448,24 @@ export default function Raport2025() {
                 >
                   {String(capitol.numar).padStart(2, "0")}
                 </span>
-                <h2 className="relative text-h3 text-cerneala">{capitol.titlu}</h2>
+                <h2 className="relative text-h3 text-cerneala">
+                  {capitol.titlu}
+                </h2>
 
                 {capitol.paragrafe?.map((paragraf) => (
-                  <p key={paragraf.slice(0, 30)} className="relative mt-4 text-cerneala-moale">
+                  <p
+                    key={paragraf.slice(0, 30)}
+                    className="relative mt-4 text-cerneala-moale"
+                  >
                     {paragraf}
                   </p>
                 ))}
 
                 {capitol.liste?.map((lista) => (
-                  <div key={lista.titlu ?? lista.elemente[0]} className="relative mt-5">
+                  <div
+                    key={lista.titlu ?? lista.elemente[0]}
+                    className="relative mt-5"
+                  >
                     {lista.titlu && (
                       <p className="font-titlu font-semibold text-cerneala">
                         {lista.titlu}
@@ -418,8 +487,14 @@ export default function Raport2025() {
       {/* 8 — parteneriate */}
       <Val culoare="text-hartie-calda" className={VAL_PESTE} />
       <section className="granulatie relative overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="soare" className="pluteste-lent absolute top-12 right-[5%] size-9 text-miere-300 lg:size-12" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="soare"
+            className="pluteste-lent absolute top-12 right-[5%] size-9 text-miere-300 lg:size-12"
+          />
         </div>
         <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <span
@@ -428,7 +503,9 @@ export default function Raport2025() {
           >
             08
           </span>
-          <h2 className="relative text-h3 text-cerneala">Parteneriate și susținere</h2>
+          <h2 className="relative text-h3 text-cerneala">
+            Parteneriate și susținere
+          </h2>
 
           <h3 className="mt-7 font-titlu text-amplu font-bold text-cerneala">
             Parteneri instituționali
@@ -473,13 +550,15 @@ export default function Raport2025() {
           >
             09
           </span>
-          <h2 className="relative text-h3 text-cerneala">Situație financiară 2025</h2>
+          <h2 className="relative text-h3 text-cerneala">
+            Situație financiară 2025
+          </h2>
           <p className="mt-4 text-cerneala-moale">
-            Cheltuielile pentru servicii terapeutice și activități sunt susținute
-            integral din fonduri atrase — donații, sponsorizări și granturi —,
-            beneficiarii neplătind contribuții financiare pentru participare.
-            Asociația își asumă transparența financiară și utilizarea
-            responsabilă a fondurilor primite.
+            Cheltuielile pentru servicii terapeutice și activități sunt
+            susținute integral din fonduri atrase — donații, sponsorizări și
+            granturi —, beneficiarii neplătind contribuții financiare pentru
+            participare. Asociația își asumă transparența financiară și
+            utilizarea responsabilă a fondurilor primite.
           </p>
 
           <div className="mt-10 grid gap-10">
@@ -488,11 +567,17 @@ export default function Raport2025() {
           </div>
 
           <p className="granulatie relative mt-8 overflow-hidden colt-a bg-turcoaz-100 px-6 py-6 font-titlu font-bold text-turcoaz-900 shadow-[0_24px_50px_-26px_rgba(42,159,163,0.6)]">
-            <Decor semn="spirala" strokeWidth={0.8} className="absolute -right-8 -bottom-8 size-32 text-turcoaz-200" />
+            <Decor
+              semn="spirala"
+              strokeWidth={0.8}
+              className="absolute -right-8 -bottom-8 size-32 text-turcoaz-200"
+            />
             <span className="relative block text-nota font-bold tracking-wider uppercase opacity-80">
               Rezultat financiar 2025 (excedent)
             </span>
-            <span className="relative mt-1 block text-h2 tabular-nums">114.951 lei</span>
+            <span className="relative mt-1 block text-h2 tabular-nums">
+              114.951 lei
+            </span>
           </p>
         </div>
       </section>
@@ -500,11 +585,19 @@ export default function Raport2025() {
       {/* 11 — mulțumiri */}
       <Val culoare="text-tenta-cald" className={VAL_PESTE} />
       <section className="granulatie relative overflow-hidden bg-tenta-cald pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="inima" className="pluteste-lent absolute top-12 right-[5%] size-9 text-caramiziu-200 lg:size-12" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="inima"
+            className="pluteste-lent absolute top-12 right-[5%] size-9 text-caramiziu-200 lg:size-12"
+          />
         </div>
         <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <p className="scris text-amplu text-caramiziu-600">Tuturor celor care au fost alături de noi</p>
+          <p className="scris text-amplu text-caramiziu-600">
+            Tuturor celor care au fost alături de noi
+          </p>
           <h2 className="mt-2 text-h2 text-cerneala">Mulțumiri</h2>
           <p className="mt-4 text-cerneala-moale">
             Mulțumim tuturor părinților, copiilor, voluntarilor, terapeuților,

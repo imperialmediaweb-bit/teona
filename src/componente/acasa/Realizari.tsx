@@ -82,7 +82,13 @@ function Poza({
   if (!poza) return null;
   return (
     <div className={`relative ${className}`}>
-      <Image src={poza.cale} alt={poza.alt} fill sizes={dimensiuni} className="object-cover" />
+      <Image
+        src={poza.cale}
+        alt={poza.alt}
+        fill
+        sizes={dimensiuni}
+        className="object-cover"
+      />
       <span
         className={`colt-mic-${colt} absolute top-4 left-4 flex h-12 min-w-12 items-center justify-center px-3 text-hartie ${culoare}`}
       >
@@ -109,8 +115,14 @@ export default function Realizari() {
   return (
     <section className="relative overflow-hidden bg-hartie pt-10 pb-20 lg:pt-16 lg:pb-28">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <Decor semn="spirala" className="pluteste-lent absolute top-14 right-[5%] size-9 text-miere-300 lg:size-12" />
-        <Decor semn="stea" className="pluteste-lent absolute bottom-16 left-[4%] size-7 text-caramiziu-300 lg:size-10" />
+        <Decor
+          semn="spirala"
+          className="pluteste-lent absolute top-14 right-[5%] size-9 text-miere-300 lg:size-12"
+        />
+        <Decor
+          semn="stea"
+          className="pluteste-lent absolute bottom-16 left-[4%] size-7 text-caramiziu-300 lg:size-10"
+        />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -128,7 +140,10 @@ export default function Realizari() {
               de identitate. */}
           <li className="lg:col-span-2">
             <article className="granulatie relative flex h-full min-h-[18rem] flex-col overflow-hidden colt-a bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 p-7 text-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.8)]">
-              <Numar n={1} className="absolute -top-6 -right-3 text-[9rem] text-hartie/15" />
+              <Numar
+                n={1}
+                className="absolute -top-6 -right-3 text-[9rem] text-hartie/15"
+              />
               <span
                 aria-hidden="true"
                 className="absolute -bottom-20 -left-12 size-52 rounded-full border-2 border-hartie/20"
@@ -136,8 +151,12 @@ export default function Realizari() {
               <span className="colt-mic-b relative flex size-12 items-center justify-center bg-hartie/20 text-hartie">
                 <Pictograma nume={cancer.pictograma} className="size-6" />
               </span>
-              <h3 className="relative mt-auto pt-8 text-h3 text-hartie">{cancer.titlu}</h3>
-              <p className="relative mt-3 text-corp text-hartie/90">{cancer.text}</p>
+              <h3 className="relative mt-auto pt-8 text-h3 text-hartie">
+                {cancer.titlu}
+              </h3>
+              <p className="relative mt-3 text-corp text-hartie/90">
+                {cancer.text}
+              </p>
             </article>
           </li>
 
@@ -151,12 +170,19 @@ export default function Realizari() {
               />
               <div className="relative flex items-start justify-between gap-4">
                 <span className="colt-mic-a flex size-12 items-center justify-center bg-miere-400 text-cerneala shadow-[0_10px_22px_-10px_rgba(255,172,0,0.9)]">
-                  <Pictograma nume={performanta.pictograma} className="size-6" />
+                  <Pictograma
+                    nume={performanta.pictograma}
+                    className="size-6"
+                  />
                 </span>
                 <Numar n={2} className="text-[4.5rem] text-miere-400" />
               </div>
-              <h3 className="relative mt-auto pt-8 text-h3 text-cerneala">{performanta.titlu}</h3>
-              <p className="relative mt-3 text-corp text-cerneala-moale">{performanta.text}</p>
+              <h3 className="relative mt-auto pt-8 text-h3 text-cerneala">
+                {performanta.titlu}
+              </h3>
+              <p className="relative mt-3 text-corp text-cerneala-moale">
+                {performanta.text}
+              </p>
             </article>
           </li>
 
@@ -173,7 +199,9 @@ export default function Realizari() {
               />
               <div className="flex flex-1 flex-col p-6 sm:p-7">
                 <h3 className="text-h4 text-cerneala">{autism.titlu}</h3>
-                <p className="mt-2 text-mic text-cerneala-moale">{autism.text}</p>
+                <p className="mt-2 text-mic text-cerneala-moale">
+                  {autism.text}
+                </p>
               </div>
             </article>
           </li>
@@ -194,7 +222,9 @@ export default function Realizari() {
                   <Pictograma nume={casa.pictograma} className="size-6" />
                 </span>
                 <h3 className="mt-5 text-h3 text-cerneala">{casa.titlu}</h3>
-                <p className="mt-2 text-corp text-cerneala-moale">{casa.text}</p>
+                <p className="mt-2 text-corp text-cerneala-moale">
+                  {casa.text}
+                </p>
               </div>
             </article>
           </li>
@@ -202,7 +232,10 @@ export default function Realizari() {
           {/* 5 — fără poză (fără chipuri la cazuri umanitare), cu turcoaz calm. */}
           <li className="sm:col-span-2 lg:col-span-3">
             <article className="granulatie relative flex h-full flex-col justify-center overflow-hidden colt-a bg-turcoaz-100 p-7 shadow-[0_24px_50px_-28px_rgba(42,159,163,0.6)] lg:p-8">
-              <Numar n={5} className="absolute -top-5 -right-2 text-[9rem] text-turcoaz-200/70" />
+              <Numar
+                n={5}
+                className="absolute -top-5 -right-2 text-[9rem] text-turcoaz-200/70"
+              />
               <Decor
                 semn="inima"
                 strokeWidth={0.8}
@@ -211,8 +244,12 @@ export default function Realizari() {
               <span className="colt-mic-a relative flex size-12 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
                 <Pictograma nume={umanitare.pictograma} className="size-6" />
               </span>
-              <h3 className="relative mt-5 text-h3 text-turcoaz-900">{umanitare.titlu}</h3>
-              <p className="relative mt-2 max-w-md text-corp text-turcoaz-900/80">{umanitare.text}</p>
+              <h3 className="relative mt-5 text-h3 text-turcoaz-900">
+                {umanitare.titlu}
+              </h3>
+              <p className="relative mt-2 max-w-md text-corp text-turcoaz-900/80">
+                {umanitare.text}
+              </p>
             </article>
           </li>
         </ol>

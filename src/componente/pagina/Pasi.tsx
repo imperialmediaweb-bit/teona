@@ -34,7 +34,8 @@ const FELURI = [
     card: "granulatie bg-turcoaz-100 text-cerneala shadow-[0_28px_56px_-26px_rgba(42,159,163,0.6)]",
     numar: "text-turcoaz-200",
     text: "text-turcoaz-900",
-    pictograma: "bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
+    pictograma:
+      "bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
     semn: "text-turcoaz-200",
   },
   {

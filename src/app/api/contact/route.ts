@@ -50,7 +50,8 @@ function varsta(nastere: Date, azi: Date): number {
   let ani = azi.getFullYear() - nastere.getFullYear();
   const inainteDeZi =
     azi.getMonth() < nastere.getMonth() ||
-    (azi.getMonth() === nastere.getMonth() && azi.getDate() < nastere.getDate());
+    (azi.getMonth() === nastere.getMonth() &&
+      azi.getDate() < nastere.getDate());
   if (inainteDeZi) ani -= 1;
   return ani;
 }

@@ -24,7 +24,6 @@ import { citesteSuma, laBan, scrieSuma } from "@/lib/suma";
  * termene de depunere: caietul le lasă „[de confirmat]”.
  */
 
-
 export default function CalculatorSponsorizare() {
   const id = useId();
   const [cifraText, setCifraText] = useState("");
@@ -102,7 +101,9 @@ export default function CalculatorSponsorizare() {
             value={cifraText}
             onChange={(ev) => setCifraText(ev.target.value)}
             aria-invalid={Boolean(cifra.eroare)}
-            aria-describedby={cifra.eroare ? `${id}-cifra-eroare` : `${id}-cifra-nota`}
+            aria-describedby={
+              cifra.eroare ? `${id}-cifra-eroare` : `${id}-cifra-nota`
+            }
             className={cifra.eroare ? claseControlGresit : claseControl}
           />
         </Camp>
@@ -157,11 +158,17 @@ export default function CalculatorSponsorizare() {
                 <li
                   key={prag.eticheta}
                   className={`colt-mic-a flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-3 ${
-                    prag.limita ? "bg-hartie text-cerneala" : "bg-hartie/15 text-hartie"
+                    prag.limita
+                      ? "bg-hartie text-cerneala"
+                      : "bg-hartie/15 text-hartie"
                   }`}
                 >
-                  <span className="text-mic font-semibold">{prag.eticheta}</span>
-                  <span className="font-titlu text-corp font-bold">{scrieSuma(prag.suma)}</span>
+                  <span className="text-mic font-semibold">
+                    {prag.eticheta}
+                  </span>
+                  <span className="font-titlu text-corp font-bold">
+                    {scrieSuma(prag.suma)}
+                  </span>
                   {prag.limita && (
                     <span className="basis-full text-nota font-semibold text-caramiziu-700">
                       Acesta e pragul care limitează suma.

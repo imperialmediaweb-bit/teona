@@ -22,7 +22,11 @@ import {
 export default function BannerCookieuri() {
   // Pe server nu știm dacă există acord. „necunoscut” ține bannerul în afara
   // HTML-ului, ca să nu clipească pentru cine a ales deja.
-  const acord = useSyncExternalStore(abonareLaAcord, areAcord, () => "necunoscut");
+  const acord = useSyncExternalStore(
+    abonareLaAcord,
+    areAcord,
+    () => "necunoscut",
+  );
 
   // Deschiderea din subsol, pentru schimbarea alegerii.
   const [redeschis, setRedeschis] = useState(false);
@@ -91,7 +95,9 @@ export default function BannerCookieuri() {
             </li>
             <li className="flex items-start justify-between gap-4">
               <label htmlFor="cookie-statistici" className="cursor-pointer">
-                <p className="font-titlu font-semibold text-cerneala">Statistici</p>
+                <p className="font-titlu font-semibold text-cerneala">
+                  Statistici
+                </p>
                 <p className="text-mic text-cerneala-moale">
                   Ne arată câți oameni ne vizitează și ce pagini citesc.
                 </p>
@@ -106,7 +112,9 @@ export default function BannerCookieuri() {
             </li>
             <li className="flex items-start justify-between gap-4">
               <label htmlFor="cookie-marketing" className="cursor-pointer">
-                <p className="font-titlu font-semibold text-cerneala">Marketing</p>
+                <p className="font-titlu font-semibold text-cerneala">
+                  Marketing
+                </p>
                 <p className="text-mic text-cerneala-moale">
                   Ne ajută să ajungem la oameni care ar vrea să susțină copiii.
                 </p>

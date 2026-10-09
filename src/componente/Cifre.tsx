@@ -9,10 +9,22 @@ const formateaza = new Intl.NumberFormat("ro-RO").format;
 
 /** Culorile se rotesc, ca cele patru cifre să nu arate ca un singur bloc. */
 const CULORI = [
-  { cifra: "text-caramiziu-500", linie: "text-caramiziu-300", pata: "bg-caramiziu-100" },
+  {
+    cifra: "text-caramiziu-500",
+    linie: "text-caramiziu-300",
+    pata: "bg-caramiziu-100",
+  },
   { cifra: "text-miere-500", linie: "text-miere-300", pata: "bg-miere-100" },
-  { cifra: "text-turcoaz-500", linie: "text-turcoaz-300", pata: "bg-turcoaz-100" },
-  { cifra: "text-caramiziu-600", linie: "text-caramiziu-300", pata: "bg-caramiziu-100" },
+  {
+    cifra: "text-turcoaz-500",
+    linie: "text-turcoaz-300",
+    pata: "bg-turcoaz-100",
+  },
+  {
+    cifra: "text-caramiziu-600",
+    linie: "text-caramiziu-300",
+    pata: "bg-caramiziu-100",
+  },
 ] as const;
 
 /**
