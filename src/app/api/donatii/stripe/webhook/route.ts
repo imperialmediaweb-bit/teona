@@ -93,8 +93,7 @@ async function prelucreaza(eveniment: Stripe.Event) {
       // .completed`; aici ne interesează doar reînnoirile.
       if (factura.billing_reason === "subscription_create") return;
 
-      const date = (factura.parent as { subscription_details?: { metadata?: Record<string, string> } } | null)
-        ?.subscription_details?.metadata ?? {};
+      const date = metadateleAbonamentului(factura);
 
       await scrieInitiata({
         procesator: "stripe",
@@ -123,6 +122,39 @@ async function prelucreaza(eveniment: Stripe.Event) {
       // le retrimită.
       return;
   }
+}
+
+/**
+ * Datele campaniei, din factura reînnoirii.
+ *
+ * Stripe a mutat locul lor între versiuni de API, iar versiunea e aleasă în
+ * contul asociației, nu aici: în cele noi stau sub `parent
+ * .subscription_details`, în cele mai vechi direct sub `subscription_details`,
+ * iar unele le aduc doar pe linia de factură. Le căutăm în toate trei, în
+ * ordine.
+ *
+ * Dacă n-am face-o, o reînnoire s-ar înregistra tăcut cu destinația greșită
+ * și fără numele donatorului — nu o eroare, ci o evidență stricată, care se
+ * observă abia peste luni.
+ */
+function metadateleAbonamentului(
+  factura: Stripe.Invoice,
+): Record<string, string> {
+  const f = factura as unknown as {
+    parent?: {
+      subscription_details?: {
+        metadata?: Record<string, string> | null;
+      } | null;
+    } | null;
+    subscription_details?: { metadata?: Record<string, string> | null } | null;
+    lines?: { data?: Array<{ metadata?: Record<string, string> | null }> };
+  };
+  return (
+    f.parent?.subscription_details?.metadata ??
+    f.subscription_details?.metadata ??
+    f.lines?.data?.[0]?.metadata ??
+    {}
+  );
 }
 
 /** Donatorul ajunge pe lista de buletin doar dacă a bifat el acordul. */
