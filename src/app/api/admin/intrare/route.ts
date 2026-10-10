@@ -31,7 +31,19 @@ export async function POST(cerere: Request) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    path: "/admin",
+    /*
+      Calea e `/`, nu `/admin`.
+
+      Paginile panoului stau sub `/admin`, dar rutele care fac efectiv treaba
+      — publică o campanie, șterge un donator, creează o ciornă — stau sub
+      `/api/admin`. Cu cookie-ul limitat la `/admin`, browserul nu-l trimitea
+      la ele, iar fiecare apăsare de buton răspundea 403. Prins de proba pe
+      site-ul viu, nu de citirea codului.
+
+      Nu scade protecția: cookie-ul rămâne `httpOnly` (JavaScript nu-l poate
+      citi) și `sameSite: strict` (nu pleacă la cereri venite de pe alt sit).
+    */
+    path: "/",
     maxAge: 12 * 60 * 60,
   });
   return raspunsul;
