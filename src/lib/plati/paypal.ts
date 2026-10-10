@@ -122,8 +122,23 @@ export async function semnaturaEValida(
   antete: Headers,
   corp: string,
 ): Promise<boolean> {
-  const webhookId = process.env.PAYPAL_WEBHOOK_ID;
-  if (!webhookId) return false;
+  /*
+    `PAYPAL_WEBHOOK_ID` poate conține mai multe ID-uri, despărțite prin
+    virgulă.
+
+    În perioada de tranziție există două webhookuri în PayPal: unul către
+    adresa de previzualizare, cu care se testează, și unul către domeniul
+    final, care prinde viață în ziua mutării. Fiecare are ID-ul lui, iar
+    verificarea semnăturii se face per ID — cu unul singur configurat,
+    jumătate din notificări ar fi respinse ca nesemnate.
+
+    Se încearcă pe rând; prima potrivire oprește căutarea.
+  */
+  const idUri = (process.env.PAYPAL_WEBHOOK_ID ?? "")
+    .split(",")
+    .map((x) => x.trim())
+    .filter(Boolean);
+  if (idUri.length === 0) return false;
 
   const necesare = [
     "paypal-auth-algo",
@@ -135,28 +150,34 @@ export async function semnaturaEValida(
   if (necesare.some((a) => !antete.get(a))) return false;
 
   const acces = await iaJeton();
-  const raspuns = await fetch(
-    `${BAZA()}/v1/notifications/verify-webhook-signature`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${acces}`,
-        "Content-Type": "application/json",
+  const eveniment = JSON.parse(corp);
+
+  for (const webhookId of idUri) {
+    const raspuns = await fetch(
+      `${BAZA()}/v1/notifications/verify-webhook-signature`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${acces}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          auth_algo: antete.get("paypal-auth-algo"),
+          cert_url: antete.get("paypal-cert-url"),
+          transmission_id: antete.get("paypal-transmission-id"),
+          transmission_sig: antete.get("paypal-transmission-sig"),
+          transmission_time: antete.get("paypal-transmission-time"),
+          webhook_id: webhookId,
+          webhook_event: eveniment,
+        }),
       },
-      body: JSON.stringify({
-        auth_algo: antete.get("paypal-auth-algo"),
-        cert_url: antete.get("paypal-cert-url"),
-        transmission_id: antete.get("paypal-transmission-id"),
-        transmission_sig: antete.get("paypal-transmission-sig"),
-        transmission_time: antete.get("paypal-transmission-time"),
-        webhook_id: webhookId,
-        webhook_event: JSON.parse(corp),
-      }),
-    },
-  );
-  if (!raspuns.ok) return false;
-  const date = (await raspuns.json()) as { verification_status?: string };
-  return date.verification_status === "SUCCESS";
+    );
+    if (!raspuns.ok) continue;
+    const date = (await raspuns.json()) as { verification_status?: string };
+    if (date.verification_status === "SUCCESS") return true;
+  }
+
+  return false;
 }
 
 export type { Frecventa };
