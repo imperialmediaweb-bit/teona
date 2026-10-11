@@ -105,11 +105,12 @@ export; aparițiile rămân pe pagină, fără buton
 | 12.1 Meniul | ✅ |
 | 12.2 Bara de anunț | ✅ |
 | 12.3 Subsolul | ✅ |
-| 12.4 Newsletter | ⚠️ formularul există; platforma nu e aleasă, deci abonarea nu e activă și o spune |
+| 12.4 Newsletter | ✅ prin **MailerLite**: abonarea de pe site merge acolo direct, iar confirmarea și dezabonarea le gestionează ei (caietul cere dezabonare dintr-un click și export de date — le are) |
 | 12.5 Bannerul de cookie-uri | ✅ |
 | 12.6 Paginile legale | ✅ |
 | 12.7 Pagina 404 | ✅ |
 | 12.8 Pictogramă, imagine de distribuire, accesibilitate | ✅ |
+| **Panou de admin** | ✅ **peste caiet** — caietul cere de peste șapte ori ca asociația să-și poată schimba singură conținutul. Panoul acoperă o parte: verifică și publică campaniile aniversare, vede donatorii, și face ciorne de e-mail în MailerLite, cu butoane de donație predefinite. Un asistent scrie prima variantă; nimic nu pleacă fără ca un om să apese trimite în MailerLite. Textele paginilor tot prin dezvoltator trec — pentru ele e nevoie de un CMS |
 | 12.8 **Statistici de vizite** | ❌ **nefăcut.** Caietul cere urmărirea donațiilor finalizate, a alegerii „Lunar”, a copierii IBAN-ului, a click-urilor către Galantom / 3,5% / Sponsori și a descărcărilor |
 
 ## Ce blochează, în ordinea importanței

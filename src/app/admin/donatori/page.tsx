@@ -58,7 +58,7 @@ async function Continut({
   if (!(await esteAutentificat())) {
     return (
       <Cadru titlu="Donatori" activ="/admin/donatori">
-        <Intrare gresit={Boolean(gresit)} />
+        <Intrare gresit={Boolean(gresit)} unde="/admin/donatori" />
       </Cadru>
     );
   }

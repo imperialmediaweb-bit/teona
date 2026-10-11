@@ -3,9 +3,11 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
 import { areCampanii, grupuri } from "@/lib/email/mailerlite";
+import { areAsistent } from "@/lib/asistent";
 import { EMAIL } from "@/date/asociatie";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
+import Asistent from "@/componente/admin/Asistent";
 
 export const metadata: Metadata = {
   title: "Trimite un e-mail",
@@ -49,7 +51,7 @@ async function Continut({
   if (!(await esteAutentificat())) {
     return (
       <Cadru titlu="Trimite un e-mail" activ="/admin/email">
-        <Intrare gresit={Boolean(gresit)} />
+        <Intrare gresit={Boolean(gresit)} unde="/admin/email" />
       </Cadru>
     );
   }
@@ -95,6 +97,13 @@ async function Continut({
           {eroare}
         </p>
       )}
+
+      {/*
+        Asistentul apare doar cu `ANTHROPIC_API_KEY` în mediu, ca toate
+        celelalte lucruri care depind de un serviciu din afară. Scrie în
+        câmpurile de mai jos; nu trimite nimic și nu apasă niciun buton.
+      */}
+      {areAsistent() && <Asistent />}
 
       <form
         action="/api/admin/email"

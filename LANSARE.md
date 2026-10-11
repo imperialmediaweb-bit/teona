@@ -115,7 +115,33 @@ fiscală o emite asociația.
 `redirectionare`, `campanie-trimisa`, `campanie-publicata`,
 `campanie-respinsa`, și variantele `-anunt`). În producție ruta dă 404.
 
-## 7. Ce mai lipsește de la asociație
+## 7. Panoul de admin
+
+`/admin/campanii`, `/admin/donatori`, `/admin/email`. O singură parolă, în
+`PAROLA_ADMIN`, de cel puțin 12 caractere. Nu e un sistem de conturi și nici
+nu pretinde să fie: pentru o listă pe care o verifică una-două persoane, ar fi
+mai mult de întreținut decât de câștigat.
+
+- [ ] `PAROLA_ADMIN` în Railway, lungă și nefolosită în altă parte. Schimbarea
+      ei deconectează pe toată lumea — asta e și mecanismul de „ieșire” dacă
+      parola ajunge unde nu trebuie.
+- [ ] `MAILERLITE_API_KEY`, altfel pagina de e-mail spune că lipsește.
+- [ ] `ANTHROPIC_API_KEY`, pentru asistentul care scrie ciorna. Opțional: fără
+      ea, panoul funcționează la fel, doar că omul scrie singur.
+
+**Asistentul nu trimite niciodată nimic.** Scrie un titlu și un text în
+câmpurile formularului; omul le citește, le schimbă, apasă „Creează ciorna în
+MailerLite”, își trimite o probă pe adresa lui, și abia apoi trimite din
+MailerLite. Trei opriri, toate cu un om la mijloc.
+
+Asistentul primește în instrucțiuni **doar** cifrele verificate (33 de tabere,
+1.500+ participanți, 80+ copii la Casa Teona, 300+ voluntari) și i se cere ca,
+unde ar avea nevoie de altceva, să lase un gol între paranteze drepte:
+`[câți copii]`, `[data]`. Un gol se vede și se completează; o cifră plauzibilă
+și greșită nu se vede deloc. **Instrucțiunea nu e o garanție** — cine trimite
+e cel care verifică, iar panoul i-o spune de fiecare dată.
+
+## 8. Ce mai lipsește de la asociație
 
 Lista completă e în `continut/stadiu-caiet.md`. Site-ul funcționează fără ele,
 dar secțiunile respective nu se afișează.
