@@ -7,19 +7,24 @@ import {
   text,
   textOptional,
 } from "@/lib/api";
+import { EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
+import { areEmail, curat, tabel, trimiteEmail } from "@/lib/email/trimite";
 
 /**
  * Formularul de contact (10.4) și cel de voluntariat (11.4).
  *
  * Caietul cere ca toate cererile să ajungă la contact@teona-ariana.ro, cu
  * eticheta potrivită, și ca expeditorul să primească un email automat de
- * primire. Pentru asta e nevoie de un serviciu de trimitere a emailului,
- * configurat pe gazdă — nu există încă unul ales.
+ * primire. Se trimit două mesaje: unul către asociație, cu tot ce a completat
+ * omul și cu `reply_to` pe adresa lui — ca răspunsul să plece direct din
+ * inbox — și unul scurt către om, ca să știe că a ajuns.
  *
- * Până atunci ruta validează cererea și răspunde cinstit că trimiterea nu e
- * conectată, trimițând omul spre email și telefon. Nu afișăm „Am primit
- * formularul tău” pentru un mesaj care n-a plecat nicăieri și nu stocăm date
- * personale într-un loc din care n-am ști să le scoatem.
+ * Fără `RESEND_API_KEY`, ruta răspunde cinstit că trimiterea nu e conectată și
+ * dă telefonul și adresa. Nu afișăm „Am primit formularul tău” pentru un mesaj
+ * care n-a plecat nicăieri.
+ *
+ * Dacă mesajul către asociație nu pleacă, omul **nu** primește confirmare:
+ * altfel ar crede că a scris cuiva, iar la asociație n-ar ști nimeni.
  *
  * Limitele (corp, rată, lungimi) sunt puse de pe acum, nu când se conectează
  * emailul: atunci fiecare cerere va costa un email, și e mai ușor să ai
@@ -127,8 +132,70 @@ export async function POST(cerere: Request) {
     }
   }
 
+  if (!areEmail()) {
+    return raspuns(
+      "Trimiterea formularului nu este încă activă pe site-ul nou. Până atunci scrie-ne direct:",
+      503,
+    );
+  }
+
+  const voluntariat = corp.fel === "voluntariat";
+  const adresaOmului = String(corp.email);
+  const numeleOmului = String(corp.nume ?? "").trim();
+
+  const campuri = tabel([
+    ["Nume", numeleOmului],
+    ["E-mail", adresaOmului],
+    ["Telefon", String(corp.telefon ?? "")],
+    ["Interesat de", String(corp.interes ?? "")],
+    ["Localitate", String(corp.localitate ?? "")],
+    ["Data nașterii", String(corp.nastere ?? "")],
+    ["Disponibilitate", String(corp.disponibilitate ?? "")],
+    ["Experiență cu copii", String(corp.experientaCopii ?? "")],
+    ["Limbi", String(corp.limbi ?? "")],
+    ["Permis", String(corp.permis ?? "")],
+    ["Cum a aflat", String(corp.aflat ?? "")],
+    ["Motivul", String(corp.motiv ?? "")],
+    ["Mesaj", String(corp.mesaj ?? "")],
+  ]);
+
+  const titlu = voluntariat
+    ? "Cerere nouă de voluntariat"
+    : "Mesaj nou de pe site";
+
+  const catreAsociatie = await trimiteEmail({
+    catre: EMAIL.contact,
+    subiect: `${titlu}${numeleOmului ? ` — ${numeleOmului}` : ""}`,
+    raspundeLa: adresaOmului,
+    text: `${titlu}\n\n${campuri.text}`,
+    html: `<h2 style="font-family:Arial,sans-serif;color:#232323;">${curat(titlu)}</h2><table cellpadding="0" cellspacing="0">${campuri.html}</table>`,
+  });
+
+  if (!catreAsociatie) {
+    // Mesajul n-a ajuns la asociație. Omul trebuie să afle, nu să plece
+    // liniștit că a scris cuiva.
+    return raspuns(
+      "Nu am putut trimite mesajul acum. Încearcă din nou peste câteva minute sau scrie-ne direct:",
+      502,
+    );
+  }
+
+  // Confirmarea către om. Dacă ea nu pleacă, nu e grav: mesajul lui a ajuns
+  // deja unde trebuie, iar asociația îl va contacta.
+  await trimiteEmail({
+    catre: adresaOmului,
+    subiect: voluntariat
+      ? "Am primit cererea ta de voluntariat"
+      : "Am primit mesajul tău",
+    raspundeLa: EMAIL.contact,
+    text: `${numeleOmului ? `Bună, ${numeleOmului}` : "Bună"},\n\nȚi-am primit ${voluntariat ? "cererea de voluntariat" : "mesajul"} și îți răspundem cât putem de repede.\n\nDacă e urgent, sună-ne la ${TELEFON_PRINCIPAL.afisat}.\n\nAsociația Teona Ariana Suceava`,
+    html: `<p style="font-family:Arial,sans-serif;font-size:16px;color:#232323;">${curat(numeleOmului ? `Bună, ${numeleOmului}` : "Bună")},</p><p style="font-family:Arial,sans-serif;font-size:16px;color:#232323;">Ți-am primit ${voluntariat ? "cererea de voluntariat" : "mesajul"} și îți răspundem cât putem de repede.</p><p style="font-family:Arial,sans-serif;font-size:16px;color:#232323;">Dacă e urgent, sună-ne la <strong>${curat(TELEFON_PRINCIPAL.afisat)}</strong>.</p><p style="font-family:Arial,sans-serif;font-size:15px;color:#616161;">Asociația Teona Ariana Suceava</p>`,
+  });
+
   return raspuns(
-    "Trimiterea formularului nu este încă activă pe site-ul nou — se conectează înainte de lansare. Până atunci scrie-ne direct:",
-    503,
+    voluntariat
+      ? "Mulțumim! Am primit cererea ta și te contactăm în curând."
+      : "Mulțumim! Am primit mesajul tău și îți răspundem cât putem de repede.",
+    200,
   );
 }

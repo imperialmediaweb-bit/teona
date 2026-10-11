@@ -6,17 +6,18 @@ import {
   raspuns,
   textOptional,
 } from "@/lib/api";
+import { areBuletin, laBuletin } from "@/lib/buletin";
 
 /**
  * Abonarea la newsletter.
  *
- * Decizia e încă deschisă: caietul de sarcini (12.4) spune că asociația nu are
- * încă o platformă de newsletter și că se alege împreună înainte de lansare, cu
- * servere în Uniunea Europeană, dezabonare dintr-un click și export de date.
+ * Platforma aleasă e MailerLite. Adresa pleacă acolo direct, iar confirmarea
+ * și dezabonarea le gestionează ei — caietul (12.4) cere dezabonare dintr-un
+ * click și export de date, pe care le are.
  *
- * Până atunci ruta răspunde cinstit că abonarea nu e activă. Nu stocăm adrese
- * într-un loc din care n-am ști să le scoatem, și nu arătăm „Mulțumim!” pentru
- * o abonare care nu s-a întâmplat.
+ * Fără `MAILERLITE_API_KEY`, ruta răspunde cinstit că abonarea nu e activă.
+ * Nu stocăm adrese într-un loc din care n-am ști să le scoatem, și nu arătăm
+ * „Mulțumim!” pentru o abonare care nu s-a întâmplat.
  *
  * Limita de rată e aici de pe acum: când platforma va fi conectată, fiecare
  * cerere va fi un email de confirmare trimis la adresa din formular — adică
@@ -56,8 +57,26 @@ export async function POST(cerere: Request) {
     return raspuns("Bifează acordul pentru a continua.", 400);
   }
 
+  if (!areBuletin()) {
+    return raspuns(
+      "Abonarea la buletinul informativ nu este încă activă. Până atunci ne poți scrie direct:",
+      503,
+    );
+  }
+
+  const adresa = email(corp.email);
+  if (!adresa) return raspuns("Introdu o adresă de e-mail validă.", 400);
+
+  const dus = await laBuletin(adresa);
+  if (!dus) {
+    return raspuns(
+      "Nu am putut finaliza abonarea acum. Încearcă din nou peste câteva minute sau scrie-ne direct:",
+      502,
+    );
+  }
+
   return raspuns(
-    "Abonarea la buletinul informativ nu este încă activă — alegem platforma înainte de lansare. Până atunci ne poți scrie direct:",
-    503,
+    "Mulțumim! Verifică-ți emailul pentru a confirma abonarea.",
+    200,
   );
 }
