@@ -42,10 +42,7 @@ export async function POST(cerere: Request) {
 
   const lei = Number(corp.lei);
   if (!sumaAcceptata(lei)) {
-    return raspuns(
-      "Suma trebuie să fie între 5 și 50.000 de lei.",
-      400,
-    );
+    return raspuns("Suma trebuie să fie între 5 și 50.000 de lei.", 400);
   }
 
   const frecventa = corp.frecventa === "lunar" ? "lunar" : "o-data";

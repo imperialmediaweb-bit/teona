@@ -30,7 +30,10 @@ export async function POST(cerere: Request) {
   const titlu = camp("titlu");
   const expeditor = camp("expeditor");
   if (!subiect || !titlu || !expeditor) {
-    return inapoi(cerere, "Completează subiectul, titlul și adresa de expediere.");
+    return inapoi(
+      cerere,
+      "Completează subiectul, titlul și adresa de expediere.",
+    );
   }
 
   const paragrafe = camp("text")

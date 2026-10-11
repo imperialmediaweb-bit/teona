@@ -6,9 +6,11 @@ import {
   evenimentNou,
   marcheazaPlatita,
   scrieInitiata,
+  type DonatieIncasata,
 } from "@/lib/plati/donatii";
 import { citesteEveniment } from "@/lib/plati/stripe";
 import { laBuletin } from "@/lib/buletin";
+import { trimiteMultumirea } from "@/lib/email/donatie";
 
 /**
  * Confirmarea plăților, de la Stripe.
@@ -78,7 +80,7 @@ async function prelucreaza(eveniment: Stripe.Event) {
         sesiune.id,
         sesiune.amount_total ?? undefined,
       );
-      await poateLaBuletin(rand);
+      await dupaIncasare(rand);
       return;
     }
 
@@ -109,11 +111,12 @@ async function prelucreaza(eveniment: Stripe.Event) {
         acordBuletin: date.acord_buletin === "da",
         campanieSlug: date.campanie || null,
       });
-      await marcheazaPlatita(
+      const randReinnoire = await marcheazaPlatita(
         "stripe",
         factura.id ?? `factura-${eveniment.id}`,
         factura.amount_paid,
       );
+      await dupaIncasare(randReinnoire, true);
       return;
     }
 
@@ -157,10 +160,37 @@ function metadateleAbonamentului(
   );
 }
 
-/** Donatorul ajunge pe lista de buletin doar dacă a bifat el acordul. */
-async function poateLaBuletin(
-  rand: { email: string | null; acord_buletin: boolean } | null,
-) {
-  if (!rand?.email || !rand.acord_buletin) return;
-  await laBuletin(rand.email).catch(() => undefined);
+/**
+ * Ce se întâmplă după ce banii au intrat.
+ *
+ * `marcheazaPlatita` întoarce un rând **doar prima dată**, pentru că schimbă
+ * starea; la o a doua livrare a aceluiași eveniment întoarce `null`. De aceea
+ * nimic de aici nu se poate întâmpla de două ori: nici mulțumirea, nici
+ * urcarea pe listă.
+ *
+ * Mulțumirea nu oprește nimic dacă pică. Banii au intrat și sunt înregistrați;
+ * un e-mail netrimis e supărător, dar a cere procesatorului să retrimită tot
+ * evenimentul pentru atât ar risca o dublă înregistrare.
+ */
+async function dupaIncasare(
+  rand: DonatieIncasata | null,
+  reinnoire = false,
+): Promise<void> {
+  if (!rand?.email) return;
+
+  await trimiteMultumirea({
+    email: rand.email,
+    prenume: rand.prenume,
+    nume: rand.nume,
+    sumaBani: Number(rand.suma_bani),
+    moneda: rand.moneda,
+    frecventa: rand.frecventa,
+    destinatie: rand.destinatie,
+    reinnoire,
+  }).catch(() => undefined);
+
+  // Pe lista de buletin ajunge doar cine a bifat el acordul.
+  if (rand.acord_buletin) {
+    await laBuletin(rand.email).catch(() => undefined);
+  }
 }

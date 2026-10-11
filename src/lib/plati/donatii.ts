@@ -50,19 +50,37 @@ export async function scrieInitiata(d: DonatieNoua): Promise<void> {
   );
 }
 
-/** Marchează plata ca încasată. Întoarce rândul, dacă a fost schimbat acum. */
+export type DonatieIncasata = {
+  email: string | null;
+  acord_buletin: boolean;
+  prenume: string | null;
+  nume: string | null;
+  suma_bani: string | number;
+  moneda: string;
+  frecventa: string;
+  destinatie: string;
+};
+
+/**
+ * Marchează plata ca încasată. Întoarce rândul, dacă a fost schimbat acum.
+ *
+ * `stare <> 'platita'` în condiție nu e de prisos: dacă același eveniment
+ * ajunge de două ori, a doua oară nu se schimbă nimic, nu se întoarce niciun
+ * rând, și omul nu primește două mulțumiri pentru o singură donație.
+ */
 export async function marcheazaPlatita(
   procesator: string,
   referinta: string,
   sumaBani?: number,
-): Promise<{ email: string | null; acord_buletin: boolean } | null> {
-  const randuri = await intreaba<{ email: string | null; acord_buletin: boolean }>(
+): Promise<DonatieIncasata | null> {
+  const randuri = await intreaba<DonatieIncasata>(
     `UPDATE donatii
         SET stare = 'platita',
             platita_la = now(),
             suma_bani = COALESCE($3, suma_bani)
       WHERE procesator = $1 AND referinta = $2 AND stare <> 'platita'
-      RETURNING email, acord_buletin`,
+      RETURNING email, acord_buletin, prenume, nume,
+                suma_bani, moneda, frecventa, destinatie`,
     [procesator, referinta, sumaBani ?? null],
   );
   return randuri[0] ?? null;

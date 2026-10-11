@@ -7,6 +7,7 @@ import {
   scrieInitiata,
 } from "@/lib/plati/donatii";
 import { semnaturaEValida } from "@/lib/plati/paypal";
+import { trimiteMultumirea } from "@/lib/email/donatie";
 
 /**
  * Confirmarea plăților, de la PayPal.
@@ -67,7 +68,21 @@ export async function POST(cerere: Request) {
       // site-ul nostru. Fără acord explicit, nimeni nu ajunge pe listă.
       acordBuletin: false,
     });
-    await marcheazaPlatita("paypal", referinta, bani);
+    const rand = await marcheazaPlatita("paypal", referinta, bani);
+
+    // Ca la Stripe: rândul se întoarce doar prima dată, deci mulțumirea nu
+    // poate pleca de două ori pentru aceeași donație.
+    if (rand?.email) {
+      await trimiteMultumirea({
+        email: rand.email,
+        prenume: rand.prenume,
+        nume: rand.nume,
+        sumaBani: Number(rand.suma_bani),
+        moneda: rand.moneda,
+        frecventa: rand.frecventa,
+        destinatie: rand.destinatie,
+      }).catch(() => undefined);
+    }
   }
 
   return NextResponse.json({ primit: true });
