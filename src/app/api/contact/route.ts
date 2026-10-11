@@ -134,32 +134,9 @@ export async function POST(cerere: Request) {
     }
   }
 
-  if (!areEmail()) {
-    return raspuns(
-      "Trimiterea formularului nu este încă activă pe site-ul nou. Până atunci scrie-ne direct:",
-      503,
-    );
-  }
-
   const voluntariat = corp.fel === "voluntariat";
   const adresaOmului = String(corp.email);
   const numeleOmului = String(corp.nume ?? "").trim();
-
-  const campuri = tabel([
-    ["Nume", numeleOmului],
-    ["E-mail", adresaOmului],
-    ["Telefon", String(corp.telefon ?? "")],
-    ["Interesat de", String(corp.interes ?? "")],
-    ["Localitate", String(corp.localitate ?? "")],
-    ["Data nașterii", String(corp.nastere ?? "")],
-    ["Disponibilitate", String(corp.disponibilitate ?? "")],
-    ["Experiență cu copii", String(corp.experientaCopii ?? "")],
-    ["Limbi", String(corp.limbi ?? "")],
-    ["Permis", String(corp.permis ?? "")],
-    ["Cum a aflat", String(corp.aflat ?? "")],
-    ["Motivul", String(corp.motiv ?? "")],
-    ["Mesaj", String(corp.mesaj ?? "")],
-  ]);
 
   // În CRM înainte de e-mail: un mesaj citit și uitat dispare din inbox, un
   // rând în `cereri` rămâne, cu stadiul lui — nou, în lucru, rezolvat.
@@ -189,6 +166,30 @@ export async function POST(cerere: Request) {
       ),
     }).catch(() => null);
   }
+
+  if (!areEmail()) {
+    return raspuns(
+      "Trimiterea formularului nu este încă activă pe site-ul nou. Până atunci scrie-ne direct:",
+      503,
+    );
+  }
+
+
+  const campuri = tabel([
+    ["Nume", numeleOmului],
+    ["E-mail", adresaOmului],
+    ["Telefon", String(corp.telefon ?? "")],
+    ["Interesat de", String(corp.interes ?? "")],
+    ["Localitate", String(corp.localitate ?? "")],
+    ["Data nașterii", String(corp.nastere ?? "")],
+    ["Disponibilitate", String(corp.disponibilitate ?? "")],
+    ["Experiență cu copii", String(corp.experientaCopii ?? "")],
+    ["Limbi", String(corp.limbi ?? "")],
+    ["Permis", String(corp.permis ?? "")],
+    ["Cum a aflat", String(corp.aflat ?? "")],
+    ["Motivul", String(corp.motiv ?? "")],
+    ["Mesaj", String(corp.mesaj ?? "")],
+  ]);
 
   const titlu = voluntariat
     ? "Cerere nouă de voluntariat"

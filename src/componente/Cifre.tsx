@@ -7,14 +7,22 @@ import { CIFRE } from "@/date/asociatie";
 /** 1.500 se scrie cu punct în română; 33 și 80 rămân cum sunt. */
 const formateaza = new Intl.NumberFormat("ro-RO").format;
 
-/** Culorile se rotesc, ca cele patru cifre să nu arate ca un singur bloc. */
+/*
+  Culorile se rotesc, ca cele patru cifre să nu arate ca un singur bloc.
+
+  Mierea e treapta 600, nu 500: la 68 px cifrele sunt „text mare", deci pragul
+  e 3:1, iar `miere-500` dădea 2,52:1 pe alb — galbenul deschis e cea mai
+  slabă culoare de pe hârtie albă. Treapta 600 dă 3,90:1 și arată la fel de
+  cald. Portocaliul (3,44:1) și turcoazul (3,19:1) trec pragul la mărimea
+  asta.
+*/
 const CULORI = [
   {
     cifra: "text-caramiziu-500",
     linie: "text-caramiziu-300",
     pata: "bg-caramiziu-100",
   },
-  { cifra: "text-miere-500", linie: "text-miere-300", pata: "bg-miere-100" },
+  { cifra: "text-miere-600", linie: "text-miere-300", pata: "bg-miere-100" },
   {
     cifra: "text-turcoaz-500",
     linie: "text-turcoaz-300",

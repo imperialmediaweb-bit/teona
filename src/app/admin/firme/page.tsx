@@ -25,6 +25,7 @@ type Cautare = {
   cauta?: string;
   gresit?: string;
   deschis?: string;
+  eroare?: string;
 };
 
 export default function PaginaFirme({
@@ -55,7 +56,7 @@ async function Continut({
   searchParams: Promise<Cautare>;
 }) {
   await connection();
-  const { stadiu, cauta = "", gresit, deschis } = await searchParams;
+  const { stadiu, cauta = "", gresit, deschis, eroare } = await searchParams;
 
   if (!areParolaConfigurata()) {
     return (
@@ -110,6 +111,14 @@ async function Continut({
 
   return (
     <Cadru titlu="Firme" activ="/admin/firme">
+      {eroare && (
+        <p
+          role="alert"
+          className="mb-6 rounded-card border border-caramiziu-200 bg-caramiziu-50 p-4 text-mic text-caramiziu-900"
+        >
+          {eroare}
+        </p>
+      )}
       <div className="flex flex-wrap items-center gap-2">
         <Filtru href="/admin/firme" activ={!ales} cauta={cauta}>
           Toate
@@ -235,6 +244,11 @@ async function Continut({
                   <input
                     name="suma"
                     inputMode="decimal"
+                    // Arată ce e deja trecut: altfel „las gol ca să păstrez
+                    // suma" e o regulă pe care n-o vede nimeni.
+                    defaultValue={
+                      f.sumaBani === null ? "" : String(f.sumaBani / 100)
+                    }
                     placeholder="Suma încasată (lei)"
                     className="w-44 rounded-moale border border-hartie-umbra bg-hartie px-3 py-1.5 text-mic"
                   />

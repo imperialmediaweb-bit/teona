@@ -23,7 +23,13 @@ import Testimoniale, {
 import { metadate } from "./seo";
 
 export const metadata: Metadata = metadate({
-  titlu: "Asociația Teona Ariana Suceava · ONG pentru copii cu dizabilități",
+  /*
+    65 de caractere intrau în 60 doar tăiate de Google, iar ce se taie e
+    tocmai coada — „pentru copii cu dizabilități", partea care spune ce face
+    asociația. Varianta scurtă încape întreagă și păstrează și numele, și
+    orașul, și ce face.
+  */
+  titlu: "Asociația Teona Ariana Suceava · copii cu dizabilități",
   titluAbsolut: true,
   descriere:
     "Tabere RESPIRO, Casa Teona și sprijin pentru copiii cu autism, sindrom Down sau alte nevoi speciale și familiile lor, în Suceava. Donează sau fii voluntar.",

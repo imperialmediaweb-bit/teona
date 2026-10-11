@@ -107,9 +107,19 @@ export default function PanouDonator({ cont }: { cont: ContulMeu }) {
 
       {/* Cifrele lui, toate adevărate și calculate din donațiile lui. */}
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        {/*
+          Un total pe fiecare monedă, nu unul singur.
+
+          Cine a dat 100 de lei cu cardul și 25 € prin PayPal n-a dat „125".
+          Nu convertim: cursul care contează e al băncii lui, în ziua plății.
+          Aproape toți au o singură monedă, deci de obicei se vede o singură
+          cifră, ca înainte.
+        */}
         <Cifra
           eticheta="Ai dăruit în total"
-          valoare={scrieSuma(cont.totalBani / 100)}
+          valoare={cont.totaluri
+            .map((t) => scrieSuma(t.bani / 100, t.moneda))
+            .join(" + ")}
         />
         <Cifra
           eticheta={cont.donatii.length === 1 ? "Donație" : "Donații"}
@@ -132,9 +142,9 @@ export default function PanouDonator({ cont }: { cont: ContulMeu }) {
           {cont.peDestinatii.map((d) => {
             const scris = DESTINATII[d.destinatie];
             return (
-              <li key={d.destinatie}>
+              <li key={`${d.destinatie}-${d.moneda}`}>
                 <p className="font-titlu text-amplu font-bold text-caramiziu-700">
-                  {scrieSuma(d.bani / 100)}{" "}
+                  {scrieSuma(d.bani / 100, d.moneda)}{" "}
                   <span className="font-normal text-cerneala">
                     {scris?.cum ?? `pentru ${numeDestinatie(d.destinatie)}`}
                   </span>
@@ -204,7 +214,7 @@ export default function PanouDonator({ cont }: { cont: ContulMeu }) {
                     {d.platitaLa ? ZI.format(new Date(d.platitaLa)) : "—"}
                   </td>
                   <td className="py-3 pr-4 font-titlu font-bold whitespace-nowrap text-cerneala">
-                    {scrieSuma(d.sumaBani / 100)}
+                    {scrieSuma(d.sumaBani / 100, d.moneda)}
                     {d.frecventa === "lunar" && (
                       <span className="ml-2 rounded-full bg-turcoaz-100 px-2 py-0.5 text-nota font-bold text-turcoaz-900">
                         lunar

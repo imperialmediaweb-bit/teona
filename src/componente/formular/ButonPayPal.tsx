@@ -7,7 +7,7 @@ import {
   SUME_PROPUSE_EURO,
   euroAcceptat,
 } from "@/date/plati";
-import { scrieSuma } from "@/lib/suma";
+import { citesteSuma, scrieSuma } from "@/lib/suma";
 import Pictograma from "../Pictograma";
 
 /**
@@ -32,10 +32,15 @@ type Stare =
   | { fel: "trimite" }
   | { fel: "eroare"; mesaj: string };
 
-/** „12,50” și „12.50” sunt același lucru pentru om; `Number` vede doar al doilea. */
-function citesteSuma(brut: string): number {
-  return Number(brut.replace(/\s/g, "").replace(",", "."));
-}
+/*
+  Suma scrisă de mână o citește `citesteSuma` din `@/lib/suma`, nu un
+  `Number()` local.
+
+  Aici era o copie proprie, cu exact greșeala pentru care fusese scris
+  modulul comun: `Number("1.000")` e **1**, nu 1000. Iar sugestia din câmp
+  arăta „2–10.000", adică un format pe care propriul parser nu-l putea citi —
+  cine scria „10.000" cerea zece mii de euro și ar fi plătit zece.
+*/
 
 /**
  * Suma în euro, scrisă cu aceeași regulă ca sumele în lei de pe site:
@@ -59,14 +64,19 @@ export default function ButonPayPal({
   const [alta, setAlta] = useState("");
   const [stare, setStare] = useState<Stare>({ fel: "gol" });
 
-  const suma = alta.trim() ? citesteSuma(alta) : euro;
+  const scrisaDeMana = alta.trim() ? citesteSuma(alta) : null;
+  const suma = scrisaDeMana ? (scrisaDeMana.suma ?? NaN) : euro;
   const valida = euroAcceptat(suma);
 
   async function plateste() {
     if (!valida) {
       setStare({
         fel: "eroare",
-        mesaj: `Suma trebuie să fie între ${scrieEuro(EURO_MINIM)} și ${scrieEuro(EURO_MAXIM)} de euro.`,
+        // Dacă parserul are ceva de spus — „scrie doar cifre" — spunem asta,
+        // nu un mesaj despre praguri care n-are legătură cu problema.
+        mesaj:
+          scrisaDeMana?.eroare ??
+          `Suma trebuie să fie între ${scrieEuro(EURO_MINIM)} și ${scrieEuro(EURO_MAXIM)} de euro.`,
       });
       return;
     }

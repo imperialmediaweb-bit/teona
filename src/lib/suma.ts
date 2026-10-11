@@ -20,6 +20,10 @@ const CU_BANI = new Intl.NumberFormat("ro-RO", {
 /**
  * „20000” -> „20.000 lei”, „1250.5” -> „1.250,50 lei”.
  *
+ * Moneda e un argument, nu o presupunere. Înainte lipea „lei" la orice sumă,
+ * iar de când site-ul primește și donații în euro prin PayPal asta însemna
+ * că o sumă în euro era afișată ca lei.
+ *
  * Banii nu se scriu niciodată cu un singur zecimal. `maximumFractionDigits:
  * 2` singur dădea „1.250,5 lei”, care pe un extras de cont arată a greșeală
  * de tastare — și care, citit repede, se confundă cu 1.250,05.
@@ -28,9 +32,13 @@ const CU_BANI = new Intl.NumberFormat("ro-RO", {
  * Majoritatea donațiilor sunt sume rotunde, iar două zerouri la fiecare
  * rând dintr-un tabel sunt zgomot.
  */
-export function scrieSuma(suma: number): string {
+/** Simbolul monedei, scris după sumă, cum se scrie în română. */
+const SIMBOL: Record<string, string> = { RON: "lei", EUR: "€", USD: "$" };
+
+export function scrieSuma(suma: number, moneda = "RON"): string {
   const rotund = Number.isInteger(laBan(suma));
-  return `${(rotund ? INTREG : CU_BANI).format(suma)} lei`;
+  const cifre = (rotund ? INTREG : CU_BANI).format(suma);
+  return `${cifre} ${SIMBOL[moneda] ?? moneda}`;
 }
 
 /** Rotunjire la ban: 0,75% din 100.000 iese 750,0000000000001 în virgulă mobilă. */
@@ -53,6 +61,25 @@ export function citesteSuma(brut: string): {
   if (text === "") return { suma: null };
 
   if (text.includes(",")) {
+    /*
+      Virgula e zecimală în română, deci punctele dinaintea ei sunt separatori
+      de mii. Dar numai dacă chiar arată așa.
+
+      Înainte ștergeam punctele oriunde erau, inclusiv după virgulă. „12,500.50”
+      — scris la englezește — devenea 12.5005, adică 12,50 lei în loc de
+      12.500,50. De o mie de ori mai puțin, fără niciun semn că s-a întâmplat
+      ceva, pe un câmp în care cineva bate cifre dintr-un extras de cont.
+
+      Forma englezească nu e validă în română sub nicio citire: o virgulă
+      zecimală nu poate fi urmată de un punct. Deci se respinge, nu se ghicește.
+    */
+    if (!/^-?\d{1,3}(\.\d{3})*,\d+$/.test(text)) {
+      return {
+        suma: null,
+        eroare:
+          "Scrie suma în formatul românesc: punctul desparte miile, virgula zecimalele. De exemplu 12.500,50.",
+      };
+    }
     text = text.replace(/\./g, "").replace(",", ".");
   } else if (/^-?\d{1,3}(\.\d{3})+$/.test(text)) {
     text = text.replace(/\./g, "");

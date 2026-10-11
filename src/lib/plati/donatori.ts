@@ -70,7 +70,9 @@ export async function donatori(
         (ARRAY_AGG(NULLIF(TRIM(CONCAT_WS(' ', d.prenume, d.nume)), '')
                    ORDER BY d.platita_la DESC NULLS LAST))[1] AS nume,
         (ARRAY_AGG(d.telefon ORDER BY d.platita_la DESC NULLS LAST))[1] AS telefon,
-        SUM(d.suma_bani)                                        AS total_bani,
+        -- Numai lei: suma_bani ține bani sau cenți, după monedă, iar un
+        -- PayPal de 25 € adunat aici s-ar fi numărat ca 25 de lei.
+        SUM(d.suma_bani) FILTER (WHERE d.moneda = 'RON')        AS total_bani,
         COUNT(*)                                                AS nr_donatii,
         SUM(CASE WHEN d.frecventa = 'lunar' THEN 1 ELSE 0 END)  AS nr_lunare,
         MIN(d.platita_la)                                       AS prima_la,
@@ -120,11 +122,19 @@ export async function rezumat(): Promise<{
     luna_asta: string | null;
   }>(
     `SELECT
-        SUM(suma_bani)                                   AS total_bani,
+        -- Totalurile sunt în lei. Donațiile în altă monedă se văd separat,
+        -- cu peMonede(): nu există curs de schimb ales de noi.
+        SUM(suma_bani) FILTER (WHERE moneda = 'RON')     AS total_bani,
         COUNT(DISTINCT email)                            AS nr_donatori,
         COUNT(DISTINCT email) FILTER (WHERE frecventa = 'lunar') AS nr_lunari,
+        -- Marginea de sus face ca „luna asta" să însemne chiar luna asta: o
+        -- donație trecută de mână cu dată în viitor cădea altfel în total,
+        -- dar lipsea din graficul lunar, iar tabloul nu se mai potrivea cu
+        -- el însuși.
         SUM(suma_bani) FILTER (
-          WHERE platita_la >= date_trunc('month', now())
+          WHERE moneda = 'RON'
+            AND platita_la >= date_trunc('month', now())
+            AND platita_la < date_trunc('month', now()) + interval '1 month'
         )                                                AS luna_asta
        FROM donatii
       WHERE stare = 'platita'`,
@@ -167,6 +177,26 @@ export async function uitaDonatorul(email: string): Promise<number> {
   await intreaba("DELETE FROM note_donatori WHERE email = $1", [email]).catch(
     () => undefined,
   );
+
+  /*
+    Jurnalul discuțiilor și jetoanele de intrare.
+
+    Lipseau: jurnalul a fost scris după funcția asta, și n-a fost adăugat
+    aici. Un rând din `interactiuni` poartă adresa omului **și** ce a scris
+    cineva din asociație despre el — „a sunat supărat", „nu mai vrea
+    telefoane". Exact genul de text pentru care omul cere ștergerea, lăsat în
+    urmă de o funcție care-i spunea că l-a șters.
+
+    Jetoanele ar fi expirat oricum în șapte zile, dar până atunci ar fi
+    păstrat adresa. Dacă a cerut ștergerea, se duce și ea acum.
+  */
+  await intreaba("DELETE FROM interactiuni WHERE email = $1", [email]).catch(
+    () => undefined,
+  );
+  await intreaba("DELETE FROM jetoane_cont WHERE email = $1", [email]).catch(
+    () => undefined,
+  );
+
   return randuri.length;
 }
 
@@ -326,7 +356,14 @@ export async function donatii(limita = 100): Promise<Donatie[]> {
 export type ContulMeu = {
   email: string;
   nume: string | null;
-  totalBani: number;
+  /**
+   * Cât a dăruit, pe fiecare monedă.
+   *
+   * Nu un singur total: cine a dat 100 de lei prin card și 25 € prin PayPal
+   * n-a dat „125". Nu convertim — cursul care contează e al băncii lui, în
+   * ziua plății, și n-avem de unde să-l știm.
+   */
+  totaluri: Array<{ moneda: string; bani: number }>;
   donatii: Donatie[];
   /** Prima și ultima donație, ISO. */
   primaLa: string;
@@ -336,8 +373,8 @@ export type ContulMeu = {
   /** Are cel puțin o donație lunară. */
   areLunara: boolean;
   acordBuletin: boolean;
-  /** Cât a mers pe fiecare destinație. */
-  peDestinatii: Array<{ destinatie: string; bani: number }>;
+  /** Cât a mers pe fiecare destinație, pe monedă. */
+  peDestinatii: Array<{ destinatie: string; bani: number; moneda: string }>;
 };
 
 export async function contulMeu(email: string): Promise<ContulMeu | null> {
@@ -398,19 +435,28 @@ export async function contulMeu(email: string): Promise<ContulMeu | null> {
     luni = Math.max(0, luni);
   }
 
-  const peDestinatii = new Map<string, number>();
+  const totaluri = new Map<string, number>();
   for (const d of donatiile) {
-    peDestinatii.set(
-      d.destinatie,
-      (peDestinatii.get(d.destinatie) ?? 0) + d.sumaBani,
-    );
+    totaluri.set(d.moneda, (totaluri.get(d.moneda) ?? 0) + d.sumaBani);
+  }
+
+  // Destinațiile se adună pe (destinație, monedă): altfel 25 € și 25 de lei
+  // pentru aceeași destinație ar ieși „50".
+  const peDestinatii = new Map<string, { bani: number; moneda: string }>();
+  for (const d of donatiile) {
+    const cheie = `${d.destinatie}|${d.moneda}`;
+    const intrare = peDestinatii.get(cheie) ?? { bani: 0, moneda: d.moneda };
+    intrare.bani += d.sumaBani;
+    peDestinatii.set(cheie, intrare);
   }
 
   return {
     email,
     // Numele cel mai recent pe care l-a scris el, nu primul.
     nume: donatiile.find((d) => d.nume)?.nume ?? null,
-    totalBani: donatiile.reduce((s, d) => s + d.sumaBani, 0),
+    totaluri: [...totaluri.entries()]
+      .map(([moneda, bani]) => ({ moneda, bani }))
+      .sort((a, b) => (a.moneda === "RON" ? -1 : b.moneda === "RON" ? 1 : 0)),
     donatii: donatiile,
     primaLa: prima?.toISOString() ?? "",
     ultimaLa: ultima?.toISOString() ?? "",
@@ -418,7 +464,11 @@ export async function contulMeu(email: string): Promise<ContulMeu | null> {
     areLunara: donatiile.some((d) => d.frecventa === "lunar"),
     acordBuletin: lista.some((r) => r.acord_buletin),
     peDestinatii: [...peDestinatii.entries()]
-      .map(([destinatie, bani]) => ({ destinatie, bani }))
+      .map(([cheie, v]) => ({
+        destinatie: cheie.split("|")[0],
+        bani: v.bani,
+        moneda: v.moneda,
+      }))
       .sort((a, b) => b.bani - a.bani),
   };
 }

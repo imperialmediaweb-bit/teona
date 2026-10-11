@@ -60,7 +60,18 @@
   /* Cerneală — text. */
   --color-cerneala: #232323;
   --color-cerneala-moale: #616161;
-  --color-cerneala-slab: #8a8a8a;
+  /*
+    Griul stins, pentru note și etichete mici.
+
+    Era #8a8a8a, adică 3,45:1 pe alb — sub pragul AA de 4,5:1 pentru text
+    normal. Îl purtau tocmai textele pe care omul chiar are nevoie să le
+    citească: „(opțional)" lângă un câmp, nota de sub un formular, sursa unui
+    testimonial. Pe hârtia caldă scădea la 2,83:1.
+
+    #666666 dă 5,74:1 pe alb și 4,70:1 pe hârtia umbrită — trece pe ambele,
+    și rămâne vizibil mai stins decât cerneala obișnuită, care era rostul lui.
+  */
+  --color-cerneala-slab: #666666;
 
   /* Hârtie — fundaluri. */
   --color-hartie: #ffffff;

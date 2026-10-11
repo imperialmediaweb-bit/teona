@@ -330,7 +330,10 @@ export function Felii({
                 <div
                   className="h-full rounded-full"
                   style={{
-                    width: `${Math.max(1, procent)}%`,
+                    // Zero nu primește bară. `Math.max(1, …)` dădea o dungă
+                    // vizibilă unei categorii cu 0 lei, care citea ca „puțin,
+                    // dar ceva". `Coloane` făcea deja distincția asta.
+                    width: `${d.bani === 0 ? 0 : Math.max(1, procent)}%`,
                     backgroundColor: BANI,
                   }}
                 />

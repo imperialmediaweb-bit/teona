@@ -19,10 +19,19 @@ export type Intrebare = { intrebare: string; raspuns: React.ReactNode };
  * pagină „de bifat”. Fără poză, coloana de întrebări ocupă singură centrul.
  */
 
+/*
+  Numerele întrebărilor. Treptele 600/700, nu 500.
+
+  Numărul e `aria-hidden`, deci strict vorbind e decor și nu intră sub pragul
+  de contrast. Dar un om care-l vede tot îl citește, iar alb pe
+  `caramiziu-500` dă 3,44:1 și alb pe `turcoaz-500` 3,19:1 — la 15 px, sub
+  pragul de 4,5:1. Treptele mai închise dau 6,20:1 și 4,73:1 și arată
+  practic la fel.
+*/
 const CULORI = [
-  "bg-caramiziu-500 text-hartie",
+  "bg-caramiziu-700 text-hartie",
   "bg-miere-400 text-cerneala",
-  "bg-turcoaz-500 text-hartie",
+  "bg-turcoaz-600 text-hartie",
 ] as const;
 
 export default function Intrebari({

@@ -13,6 +13,7 @@ import {
   peFrecventa,
   peLuni,
   peMetode,
+  peMonede,
 } from "@/lib/statistici";
 import { FELURI_CERERE, STADII_FIRMA } from "@/lib/crm";
 import { DESTINATII_DONATIE } from "@/date/asociatie";
@@ -102,6 +103,7 @@ async function Continut({
     palnie,
     deLucru,
     apasari,
+    monede,
   ] = await Promise.all([
     rezumat(),
     peLuni(12),
@@ -111,8 +113,11 @@ async function Continut({
     palniaFirmelor(),
     cereriDeLucru(),
     apasariPeLuna(6),
+    peMonede(),
   ]);
 
+  // Tot ce nu e în lei se arată separat, nu se adună.
+  const alteMonede = monede.filter((m) => m.moneda !== "RON");
   const nrPalnie = new Map(palnie.map((p) => [p.stadiu, p.nr]));
   const nrDeLucru = new Map(deLucru.map((c) => [c.fel, c.nr]));
   const totalDeLucru = deLucru.reduce((s, c) => s + c.nr, 0);
@@ -122,10 +127,23 @@ async function Continut({
   return (
     <Cadru titlu="Tabloul de bord" activ="/admin">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/*
+          Totalul e în lei, și numai în lei.
+
+          `suma_bani` ține bani sau cenți, după monedă. Adunate la grămadă,
+          25 € s-ar fi numărat ca 25 de lei — iar cifra din raportul anual ar
+          fi fost greșită fără ca nimic s-o arate. Donațiile în altă monedă
+          apar în nota de dedesubt, neconvertite: cursul care contează e al
+          băncii, în ziua încasării, nu unul ales de noi.
+        */}
         <Cifra
           eticheta="Total strâns"
           valoare={scrieSuma(cifre.totalBani / 100)}
-          nota="Toate donațiile încasate"
+          nota={
+            alteMonede.length > 0
+              ? `Plus ${alteMonede.map((m) => scrieSuma(m.bani / 100, m.moneda)).join(" și ")}, neconvertiți`
+              : "Toate donațiile încasate"
+          }
         />
         <Cifra
           eticheta="Luna asta"
@@ -174,7 +192,10 @@ async function Continut({
           />
         </Card>
 
-        <Card titlu="Pe ce cale intră" nota="Inclusiv ce s-a trecut de mână.">
+        <Card
+          titlu="Pe ce cale intră"
+          nota="Inclusiv ce s-a trecut de mână. Numai donațiile în lei."
+        >
           <Felii
             date={metode}
             titlu="Donații pe metode de plată"

@@ -109,7 +109,9 @@ export default function DevinoVoluntar() {
                   </span>
                   <p
                     aria-hidden="true"
-                    className="relative mt-5 font-titlu text-[3.4rem] leading-none font-extrabold tracking-tight text-miere-500"
+                    // Treapta 600, nu 500: la mărimea asta pragul e 3:1, iar `miere-500`
+                    // dă 2,52:1 pe alb.
+                    className="relative mt-5 font-titlu text-[3.4rem] leading-none font-extrabold tracking-tight text-miere-600"
                   >
                     18+
                   </p>

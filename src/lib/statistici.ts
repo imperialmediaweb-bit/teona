@@ -11,7 +11,16 @@ import { intreaba } from "./baza";
  * Lunile goale se completează aici, în cod, nu în SQL. O lună fără donații
  * nu produce niciun rând, iar un grafic care sare peste februarie pentru că
  * n-a intrat niciun ban minte despre formă: pare o creștere continuă.
+ *
+ * **Toate cifrele de aici sunt în lei, și numai în lei.** Donațiile prin
+ * PayPal intră în euro, iar `suma_bani` ține bani sau cenți, după monedă.
+ * Adunate la grămadă, 25 € s-ar fi numărat ca 25 de lei: cifra din raportul
+ * anual ar fi fost greșită, fără ca nimic să arate asta. De aceea fiecare
+ * interogare filtrează pe `moneda = 'RON'`, iar euro se arată separat, cu
+ * `peMonede()` — niciun curs de schimb nu e ales de noi.
  */
+
+
 
 export type Luna = {
   /** „2026-03” */
@@ -66,8 +75,12 @@ export async function peLuni(cate = 12): Promise<Luna[]> {
             SUM(suma_bani) AS bani,
             COUNT(*)       AS nr
        FROM donatii
-      WHERE stare = 'platita'
+      WHERE stare = 'platita' AND moneda = 'RON'
         AND platita_la >= date_trunc('month', now()) - make_interval(months => $1)
+        -- Margine de sus: o donație trecută de mână cu dată în viitor ar
+        -- cădea într-o lună care nu există în lista de mai jos, deci ar
+        -- dispărea din grafic dar ar rămâne în total.
+        AND platita_la < date_trunc('month', now()) + interval '1 month'
       GROUP BY 1`,
     [cate - 1],
   );
@@ -84,7 +97,7 @@ export async function peLuni(cate = 12): Promise<Luna[]> {
             COUNT(*) AS nr
        FROM (SELECT email, MIN(platita_la) AS prima
                FROM donatii
-              WHERE stare = 'platita' AND email IS NOT NULL
+              WHERE stare = 'platita' AND moneda = 'RON' AND email IS NOT NULL
               GROUP BY email) p
       WHERE prima >= date_trunc('month', now()) - make_interval(months => $1)
       GROUP BY 1`,
@@ -113,7 +126,7 @@ export async function peDestinatii(): Promise<Felie[]> {
     nr: string;
   }>(
     `SELECT destinatie, SUM(suma_bani) AS bani, COUNT(*) AS nr
-       FROM donatii WHERE stare = 'platita'
+       FROM donatii WHERE stare = 'platita' AND moneda = 'RON'
       GROUP BY destinatie ORDER BY SUM(suma_bani) DESC`,
   );
   return randuri.map((r) => ({
@@ -131,7 +144,7 @@ export async function peMetode(): Promise<Felie[]> {
     nr: string;
   }>(
     `SELECT procesator, SUM(suma_bani) AS bani, COUNT(*) AS nr
-       FROM donatii WHERE stare = 'platita'
+       FROM donatii WHERE stare = 'platita' AND moneda = 'RON'
       GROUP BY procesator ORDER BY SUM(suma_bani) DESC`,
   );
   return randuri.map((r) => ({
@@ -149,7 +162,7 @@ export async function peFrecventa(): Promise<Felie[]> {
     nr: string;
   }>(
     `SELECT frecventa, SUM(suma_bani) AS bani, COUNT(*) AS nr
-       FROM donatii WHERE stare = 'platita'
+       FROM donatii WHERE stare = 'platita' AND moneda = 'RON'
       GROUP BY frecventa`,
   );
   return randuri.map((r) => ({
@@ -196,4 +209,31 @@ export async function apasariPeLuna(
     [cate - 1],
   );
   return randuri.map((r) => ({ ce: r.ce, nr: Number(r.nr) }));
+}
+
+/**
+ * Cât a intrat în fiecare monedă.
+ *
+ * Restul fișierului numără numai lei. Asta e singura funcție care vede și
+ * euro, ca să poată fi arătați separat — nu convertiți. Un curs ales de noi
+ * ar fi vechi din prima zi, iar cel care contează e al băncii, în ziua
+ * încasării.
+ */
+export async function peMonede(): Promise<
+  Array<{ moneda: string; bani: number; nr: number }>
+> {
+  const randuri = await intreaba<{
+    moneda: string;
+    bani: string;
+    nr: string;
+  }>(
+    `SELECT moneda, SUM(suma_bani) AS bani, COUNT(*) AS nr
+       FROM donatii WHERE stare = 'platita'
+      GROUP BY moneda ORDER BY SUM(suma_bani) DESC`,
+  );
+  return randuri.map((r) => ({
+    moneda: r.moneda,
+    bani: Number(r.bani),
+    nr: Number(r.nr),
+  }));
 }
