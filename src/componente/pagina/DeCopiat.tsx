@@ -105,8 +105,20 @@ export default function DeCopiat({
         <span role="status" className="sr-only">
           {stare === "copiat" ? `${eticheta} a fost copiat.` : ""}
         </span>
+        {/*
+          `role="alert"`, nu un paragraf obișnuit.
+
+          Reușita era anunțată (zona `role="status"` de mai sus), eșecul nu.
+          Un om care folosește cititor de ecran apăsa „Copiază", nu auzea
+          nimic, butonul rămânea „Copiază" — și n-avea de unde să știe că
+          IBAN-ul nu e în clipboard. `alert` se citește imediat, fiindcă e
+          exact cazul în care omul trebuie să afle acum.
+        */}
         {stare === "eroare" && (
-          <p className="mt-1.5 max-w-[14rem] text-nota text-caramiziu-700">
+          <p
+            role="alert"
+            className="mt-1.5 max-w-[14rem] text-nota text-caramiziu-700"
+          >
             Nu am putut copia automat. Selectează textul și copiază-l cu mâna.
           </p>
         )}

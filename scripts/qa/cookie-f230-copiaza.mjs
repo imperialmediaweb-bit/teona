@@ -72,6 +72,16 @@ log("=== Bannerul de cookie-uri ===");
   const ctxM = await b.newContext({ viewport: { width: 320, height: 568 } });
   const pm = await ctxM.newPage();
   await pm.goto(BAZA + "/", { waitUntil: "networkidle" });
+  /*
+    Așteptăm bannerul anume, nu ne bazăm pe `networkidle`.
+
+    Bannerul e o componentă de browser care citește `localStorage` după
+    hidratare. Când serverul de dezvoltare e ocupat — adică exact când rulează
+    toată suita — `networkidle` se împlinește înainte ca el să apară, iar
+    `querySelector` întorcea `null` și scriptul crăpa. Pica doar sub
+    încărcare, deci arăta ca o defecțiune a site-ului, nu a probei.
+  */
+  await pm.waitForSelector('[role="dialog"]', { timeout: 15000 });
   const geo = await pm.evaluate(() => {
     const d = document.querySelector('[role="dialog"]');
     const r = d.getBoundingClientRect();
