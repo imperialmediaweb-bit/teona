@@ -64,12 +64,26 @@ async function cereJeton(page, email) {
   probei ar primi 429, iar testul „răspunsul e identic" ar pica pe limită, nu
   pe o scurgere. O adresă nouă la fiecare rulare îl face repetabil.
 */
-const ctx = await b.newContext({
-  extraHTTPHeaders: {
-    "x-forwarded-for": `203.0.113.${1 + Math.floor(Math.random() * 250)}`,
-  },
-});
-const page = await ctx.newPage();
+/**
+ * Un browser nou pentru fiecare om din poveste.
+ *
+ * **Contextele împart cookie-urile.** Două pagini din același context sunt
+ * același vizitator, deci intrarea celui de-al doilea o șterge pe a
+ * primului. Am pățit-o: proba „Dan nu vede datele Anei" trecea, dar după ea
+ * `page` nu mai era Ana, iar verificările de setări picau fără motiv
+ * aparent. Un om = un context.
+ */
+function adresaNoua() {
+  return `203.0.113.${1 + Math.floor(Math.random() * 250)}`;
+}
+async function omNou() {
+  const ctx = await b.newContext({
+    extraHTTPHeaders: { "x-forwarded-for": adresaNoua() },
+  });
+  return { ctx, page: await ctx.newPage() };
+}
+
+const { page } = await omNou();
 const erori = urmaresteErori(page);
 
 // ─── Nu se scurge cine a donat ────────────────────────────────────────────
@@ -148,7 +162,7 @@ verifica(
 
 // ─── Jetonul nu se refolosește ────────────────────────────────────────────
 console.log("\n=== Jetonul ===");
-const altul = await ctx.newPage();
+const { page: altul } = await omNou();
 await altul.goto(`${BAZA}/contul-meu/intra?jeton=${brut}`, {
   waitUntil: "networkidle",
 });
@@ -168,7 +182,7 @@ verifica("un jeton inventat nu intră", altul.url().includes("expirat=1"));
 
 // ─── Un om nu vede datele altuia ──────────────────────────────────────────
 console.log("\n=== Izolarea datelor ===");
-const alDoilea = await ctx.newPage();
+const { page: alDoilea, ctx: ctxDan } = await omNou();
 const brut2 = randomBytes(32).toString("base64url");
 await sql.query(
   `INSERT INTO jetoane_cont (amprenta, email, expira_la)
@@ -185,7 +199,7 @@ verifica("Dan NU vede suma Anei", !panouDan.includes("200 lei"), panouDan.match(
 verifica("Dan vede o singură donație", (await alDoilea.locator("tbody tr").count()) === 1);
 
 // Cookie-ul măsluit nu trece.
-await alDoilea.context().addCookies([
+await ctxDan.addCookies([
   { name: "teona_cont", value: `${ANA}|` + "a".repeat(64), url: BAZA },
 ]);
 await alDoilea.goto(BAZA + "/contul-meu", { waitUntil: "networkidle" });
@@ -245,7 +259,7 @@ verifica(
 );
 
 // ─── Fără sesiune, setările nu merg ───────────────────────────────────────
-const anonim = await b.newPage(); // context curat: fără sesiune
+const { page: anonim } = await omNou(); // om nou, fără sesiune
 const refuz = await anonim.request.post(BAZA + "/api/cont/setari", {
   form: { ce: "stergere", confirmare: "ȘTERGE" },
 });

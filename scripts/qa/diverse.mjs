@@ -1,4 +1,4 @@
-import { browser, BAZA, urmaresteErori } from "./comun.mjs";
+import { browser, BAZA } from "./comun.mjs";
 
 const b = await browser();
 const log = (...a) => console.log(...a);
