@@ -19,6 +19,7 @@ import IndemnFinal from "@/componente/IndemnFinal";
 import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
 import Val, { VAL_PESTE } from "@/componente/Val";
 import Formular230 from "@/componente/pagina/Formular230";
+import FormularRedirectionare from "@/componente/formular/FormularRedirectionare";
 import AntetPagina from "@/componente/pagina/AntetPagina";
 import DeCopiat from "@/componente/pagina/DeCopiat";
 import DocumentDeDescarcat from "@/componente/pagina/DocumentDeDescarcat";
@@ -377,6 +378,23 @@ export default async function Redirectioneaza35() {
           />
           <div className="mt-10">
             <Formular230 linkDescarcare="#documente" />
+          </div>
+
+          {/*
+            Pentru cine citește de pe telefon și n-are cum să completeze
+            acum. Îi trimitem pașii pe e-mail, cu linkul de mai sus înăuntru,
+            ca să-i găsească atunci când se așază cu actele în față.
+          */}
+          <div id="pasi-pe-email" className="mt-16 scroll-mt-32">
+            <TitluSectiune
+              scris="Nu acum?"
+              titlu="Îți trimitem pașii pe e-mail"
+              text="Nu cerem CNP și nicio altă dată fiscală — doar unde să-ți scriem."
+              culoare="turcoaz"
+            />
+            <div className="mt-10">
+              <FormularRedirectionare />
+            </div>
           </div>
         </div>
       </section>

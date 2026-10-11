@@ -70,6 +70,7 @@ Toate secțiunile, 4.1–4.7: ✅
 | 7.4 Unde se trimit formularele | ✅ · ⚠️ perioada de păstrare a datelor e lăsată în alb, ca în caiet |
 | 7.5 Cele trei documente | ⏳ butoanele rămân inactive până vin fișierele |
 | 7.10 Formular online (etapa 2) | ✅ **făcut mai devreme decât cerea caietul**, prin formular230.ro, contul asociației |
+| „Trimite-mi pașii pe e-mail” | ✅ **peste caiet** — cine citește de pe telefon primește cei trei pași pe e-mail, cu linkul de completare online. Nu cere CNP. |
 
 ## 8. Direcționează 20%
 
@@ -78,6 +79,7 @@ Toate secțiunile, 4.1–4.7: ✅
 | 8.1, 8.2, 8.5–8.7 | ✅ · termenele rămân „[de confirmat]”, ca în caiet |
 | 8.3 Contractul și Declarația 177 | ⏳ lipsesc fișierele |
 | 8.4 Calculator fiscal (etapa 2) | ✅ **făcut mai devreme decât cerea caietul** |
+| Cerere de sponsorizare, sub calculator | ✅ **peste caiet** — firma lasă denumirea, CUI-ul și persoana de contact; primește pașii și datele de cont pe e-mail, iar asociația primește cererea. Suma și termenul rămân „de confirmat cu contabilitatea”, nicăieri nu se ghicește o cifră. |
 
 ## 9. Media (Suntem în presă)
 ✅ cele șase apariții, în ordine · ⚠️ două linkuri sunt moarte la sursă

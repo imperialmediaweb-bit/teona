@@ -45,7 +45,43 @@ La lansare:
 - [ ] Cheile Cloudinary se dau **numai** prin variabile de mediu în Railway.
       Nu intră niciodată într-un fișier din depozit.
 
-## 5. Ce mai lipsește de la asociație
+## 5. E-mailurile — nu pleacă niciunul fără Resend
+
+Tot ce trimite site-ul pe e-mail trece prin Resend. **Fără `RESEND_API_KEY`,
+niciun e-mail nu pleacă** — rutele răspund cinstit că trimiterea nu e activă și
+dau telefonul, în loc să afișeze „am primit mesajul tău" pentru un mesaj care
+n-a ajuns nicăieri. Nimic nu se pierde tăcut, dar nimic nu ajunge nici la
+asociație.
+
+- [ ] Verifică domeniul `teona-ariana.ro` în Resend (DNS: SPF, DKIM, DMARC).
+- [ ] Pune `RESEND_API_KEY` în Railway → serviciul site → Variables.
+- [ ] Opțional, `EMAIL_EXPEDITOR` dacă expeditorul trebuie să fie altul decât
+      `Asociația Teona Ariana Suceava <contact@teona-ariana.ro>`. Trebuie să
+      fie pe domeniul verificat, altfel Resend refuză.
+- [ ] Trimite câte un mesaj de probă prin fiecare formular și verifică unde
+      ajunge. Atenție la alias: `redirectionare@teona-ariana.ro` trebuie să
+      funcționeze, altfel cererile de 3,5% nu ajung la nimeni.
+
+Ce pleacă, și către cine:
+
+| când | către om | către asociație |
+|---|---|---|
+| donație încasată (Stripe) | mulțumire, cu suma și destinația | — |
+| formular de contact / voluntariat | confirmare de primire | mesajul complet, cu `reply-to` pe adresa lui |
+| cerere de sponsorizare (20%) | pașii și datele de cont | datele firmei, la `contact@` și la fundraising |
+| „trimite-mi pașii” (3,5%) | cei trei pași și linkul de completare online | evidență, la `redirectionare@` |
+| campanie aniversară trimisă | linkul privat al paginii lui | „ai ceva de verificat" |
+| campanie publicată / respinsă | adresa publică, ori motivul | — |
+
+Mulțumirea pentru donație **nu e chitanță** și scrie asta în ea. Chitanța
+fiscală o emite asociația.
+
+Șabloanele se pot privi în dezvoltare, fără să trimită nimic nimănui:
+`/api/proba-email?fel=…` (`o-data`, `lunar`, `reinnoire`, `sponsorizare`,
+`redirectionare`, `campanie-trimisa`, `campanie-publicata`,
+`campanie-respinsa`, și variantele `-anunt`). În producție ruta dă 404.
+
+## 6. Ce mai lipsește de la asociație
 
 Lista completă e în `continut/stadiu-caiet.md`. Site-ul funcționează fără ele,
 dar secțiunile respective nu se afișează.

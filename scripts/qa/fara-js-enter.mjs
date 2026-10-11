@@ -28,10 +28,16 @@ log("Newsletter fără JS, clic Abonează-mă → URL:", page.url());
 // Testul constată asta, nu crapă pe ea — e o constatare de raportat, nu o
 // eroare de script.
 await page.goto(BAZA + "/doneaza", { waitUntil: "load" });
+// `count()` nu e de ajuns: React trimite conținutul de sub `<Suspense>`
+// într-un `<div hidden id="S:1">` și îl mută la locul lui cu un script în
+// linie. Fără JS scriptul nu rulează, deci câmpurile *există* în DOM, dar
+// stau într-un părinte `display:none` — iar `fill()` așteaptă degeaba până
+// expiră. Se verifică vizibilitatea, nu existența.
 const areCampuri = await page
   .locator('input[name="alta"]')
-  .count()
-  .then((n) => n > 0);
+  .first()
+  .isVisible()
+  .catch(() => false);
 if (areCampuri) {
   await page.fill('input[name="alta"]', "50");
   await page.fill('input[name="email"]', "ana@example.com");

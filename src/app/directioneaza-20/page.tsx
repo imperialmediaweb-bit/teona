@@ -15,6 +15,7 @@ import Fotografie from "@/componente/Fotografie";
 import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
 import Val, { VAL_PESTE } from "@/componente/Val";
 import CalculatorSponsorizare from "@/componente/pagina/CalculatorSponsorizare";
+import FormularSponsorizare from "@/componente/formular/FormularSponsorizare";
 import AntetPagina from "@/componente/pagina/AntetPagina";
 import DeCopiat from "@/componente/pagina/DeCopiat";
 import DocumentDeDescarcat from "@/componente/pagina/DocumentDeDescarcat";
@@ -350,6 +351,24 @@ export default function Directioneaza20() {
           />
           <div className="mt-10">
             <CalculatorSponsorizare />
+          </div>
+
+          {/*
+            Cererea stă imediat sub calculator, nu într-o secțiune a ei.
+            Firma care tocmai a văzut suma e exact firma care vrea să scrie —
+            dacă o trimitem mai departe, prin încă trei secțiuni, până la
+            telefoanele de la 8.7, se pierde pe drum.
+          */}
+          <div id="cerere" className="mt-16 scroll-mt-32">
+            <TitluSectiune
+              scris="Un singur pas"
+              titlu="Trimiteți-ne datele firmei"
+              text="Vă răspundem cu contractul de sponsorizare completat cu datele noastre. Suma și termenul le stabilim împreună cu contabilitatea dumneavoastră."
+              culoare="turcoaz"
+            />
+            <div className="mt-10 lg:max-w-4xl">
+              <FormularSponsorizare />
+            </div>
           </div>
         </div>
       </section>

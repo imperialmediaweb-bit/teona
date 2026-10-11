@@ -6,6 +6,12 @@ import {
   compuneHotarare,
   compuneTrimisa,
 } from "@/lib/email/campanie";
+import {
+  compuneAnuntRedirectionare,
+  compuneAnuntSponsorizare,
+  compuneRedirectionare,
+  compuneSponsorizare,
+} from "@/lib/email/formulare";
 
 /**
  * Previzualizarea șabloanelor de e-mail, numai în dezvoltare.
@@ -19,6 +25,8 @@ import {
  * - donații: `o-data`, `lunar`, `reinnoire`, `fara-nume`
  * - campanii aniversare: `campanie-trimisa`, `campanie-anunt`,
  *   `campanie-publicata`, `campanie-respinsa`
+ * - formulare fiscale: `sponsorizare`, `sponsorizare-anunt`,
+ *   `redirectionare`, `redirectionare-anunt`
  */
 
 const CAMPANIE = {
@@ -28,8 +36,33 @@ const CAMPANIE = {
   slug: "ziua-mea-pentru-copiii-de-la-casa-teona",
 };
 
+const FIRMA = {
+  firma: "Lemnul Bun SRL",
+  cui: "RO12345678",
+  persoana: "Andrei Munteanu",
+  email: "andrei@example.com",
+  telefon: "0744 000 000",
+  cale: "Declarația 177",
+  suma: "12.000 lei",
+  mesaj: "Am vrea să sprijinim taberele.",
+};
+
+const OM = {
+  nume: "Ana Pop",
+  email: "ana@example.com",
+  preferinta: "Completez online",
+};
+
 function alege(fel: string) {
   switch (fel) {
+    case "sponsorizare":
+      return compuneSponsorizare(FIRMA);
+    case "sponsorizare-anunt":
+      return compuneAnuntSponsorizare(FIRMA);
+    case "redirectionare":
+      return compuneRedirectionare(OM);
+    case "redirectionare-anunt":
+      return compuneAnuntRedirectionare(OM);
     case "campanie-trimisa":
       return compuneTrimisa({ ...CAMPANIE, jeton: "a".repeat(32) });
     case "campanie-anunt":

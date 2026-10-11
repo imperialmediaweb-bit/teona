@@ -1,6 +1,7 @@
 import { ASOCIATIA, EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import { ADRESA_SITE } from "@/app/seo";
 import { curat, trimiteEmail } from "./trimite";
+import { MIC, P, buton, pagina } from "./plic";
 
 /**
  * E-mailurile modulului „Donează-ți ziua de naștere".
@@ -18,40 +19,6 @@ import { curat, trimiteEmail } from "./trimite";
  * n-ar ști că are ceva de verificat — site-ul n-are cum să dea un semn de la
  * sine.
  */
-
-const PORTOCALIU = "#b82b09";
-const CERNEALA = "#232323";
-const MOALE = "#616161";
-
-function pagina(titlu: string, corp: string): string {
-  return `<!doctype html>
-<html lang="ro"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><title>${curat(titlu)}</title></head>
-<body style="margin:0;padding:0;background-color:#f9f5f2;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f9f5f2;">
-    <tr><td align="center" style="padding:24px 12px;">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background-color:#ffffff;border-radius:16px;overflow:hidden;">
-        <tr><td style="height:6px;background-color:${PORTOCALIU};font-size:0;line-height:0;">&nbsp;</td></tr>
-        <tr><td align="center" style="padding:28px 32px 0;">
-          <p style="margin:0;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;color:${PORTOCALIU};">${curat(ASOCIATIA.denumire)}</p>
-          <h1 style="margin:12px 0 0;font-family:Arial,sans-serif;font-size:25px;line-height:1.3;color:${CERNEALA};">${curat(titlu)}</h1>
-        </td></tr>
-        <tr><td style="padding:22px 32px 30px;">${corp}</td></tr>
-        <tr><td style="padding:0 32px 28px;">
-          <p style="margin:0;font-family:Arial,sans-serif;font-size:13px;line-height:1.6;color:${MOALE};">
-            ${curat(ASOCIATIA.denumireLegala)} · ${curat(TELEFON_PRINCIPAL.afisat)} · ${curat(EMAIL.contact)}
-          </p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body></html>`;
-}
-
-const P = `margin:0 0 16px;font-family:Arial,sans-serif;font-size:16px;line-height:1.6;color:${CERNEALA};`;
-
-function buton(eticheta: string, adresa: string): string {
-  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 18px;"><tr><td bgcolor="${PORTOCALIU}" style="border-radius:999px;"><a href="${curat(adresa)}" style="display:inline-block;padding:13px 28px;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:999px;">${curat(eticheta)}</a></td></tr></table>`;
-}
 
 /** Ce poartă un e-mail, înainte de a pleca: se poate și doar privi. */
 export type Compus = { subiect: string; html: string; text: string };
@@ -73,7 +40,7 @@ export function compuneTrimisa(d: Trimisa): Compus {
     <p style="${P}">Ți-am primit campania <strong>${curat(d.titlu)}</strong>. O citim și o publicăm, de obicei în aceeași zi lucrătoare — îți scriem imediat ce e gata.</p>
     <p style="${P}">Până atunci îți poți vedea pagina, exact cum va arăta, la adresa asta. E doar a ta, păstreaz-o:</p>
     ${buton("Vezi pagina ta", privat)}
-    <p style="margin:0;font-family:Arial,sans-serif;font-size:13px;line-height:1.6;color:${MOALE};word-break:break-all;">${curat(privat)}</p>`;
+    <p style="${MIC}margin-bottom:0;word-break:break-all;">${curat(privat)}</p>`;
 
   return {
     subiect: titlu,
@@ -136,7 +103,7 @@ export function compuneHotarare(d: Hotarare): Compus {
       <p style="${P}">Bună, ${prenume},</p>
       <p style="${P}">Campania <strong>${curat(d.titlu)}</strong> e publicată. De acum o poți trimite prietenilor — poza ta apare în previzualizare pe Facebook și pe WhatsApp.</p>
       ${buton("Deschide pagina ta", adresa)}
-      <p style="margin:0 0 16px;font-family:Arial,sans-serif;font-size:13px;line-height:1.6;color:${MOALE};word-break:break-all;">${curat(adresa)}</p>
+      <p style="${MIC}word-break:break-all;">${curat(adresa)}</p>
       <p style="${P}">Mulțumim că te-ai gândit la copii de ziua ta.</p>`
     : `
       <p style="${P}">Bună, ${prenume},</p>
