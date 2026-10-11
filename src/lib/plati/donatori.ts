@@ -169,3 +169,89 @@ export async function uitaDonatorul(email: string): Promise<number> {
   );
   return randuri.length;
 }
+
+/**
+ * Metodele prin care intră bani fără să treacă prin site.
+ *
+ * Caietul cere ca asociația să-și vadă toate donațiile într-un loc, nu doar
+ * pe cele cu cardul. Fără ele, totalul din panou ar fi mereu mai mic decât
+ * cel real — iar un total în care nu ai încredere nu-l mai deschizi.
+ *
+ * Intră în același tabel `donatii`, cu `procesator` diferit, ca toate
+ * calculele (totaluri, grafice, lista de donatori) să le vadă fără nicio
+ * ramură specială.
+ */
+export const METODE_MANUALE = [
+  { id: "manual-transfer", eticheta: "Transfer bancar" },
+  { id: "manual-numerar", eticheta: "Numerar" },
+  { id: "manual-sms", eticheta: "SMS" },
+  { id: "manual-galantom", eticheta: "Galantom" },
+  { id: "manual-altul", eticheta: "Altă cale" },
+] as const;
+
+export type MetodaManuala = (typeof METODE_MANUALE)[number]["id"];
+
+export function esteMetodaManuala(x: unknown): x is MetodaManuala {
+  return METODE_MANUALE.some((m) => m.id === x);
+}
+
+/** Eticheta metodei, pentru afișare. Procesatoarele își poartă numele. */
+export function numeleMetodei(procesator: string): string {
+  const manuala = METODE_MANUALE.find((m) => m.id === procesator);
+  if (manuala) return manuala.eticheta;
+  if (procesator === "stripe") return "Card (Stripe)";
+  if (procesator === "paypal") return "PayPal";
+  return procesator;
+}
+
+/**
+ * Scrie o donație care n-a venit de la un procesator.
+ *
+ * `referinta` e ce scrie omul: numărul extrasului, al chitanței, data
+ * transferului. Împreună cu `procesator` are o constrângere de unicitate, așa
+ * că aceeași chitanță nu poate fi trecută de două ori — exact apărarea de
+ * care e nevoie când datele se introduc de mână, dintr-un extras de cont.
+ */
+export async function adaugaDonatieManuala(date: {
+  metoda: MetodaManuala;
+  referinta: string;
+  sumaBani: number;
+  destinatie: string;
+  data: string;
+  email?: string;
+  prenume?: string;
+  nume?: string;
+  telefon?: string;
+  observatii?: string;
+  adaugatDe?: string;
+}): Promise<{ ok: true } | { ok: false; motiv: "duplicat" | "eroare" }> {
+  try {
+    const randuri = await intreaba<{ id: string }>(
+      `INSERT INTO donatii
+         (procesator, referinta, suma_bani, moneda, frecventa, destinatie,
+          email, prenume, nume, telefon, stare, platita_la,
+          observatii, adaugat_de)
+       VALUES ($1,$2,$3,'RON','o-data',$4,$5,$6,$7,$8,'platita',$9,$10,$11)
+       ON CONFLICT (procesator, referinta) DO NOTHING
+       RETURNING id`,
+      [
+        date.metoda,
+        date.referinta,
+        date.sumaBani,
+        date.destinatie,
+        date.email ?? null,
+        date.prenume ?? null,
+        date.nume ?? null,
+        date.telefon ?? null,
+        date.data,
+        date.observatii ?? null,
+        date.adaugatDe ?? null,
+      ],
+    );
+    return randuri.length > 0
+      ? { ok: true }
+      : { ok: false, motiv: "duplicat" };
+  } catch {
+    return { ok: false, motiv: "eroare" };
+  }
+}

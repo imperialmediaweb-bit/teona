@@ -46,3 +46,6 @@ next-env.d.ts
 # Copiile de lucru ale agenților care lucrează în paralel.
 # Fiecare e un depozit întreg; comise din greșeală, ar dubla tot proiectul.
 /.claude/worktrees/
+
+# Fișiere compilate pentru probele de bază de date (scripts/qa/baza.mjs)
+.next-proba/

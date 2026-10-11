@@ -17,6 +17,8 @@ import {
   CAI_SPONSORIZARE,
   PREFERINTE_REDIRECTIONARE,
 } from "@/date/formulare";
+import { areBazaDeDate } from "@/lib/baza";
+import { salveazaCerere, salveazaFirma } from "@/lib/crm";
 
 /**
  * Cele două formulare fiscale: 20% pentru firme (8) și 3,5% pentru persoane
@@ -36,6 +38,11 @@ import {
  *
  * Fără `RESEND_API_KEY` ambele răspund cinstit că trimiterea nu e activă și
  * dau telefonul. Nu afișăm „ți-am trimis” pentru un e-mail care n-a plecat.
+ *
+ * **Fiecare cerere se scrie și în CRM**, nu doar pe e-mail. Un e-mail se
+ * pierde într-un inbox aglomerat și nu se poate filtra, număra sau urmări;
+ * un rând în `firme` sau `cereri` rămâne și după ce mesajul a fost citit și
+ * uitat. Scrierea se face prima, tocmai ca să nu depindă de Resend.
  */
 
 const MAXIM = {
@@ -154,21 +161,43 @@ export async function POST(cerere: Request) {
       return raspuns("Mesajul e prea lung.", 400);
     }
 
+    const suma = String(corp.suma ?? "").trim() || undefined;
+    const mesaj = String(corp.mesaj ?? "").trim() || undefined;
+
+    // Întâi în CRM. Dacă pică baza, mergem mai departe cu e-mailul: o cerere
+    // ajunsă doar pe e-mail e mai bună decât una pierdută.
+    const inCrm = areBazaDeDate()
+      ? await salveazaFirma({
+          cui,
+          denumire: firma,
+          persoana,
+          email: adresa,
+          telefon,
+          cale,
+          sumaEstimata: suma,
+          mesaj,
+        }).catch(() => null)
+      : null;
+
     const inactiv = nuPleacaNimic(fel);
-    if (inactiv) return inactiv;
+    // Fără Resend, cererea tot e salvată — deci nu mai e o cerere pierdută.
+    // Omul află totuși că nu i-am trimis nimic pe e-mail.
+    if (inactiv && !inCrm) return inactiv;
 
-    const { catreAsociatie } = await trimiteSponsorizare({
-      firma,
-      cui,
-      persoana,
-      email: adresa,
-      telefon,
-      cale,
-      suma: String(corp.suma ?? "").trim() || undefined,
-      mesaj: String(corp.mesaj ?? "").trim() || undefined,
-    });
+    const { catreAsociatie } = inactiv
+      ? { catreAsociatie: false }
+      : await trimiteSponsorizare({
+          firma,
+          cui,
+          persoana,
+          email: adresa,
+          telefon,
+          cale,
+          suma,
+          mesaj,
+        });
 
-    if (!catreAsociatie) {
+    if (!catreAsociatie && !inCrm) {
       return raspuns(
         `Nu am putut trimite cererea acum. Încearcă din nou peste câteva minute sau scrie-ne la ${EMAIL.contact}.`,
         502,
@@ -176,7 +205,9 @@ export async function POST(cerere: Request) {
     }
 
     return raspuns(
-      "Mulțumim! V-am trimis pașii pe e-mail și vă contactăm în curând.",
+      catreAsociatie
+        ? "Mulțumim! V-am trimis pașii pe e-mail și vă contactăm în curând."
+        : "Mulțumim! V-am înregistrat cererea și vă contactăm în curând.",
       200,
     );
   }
@@ -189,6 +220,16 @@ export async function POST(cerere: Request) {
   const preferinta = String(corp.preferinta ?? "");
   if (!PREFERINTE_REDIRECTIONARE.some((p) => p.valoare === preferinta)) {
     return raspuns("Alege cum vrei să completezi formularul.", 400);
+  }
+
+  if (areBazaDeDate()) {
+    await salveazaCerere({
+      fel: "redirectionare",
+      nume,
+      email: adresa,
+      telefon,
+      detalii: { preferinta },
+    }).catch(() => null);
   }
 
   const inactiv = nuPleacaNimic(fel);

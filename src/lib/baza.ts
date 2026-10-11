@@ -21,16 +21,31 @@ export function areBazaDeDate(): boolean {
   return Boolean(process.env.DATABASE_URL);
 }
 
+/**
+ * Dacă legătura are nevoie de TLS.
+ *
+ * Două cazuri nu au: Postgres-ul din rețeaua privată Railway (traficul nu
+ * iese din ea, iar certificatul lui propriu ar pica la verificarea lanțului)
+ * și o bază locală, de pe calculatorul cuiva, care de obicei n-are TLS
+ * pornit deloc. Fără excepția a doua, o rulare locală cu Postgres pe
+ * localhost cade cu „The server does not support SSL connections”, iar
+ * mesajul nu spune nicăieri că vinovat e codul nostru.
+ *
+ * Pentru orice altă gazdă cerem TLS, dar fără verificarea lanțului: bazele
+ * administrate vin aproape toate cu certificat propriu.
+ */
+function cereSsl(adresa: string | undefined) {
+  if (!adresa) return false;
+  const local = /@(localhost|127\.0\.0\.1|\[::1\])[:/]/.test(adresa);
+  if (local || adresa.includes("railway.internal")) return false;
+  return { rejectUnauthorized: false };
+}
+
 function ia(): Pool {
   if (!rezervor) {
     rezervor = new Pool({
       connectionString: process.env.DATABASE_URL,
-      // Railway pune Postgres în rețeaua privată a proiectului, cu un
-      // certificat propriu. Verificarea lanțului ar pica pe el, iar
-      // traficul oricum nu iese din rețeaua privată.
-      ssl: process.env.DATABASE_URL?.includes("railway.internal")
-        ? false
-        : { rejectUnauthorized: false },
+      ssl: cereSsl(process.env.DATABASE_URL),
       max: 4,
       idleTimeoutMillis: 30_000,
       connectionTimeoutMillis: 8_000,
@@ -42,9 +57,15 @@ function ia(): Pool {
 /*
   Schema se creează la prima folosire, nu dintr-un pas separat de migrare.
 
-  Pentru un singur tabel, într-un proiect fără echipă de întreținere, un
-  fișier de migrări ar fi mai mult de administrat decât de câștigat. Dacă
-  tabelele se înmulțesc, aici se schimbă — nu peste tot prin cod.
+  Într-un proiect fără echipă de întreținere, un sistem de migrări ar fi mai
+  mult de administrat decât de câștigat, iar `CREATE TABLE IF NOT EXISTS` e
+  de ajuns cât timp schimbările doar *adaugă*: un tabel nou, un index nou.
+
+  **Ce nu acoperă:** o coloană adăugată la un tabel care există deja, o
+  coloană redenumită, un tip schimbat. Astea nu se întâmplă de la sine și
+  trebuie rulate o dată, de mână, pe baza de date din Railway. De aceea
+  coloanele noi se adaugă mai jos, cu `ALTER TABLE … ADD COLUMN IF NOT
+  EXISTS`, care e sigur de rulat de câte ori vrei.
 */
 const DEFINITIE = `
   CREATE TABLE IF NOT EXISTS campanii_aniversare (
@@ -120,6 +141,80 @@ const DEFINITIE = `
     scris_la  timestamptz NOT NULL DEFAULT now()
   );
 
+  /*
+    Firmele care vor să sponsorizeze (8).
+
+    Un rând pe firmă, nu pe cerere: identificatorul e CUI-ul, normalizat
+    (fără RO, fără spații). Dacă aceeași firmă trimite a doua oară
+    formularul, se actualizează datele de contact și se adaugă o interacțiune
+    — nu apare încă un card în lista de urmărit, cu alt stadiu decât primul.
+  */
+  CREATE TABLE IF NOT EXISTS firme (
+    id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    cui            text UNIQUE NOT NULL,
+    denumire       text NOT NULL,
+    persoana       text NOT NULL,
+    email          text NOT NULL,
+    telefon        text,
+    cale           text NOT NULL,
+    suma_estimata  text,
+    mesaj          text,
+    /* cerere → contract_trimis → semnat → incasat, sau renuntat. */
+    stadiu         text NOT NULL DEFAULT 'cerere',
+    suma_bani      bigint,
+    creat_la       timestamptz NOT NULL DEFAULT now(),
+    schimbat_la    timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS firme_dupa_stadiu
+    ON firme (stadiu, schimbat_la DESC);
+
+  /*
+    Restul cererilor care vin de pe site: pașii pentru 3,5%, voluntariat,
+    mesajele din formularul de contact.
+
+    Toate au aceeași formă — cine, cum îl găsim, ce a cerut — deci stau
+    într-un tabel, cu „fel” ca etichetă și „detalii” pentru ce diferă. Un
+    tabel per formular ar însemna trei pagini de admin aproape identice.
+  */
+  CREATE TABLE IF NOT EXISTS cereri (
+    id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    fel          text NOT NULL,
+    nume         text NOT NULL,
+    email        text NOT NULL,
+    telefon      text,
+    detalii      jsonb NOT NULL DEFAULT '{}'::jsonb,
+    /* nou → in_lucru → rezolvat */
+    stadiu       text NOT NULL DEFAULT 'nou',
+    creat_la     timestamptz NOT NULL DEFAULT now(),
+    schimbat_la  timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS cereri_dupa_fel
+    ON cereri (fel, stadiu, creat_la DESC);
+  CREATE INDEX IF NOT EXISTS cereri_dupa_email ON cereri (email);
+
+  /*
+    Jurnalul discuțiilor: ce s-a vorbit la telefon, ce s-a trimis, ce s-a
+    hotărât.
+
+    Fără el, „l-am sunat" trăiește în capul unei singure persoane. Un rând e
+    legat ori de un om (prin e-mail), ori de o firmă (prin firma_id) —
+    niciodată de amândouă.
+  */
+  CREATE TABLE IF NOT EXISTS interactiuni (
+    id        bigserial PRIMARY KEY,
+    email     text,
+    firma_id  uuid REFERENCES firme(id) ON DELETE CASCADE,
+    /* telefon | email | intalnire | notita */
+    fel       text NOT NULL,
+    rezumat   text NOT NULL,
+    cand      timestamptz NOT NULL DEFAULT now(),
+    CHECK (email IS NOT NULL OR firma_id IS NOT NULL)
+  );
+  CREATE INDEX IF NOT EXISTS interactiuni_dupa_email
+    ON interactiuni (email, cand DESC);
+  CREATE INDEX IF NOT EXISTS interactiuni_dupa_firma
+    ON interactiuni (firma_id, cand DESC);
+
   CREATE TABLE IF NOT EXISTS evenimente_plati (
     procesator  text NOT NULL,
     eveniment   text NOT NULL,
@@ -128,9 +223,24 @@ const DEFINITIE = `
   );
 `;
 
+/*
+  Coloane apărute după ce tabelul exista deja pe baza de date din Railway.
+
+  `CREATE TABLE IF NOT EXISTS` nu le-ar adăuga niciodată: tabelul există, deci
+  definiția lui e sărită în întregime. Rulează separat, și sunt scrise ca să
+  poată fi rulate de oricâte ori.
+*/
+const ADAOSURI = `
+  /* Cine a scris donația de mână, pentru cele care nu vin de la un procesator. */
+  ALTER TABLE donatii ADD COLUMN IF NOT EXISTS adaugat_de text;
+  /* Ce a scris omul la adăugarea manuală: „transfer BCR 12 mart", chitanța etc. */
+  ALTER TABLE donatii ADD COLUMN IF NOT EXISTS observatii text;
+`;
+
 async function pregateste(): Promise<void> {
   schema ??= ia()
     .query(DEFINITIE)
+    .then(() => ia().query(ADAOSURI))
     .then(() => undefined)
     .catch((eroare) => {
       // Dacă n-a mers, următoarea cerere încearcă din nou: altfel o pană de

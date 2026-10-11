@@ -9,6 +9,8 @@ import {
 } from "@/lib/api";
 import { EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import { areEmail, curat, tabel, trimiteEmail } from "@/lib/email/trimite";
+import { areBazaDeDate } from "@/lib/baza";
+import { salveazaCerere } from "@/lib/crm";
 
 /**
  * Formularul de contact (10.4) și cel de voluntariat (11.4).
@@ -158,6 +160,35 @@ export async function POST(cerere: Request) {
     ["Motivul", String(corp.motiv ?? "")],
     ["Mesaj", String(corp.mesaj ?? "")],
   ]);
+
+  // În CRM înainte de e-mail: un mesaj citit și uitat dispare din inbox, un
+  // rând în `cereri` rămâne, cu stadiul lui — nou, în lucru, rezolvat.
+  if (areBazaDeDate()) {
+    await salveazaCerere({
+      fel: voluntariat ? "voluntariat" : "contact",
+      nume: numeleOmului,
+      email: adresaOmului,
+      telefon: String(corp.telefon ?? "").trim() || undefined,
+      detalii: Object.fromEntries(
+        (
+          [
+            ["Interesat de", corp.interes],
+            ["Localitate", corp.localitate],
+            ["Data nașterii", corp.nastere],
+            ["Disponibilitate", corp.disponibilitate],
+            ["Experiență cu copii", corp.experientaCopii],
+            ["Limbi", corp.limbi],
+            ["Permis", corp.permis],
+            ["Cum a aflat", corp.aflat],
+            ["Motivul", corp.motiv],
+            ["Mesaj", corp.mesaj],
+          ] as Array<[string, unknown]>
+        )
+          .map(([k, v]) => [k, String(v ?? "").trim()] as [string, string])
+          .filter(([, v]) => v !== ""),
+      ),
+    }).catch(() => null);
+  }
 
   const titlu = voluntariat
     ? "Cerere nouă de voluntariat"
