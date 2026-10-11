@@ -3,8 +3,11 @@ import { ASOCIATIA } from "@/date/asociatie";
 
 /** Paginile panoului, în ordinea în care se folosesc. */
 const PAGINI = [
-  { href: "/admin/campanii", eticheta: "Campanii de verificat" },
+  { href: "/admin", eticheta: "Tablou de bord" },
   { href: "/admin/donatori", eticheta: "Donatori" },
+  { href: "/admin/firme", eticheta: "Firme" },
+  { href: "/admin/cereri", eticheta: "Cereri" },
+  { href: "/admin/campanii", eticheta: "Campanii" },
   { href: "/admin/email", eticheta: "Trimite un e-mail" },
 ] as const;
 
@@ -26,7 +29,7 @@ export default function Cadru({
 }) {
   return (
     <div id="panou-admin" className="min-h-screen bg-hartie-calda">
-      <header className="border-b border-hartie-umbra bg-hartie">
+      <div className="border-b border-hartie-umbra bg-hartie">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-4 sm:px-6">
           <span className="font-titlu font-extrabold text-caramiziu-700">
             {ASOCIATIA.denumire}
@@ -48,12 +51,21 @@ export default function Cadru({
             ))}
           </nav>
         </div>
-      </header>
+      </div>
 
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      {/*
+        `div`, nu `main`.
+
+        Paginile panoului se randează înăuntrul aspectului site-ului, care are
+        deja `<main id="continut">`. Două `main` imbricate sunt HTML invalid,
+        iar un cititor de ecran care sare „la conținutul principal” nu mai
+        știe unde să ducă omul. Prins de proba automată, care a dat peste două
+        elemente acolo unde se aștepta la unul.
+      */}
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
         <h1 className="text-h2 text-cerneala">{titlu}</h1>
         <div className="mt-8">{children}</div>
-      </main>
+      </div>
     </div>
   );
 }

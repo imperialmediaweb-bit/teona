@@ -10,11 +10,18 @@ import { COOKIE_ADMIN, parolaCorecta, valoareaCookieului } from "@/lib/admin";
  * alt sit, iar răspunsul nostru ar deveni o trambulină de redirecționare,
  * semnată cu domeniul asociației.
  */
-const PAGINI = new Set(["/admin/campanii", "/admin/donatori", "/admin/email"]);
+const PAGINI = new Set([
+  "/admin",
+  "/admin/campanii",
+  "/admin/cereri",
+  "/admin/donatori",
+  "/admin/email",
+  "/admin/firme",
+]);
 
 function unde(formular: FormData | null): string {
   const cerut = formular ? String(formular.get("unde") ?? "") : "";
-  return PAGINI.has(cerut) ? cerut : "/admin/campanii";
+  return PAGINI.has(cerut) ? cerut : "/admin";
 }
 
 /** Intrarea în zona de verificare. Parola vine prin POST, niciodată prin adresă. */
