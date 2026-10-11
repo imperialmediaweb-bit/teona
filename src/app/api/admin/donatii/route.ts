@@ -6,7 +6,7 @@ import {
   esteMetodaManuala,
 } from "@/lib/plati/donatori";
 import { citesteSuma } from "@/lib/suma";
-import { DESTINATII, inBani } from "@/date/plati";
+import { esteDestinatie, inBani } from "@/date/plati";
 
 /**
  * Scrie o donație care n-a venit printr-un procesator: transfer bancar,
@@ -51,7 +51,7 @@ export async function POST(cerere: Request) {
   if (suma === null || suma <= 0) return inapoi("Scrie suma donației.");
 
   const destinatie = String(formular.get("destinatie") ?? "oriunde");
-  if (!(destinatie in DESTINATII)) return inapoi("Destinație necunoscută.");
+  if (!esteDestinatie(destinatie)) return inapoi("Destinație necunoscută.");
 
   const data = String(formular.get("data") ?? "");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) return inapoi("Alege data donației.");

@@ -10,7 +10,7 @@ import {
 import { areBazaDeDate } from "@/lib/baza";
 import { scrieInitiata } from "@/lib/plati/donatii";
 import { areStripe, deschideSesiune } from "@/lib/plati/stripe";
-import { DESTINATII, inBani, sumaAcceptata } from "@/date/plati";
+import { esteDestinatie, inBani, sumaAcceptata } from "@/date/plati";
 import { ADRESA_SITE } from "@/app/seo";
 
 /** Pornește o plată cu cardul și întoarce adresa paginii de plată Stripe. */
@@ -50,7 +50,7 @@ export async function POST(cerere: Request) {
   // Destinația vine din browser, deci nu e de încredere: se acceptă doar una
   // dintre cele patru din caiet.
   const destinatie =
-    typeof corp.destinatie === "string" && corp.destinatie in DESTINATII
+    esteDestinatie(corp.destinatie)
       ? corp.destinatie
       : "oriunde";
 

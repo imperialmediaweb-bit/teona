@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { citesteJson, esteRobot, limitaDeRata, raspuns } from "@/lib/api";
 import { arePayPal, deschideComanda } from "@/lib/plati/paypal";
-import { DESTINATII, EURO_MAXIM, EURO_MINIM, euroAcceptat } from "@/date/plati";
+import {
+  EURO_MAXIM,
+  EURO_MINIM,
+  esteDestinatie,
+  euroAcceptat,
+} from "@/date/plati";
 import { ADRESA_SITE } from "@/app/seo";
 
 /**
@@ -43,7 +48,7 @@ export async function POST(cerere: Request) {
   }
 
   const destinatie =
-    typeof corp.destinatie === "string" && corp.destinatie in DESTINATII
+    esteDestinatie(corp.destinatie)
       ? corp.destinatie
       : "oriunde";
 

@@ -93,9 +93,20 @@ async function Continut({
     : undefined;
   const lista = await firme(ales, cauta);
 
-  // Jurnalul se încarcă doar pentru firma deschisă: altfel fiecare pagină ar
-  // face câte o interogare pentru fiecare rând din tabel.
-  const jurnal = deschis ? await interactiuni({ firmaId: deschis }) : [];
+  /*
+    Jurnalul se încarcă doar pentru firma deschisă: altfel fiecare pagină ar
+    face câte o interogare pentru fiecare rând din tabel.
+
+    `deschis` vine din adresă, deci poate fi orice. Coloana e `uuid`, iar
+    Postgres aruncă o eroare pentru un text care nu arată a uuid — adică
+    pagina răspundea 500 pentru `?deschis=abc`. Se verifică forma înainte.
+  */
+  const firmaDeschisa = /^[0-9a-f-]{36}$/i.test(deschis ?? "")
+    ? deschis
+    : undefined;
+  const jurnal = firmaDeschisa
+    ? await interactiuni({ firmaId: firmaDeschisa })
+    : [];
 
   return (
     <Cadru titlu="Firme" activ="/admin/firme">
@@ -140,7 +151,7 @@ async function Continut({
       ) : (
         <ul className="mt-8 grid gap-4">
           {lista.map((f) => {
-            const eDeschis = deschis === f.id;
+            const eDeschis = firmaDeschisa === f.id;
             return (
               <li
                 key={f.id}

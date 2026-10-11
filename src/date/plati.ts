@@ -28,6 +28,20 @@ export const DESTINATII: Record<string, string> = {
   "cazuri-umanitare": "Donație — cazuri umanitare",
 };
 
+/**
+ * E o destinație adevărată, dintre cele patru?
+ *
+ * Se cheamă asta, nu `destinatie in DESTINATII`. Operatorul `in` se uită și
+ * în lanțul de prototipuri, deci `"toString"`, `"constructor"` și
+ * `"__proto__"` trec de el ca și cum ar fi destinații reale. Nimic rău nu se
+ * întâmpla — mai departe codul pica și ruta răspundea 502 — dar o verificare
+ * de validitate care spune „da" pentru `toString` e un capcană lăsată în
+ * drum pentru cine atinge codul mâine.
+ */
+export function esteDestinatie(x: unknown): x is string {
+  return typeof x === "string" && Object.hasOwn(DESTINATII, x);
+}
+
 export type Frecventa = "o-data" | "lunar";
 
 /**

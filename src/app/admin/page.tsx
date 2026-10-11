@@ -197,16 +197,16 @@ async function Continut({
           titlu="Sponsorizări de la firme"
           nota="Unde a ajuns fiecare firmă."
         >
+          {/*
+            Culoarea nu mai vine de aici: stadiile au ordine, iar pâlnia le
+            colorează singură cu o rampă, de la deschis la închis. Înainte
+            fiecare stadiu își purta culoarea lui, aleasă pe gust, iar
+            ordinea nu se vedea deloc.
+          */}
           <Palnie
             date={STADII_FIRMA.map((s) => ({
               eticheta: s.eticheta,
               nr: nrPalnie.get(s.id) ?? 0,
-              culoare: {
-                miere: "bg-miere-400",
-                turcoaz: "bg-turcoaz-500",
-                caramiziu: "bg-caramiziu-500",
-                cerneala: "bg-cerneala-slab",
-              }[s.culoare],
             }))}
           />
           <Link

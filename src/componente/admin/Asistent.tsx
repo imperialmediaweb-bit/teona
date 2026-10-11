@@ -140,7 +140,13 @@ export default function Asistent() {
               if (stare.fel === "eroare") setStare({ fel: "gol" });
             }}
             rows={5}
-            placeholder="Tabăra RESPIRO din septembrie, la Vatra Dornei. Au fost 24 de copii cu sindrom Down și părinții lor. Au făcut drumeție, atelier de olărit și o seară cu foc de tabără. Vrem să mulțumim celor care au donat."
+            /*
+              Exemplul are golurile lăsate în paranteze drepte, nu cifre
+              plauzibile. Un text de exemplu care sună a eveniment adevărat e
+              o invitație să fie trimis așa cum e — iar atunci asistentul ar
+              scrie despre o tabără care n-a existat.
+            */
+            placeholder="Tabăra RESPIRO de la [localitate], din [luna]. Au fost [câți] copii cu [ce nevoi] și părinții lor. Au făcut [ce activități]. Vrem să mulțumim celor care au donat."
             className={`${camp} resize-y`}
           />
           <span className="mt-1 block text-nota text-turcoaz-900/70">

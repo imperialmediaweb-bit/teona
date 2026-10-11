@@ -1,5 +1,6 @@
-import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, randomBytes } from "node:crypto";
 import { intreaba } from "./baza";
+import { egale } from "./comparatie";
 
 /**
  * Contul donatorului: intrare fără parolă, prin link trimis pe e-mail.
@@ -56,10 +57,25 @@ export function areConturi(): boolean {
   return cheieSesiune() !== null;
 }
 
+/**
+ * Semnătura sesiunii: HMAC, nu „cheia lipită în fața textului".
+ *
+ * Varianta dinainte era `sha256(cheie + ":cont:" + email)`. Nu era
+ * exploatabilă — atacul clasic împotriva ei, extensia de lungime, cere să
+ * poți trimite octetul `0x80`, pe care un șir UTF-8 nu-l poate produce, iar
+ * adresa falsificată n-ar fi găsit oricum niciun rând în baza de date.
+ *
+ * Dar asta înseamnă că siguranța stătea pe două accidente fericite, nu pe
+ * construcție. HMAC e făcut exact pentru treaba asta și închide întrebarea
+ * definitiv, pe un rând de cod.
+ *
+ * Schimbarea invalidează sesiunile deschise: oamenii cer un link nou. E un
+ * preț de nimic, plătit o dată.
+ */
 export function semneaza(email: string): string {
   const cheie = cheieSesiune();
   if (!cheie) throw new Error("Lipsește cheia de sesiune.");
-  return createHash("sha256").update(`${cheie}:cont:${email}`).digest("hex");
+  return createHmac("sha256", cheie).update(`cont:${email}`).digest("hex");
 }
 
 /**
@@ -130,9 +146,6 @@ export function cititSesiunea(brut: string | undefined): string | null {
   } catch {
     return null;
   }
-  if (semnatura.length !== asteptat.length) return null;
   // Comparație în timp constant: altfel durata răspunsului trădează semnătura.
-  return timingSafeEqual(Buffer.from(semnatura), Buffer.from(asteptat))
-    ? email
-    : null;
+  return egale(semnatura, asteptat) ? email : null;
 }

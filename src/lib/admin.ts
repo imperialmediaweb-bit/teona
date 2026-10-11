@@ -1,4 +1,5 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac } from "node:crypto";
+import { egale } from "./comparatie";
 import { cookies } from "next/headers";
 
 /**
@@ -32,9 +33,7 @@ function semnatura(parola: string): string {
 export function parolaCorecta(incercare: string): boolean {
   const parola = cheie();
   if (!parola) return false;
-  const a = Buffer.from(semnatura(incercare));
-  const b = Buffer.from(semnatura(parola));
-  return a.length === b.length && timingSafeEqual(a, b);
+  return egale(semnatura(incercare), semnatura(parola));
 }
 
 export function valoareaCookieului(): string | null {
@@ -50,6 +49,6 @@ export async function esteAutentificat(): Promise<boolean> {
   const asteptat = valoareaCookieului();
   if (!asteptat) return false;
   const gasit = (await cookies()).get(COOKIE_ADMIN)?.value;
-  if (!gasit || gasit.length !== asteptat.length) return false;
-  return timingSafeEqual(Buffer.from(gasit), Buffer.from(asteptat));
+  if (!gasit) return false;
+  return egale(gasit, asteptat);
 }
