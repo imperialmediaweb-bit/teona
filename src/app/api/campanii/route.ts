@@ -8,6 +8,7 @@ import {
 } from "@/lib/api";
 import { areBazaDeDate } from "@/lib/baza";
 import { creeazaCampanie } from "@/lib/campanii";
+import { anuntaAsociatia, campanieTrimisa } from "@/lib/email/campanie";
 import {
   POZA_MAXIM,
   areCloudinary,
@@ -156,6 +157,15 @@ export async function POST(cerere: Request) {
       pozaInaltime,
       linkGalantom: linkBrut || null,
     });
+
+    // E-mailurile pleacă după ce campania e salvată, și nu pot anula salvarea:
+    // omul și-a scris textul o dată. Dacă Resend nu răspunde, campania rămâne
+    // în listă, iar linkul privat se vede oricum pe ecran.
+    await Promise.allSettled([
+      campanieTrimisa({ email, numePublic, titlu, slug, jeton }),
+      anuntaAsociatia({ numePublic, titlu, email }),
+    ]);
+
     return NextResponse.json(
       { slug, jeton },
       { status: 201, headers: { "Cache-Control": "no-store" } },

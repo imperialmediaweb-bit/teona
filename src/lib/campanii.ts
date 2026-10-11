@@ -134,17 +134,32 @@ export async function campaniiDeVerificat(): Promise<CampanieDeVerificat[]> {
   return randuri.map((r) => ({ ...laCampanie(r), id: r.id, email: r.email }));
 }
 
+/**
+ * Publică sau respinge o campanie.
+ *
+ * Întoarce rândul **doar dacă starea chiar s-a schimbat acum** — condiția
+ * `stare = 'in_asteptare'` face ca o a doua apăsare pe același buton să nu
+ * producă nimic. Așa omul nu primește de două ori același e-mail.
+ */
 export async function hotaraste(
   id: string,
   stare: "publicata" | "respinsa",
   motiv?: string,
-): Promise<boolean> {
-  const randuri = await intreaba<{ id: string }>(
+): Promise<{ email: string; numePublic: string; titlu: string; slug: string } | null> {
+  const randuri = await intreaba<{
+    email: string;
+    nume_public: string;
+    titlu: string;
+    slug: string;
+  }>(
     `UPDATE campanii_aniversare
         SET stare = $2, motiv = $3, hotarat_la = now()
       WHERE id = $1 AND stare = 'in_asteptare'
-      RETURNING id`,
+      RETURNING email, nume_public, titlu, slug`,
     [id, stare, motiv ?? null],
   );
-  return randuri.length > 0;
+  const r = randuri[0];
+  return r
+    ? { email: r.email, numePublic: r.nume_public, titlu: r.titlu, slug: r.slug }
+    : null;
 }

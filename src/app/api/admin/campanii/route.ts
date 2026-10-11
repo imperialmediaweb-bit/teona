@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { limitaDeRata, raspuns } from "@/lib/api";
 import { esteAutentificat } from "@/lib/admin";
 import { hotaraste } from "@/lib/campanii";
+import { campanieHotarata } from "@/lib/email/campanie";
 
 /** Publicarea sau respingerea unei campanii, din lista de verificare. */
 export async function POST(cerere: Request) {
@@ -25,11 +26,18 @@ export async function POST(cerere: Request) {
     return raspuns("Hotărâre necunoscută.", 400);
   }
 
-  await hotaraste(
-    id,
-    hotarare,
-    String(formular.get("motiv") ?? "") || undefined,
-  );
+  const motiv = String(formular.get("motiv") ?? "") || undefined;
+  const rand = await hotaraste(id, hotarare, motiv);
+
+  // `hotaraste` întoarce rândul doar dacă starea chiar s-a schimbat acum, deci
+  // o a doua apăsare pe buton nu mai trimite al doilea e-mail.
+  if (rand) {
+    await campanieHotarata({
+      ...rand,
+      publicata: hotarare === "publicata",
+      motiv,
+    }).catch(() => undefined);
+  }
   return NextResponse.redirect(new URL("/admin/campanii", cerere.url), {
     status: 303,
   });
