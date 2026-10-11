@@ -58,6 +58,17 @@ Sunt deja în cod, nu e nimic de făcut la lansare în afară de o verificare:
       [validator.schema.org](https://validator.schema.org/): prima pagină și un
       proiect cu poze.
 
+### Motoarele care răspund (ChatGPT, Perplexity, rezumatele AI)
+
+- Site-ul servește `https://www.teona-ariana.ro/llms.txt`: datele asociației și
+  harta site-ului, scrise pentru modele de limbaj, generate din aceleași date
+  ca paginile. Nimic de făcut la lansare; de verificat o dată că răspunde.
+- `robots.txt` are un grup separat care **permite** roboții AI (GPTBot,
+  ClaudeBot, PerplexityBot, Google-Extended, CCBot și ceilalți). Dacă asociația
+  decide vreodată că nu vrea ca modelele să se antreneze pe textele și pozele
+  ei, se schimbă `allow` în `disallow` în `src/app/robots.ts`, în grupul
+  `ROBOTI_AI` — fără să atingă regula pentru Google și Bing.
+
 ### Google Business Profile — pasul care nu e în cod
 
 Pentru „ong suceava”, „asociație copii autism Suceava” și pentru harta din

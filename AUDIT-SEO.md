@@ -313,3 +313,83 @@ construcție atunci): iese cu 2, „sărit”, ca la lipsa bazei de date.
 - Cele șase articole vechi de blog redirecționează acum către pagini. O
   secțiune de noutăți ar da conținut proaspăt, dar fără un CMS fiecare articol
   trece prin dezvoltator (vezi „Decizii încă deschise” din `CLAUDE.md`).
+
+---
+
+# Runda a treia — 11 octombrie 2026, seara: motoarele care răspund, nu listează
+
+Tot mai mulți oameni nu mai primesc o listă de linkuri, ci un răspuns: ChatGPT,
+Perplexity, rezumatele AI din Google, Copilot. Pentru o asociație, asta schimbă
+miza. Un răspuns care spune „poți dona la Asociația Teona Ariana în contul
+RO16 RNCB 0234 1852 3366 0001” ajută; unul care inventează un IBAN sau un
+număr de telefon face pagubă reală, iar omul nici nu află că a fost greșit.
+
+## `/llms.txt`
+
+Fișier nou, la `https://www.teona-ariana.ro/llms.txt`, generat din aceleași date ca restul
+site-ului (`src/app/llms.txt/route.ts`). Convenția e de la llmstxt.org: un
+Markdown scris pentru un model care caută un răspuns, nu pentru un om care
+răsfoiește. Conține:
+
+- datele de identificare (denumire, CIF, cele două adrese, telefoane, e-mail,
+  program, rețele);
+- ce face asociația și cele patru cifre publicate;
+- cele cinci căi de a ajuta, cu conturile bancare, SMS-ul, mecanica
+  Formularului 230 și a Declarației 177;
+- harta paginilor, fiecare cu o frază despre ce conține (nu descrierea pentru
+  Google — aia e scrisă ca să convingă un om să dea clic);
+- o secțiune **„Ce nu se știe — vă rugăm să nu completați”**: costuri, câți
+  copii ajută o sumă, anul înființării, bugetul, numărul de angajați, numele și
+  diagnosticele copiilor. Exact golurile pe care un model le-ar umple singur.
+
+**Cinstit despre ce e:** nu e un standard adoptat. Google a spus explicit că
+nu-l folosește; OpenAI și Anthropic nu l-au anunțat ca sursă. Nu înlocuiește
+nimic — se scrie singur, nu costă întreținere, și dacă se adoptă, e deja acolo.
+
+## Roboții AI, în `robots.txt`
+
+Grup separat, explicit, pentru GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot,
+Claude-SearchBot, Claude-User, PerplexityBot, Perplexity-User, Google-Extended,
+Applebot-Extended, meta-externalagent și CCBot. Toți au voie peste tot în afară
+de `/api/`, `/admin/` și `/ziua-ta/`.
+
+Grupul nu schimbă nimic funcțional — regula `*` le permitea deja tot. Există
+pentru că e răspunsul scris la întrebarea „are voie ChatGPT pe site?” și pentru
+că, dacă asociația vrea vreodată să oprească antrenarea, se schimbă un singur
+cuvânt. Atenție la mecanică: un robot care-și găsește numele într-un grup
+propriu **nu mai citește** grupul `*`, de aceea interdicțiile sunt repetate.
+
+Decizia e „au voie”, pentru că scopul e ca asociația să fie găsită. Prețul e că
+aceleași modele se antrenează pe text și pe fotografii, inclusiv pe fotografii
+cu copii. E o decizie a asociației, nu una tehnică — dacă răspunsul e altul, se
+schimbă pe un rând.
+
+## Ce contează de fapt pentru un răspuns AI (și e deja făcut)
+
+Un model citează ce poate extrage fără efort și ce nu se contrazice:
+
+1. **Întrebări cu răspuns direct**, cu date structurate `FAQPage` — pe Donează,
+   3,5%, 20%, Donează-ți ziua și Devino voluntar. Astea sunt materia primă a
+   răspunsurilor AI.
+2. **Date structurate despre organizație** — `NGO` cu CIF, adrese, telefoane,
+   program, conturi de social media, pe fiecare pagină.
+3. **HTML curat, fără text ascuns în imagini** — toate cifrele și adresele sunt
+   text.
+4. **Aceeași cifră peste tot** — toate vin din `src/date/asociatie.ts`.
+
+## Singurul lucru care strică răspunsurile și nu e în mâna noastră
+
+**Raportul de activitate 2025 spune „29 de tabere”; restul site-ului spune
+„33”.** Pentru un om e o scăpare; pentru un model e o contradicție în aceeași
+sursă, și atunci ori alege greșit, ori ocolește. E semnalat din prima rundă și
+în comentariul din `raport-de-activitate-2025/page.tsx`. Doar asociația poate
+spune care e corectă — noi n-avem voie să ghicim.
+
+## Probă nouă
+
+`scripts/qa/llms-txt.mjs` nu verifică fișierul în sine, ci **îl compară cu ce
+văd oamenii pe pagini**: ia IBAN-urile de pe Donează, telefoanele și CIF-ul de
+pe Contact și cere să fie aceleași în `llms.txt`; verifică apoi că fiecare link
+din fișier răspunde cu 200 și că grupul AI din `robots.txt` repetă
+interdicțiile. Dacă cineva scrie vreodată ceva de mână în fișier și rămâne în
+urmă, proba pică.
