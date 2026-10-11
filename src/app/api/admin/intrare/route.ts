@@ -14,6 +14,7 @@ const PAGINI = new Set([
   "/admin",
   "/admin/campanii",
   "/admin/cereri",
+  "/admin/donatii",
   "/admin/donatori",
   "/admin/email",
   "/admin/firme",

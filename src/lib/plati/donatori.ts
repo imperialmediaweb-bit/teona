@@ -255,3 +255,63 @@ export async function adaugaDonatieManuala(date: {
     return { ok: false, motiv: "eroare" };
   }
 }
+
+export type Donatie = {
+  id: string;
+  procesator: string;
+  referinta: string;
+  sumaBani: number;
+  moneda: string;
+  frecventa: string;
+  destinatie: string;
+  email: string | null;
+  nume: string | null;
+  platitaLa: string;
+  observatii: string | null;
+};
+
+/**
+ * Donațiile una câte una, cea mai nouă prima.
+ *
+ * Lista de donatori arată totaluri; asta arată mișcările. E nevoie de
+ * amândouă: când cineva întreabă „ce e suma asta din extras?”, răspunsul nu
+ * se găsește într-un total.
+ */
+export async function donatii(limita = 100): Promise<Donatie[]> {
+  const randuri = await intreaba<{
+    id: string;
+    procesator: string;
+    referinta: string;
+    suma_bani: string;
+    moneda: string;
+    frecventa: string;
+    destinatie: string;
+    email: string | null;
+    prenume: string | null;
+    nume: string | null;
+    platita_la: Date | null;
+    observatii: string | null;
+  }>(
+    `SELECT id, procesator, referinta, suma_bani, moneda, frecventa,
+            destinatie, email, prenume, nume, platita_la, observatii
+       FROM donatii
+      WHERE stare = 'platita'
+      ORDER BY platita_la DESC NULLS LAST
+      LIMIT $1`,
+    [limita],
+  );
+  return randuri.map((r) => ({
+    id: r.id,
+    procesator: r.procesator,
+    referinta: r.referinta,
+    sumaBani: Number(r.suma_bani),
+    moneda: r.moneda,
+    frecventa: r.frecventa,
+    destinatie: r.destinatie,
+    email: r.email,
+    nume:
+      [r.prenume, r.nume].filter(Boolean).join(" ").trim() || null,
+    platitaLa: r.platita_la?.toISOString() ?? "",
+    observatii: r.observatii,
+  }));
+}

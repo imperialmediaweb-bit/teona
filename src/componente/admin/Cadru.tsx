@@ -4,6 +4,7 @@ import { ASOCIATIA } from "@/date/asociatie";
 /** Paginile panoului, în ordinea în care se folosesc. */
 const PAGINI = [
   { href: "/admin", eticheta: "Tablou de bord" },
+  { href: "/admin/donatii", eticheta: "Donații" },
   { href: "/admin/donatori", eticheta: "Donatori" },
   { href: "/admin/firme", eticheta: "Firme" },
   { href: "/admin/cereri", eticheta: "Cereri" },

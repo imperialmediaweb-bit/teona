@@ -11,11 +11,26 @@
 /** Peste atât, e aproape sigur o greșeală de tastare, nu o sumă. */
 const LIMITA = 1e15;
 
-const format = new Intl.NumberFormat("ro-RO", { maximumFractionDigits: 2 });
+const INTREG = new Intl.NumberFormat("ro-RO", { maximumFractionDigits: 0 });
+const CU_BANI = new Intl.NumberFormat("ro-RO", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
 
-/** „20000” -> „20.000 lei”. */
+/**
+ * „20000” -> „20.000 lei”, „1250.5” -> „1.250,50 lei”.
+ *
+ * Banii nu se scriu niciodată cu un singur zecimal. `maximumFractionDigits:
+ * 2` singur dădea „1.250,5 lei”, care pe un extras de cont arată a greșeală
+ * de tastare — și care, citit repede, se confundă cu 1.250,05.
+ *
+ * Zecimalele apar doar când există: „20.000 lei”, nu „20.000,00 lei”.
+ * Majoritatea donațiilor sunt sume rotunde, iar două zerouri la fiecare
+ * rând dintr-un tabel sunt zgomot.
+ */
 export function scrieSuma(suma: number): string {
-  return `${format.format(suma)} lei`;
+  const rotund = Number.isInteger(laBan(suma));
+  return `${(rotund ? INTREG : CU_BANI).format(suma)} lei`;
 }
 
 /** Rotunjire la ban: 0,75% din 100.000 iese 750,0000000000001 în virgulă mobilă. */

@@ -7,6 +7,8 @@ import { donatori, rezumat, type Filtru } from "@/lib/plati/donatori";
 import { scrieSuma } from "@/lib/suma";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
+import Jurnal from "@/componente/admin/Jurnal";
+import { interactiuni } from "@/lib/crm";
 
 export const metadata: Metadata = {
   title: "Donatori",
@@ -21,10 +23,17 @@ const FILTRE: Array<{ id: Filtru; eticheta: string }> = [
   { id: "neduși", eticheta: "Cu acord, neurcați în listă" },
 ];
 
+type Cautare = {
+  filtru?: string;
+  cauta?: string;
+  gresit?: string;
+  deschis?: string;
+};
+
 export default function PaginaDonatori({
   searchParams,
 }: {
-  searchParams: Promise<{ filtru?: string; cauta?: string; gresit?: string }>;
+  searchParams: Promise<Cautare>;
 }) {
   return (
     <Suspense fallback={<Cadru titlu="Donatori">Se încarcă…</Cadru>}>
@@ -36,10 +45,10 @@ export default function PaginaDonatori({
 async function Continut({
   searchParams,
 }: {
-  searchParams: Promise<{ filtru?: string; cauta?: string; gresit?: string }>;
+  searchParams: Promise<Cautare>;
 }) {
   await connection();
-  const { filtru: cerut, cauta = "", gresit } = await searchParams;
+  const { filtru: cerut, cauta = "", gresit, deschis } = await searchParams;
 
   if (!areParolaConfigurata()) {
     return (
@@ -75,6 +84,16 @@ async function Continut({
     donatori(filtru, cauta),
     rezumat(),
   ]);
+
+  // Jurnalul se citește doar pentru donatorul deschis. O listă de 200 de
+  // oameni ar face altfel 200 de interogări ca să arate 200 de liste goale.
+  const jurnal = deschis ? await interactiuni({ email: deschis }) : [];
+
+  // „Închide" și salvarea se întorc la aceeași listă, cu filtrele ei.
+  const parametri = new URLSearchParams();
+  if (filtru !== "toti") parametri.set("filtru", filtru);
+  if (cauta) parametri.set("cauta", cauta);
+  const inapoiLa = `/admin/donatori${parametri.size ? `?${parametri}` : ""}`;
 
   return (
     <Cadru titlu="Donatori" activ="/admin/donatori">
@@ -154,10 +173,25 @@ async function Continut({
                     </span>
                     <span className="block text-cerneala-moale">{d.email}</span>
                     {d.telefon && (
-                      <span className="block text-cerneala-slab">
+                      <a
+                        href={`tel:${d.telefon.replace(/\s/g, "")}`}
+                        className="block font-titlu font-bold text-caramiziu-700 underline underline-offset-2"
+                      >
                         {d.telefon}
-                      </span>
+                      </a>
                     )}
+                    {/*
+                      Jurnalul stă sub donator, nu într-o coloană a lui:
+                      ocupă toată lățimea când e deschis, iar un tabel cu o
+                      coloană care uneori e înaltă cât un ecran devine
+                      ilizibil.
+                    */}
+                    <Jurnal
+                      email={d.email}
+                      deschis={deschis === d.email}
+                      intrari={deschis === d.email ? jurnal : []}
+                      inapoiLa={inapoiLa}
+                    />
                   </td>
                   <td className="py-3 pr-4 align-top font-titlu font-bold">
                     {scrieSuma(d.totalBani / 100)}

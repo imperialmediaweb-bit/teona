@@ -7,6 +7,7 @@ import {
   SUME_PROPUSE_EURO,
   euroAcceptat,
 } from "@/date/plati";
+import { scrieSuma } from "@/lib/suma";
 import Pictograma from "../Pictograma";
 
 /**
@@ -37,23 +38,15 @@ function citesteSuma(brut: string): number {
 }
 
 /**
- * Suma, scrisă cum se scrie în română: virgulă la zecimale, punct la mii.
+ * Suma în euro, scrisă cu aceeași regulă ca sumele în lei de pe site:
+ * virgulă la zecimale, punct la mii, zecimalele doar când există.
  *
- * `${12.5} €` ar da „12.5 €" — punct în loc de virgulă și fără al doilea
- * zecimal, adică exact ce nu scrie nimeni pe o chitanță. Zecimalele apar doar
- * când există: „25 €", nu „25,00 €".
+ * `scrieSuma` adaugă „lei", care aici ar fi greșit — de aceea se taie.
+ * Regula rămâne una singură, în `src/lib/suma.ts`, ca „12,50" să nu devină
+ * „12.5" într-un loc și „12,50" în altul.
  */
-const BANI = new Intl.NumberFormat("ro-RO", {
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 2,
-});
-const EXACT = new Intl.NumberFormat("ro-RO", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
-
 function scrieEuro(suma: number): string {
-  return Number.isInteger(suma) ? BANI.format(suma) : EXACT.format(suma);
+  return scrieSuma(suma).replace(" lei", "");
 }
 
 export default function ButonPayPal({
@@ -73,7 +66,7 @@ export default function ButonPayPal({
     if (!valida) {
       setStare({
         fel: "eroare",
-        mesaj: `Suma trebuie să fie între ${BANI.format(EURO_MINIM)} și ${BANI.format(EURO_MAXIM)} de euro.`,
+        mesaj: `Suma trebuie să fie între ${scrieEuro(EURO_MINIM)} și ${scrieEuro(EURO_MAXIM)} de euro.`,
       });
       return;
     }
@@ -159,7 +152,7 @@ export default function ButonPayPal({
           setAlta(ev.target.value);
           setStare({ fel: "gol" });
         }}
-        placeholder={`${BANI.format(EURO_MINIM)}–${BANI.format(EURO_MAXIM)}`}
+        placeholder={`${scrieEuro(EURO_MINIM)}–${scrieEuro(EURO_MAXIM)}`}
         aria-invalid={Boolean(alta.trim()) && !valida}
         className="colt-mic-b min-h-12 w-full border-2 border-hartie/30 bg-transparent px-4 py-3 text-corp text-hartie transition-colors duration-200 outline-none placeholder:text-hartie/40 focus:border-hartie sm:max-w-xs"
       />

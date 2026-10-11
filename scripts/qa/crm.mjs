@@ -21,10 +21,18 @@ if (!PAROLA) {
 }
 
 const b = await browser();
+/*
+  Intrarea în panou e limitată la 5 încercări la 15 minute, pe adresă, iar în
+  dezvoltare toate cererile vin de la aceeași. Fără antetul ăsta, scriptul
+  merge o dată și la a doua rulare pică cu 429 — care arată ca o defecțiune a
+  panoului, nu ca limita făcându-și treaba. O adresă nouă la fiecare rulare
+  îl face repetabil. (`198.51.100.0/24` e rezervat pentru documentație.)
+*/
 const ctx = await b.newContext({
   viewport: { width: 1280, height: 1200 },
-  // Intrarea e limitată la 5 încercări pe adresă; scriptul își ia adresa lui.
-  extraHTTPHeaders: { "x-forwarded-for": "198.51.100.77" },
+  extraHTTPHeaders: {
+    "x-forwarded-for": `198.51.100.${1 + Math.floor(Math.random() * 250)}`,
+  },
 });
 const page = await ctx.newPage();
 const erori = urmaresteErori(page);
@@ -128,10 +136,16 @@ await page.goto(BAZA + "/admin/firme", { waitUntil: "networkidle" });
 await page.locator("#panou-admin ul > li").first().locator('a:has-text("Discuții și notițe")').click();
 await page.waitForLoadState("networkidle");
 verifica("jurnalul se deschide", (await page.locator('form[action="/api/admin/jurnal"]').count()) === 1);
-verifica("și spune că e gol", (await page.locator("#panou-admin").innerText()).includes("Nimic scris încă"));
+// Pe o bază curată jurnalul e gol; la a doua rulare are deja intrări. Se
+// verifică doar că spune una dintre cele două, nu că e neapărat gol.
+const textJurnal = await page.locator("#panou-admin").innerText();
+verifica(
+  "jurnalul arată ori că e gol, ori ce scrie în el",
+  textJurnal.includes("Nimic scris încă") || /Telefon|Notiță|E-mail|Întâlnire/.test(textJurnal),
+);
 
 await page.selectOption('form[action="/api/admin/jurnal"] select[name="fel"]', "telefon");
-await page.fill('input[name="rezumat"]', "L-am sunat pe Andrei: trimite actele până vineri.");
+await page.fill('form[action="/api/admin/jurnal"] input[name="rezumat"]', "L-am sunat pe Andrei: trimite actele până vineri.");
 await page.click('form[action="/api/admin/jurnal"] button:has-text("Adaugă")');
 await page.waitForLoadState("networkidle");
 const cuJurnal = await page.locator("#panou-admin").innerText();
@@ -140,7 +154,7 @@ verifica("cu felul ei", cuJurnal.includes("Telefon"));
 verifica("jurnalul rămâne deschis după salvare", (await page.locator('form[action="/api/admin/jurnal"]').count()) === 1);
 
 // Rezumat gol — nu se salvează.
-await page.fill('input[name="rezumat"]', "");
+await page.fill('form[action="/api/admin/jurnal"] input[name="rezumat"]', "");
 const golAcceptat = await page.evaluate(() => {
   const f = document.querySelector('form[action="/api/admin/jurnal"]');
   return f.checkValidity();
@@ -165,10 +179,103 @@ await page.waitForLoadState("networkidle");
 await page.goto(BAZA + "/admin/cereri?stadiu=rezolvat", { waitUntil: "networkidle" });
 verifica("cererea s-a mutat în „rezolvat”", (await page.locator("#panou-admin ul > li").count()) >= 1);
 
+// ─── Donații trecute de mână ──────────────────────────────────────────────
+console.log("\n=== Donații de mână ===");
+await page.goto(BAZA + "/admin/donatii", { waitUntil: "networkidle" });
+const inainte = await page.locator("#panou-admin tbody tr").count();
+
+async function treceDonatie(camp) {
+  await page.goto(BAZA + "/admin/donatii", { waitUntil: "networkidle" });
+  await page.click('summary:has-text("Trece o donație de mână")');
+  // Limitat la formularul panoului: subsolul site-ului are și el un câmp
+  // „nume”, cel de abonare la buletin, iar Playwright se oprește pe două
+  // potriviri.
+  const formular = page.locator('form[action="/api/admin/donatii"]');
+  for (const [nume, val] of Object.entries(camp)) {
+    const el = formular.locator(`[name="${nume}"]`);
+    if ((await el.evaluate((e) => e.tagName)) === "SELECT")
+      await el.selectOption(val);
+    else await el.fill(val);
+  }
+  await formular.locator('button:has-text("Trece donația")').click();
+  await page.waitForLoadState("networkidle");
+  return page.locator("#panou-admin").innerText();
+}
+
+// Referință nouă la fiecare rulare: una fixă ar fi fost respinsă ca duplicat
+// de la a doua rulare încoace, iar scriptul ar fi părut că găsește o pană.
+const ref = `extras-OP-${Date.now()}`;
+
+let t = await treceDonatie({ metoda: "manual-transfer", suma: "1.250,50", data: "2026-09-15", referinta: ref, nume: "Firma Bună SRL" });
+verifica("donația de mână se salvează", t.includes("Donația e trecută"), t.split("\n").find((l) => l.includes("Donația")) ?? t.slice(0, 60));
+verifica("suma scrisă româneşte se citeşte corect", t.includes("1.250,5 lei"), t.match(/1\.250[^\n]*/)?.[0] ?? "lipsă");
+verifica("apare un rând nou în listă", (await page.locator("#panou-admin tbody tr").count()) === inainte + 1, `${inainte} → ${await page.locator("#panou-admin tbody tr").count()}`);
+
+t = await treceDonatie({ metoda: "manual-transfer", suma: "1.250,50", data: "2026-09-15", referinta: ref });
+verifica("aceeași referință de două ori e oprită", t.includes("Există deja o donație"), t.split("\n").find((l) => l.includes("Există")) ?? t.slice(0, 60));
+
+t = await treceDonatie({ metoda: "manual-numerar", suma: "aiurea", data: "2026-09-15", referinta: "chit-1" });
+verifica("suma scrisă aiurea e respinsă", t.includes("doar în cifre"), t.split("\n").find((l) => l.includes("cifre")) ?? t.slice(0, 60));
+
+/*
+  Data din viitor și adresa stricată sunt oprite de browser înainte de
+  trimitere (`max` pe `input[type=date]`, `type=email`), deci prin formular
+  nu se poate ajunge la server. Dar browserul se poate ocoli, iar o sumă
+  greșită intră direct în raportul anual — așa că se verifică serverul
+  direct, cu sesiunea paginii.
+*/
+async function catreServer(camp) {
+  const r = await page.request.post(BAZA + "/api/admin/donatii", {
+    form: camp,
+    maxRedirects: 0,
+  });
+  const unde = r.headers()["location"] ?? "";
+  return decodeURIComponent(unde);
+}
+
+let unde = await catreServer({ metoda: "manual-numerar", suma: "50", data: "2030-01-01", referinta: "chit-viitor" });
+verifica("serverul respinge o dată din viitor", unde.includes("în viitor"), unde);
+
+unde = await catreServer({ metoda: "manual-numerar", suma: "50", data: "2026-09-15", referinta: "chit-mail", email: "nu-e-adresa" });
+verifica("serverul respinge un e-mail invalid", unde.includes("nu e validă"), unde);
+
+unde = await catreServer({ metoda: "manual-numerar", suma: "50", data: "15-09-2026", referinta: "chit-data" });
+verifica("serverul respinge o dată scrisă invers", unde.includes("data donației") || unde.includes("scrisă corect"), unde);
+
+unde = await catreServer({ metoda: "inventata", suma: "50", data: "2026-09-15", referinta: "x" });
+verifica("serverul respinge o metodă inventată", unde.includes("Alege metoda"), unde);
+
+unde = await catreServer({ metoda: "manual-numerar", suma: "50", data: "2026-09-15", referinta: "x", destinatie: "inventata" });
+verifica("serverul respinge o destinație inventată", unde.includes("Destinație necunoscută"), unde);
+
+unde = await catreServer({ metoda: "manual-numerar", suma: "0", data: "2026-09-15", referinta: "chit-zero" });
+verifica("serverul respinge suma zero", unde.includes("Scrie suma"), unde);
+
+// ─── Jurnal pe donatori ───────────────────────────────────────────────────
+console.log("\n=== Jurnal pe donatori ===");
+await page.goto(BAZA + "/admin/donatori", { waitUntil: "networkidle" });
+const randuri = await page.locator("#panou-admin tbody tr").count();
+if (randuri === 0) {
+  console.log("  (fără donatori cu e-mail — se sare peste)");
+} else {
+  await page.locator('a:has-text("Discuții și notițe")').first().click();
+  await page.waitForLoadState("networkidle");
+  verifica("jurnalul se deschide pe donator", (await page.locator('form[action="/api/admin/jurnal"]').count()) === 1);
+  await page.fill('form[action="/api/admin/jurnal"] input[name="rezumat"]', "Am sunat-o: vrea să treacă pe donație lunară.");
+  await page.click('form[action="/api/admin/jurnal"] button:has-text("Adaugă")');
+  await page.waitForLoadState("networkidle");
+  verifica("se salvează pe donator", (await page.locator("#panou-admin").innerText()).includes("vrea să treacă pe donație lunară"));
+  verifica("rămâne pe pagina de donatori", new URL(page.url()).pathname === "/admin/donatori", page.url());
+  // Telefonul apare doar dacă donatorul l-a lăsat; pe firme e întotdeauna.
+  await page.goto(BAZA + "/admin/firme", { waitUntil: "networkidle" });
+  const tel = await page.locator('#panou-admin a[href^="tel:"]').count();
+  verifica("telefoanele sunt apelabile dintr-un clic", tel >= 1, `${tel} linkuri tel:`);
+}
+
 // ─── Fără sesiune, nimic nu merge ─────────────────────────────────────────
 console.log("\n=== Fără sesiune ===");
 const anonim = await b.newPage();
-for (const cale of ["/admin", "/admin/firme", "/admin/cereri"]) {
+for (const cale of ["/admin", "/admin/firme", "/admin/cereri", "/admin/donatii"]) {
   await anonim.goto(BAZA + cale, { waitUntil: "networkidle" });
   const text = await anonim.locator("#panou-admin").innerText();
   verifica(`${cale} cere parola`, text.includes("Parola") && !text.includes("CUI"), text.slice(0, 40).replace(/\n/g, " "));
@@ -177,6 +284,8 @@ const r = await anonim.request.post(BAZA + "/api/admin/firme", { form: { id: "00
 verifica("ruta de firme refuză fără sesiune", r.status() === 403, String(r.status()));
 const r2 = await anonim.request.post(BAZA + "/api/admin/jurnal", { form: { email: "x@y.ro", fel: "telefon", rezumat: "x" } });
 verifica("ruta de jurnal refuză fără sesiune", r2.status() === 403, String(r2.status()));
+const r3 = await anonim.request.post(BAZA + "/api/admin/donatii", { form: { metoda: "manual-numerar", suma: "100", data: "2026-01-01", referinta: "x" } });
+verifica("ruta de donații refuză fără sesiune", r3.status() === 403, String(r3.status()));
 
 console.log("\nerori consolă/rețea:", JSON.stringify(erori));
 console.log(`\nverificări picate: ${rele}`);
