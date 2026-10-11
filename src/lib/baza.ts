@@ -215,6 +215,28 @@ const DEFINITIE = `
   CREATE INDEX IF NOT EXISTS interactiuni_dupa_firma
     ON interactiuni (firma_id, cand DESC);
 
+  /*
+    Intrarea donatorului în contul lui, fără parolă.
+
+    Nu ținem parole. Un donator intră de două ori pe an și oricum ar uita-o,
+    iar o bază de parole e o răspundere pe care o asociație mică n-are cum s-o
+    poarte: scurgerea ei ar da acces la conturile oamenilor de pe alte site-uri,
+    unde refolosesc aceeași parolă. În loc de asta, primește pe e-mail un link
+    care merge o singură dată și expiră repede.
+
+    Se păstrează doar amprenta jetonului, nu jetonul. Cine ar citi tabelul n-ar
+    putea intra în niciun cont — exact cum se ține o parolă.
+  */
+  CREATE TABLE IF NOT EXISTS jetoane_cont (
+    amprenta    text PRIMARY KEY,
+    email       text NOT NULL,
+    creat_la    timestamptz NOT NULL DEFAULT now(),
+    expira_la   timestamptz NOT NULL,
+    folosit_la  timestamptz
+  );
+  CREATE INDEX IF NOT EXISTS jetoane_dupa_expirare
+    ON jetoane_cont (expira_la);
+
   CREATE TABLE IF NOT EXISTS evenimente_plati (
     procesator  text NOT NULL,
     eveniment   text NOT NULL,

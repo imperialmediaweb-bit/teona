@@ -115,7 +115,36 @@ fiscală o emite asociația.
 `redirectionare`, `campanie-trimisa`, `campanie-publicata`,
 `campanie-respinsa`, și variantele `-anunt`). În producție ruta dă 404.
 
-## 7. Panoul de admin
+## 7. Contul donatorului
+
+`/contul-meu`. **Nu ținem parole.** Donatorul își cere un link pe adresa cu
+care a donat; linkul merge o singură dată și expiră în 20 de minute. Nu
+există înregistrare: contul *este* istoricul donațiilor, iar cheia lui e
+adresa de e-mail.
+
+- [ ] `SECRET_SESIUNE` în Railway — un șir lung și aleatoriu, de cel puțin 16
+      caractere, folosit nicăieri altundeva. Fără el, conturile sunt oprite
+      cu totul (pagina o spune cinstit). Schimbarea lui deconectează pe toată
+      lumea, ceea ce e și butonul de urgență dacă e nevoie.
+- [ ] Are nevoie și de `DATABASE_URL`, și de `RESEND_API_KEY`: fără mesaj
+      n-are cum să ajungă linkul la om.
+
+**Ce nu scrie în panoul donatorului, și de ce.** Nu scrie „ai ajutat N
+copii". Nu știm cât costă o zi de tabără pentru un copil, deci orice număr
+ar fi inventat — iar un donator care prinde o cifră scoasă din burtă nu mai
+dă a doua oară. Se arată doar ce e adevărat: cât a dat, de când, pe ce s-a
+dus, de câte luni ne e alături, plus cifrele asociației, atribuite limpede
+asociației.
+
+**Dacă vreți și „ai ajutat N copii", îmi trebuie o cifră reală** de la
+asociație: cât costă o zi de tabără pentru un copil, sau o lună la Casa
+Teona. Cu ea, calculul devine adevărat și-l pun.
+
+Donatorul își poate schimba singur acordul pentru buletin și își poate cere
+ștergerea datelor — ceea ce acoperă o bună parte din obligațiile GDPR fără
+ca cineva de la asociație să fie nevoit să răspundă la fiecare cerere.
+
+## 8. Panoul de admin
 
 `/admin/campanii`, `/admin/donatori`, `/admin/email`. O singură parolă, în
 `PAROLA_ADMIN`, de cel puțin 12 caractere. Nu e un sistem de conturi și nici
@@ -141,7 +170,7 @@ unde ar avea nevoie de altceva, să lase un gol între paranteze drepte:
 și greșită nu se vede deloc. **Instrucțiunea nu e o garanție** — cine trimite
 e cel care verifică, iar panoul i-o spune de fiecare dată.
 
-## 8. Ce mai lipsește de la asociație
+## 9. Ce mai lipsește de la asociație
 
 Lista completă e în `continut/stadiu-caiet.md`. Site-ul funcționează fără ele,
 dar secțiunile respective nu se afișează.

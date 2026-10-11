@@ -106,6 +106,8 @@ export function construiesteMultumirea(d: Date): Compus {
       ? `Poți opri donația lunară oricând, fără motivare — scrie-ne la ${EMAIL.contact} sau sună la ${TELEFON_PRINCIPAL.afisat}.`
       : `Dacă ai nevoie de o confirmare scrisă din partea asociației, scrie-ne la ${EMAIL.contact}.`,
     "",
+    `Îți poți vedea oricând toate donațiile, fără parolă: ${ADRESA_SITE}/contul-meu`,
+    "",
     `${ASOCIATIA.denumireLegala} · CIF ${ASOCIATIA.cif}`,
     `${ADRESE.casaTeona.strada}, ${ADRESE.casaTeona.oras} ${ADRESE.casaTeona.cod}`,
     `${TELEFON_PRINCIPAL.afisat} · ${EMAIL.contact}`,
@@ -164,6 +166,22 @@ export function construiesteMultumirea(d: Date): Compus {
               <a href="${ADRESA_SITE}${RUTE.proiecte}" style="display:inline-block;padding:13px 30px;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:999px;">Vezi ce facem cu banii</a>
             </td></tr>
           </table>
+        </td></tr>
+
+        <!--
+          Contul donatorului.
+
+          Linkul duce la pagina de intrare, nu la un cont deschis: un e-mail
+          poate fi retrimis, tipărit sau ajuns la altcineva, iar un link care
+          deschide direct istoricul donațiilor ar fi o cheie plimbată prin
+          lume. Acolo cere singur un link de intrare, care merge o dată.
+        -->
+        <tr><td align="center" style="padding:14px 32px 0;">
+          <p style="margin:0;font-family:Arial,sans-serif;font-size:13px;line-height:1.6;color:${MOALE};">
+            Îți poți vedea oricând toate donațiile în
+            <a href="${ADRESA_SITE}/contul-meu" style="color:${PORTOCALIU};font-weight:bold;">contul tău</a>.
+            Nu-ți trebuie parolă.
+          </p>
         </td></tr>
 
         <tr><td style="padding:28px 32px;">

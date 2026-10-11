@@ -16,8 +16,11 @@ import { browser, BAZA, urmaresteErori } from "./comun.mjs";
 
 const PAROLA = process.env.PAROLA_ADMIN;
 if (!PAROLA) {
-  console.log("Lipsește PAROLA_ADMIN. Nu se poate intra în panou.");
-  process.exit(0);
+  // Ieșire cu 2, nu cu 0: altfel o rulare fără parolă arată ca o trecere, iar
+  // o verificare sărită se confundă cu una reușită. S-a întâmplat deja o dată
+  // în sesiunea asta, și a ascuns o probă picată.
+  console.log("SĂRIT: lipsește PAROLA_ADMIN, nu se poate intra în panou.");
+  process.exit(2);
 }
 
 const b = await browser();
@@ -208,7 +211,8 @@ const ref = `extras-OP-${Date.now()}`;
 
 let t = await treceDonatie({ metoda: "manual-transfer", suma: "1.250,50", data: "2026-09-15", referinta: ref, nume: "Firma Bună SRL" });
 verifica("donația de mână se salvează", t.includes("Donația e trecută"), t.split("\n").find((l) => l.includes("Donația")) ?? t.slice(0, 60));
-verifica("suma scrisă româneşte se citeşte corect", t.includes("1.250,5 lei"), t.match(/1\.250[^\n]*/)?.[0] ?? "lipsă");
+// Două zecimale, nu una: banii nu se scriu „1.250,5".
+verifica("suma scrisă româneşte se citeşte corect", t.includes("1.250,50 lei"), t.match(/1\.250[^\n]*/)?.[0] ?? "lipsă");
 verifica("apare un rând nou în listă", (await page.locator("#panou-admin tbody tr").count()) === inainte + 1, `${inainte} → ${await page.locator("#panou-admin tbody tr").count()}`);
 
 t = await treceDonatie({ metoda: "manual-transfer", suma: "1.250,50", data: "2026-09-15", referinta: ref });

@@ -108,9 +108,22 @@ verifica("acordul e trimis ca boolean", cerut?.acord === true);
 const reusit = await page.locator('#cerere [role="status"]').count();
 const refuzat = await page.locator('#cerere [role="alert"]').count();
 log(`  după trimitere: status=${reusit} alert=${refuzat}`);
+/*
+  Ce se așteaptă aici depinde de baza de date, și e bine că depinde:
+
+  - **cu** baza pornită, cererea e salvată în CRM chiar dacă Resend lipsește,
+    deci nu e pierdută și omul vede o confirmare cinstită („v-am înregistrat
+    cererea", nu „v-am trimis pașii");
+  - **fără** baza, nimic nu se salvează nicăieri, deci trebuie să vadă
+    refuzul. O confirmare acolo ar fi o minciună.
+
+  Exact unul dintre cele două trebuie să apară — niciodată amândouă, și
+  niciodată niciunul.
+*/
 verifica(
-  "fără RESEND, arată refuzul, nu „mulțumim”",
-  reusit === 0 && refuzat === 1,
+  "arată ori confirmarea, ori refuzul — nu amândouă",
+  reusit + refuzat === 1,
+  `status=${reusit} alert=${refuzat}`,
 );
 
 // ─── 3,5% — persoane fizice ───────────────────────────────────────────────

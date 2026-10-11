@@ -315,3 +315,130 @@ export async function donatii(limita = 100): Promise<Donatie[]> {
     observatii: r.observatii,
   }));
 }
+
+/**
+ * Tot ce vede un donator despre el însuși, în contul lui.
+ *
+ * Se cere mereu cu adresa luată din sesiunea verificată, niciodată dintr-un
+ * parametru de adresă. Dacă vreodată cineva cheamă funcția asta cu un e-mail
+ * venit de la utilizator, un om poate citi donațiile altuia.
+ */
+export type ContulMeu = {
+  email: string;
+  nume: string | null;
+  totalBani: number;
+  donatii: Donatie[];
+  /** Prima și ultima donație, ISO. */
+  primaLa: string;
+  ultimaLa: string;
+  /** Câte luni întregi au trecut de la prima donație. */
+  luniDeAtunci: number;
+  /** Are cel puțin o donație lunară. */
+  areLunara: boolean;
+  acordBuletin: boolean;
+  /** Cât a mers pe fiecare destinație. */
+  peDestinatii: Array<{ destinatie: string; bani: number }>;
+};
+
+export async function contulMeu(email: string): Promise<ContulMeu | null> {
+  const lista = await intreaba<{
+    id: string;
+    procesator: string;
+    referinta: string;
+    suma_bani: string;
+    moneda: string;
+    frecventa: string;
+    destinatie: string;
+    prenume: string | null;
+    nume: string | null;
+    platita_la: Date | null;
+    observatii: string | null;
+    acord_buletin: boolean;
+  }>(
+    `SELECT id, procesator, referinta, suma_bani, moneda, frecventa,
+            destinatie, prenume, nume, platita_la, observatii, acord_buletin
+       FROM donatii
+      WHERE email = $1 AND stare = 'platita'
+      ORDER BY platita_la DESC NULLS LAST`,
+    [email],
+  );
+  if (lista.length === 0) return null;
+
+  const donatiile: Donatie[] = lista.map((r) => ({
+    id: r.id,
+    procesator: r.procesator,
+    referinta: r.referinta,
+    sumaBani: Number(r.suma_bani),
+    moneda: r.moneda,
+    frecventa: r.frecventa,
+    destinatie: r.destinatie,
+    email,
+    nume: [r.prenume, r.nume].filter(Boolean).join(" ").trim() || null,
+    platitaLa: r.platita_la?.toISOString() ?? "",
+    observatii: r.observatii,
+  }));
+
+  const dateLe = lista
+    .map((r) => r.platita_la)
+    .filter((d): d is Date => d !== null)
+    .sort((a, b) => a.getTime() - b.getTime());
+  const prima = dateLe[0] ?? null;
+  const ultima = dateLe[dateLe.length - 1] ?? null;
+
+  // Luni întregi, calculate pe an și lună, nu prin împărțirea
+  // milisecundelor: 30 de zile nu sunt o lună, iar diferența se vede după
+  // câțiva ani ca o lună în plus.
+  let luni = 0;
+  if (prima) {
+    const acum = new Date();
+    luni =
+      (acum.getFullYear() - prima.getFullYear()) * 12 +
+      (acum.getMonth() - prima.getMonth());
+    if (acum.getDate() < prima.getDate()) luni -= 1;
+    luni = Math.max(0, luni);
+  }
+
+  const peDestinatii = new Map<string, number>();
+  for (const d of donatiile) {
+    peDestinatii.set(
+      d.destinatie,
+      (peDestinatii.get(d.destinatie) ?? 0) + d.sumaBani,
+    );
+  }
+
+  return {
+    email,
+    // Numele cel mai recent pe care l-a scris el, nu primul.
+    nume: donatiile.find((d) => d.nume)?.nume ?? null,
+    totalBani: donatiile.reduce((s, d) => s + d.sumaBani, 0),
+    donatii: donatiile,
+    primaLa: prima?.toISOString() ?? "",
+    ultimaLa: ultima?.toISOString() ?? "",
+    luniDeAtunci: luni,
+    areLunara: donatiile.some((d) => d.frecventa === "lunar"),
+    acordBuletin: lista.some((r) => r.acord_buletin),
+    peDestinatii: [...peDestinatii.entries()]
+      .map(([destinatie, bani]) => ({ destinatie, bani }))
+      .sort((a, b) => b.bani - a.bani),
+  };
+}
+
+/** Există vreo donație încasată pe adresa asta? Fără a scoate date. */
+export async function areDonatii(email: string): Promise<boolean> {
+  const randuri = await intreaba<{ unu: number }>(
+    "SELECT 1 AS unu FROM donatii WHERE email = $1 AND stare = 'platita' LIMIT 1",
+    [email],
+  );
+  return randuri.length > 0;
+}
+
+/** Schimbă acordul pentru buletinul informativ, din contul donatorului. */
+export async function schimbaAcordul(
+  email: string,
+  acord: boolean,
+): Promise<void> {
+  await intreaba(
+    "UPDATE donatii SET acord_buletin = $2 WHERE email = $1",
+    [email, acord],
+  );
+}
