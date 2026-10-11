@@ -54,3 +54,20 @@ export function sumaAcceptata(lei: number): boolean {
  * nu apare pe site — nu apare un buton care dă eroare.
  */
 export type Metoda = "stripe" | "paypal" | "revolut";
+
+/**
+ * Cât se poate dona prin PayPal, în euro.
+ *
+ * PayPal nu suportă leul — are 24 de monede, și RON nu e printre ele. Deci
+ * blocul lui e în euro de la cap la coadă, cu sume gândite în euro (5, 10,
+ * 25), nu convertite din cele în lei. Un buton care scrie „100 lei” și
+ * debitează 19,65 € ar fi exact genul de lucru care strică încrederea, iar un
+ * curs scris de noi ar fi vechi din prima zi.
+ */
+export const SUME_PROPUSE_EURO = [5, 10, 25] as const;
+export const EURO_MINIM = 2;
+export const EURO_MAXIM = 10_000;
+
+export function euroAcceptat(euro: number): boolean {
+  return Number.isFinite(euro) && euro >= EURO_MINIM && euro <= EURO_MAXIM;
+}

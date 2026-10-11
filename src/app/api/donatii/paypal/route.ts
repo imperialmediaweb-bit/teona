@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { citesteJson, esteRobot, limitaDeRata, raspuns } from "@/lib/api";
 import { arePayPal, deschideComanda } from "@/lib/plati/paypal";
-import { DESTINATII } from "@/date/plati";
+import { DESTINATII, EURO_MAXIM, EURO_MINIM, euroAcceptat } from "@/date/plati";
 import { ADRESA_SITE } from "@/app/seo";
 
 /**
@@ -11,9 +11,6 @@ import { ADRESA_SITE } from "@/app/seo";
  * suportă leul, iar un buton care scrie „100 lei” și debitează 19,65 € ar fi
  * exact genul de lucru care strică încrederea.
  */
-const EURO_MINIM = 2;
-const EURO_MAXIM = 10_000;
-
 export async function POST(cerere: Request) {
   const prea = limitaDeRata(cerere, {
     cheie: "donatii-paypal",
@@ -38,7 +35,7 @@ export async function POST(cerere: Request) {
   }
 
   const euro = Number(corp.euro);
-  if (!Number.isFinite(euro) || euro < EURO_MINIM || euro > EURO_MAXIM) {
+  if (!euroAcceptat(euro)) {
     return raspuns(
       `Suma trebuie să fie între ${EURO_MINIM} și ${EURO_MAXIM} de euro.`,
       400,

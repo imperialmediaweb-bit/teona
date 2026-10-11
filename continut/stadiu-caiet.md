@@ -26,8 +26,8 @@ Legendă: ✅ făcut · ⏳ construit, așteaptă conținut de la asociație ·
 |---|---|
 | 2.1 Antet | ✅ |
 | 2.2 Formularul cu cardul: câmpuri, ordine, mesaje de eroare | ✅ ca înfățișare și validare |
-| 2.2 Încasarea propriu-zisă | ❌ **procesatorul de plăți nu e ales.** Formularul nu se preface: trimite la Galantom, SMS și transfer bancar |
-| 2.2 Pagina de mulțumire + emailul automat | ❌ depind de procesator |
+| 2.2 Încasarea propriu-zisă | ✅ **Stripe** (card, în lei, o dată sau lunar) · **PayPal** (în euro — PayPal nu suportă leul) · **Revolut** opțional, ca link. Fiecare metodă apare pe site doar dacă își are cheile în mediu: fără chei, niciun buton care dă eroare |
+| 2.2 Pagina de mulțumire + emailul automat | ✅ e-mail de mulțumire la fiecare donație încasată, cu suma și destinația. Scrie în el că **nu e chitanță** — chitanța fiscală o emite asociația |
 | 2.3 SMS, transfer bancar cu „Copiază”, ziua de naștere, 3,5% | ✅ |
 | 2.4 Pentru firme | ⏳ cele două documente lipsesc |
 | 2.5 Cele șase întrebări frecvente | ✅ |

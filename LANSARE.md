@@ -45,7 +45,41 @@ La lansare:
 - [ ] Cheile Cloudinary se dau **numai** prin variabile de mediu în Railway.
       Nu intră niciodată într-un fișier din depozit.
 
-## 5. E-mailurile — nu pleacă niciunul fără Resend
+## 5. Plățile
+
+Fiecare metodă apare pe site **doar dacă își are cheile în mediu**. Fără ele,
+blocul nu se afișează deloc — nu apare un buton care dă eroare.
+
+| metodă | variabile | ce e de făcut la lansare |
+|---|---|---|
+| Stripe (lei, o dată sau lunar) | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | mută webhook-ul pe `https://www.teona-ariana.ro/api/donatii/stripe/webhook` |
+| PayPal (euro) | `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_WEBHOOK_ID` | webhook-ul e deja pe domeniul real |
+| Revolut (link) | `REVOLUT_LINK` | opțional; vezi mai jos |
+
+- [ ] **Rotește cheile care au trecut prin chat**: cheia secretă Stripe și
+      secretul PayPal. Amândouă sunt compromise prin simplul fapt că au fost
+      scrise undeva în afara Railway.
+- [ ] Verifică webhook-ul Stripe **după** mutarea domeniului. Un webhook
+      trimis către o adresă care face 301 poate fi pierdut tăcut: Stripe nu
+      urmărește redirecționarea.
+- [ ] Prima donație reală, de 5 lei, făcută de voi, și verificată în Stripe,
+      în baza de date (`donatii`) și în inbox (mulțumirea).
+
+**Revolut, înainte de a-l porni.** Un link Revolut nu se poate contoriza:
+banii nu trec prin site, deci site-ul nu află niciodată că s-a plătit. Tot ce
+se numără sunt apăsările pe buton, adică intenția. În plus, un link
+`revolut.me` primește cel mult ~250 £ pe săptămână prin card și cel mult 20 de
+plăți pe săptămână, iar dacă linkul e al unei persoane și nu al asociației,
+donațiile ajung într-un cont personal. Nimic din toate astea nu se rezolvă din
+cod — de aceea blocul apare doar dacă cineva pune `REVOLUT_LINK`, adică doar
+dacă asociația a decis că vrea.
+
+**PayPal e în euro, și scrie asta de sus.** PayPal procesează 24 de monede și
+leul nu e printre ele. Alternativa — să afișăm lei și să convertim pe ascuns —
+ar însemna un buton care scrie „100 lei" și debitează altceva. Cine vrea în
+lei are cardul prin Stripe, mai sus pe aceeași pagină.
+
+## 6. E-mailurile — nu pleacă niciunul fără Resend
 
 Tot ce trimite site-ul pe e-mail trece prin Resend. **Fără `RESEND_API_KEY`,
 niciun e-mail nu pleacă** — rutele răspund cinstit că trimiterea nu e activă și
@@ -81,7 +115,7 @@ fiscală o emite asociația.
 `redirectionare`, `campanie-trimisa`, `campanie-publicata`,
 `campanie-respinsa`, și variantele `-anunt`). În producție ruta dă 404.
 
-## 6. Ce mai lipsește de la asociație
+## 7. Ce mai lipsește de la asociație
 
 Lista completă e în `continut/stadiu-caiet.md`. Site-ul funcționează fără ele,
 dar secțiunile respective nu se afișează.

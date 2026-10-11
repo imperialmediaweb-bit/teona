@@ -13,6 +13,7 @@ import {
 import Aparitie from "@/componente/Aparitie";
 import Buton from "@/componente/Buton";
 import Decor from "@/componente/Decor";
+import ButonPayPal from "@/componente/formular/ButonPayPal";
 import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
 import Val, { VAL_PESTE } from "@/componente/Val";
 import DeCopiat from "@/componente/pagina/DeCopiat";
@@ -20,6 +21,7 @@ import DocumentDeDescarcat from "@/componente/pagina/DocumentDeDescarcat";
 import Intrebari, { type Intrebare } from "@/componente/pagina/Intrebari";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
 import FormularDonatie from "@/componente/formular/FormularDonatie";
+import { arePayPal } from "@/lib/plati/paypal";
 
 export const metadata: Metadata = metadate({
   titlu: "Donează",
@@ -400,6 +402,49 @@ export default function Doneaza() {
                 </p>
               </section>
             </Aparitie>
+
+            {/*
+              PayPal — apare numai dacă există cheile în mediu, ca toate
+              celelalte metode. Până acum era configurat de la cap la coadă
+              (rută, comandă, webhook verificat) și nu exista niciun buton pe
+              site: plătibil doar de cine construia manual o cerere.
+
+              Scrie „în euro" de sus, nu într-o notă de subsol. PayPal nu
+              suportă leul, iar alternativa — să afișăm lei și să convertim pe
+              ascuns — ar însemna un buton care scrie una și debitează alta.
+            */}
+            {arePayPal() && (
+              <Aparitie intarziere={0.08} className="h-full">
+                <section
+                  id="paypal"
+                  className="granulatie relative flex h-full scroll-mt-32 flex-col overflow-hidden colt-a bg-gradient-to-br from-turcoaz-600 to-turcoaz-800 p-7 text-hartie shadow-[0_30px_60px_-28px_rgba(42,159,163,0.8)] sm:p-9"
+                >
+                  <Decor
+                    semn="unda"
+                    strokeWidth={0.8}
+                    className="absolute -right-12 -bottom-12 size-48 text-hartie/10"
+                  />
+                  <span className="colt-mic-b relative flex size-14 items-center justify-center bg-hartie/15 text-hartie">
+                    <Pictograma nume="card" className="size-7" />
+                  </span>
+                  <h3 className="relative mt-5 text-h3 text-hartie">
+                    PayPal, în euro
+                  </h3>
+                  <p className="relative mt-3 text-amplu text-hartie/85">
+                    Pentru donatorii din străinătate și pentru cine are deja
+                    cont PayPal.
+                  </p>
+                  <p className="relative mt-4 text-mic text-hartie/70">
+                    PayPal nu lucrează în lei, așa că aici donezi în euro, fix
+                    suma pe care o alegi. Dacă vrei în lei, folosește cardul de
+                    mai sus.
+                  </p>
+                  <div className="relative mt-auto pt-7">
+                    <ButonPayPal />
+                  </div>
+                </section>
+              </Aparitie>
+            )}
 
             {/*
               Revolut — apare numai dacă asociația a pus `REVOLUT_LINK` în
