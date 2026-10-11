@@ -221,6 +221,42 @@ export function jsonLdAsociatie(): Jsonld[] {
           postalCode: casaTeona.cod,
           addressCountry: "RO",
         },
+        hasMap: casaTeona.harta,
+        /*
+          Programul casei, în forma pe care o citește Google: `Mo`–`Fr`,
+          9:00–17:00. Aceleași ore scrise pe pagina Casa Teona, din aceeași
+          sursă (`ADRESE.casaTeona.program`) — dacă se schimbă acolo, se
+          schimbă și aici. Fără coordonate: n-am măsurat punctul pe hartă, iar
+          o latitudine inventată ar pune casa în altă stradă.
+        */
+        openingHoursSpecification: {
+          "@type": "OpeningHoursSpecification",
+          dayOfWeek: [
+            "https://schema.org/Monday",
+            "https://schema.org/Tuesday",
+            "https://schema.org/Wednesday",
+            "https://schema.org/Thursday",
+            "https://schema.org/Friday",
+          ],
+          opens: "09:00",
+          closes: "17:00",
+        },
+      },
+      /*
+        Donația, ca acțiune pe care o poate face cineva care găsește
+        asociația în rezultate: Google o leagă de pagina Donează, nu de
+        prima pagină. `DonateAction` e tipul pe care îl recunosc și
+        agregatoarele de ONG-uri.
+      */
+      potentialAction: {
+        "@type": "DonateAction",
+        name: "Donează",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: absoluta(RUTE.doneaza),
+          inLanguage: "ro",
+        },
+        recipient: { "@id": ID_ASOCIATIE },
       },
       contactPoint: {
         "@type": "ContactPoint",
@@ -303,6 +339,49 @@ export function jsonLdIntrebari(
       "@type": "Question",
       name: i.intrebare,
       acceptedAnswer: { "@type": "Answer", text: textDin(i.raspuns) },
+    })),
+  };
+}
+
+/**
+ * Galeria de fotografii a unui proiect, pentru Google Imagini.
+ *
+ * Pozele de la tabere sunt, pentru site-ul ăsta, conținutul cel mai căutat:
+ * părinții caută „tabără copii autism” și dau întâi pe imagini. Ca să apară
+ * acolo cu context — nu ca fișiere orfane — fiecare poză se declară aici cu
+ * adresa ei reală din `public/poze/` și cu textul care o descrie, același pe
+ * care îl citește și un cititor de ecran.
+ *
+ * Adresa e cea a fișierului, nu cea prin `/_next/image`: varianta optimizată
+ * se naște la prima cerere și are în adresă lățimea și calitatea, deci nu e o
+ * adresă stabilă pe care Google să o țină în index.
+ *
+ * Fără `copyrightHolder` și fără credit: pozele vin din arhiva asociației, dar
+ * nu știu cine le-a făcut — le-au trimis voluntari și părinți. O atribuire
+ * greșită în date structurate e mai rea decât niciuna.
+ */
+export function jsonLdGalerie({
+  titlu,
+  cale,
+  poze,
+}: {
+  titlu: string;
+  cale: string;
+  poze: ReadonlyArray<{ cale: string; alt: string }>;
+}): Jsonld {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ImageGallery",
+    name: titlu,
+    url: absoluta(cale),
+    inLanguage: "ro",
+    isPartOf: { "@id": `${ADRESA_SITE}/#site` },
+    about: { "@id": ID_ASOCIATIE },
+    image: poze.map((poza, i) => ({
+      "@type": "ImageObject",
+      contentUrl: absoluta(poza.cale),
+      caption: poza.alt,
+      ...(i === 0 ? { representativeOfPage: true } : {}),
     })),
   };
 }

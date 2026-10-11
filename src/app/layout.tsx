@@ -94,11 +94,61 @@ export const metadata: Metadata = {
   robots: INDEXABIL
     ? { index: true, follow: true, "max-image-preview": "large" }
     : { index: false, follow: false },
+  /*
+    Dovada că site-ul e al nostru, pentru Search Console și Bing.
+
+    Amândouă cer fie un fișier încărcat la rădăcină, fie o etichetă `meta` în
+    pagină. Eticheta se pune din variabilă de mediu, nu în cod: codul ăsta e
+    public, iar valoarea e un secret slab — cine o are poate cere acces la
+    datele de căutare ale site-ului. Se setează în Railway, cu codul pe care
+    îl dă Google („Alternative methods → HTML tag”, partea din `content`):
+
+        VERIFICARE_GOOGLE=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    Dacă variabila lipsește, eticheta nu se scrie deloc — o etichetă goală ar
+    face verificarea să pice cu un mesaj greu de înțeles.
+  */
+  verification: {
+    ...(process.env.VERIFICARE_GOOGLE
+      ? { google: process.env.VERIFICARE_GOOGLE }
+      : {}),
+    ...(process.env.VERIFICARE_BING
+      ? { other: { "msvalidate.01": process.env.VERIFICARE_BING } }
+      : {}),
+  },
 };
 
 export const viewport: Viewport = {
   themeColor: "#F74F22",
 };
+
+/**
+ * Locul pe care îl ține antetul până se randează.
+ *
+ * Antetul citește calea paginii curente, deci stă într-un `<Suspense>`, iar un
+ * `<Suspense>` fără `fallback` nu lasă nimic în HTML-ul trimis întâi: pagina
+ * se desena cu conținutul lipit de marginea de sus, iar antetul apărea o
+ * clipă mai târziu și împingea totul în jos cu 68–167 de pixeli. Măsurat pe
+ * build-ul de producție, cu procesorul încetinit de patru ori: 1,3 secunde cu
+ * pagina așezată greșit și un CLS de 0,16 — peste pragul de 0,1 de la care
+ * Google consideră că o pagină „sare”, și destul cât să apeși alt buton decât
+ * cel pe care l-ai țintit.
+ *
+ * Înălțimile sunt cele măsurate pe antetul adevărat, în starea lui desfăcută:
+ * 68 px sub 360 px lățime, 72 px până la ~644, 78 px până la 1280, 167 px
+ * peste. Nu sunt impuse antetului — el se strânge la derulare și trebuie să
+ * poată — ci doar imitate aici. Ca să nu rămână în urmă dacă antetul se
+ * schimbă, `scripts/qa/salt-layout.mjs` măsoară saltul real și pică dacă
+ * trece de 0,05.
+ */
+function LocAntet() {
+  return (
+    <div
+      aria-hidden="true"
+      className="h-[68px] min-[360px]:h-[72px] sm:h-[78px] xl:h-[167px]"
+    />
+  );
+}
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
@@ -106,6 +156,28 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="ro"
       className={`${nunito.variable} ${nunitoSans.variable} ${kalam.variable} h-full`}
     >
+      <head>
+        {/*
+          Două rânduri care rulează înaintea primei desenări.
+
+          Bara de anunț se scrie pe server, ca să-și țină locul și să nu
+          împingă pagina în jos când pornește JavaScriptul. Dar cine a închis-o
+          în vizita asta nu trebuie s-o mai vadă — nici măcar o clipă. Scriptul
+          ăsta citește `sessionStorage` și pune clasa pe `<html>` înainte ca
+          browserul să deseneze ceva; regula din `globals.css` ascunde bara pe
+          baza ei. Nu se poate face din React: orice decizie luată după
+          hidratare vine prea târziu, după prima desenare.
+
+          Conținutul e scris aici, în cod, nu vine de nicăieri din afară.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{if(sessionStorage.getItem("teona:bara-anunt-inchisa")==="1")' +
+              'document.documentElement.classList.add("fara-bara-anunt")}catch(e){}',
+          }}
+        />
+      </head>
       <body className="flex min-h-full flex-col bg-hartie">
         {/* Asociația, ca organizație, pe fiecare pagină: Google o leagă de
             site indiferent pe ce pagină intră prima dată. */}
@@ -126,7 +198,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           în afara unui `<Suspense>`. Învelișul le lasă să se randeze după ce
           calea e știută, fără să schimbe nimic pentru paginile obișnuite.
         */}
-        <Suspense>
+        <Suspense fallback={<LocAntet />}>
           <Antet />
         </Suspense>
 

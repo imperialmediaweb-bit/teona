@@ -11,6 +11,12 @@ function aboneaza(reciteste: () => void) {
   return () => window.removeEventListener(SCHIMBARE, reciteste);
 }
 
+/**
+ * Ce crede serverul. Mereu „vizibilă”, ca bara să intre în HTML și să-și
+ * țină locul; cine a închis-o o are deja ascunsă de scriptul din `<head>`.
+ */
+const SNAPSHOT_SERVER = () => "vizibila" as const;
+
 function citeste(): "inchisa" | "vizibila" {
   try {
     return sessionStorage.getItem(CHEIE) === "1" ? "inchisa" : "vizibila";
@@ -26,16 +32,25 @@ function citeste(): "inchisa" | "vizibila" {
  * „Vizitatorul o poate închide și nu mai reapare în aceeași vizită” — de aceea
  * `sessionStorage`, nu `localStorage`: la următoarea vizită apare din nou.
  *
- * La randarea pe server starea e „necunoscut”, deci bara nu intră în HTML. Așa
- * cine a închis-o n-o mai vede clipind la fiecare pagină. Prețul e că bara nu
- * apare fără JavaScript — acceptabil pentru un anunț, nu pentru conținut.
+ * **De ce intră în HTML, deși serverul nu știe dacă a fost închisă.**
+ * Înainte, starea pe server era „necunoscut” și bara nu se scria deloc:
+ * apărea abia după ce pornea JavaScriptul și împingea toată pagina în jos cu
+ * 45 de pixeli (70 pe telefon). Pentru toată lumea, la fiecare pagină — ca să
+ * nu clipească pentru cei care o închiseseră. Schimb prost: saltul îl simte
+ * oricine apasă un buton în secunda aceea, iar Google îl numără la CLS.
+ *
+ * Acum bara se scrie pe server, iar cei care au închis-o n-o văd totuși: în
+ * `<head>` e un script de două rânduri care citește `sessionStorage` **înainte
+ * de prima desenare** și pune o clasă pe `<html>`; CSS-ul o ascunde pe baza
+ * ei. Fără clipire și fără salt, în ambele cazuri. Când React pornește,
+ * `useSyncExternalStore` ajunge la aceeași concluzie și scoate bara din DOM —
+ * dar ea era deja invizibilă, deci nimic nu se mișcă.
+ *
+ * Fără JavaScript bara rămâne vizibilă și nu se poate închide. Dinainte nici
+ * nu apărea, deci nu se pierde nimic.
  */
 export default function BaraDeAnunt() {
-  const stare = useSyncExternalStore(
-    aboneaza,
-    citeste,
-    () => "necunoscut" as const,
-  );
+  const stare = useSyncExternalStore(aboneaza, citeste, SNAPSHOT_SERVER);
 
   if (stare !== "vizibila") return null;
 
@@ -49,7 +64,7 @@ export default function BaraDeAnunt() {
   }
 
   return (
-    <div className="doar-site relative bg-cerneala text-hartie">
+    <div data-bara-anunt className="doar-site relative bg-cerneala text-hartie">
       <div className="mx-auto flex max-w-7xl items-center justify-center gap-3 px-4 py-2.5 pr-12 text-center sm:pr-4">
         <p className="text-mic">
           Trimite{" "}

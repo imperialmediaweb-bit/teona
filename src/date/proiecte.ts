@@ -123,3 +123,20 @@ export function proiecteAfisate(): ProiectAfisat[] {
 export function proiectDupaSlug(slug: string): ProiectAfisat | undefined {
   return proiecteAfisate().find((p) => p.slug === slug);
 }
+
+/**
+ * Toate fotografiile unui proiect, coperta inclusă și fără duplicate.
+ *
+ * Două proiecte au copertă, dar lista `poze` goală: pagina lor rămânea fără
+ * nicio imagine, deși cardul din listă afișa coperta.
+ *
+ * Stă aici, nu în pagină, pentru că o folosesc amândouă: pagina, ca să arate
+ * galeria, și `sitemap.xml`, ca să-i spună lui Google ce poze sunt pe ea.
+ * Dacă s-ar calcula în două locuri, sitemapul ar ajunge să promită altceva
+ * decât ce e pe pagină.
+ */
+export function pozeleProiectului(proiect: ProiectAfisat): string[] {
+  return proiect.coperta && !proiect.poze.includes(proiect.coperta)
+    ? [proiect.coperta, ...proiect.poze]
+    : proiect.poze;
+}

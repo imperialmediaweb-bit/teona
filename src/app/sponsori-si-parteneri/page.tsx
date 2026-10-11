@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
 import Image from "next/image";
 import Link from "next/link";
-import { ASOCIATIA, RUTE } from "@/date/asociatie";
+import { ASOCIATIA, EMAIL, RUTE } from "@/date/asociatie";
 import { SIGLE_SPONSORI } from "@/date/sponsori";
 import Aparitie from "@/componente/Aparitie";
 import Buton from "@/componente/Buton";
 import Decor from "@/componente/Decor";
 import Fotografie from "@/componente/Fotografie";
+import Pictograma from "@/componente/Pictograma";
 import Val, { VAL_PESTE } from "@/componente/Val";
 import AntetPagina from "@/componente/pagina/AntetPagina";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
@@ -214,6 +215,124 @@ export default function SponsoriSiParteneri() {
             >
               Despre noi
             </Link>
+            .
+          </p>
+        </div>
+      </section>
+
+      {/*
+        Cele trei căi pe care o firmă ne poate fi alături.
+
+        Pagina avea 172 de cuvinte: sigle, trei testimoniale și un buton
+        „Pentru firme”. Un director care ajunge aici de pe Google vedea pe cine
+        susținem, nu cum se face. Cele trei căi există deja, fiecare pe pagina
+        ei; secțiunea asta le spune pe scurt și trimite acolo, în loc să
+        repete calculul și documentele.
+
+        Nimic despre ce „primește” firma în schimb, în afară de ce se vede pe
+        pagina asta: o listă de sigle. Beneficii pe care nu le-a promis nimeni
+        n-au ce căuta într-un text pe care îl citește un contabil.
+      */}
+      <Val culoare="text-hartie" className={VAL_PESTE} />
+      <section className="relative overflow-hidden bg-hartie pt-6 pb-24 lg:pt-10 lg:pb-32">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <Decor
+            semn="unda"
+            strokeWidth={0.7}
+            className="pluteste-lent absolute bottom-16 left-[4%] size-10 text-turcoaz-200 lg:size-14"
+          />
+        </div>
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <TitluSectiune
+            scris="Pentru firme"
+            titlu="Cum poate firma ta să ne fie alături"
+            text="Trei căi, toate prin bancă și toate cu documente. Primele două nu scot bani din firmă: mută spre copii o parte din impozitul pe care îl plătește oricum."
+          />
+
+          <ul className="mt-12 grid gap-5 lg:grid-cols-3">
+            <li>
+              <Aparitie className="h-full">
+                <Link
+                  href={RUTE.directionare20}
+                  className="group flex h-full flex-col colt-a border border-hartie-umbra bg-hartie p-6 shadow-[0_24px_50px_-26px_rgba(35,35,35,0.4)] transition-all duration-500 ease-cald hover:-translate-y-1.5 hover:shadow-[0_30px_56px_-26px_rgba(247,79,34,0.55)] motion-reduce:hover:translate-y-0 sm:p-7"
+                >
+                  <span className="colt-mic-b flex size-12 items-center justify-center bg-caramiziu-500 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]">
+                    <Pictograma nume="document" className="size-6" />
+                  </span>
+                  <h3 className="mt-5 text-h4 text-cerneala transition-colors duration-300 group-hover:text-caramiziu-600">
+                    Contract de sponsorizare
+                  </h3>
+                  <p className="mt-2 flex-1 text-mic text-cerneala-moale">
+                    Până la 20% din impozitul pe profit poate merge la
+                    asociație în loc să meargă la stat. Firma semnează un
+                    contract, face plata și scade suma din impozit.
+                  </p>
+                  <span className="mt-5 inline-flex items-center gap-2 font-titlu text-mic font-semibold text-caramiziu-600">
+                    Calculator și pași
+                    <Pictograma nume="sageata" className="size-4" />
+                  </span>
+                </Link>
+              </Aparitie>
+            </li>
+            <li>
+              <Aparitie intarziere={0.06} className="h-full">
+                <Link
+                  href={RUTE.directionare20}
+                  className="group flex h-full flex-col colt-b border border-hartie-umbra bg-hartie p-6 shadow-[0_24px_50px_-26px_rgba(35,35,35,0.4)] transition-all duration-500 ease-cald hover:-translate-y-1.5 hover:shadow-[0_30px_56px_-26px_rgba(42,159,163,0.5)] motion-reduce:hover:translate-y-0 sm:p-7"
+                >
+                  <span className="colt-mic-a flex size-12 items-center justify-center bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
+                    <Pictograma nume="plic" className="size-6" />
+                  </span>
+                  <h3 className="mt-5 text-h4 text-cerneala transition-colors duration-300 group-hover:text-turcoaz-700">
+                    Declarația 177
+                  </h3>
+                  <p className="mt-2 flex-1 text-mic text-cerneala-moale">
+                    Pentru sponsorizarea deja plătită, firma cere redirecționarea
+                    sumei prin Declarația 177. Termenul îl confirmăm împreună cu
+                    contabilitatea.
+                  </p>
+                  <span className="mt-5 inline-flex items-center gap-2 font-titlu text-mic font-semibold text-turcoaz-700">
+                    Cum se depune
+                    <Pictograma nume="sageata" className="size-4" />
+                  </span>
+                </Link>
+              </Aparitie>
+            </li>
+            <li>
+              <Aparitie intarziere={0.12} className="h-full">
+                <Link
+                  href={RUTE.doneaza}
+                  className="group flex h-full flex-col colt-a border border-hartie-umbra bg-hartie p-6 shadow-[0_24px_50px_-26px_rgba(35,35,35,0.4)] transition-all duration-500 ease-cald hover:-translate-y-1.5 hover:shadow-[0_30px_56px_-26px_rgba(255,172,0,0.55)] motion-reduce:hover:translate-y-0 sm:p-7"
+                >
+                  <span className="colt-mic-b flex size-12 items-center justify-center bg-miere-400 text-cerneala shadow-[0_10px_22px_-10px_rgba(255,172,0,0.9)]">
+                    <Pictograma nume="card" className="size-6" />
+                  </span>
+                  <h3 className="mt-5 text-h4 text-cerneala transition-colors duration-300 group-hover:text-miere-600">
+                    Donație din partea firmei
+                  </h3>
+                  <p className="mt-2 flex-1 text-mic text-cerneala-moale">
+                    Transfer bancar în conturile asociației, o dată sau lunar,
+                    cu destinația aleasă: tabere, Casa Teona sau cazuri
+                    umanitare.
+                  </p>
+                  <span className="mt-5 inline-flex items-center gap-2 font-titlu text-mic font-semibold text-miere-600">
+                    Conturile și destinațiile
+                    <Pictograma nume="sageata" className="size-4" />
+                  </span>
+                </Link>
+              </Aparitie>
+            </li>
+          </ul>
+
+          <p className="mt-10 text-center text-mic text-cerneala-moale">
+            Firmele care ne-au fost alături apar în lista de mai sus. Pentru
+            orice întrebare, scrie-ne la{" "}
+            <a
+              href={`mailto:${EMAIL.contact}`}
+              className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
+            >
+              {EMAIL.contact}
+            </a>
             .
           </p>
         </div>

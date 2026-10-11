@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
+import { JsonLd, jsonLdFir, jsonLdIntrebari, metadate } from "@/app/seo";
 import Image from "next/image";
 import Link from "next/link";
 import { EMAIL, RUTE, TELEFOANE } from "@/date/asociatie";
@@ -11,6 +11,7 @@ import Pictograma from "@/componente/Pictograma";
 import Val, { VAL_PESTE } from "@/componente/Val";
 import AntetPagina from "@/componente/pagina/AntetPagina";
 import Galerie from "@/componente/pagina/Galerie";
+import Intrebari, { type Intrebare } from "@/componente/pagina/Intrebari";
 import Pasi from "@/componente/pagina/Pasi";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
 import FormularVoluntar from "@/componente/formular/FormularVoluntar";
@@ -21,6 +22,85 @@ export const metadata: Metadata = metadate({
     "Alătură-te Culegătorilor de Zâmbete, voluntarii Asociației Teona Ariana Suceava, în tabere și la Casa Teona. Completezi formularul, te contactăm. De la 18 ani.",
   cale: "/devino-voluntar",
 });
+
+/*
+  Întrebările despre voluntariat.
+
+  Nu sunt în caiet; sunt întrebările pe care le pune oricine se gândește să se
+  înscrie, iar răspunsul la fiecare e deja hotărât undeva — în caiet sau în
+  formular. Pagina avea 244 de cuvinte, cele mai puține din tot site-ul, și
+  omul rămânea cu exact aceste nelămuriri nespuse între „vreau” și „trimit”.
+
+  Niciun răspuns nu inventează o regulă: vârsta e din 11.3, „stabilim
+  împreună” e din 11.2, timpul și întrebarea despre experiență sunt câmpurile
+  din formular (11.4), locurile sunt din antetul paginii (11.1). Ce nu știu nu
+  apare — dacă se dă contract de voluntariat sau certificat, de pildă, nu
+  scrie nicăieri, deci nu promit nimic.
+*/
+const INTREBARI: ReadonlyArray<Intrebare> = [
+  {
+    intrebare: "De la ce vârstă pot fi voluntar?",
+    raspuns: (
+      <p>
+        De la 18 ani. Formularul cere data nașterii exact pentru asta și nu se
+        trimite dacă ești mai mic. Dacă n-ai încă 18 ani, scrie-ne oricum: poți
+        ajuta altfel, iar peste un an te așteptăm.
+      </p>
+    ),
+  },
+  {
+    intrebare: "Trebuie să am experiență în voluntariat?",
+    raspuns: (
+      <p>
+        Nu. În formular te întrebăm dacă ai mai făcut voluntariat, ca să știm
+        de unde pornim, nu ca să te selectăm. Mulți dintre voluntarii noștri au
+        venit prima dată la o tabără fără să fi făcut asta vreodată.
+      </p>
+    ),
+  },
+  {
+    intrebare: "Cât timp trebuie să dedic?",
+    raspuns: (
+      <p>
+        Cât poți. În formular alegi între zilnic, săptămânal și ocazional, iar
+        „ocazional” e un răspuns bun: la o tabără sau la un atelier e nevoie de
+        oameni pentru câteva zile, nu pentru tot anul.
+      </p>
+    ),
+  },
+  {
+    intrebare: "Pot să aleg unde ajut?",
+    raspuns: (
+      <p>
+        Nu dinainte. După ce citim formularul te sunăm și stabilim împreună unde
+        poți fi cel mai de folos — depinde de ce urmează, de câți copii sunt și
+        de ce te-ai simți tu în stare să faci. Nimeni nu e pus să facă ceva cu
+        care nu e de acord.
+      </p>
+    ),
+  },
+  {
+    intrebare: "Unde se face voluntariatul?",
+    raspuns: (
+      <p>
+        În tabere, la <Link href={RUTE.casaTeona}>Casa Teona</Link>, pe Strada
+        Zamca 22 din Suceava, și la celelalte activități ale asociației.
+        Taberele sunt în afara orașului, câteva zile la rând; la Casa Teona se
+        vine pe parcursul anului.
+      </p>
+    ),
+  },
+  {
+    intrebare: "Ce se întâmplă după ce trimit formularul?",
+    raspuns: (
+      <p>
+        Vezi pe loc un mesaj de confirmare și primești un e-mail că am primit
+        cererea. Pe urmă te contactăm noi — nu trebuie să revii pe site și nu
+        trebuie să trimiți formularul de două ori.
+      </p>
+    ),
+  },
+];
 
 /** 11.6 — șase fotografii cu voluntari. */
 const GALERIE = [
@@ -274,9 +354,27 @@ export default function DevinoVoluntar() {
         </div>
       </section>
 
-      {/* 11.6 — contact */}
+      {/* Întrebările despre înscriere, înainte de blocul de contact: cine a
+          citit tot și încă ezită găsește răspunsul aici, nu pe e-mail. */}
       <Val culoare="text-hartie" className={VAL_PESTE} />
-      <section className="relative overflow-hidden bg-hartie pt-6 pb-24 lg:pt-10 lg:pb-32">
+      <JsonLd date={jsonLdIntrebari(INTREBARI)} />
+      <Intrebari
+        scris="Înainte să te înscrii"
+        titlu="Ce ne întreabă voluntarii"
+        intrebari={INTREBARI}
+        poza={{
+          cale: "/poze/2024/11/454507252_521713920428951_7631183889837889502_n-1.jpg",
+          alt: "Opt tineri cu căști portocalii de escaladă și hamuri, în grup, sub un brad, în parcul de aventură",
+          legenda: "Parcul de aventură",
+        }}
+      />
+
+      {/* 11.6 — contact. Pe hârtie caldă, nu pe hârtie: întrebările de
+          deasupra sunt pe hârtie, iar două secțiuni la rând pe aceeași
+          nuanță ar curge una în alta și valul dintre ele n-ar avea ce
+          despărți. */}
+      <Val culoare="text-hartie-calda" className={VAL_PESTE} />
+      <section className="granulatie relative overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-10 lg:pb-32">
         <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="granulatie relative overflow-hidden colt-b bg-turcoaz-100 p-8 text-center shadow-[0_30px_60px_-28px_rgba(42,159,163,0.6)] sm:p-10 lg:p-12">
             <Decor semn="unda" strokeWidth={0.8} className="absolute -right-10 -bottom-10 size-44 text-turcoaz-200" />

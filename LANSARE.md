@@ -25,6 +25,48 @@ La lansare:
 
 **Dacă se uită pasul ăsta, site-ul nou e invizibil în Google.**
 
+### Dovada că site-ul e al nostru (Search Console și Bing)
+
+Search Console cere o dovadă de proprietate înainte să arate ceva. Metoda cea
+mai simplă e eticheta `meta`, iar site-ul o scrie singur dacă îi dai codul:
+
+- [ ] Google Search Console → *Add property* → *URL prefix* →
+      `https://www.teona-ariana.ro` → *Alternative methods* → *HTML tag*. Din
+      eticheta pe care o arată, copiază **doar** valoarea din `content="…"`.
+- [ ] Railway → Variables: `VERIFICARE_GOOGLE=valoarea copiată`. Redeploy, apoi
+      apasă *Verify*.
+- [ ] (opțional) Bing Webmaster Tools, la fel: `VERIFICARE_BING=…`. Bing
+      importă direct proprietatea din Search Console, deci de obicei nu e
+      nevoie.
+- [ ] După verificare, în Search Console: *Sitemaps* → adaugă `sitemap.xml`,
+      apoi *URL Inspection* pe prima pagină → *Request indexing*.
+
+Fără variabile, eticheta nu se scrie deloc — nu rămâne nimic gol în pagină.
+
+### Ce vede Google, în afara paginilor
+
+Sunt deja în cod, nu e nimic de făcut la lansare în afară de o verificare:
+
+- `sitemap.xml` conține toate paginile publice, toate cele 31 de proiecte și
+  **186 de fotografii**, declarate pe paginile pe care se află (sitemap de
+  imagini). Google Imagini e, pentru un site cu tabere, a doua ușă de intrare.
+- Datele structurate: asociația (`NGO`, cu CIF, telefoane, conturi de social
+  media, programul Casei Teona și `DonateAction` către pagina Donează), firul
+  de navigare pe fiecare pagină interioară, întrebările frecvente pe Donează,
+  3,5%, 20%, Donează-ți ziua și Devino voluntar, și galeria fiecărui proiect.
+- [ ] După lansare, verifică două pagini pe
+      [validator.schema.org](https://validator.schema.org/): prima pagină și un
+      proiect cu poze.
+
+### Google Business Profile — pasul care nu e în cod
+
+Pentru „ong suceava”, „asociație copii autism Suceava” și pentru harta din
+dreapta rezultatelor, contează fișa Google Business Profile, nu site-ul.
+
+- [ ] Revendică sau creează fișa pentru **Casa Teona, Strada Zamca 22,
+      Suceava**, cu programul luni–vineri 9:00–17:00, telefonul și adresa
+      site-ului. Aceleași date, scrise identic ca pe site — Google compară.
+
 ## 2. Linkurile vechi
 
 - [ ] Verifică la întâmplare 5 adrese vechi indexate de Google

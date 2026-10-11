@@ -27,8 +27,22 @@ import Intrebari, { type Intrebare } from "@/componente/pagina/Intrebari";
 import Pasi from "@/componente/pagina/Pasi";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
 
+/*
+  Titlul începe cu „Formularul 230”, nu cu „Redirecționează 3,5%”, pentru un
+  motiv măsurat, nu presupus: în România se caută „formular 230” de 6.600 de
+  ori pe lună, plus vreo 4.000 pe variante („formular 230 anaf 2026”,
+  „formular 230 editabil”, „formular 230 pdf”), în timp ce „redirecționare 3,5
+  din impozit” adună sub 400. Oamenii caută numele formularului; titlul
+  trebuie să-l conțină, și de la început — Google îngroașă potrivirea și omul
+  o vede în prima secundă.
+
+  `titluAbsolut` pentru că șablonul („%s · Asociația Teona Ariana Suceava”) ar
+  duce titlul la peste 70 de caractere, iar Google taie pe la 60. Denumirea
+  intră scurtată în titlu și întreagă în descriere.
+*/
 export const metadata: Metadata = metadate({
-  titlu: "Redirecționează 3,5%",
+  titlu: "Formularul 230 · 3,5% pentru Asociația Teona Ariana",
+  titluAbsolut: true,
   descriere:
     "Formularul 230: redirecționezi 3,5% din impozitul pe venit către Asociația Teona Ariana Suceava, fără niciun cost. Pași, documente și termenul de 25 mai.",
   cale: "/redirectioneaza-3-5",

@@ -99,6 +99,27 @@ verifica(
   `${existent.status()} „${corpA.mesaj?.slice(0, 40)}" vs ${inexistent.status()} „${corpB.mesaj?.slice(0, 40)}"`,
 );
 
+/*
+  Dacă serverul n-are cu ce trimite e-mailuri, contul donatorului e oprit din
+  construcție: linkul de intrare se trimite pe e-mail, deci fără Resend n-ar
+  avea cum să ajungă la om, iar ruta răspunde 503 tuturor.
+
+  Atunci proba nu are ce verifica. Până acum raporta nouă verificări picate,
+  ceea ce arăta exact ca o regresie în contul donatorului și trimitea pe
+  cineva să caute o oră o defecțiune care nu există. Iese cu 2, codul pentru
+  „sărit", același cu cel de la lipsa bazei de date.
+*/
+if (existent.status() === 503) {
+  console.log(
+    `\nSĂRIT: contul donatorului e oprit pe serverul de probă — „${corpA.mesaj?.slice(0, 60)}".` +
+      "\nPornește serverul cu RESEND_API_KEY și SECRET_SESIUNE ca să se poată verifica.",
+  );
+  await sql.query("DELETE FROM donatii WHERE email IN ($1, $2)", [ANA, DAN]);
+  await sql.end();
+  await b.close();
+  process.exit(2);
+}
+
 const jetoaneNimeni = await sql.query(
   "SELECT 1 FROM jetoane_cont WHERE email LIKE 'nimeni-%'",
 );

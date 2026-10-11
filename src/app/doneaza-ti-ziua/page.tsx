@@ -16,7 +16,7 @@ import FormularAniversare from "@/componente/formular/FormularAniversare";
 export const metadata: Metadata = metadate({
   titlu: "Donează-ți ziua de naștere",
   descriere:
-    "Îți faci o pagină de campanie pe site-ul Asociației Teona Ariana Suceava, cu poza și mesajul tău, și o distribui prietenilor. În loc de cadouri, o tabără pentru un copil.",
+    "Îți faci o pagină de campanie cu poza și mesajul tău și o distribui prietenilor. În loc de cadouri, o tabără pentru un copil de la Asociația Teona Ariana.",
   cale: "/doneaza-ti-ziua",
 });
 

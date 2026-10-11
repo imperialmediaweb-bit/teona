@@ -22,8 +22,16 @@ import DocumentDeDescarcat from "@/componente/pagina/DocumentDeDescarcat";
 import Intrebari, { type Intrebare } from "@/componente/pagina/Intrebari";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
 
+/*
+  La fel ca la 3,5%: titlul pornește de la ce se caută. „Declarația 177” are
+  720 de căutări pe lună în România, „declarația 177 termen depunere” încă
+  aproape 500, iar „contract sponsorizare declarația 177” 110 — exact ce face
+  pagina asta. „Direcționează 20%” nu se caută aproape deloc; rămâne în meniu
+  și în titlul de pe pagină, unde e limpede pentru om.
+*/
 export const metadata: Metadata = metadate({
-  titlu: "Direcționează 20%",
+  titlu: "Declarația 177 și sponsorizare 20% · Teona Ariana",
+  titluAbsolut: true,
   descriere:
     "Firma ta poate sponsoriza Asociația Teona Ariana Suceava din impozitul pe profit, prin contract de sponsorizare sau Declarația 177. Calculator și documente.",
   cale: "/directioneaza-20",

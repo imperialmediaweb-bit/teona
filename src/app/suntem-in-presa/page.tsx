@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
 import Image from "next/image";
-import { RUTE } from "@/date/asociatie";
+import { ASOCIATIA, EMAIL, RUTE, TELEFOANE } from "@/date/asociatie";
 import Aparitie from "@/componente/Aparitie";
 import Buton from "@/componente/Buton";
 import Decor from "@/componente/Decor";
@@ -251,6 +251,81 @@ export default function SuntemInPresa() {
               );
             })}
           </ol>
+        </div>
+      </section>
+
+      {/*
+        Blocul pentru jurnaliști.
+
+        Pagina era o listă de linkuri către ce s-a scris despre asociație —
+        folositoare pentru un donator, inutilă pentru un reporter care tocmai
+        a aterizat aici și are nevoie de un om de contact și de datele
+        asociației scrise corect. Numele asociației și CIF-ul apar greșit în
+        presă destul de des; aici sunt o dată, de unde se pot copia.
+
+        Nimic despre „kit de presă” sau „materiale la cerere”: nu există încă
+        un dosar pregătit, iar o promisiune pe care nu o poate ține nimeni e
+        mai rea decât lipsa ei.
+      */}
+      <section className="relative overflow-hidden bg-hartie pb-24 lg:pb-32">
+        <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div className="granulatie relative overflow-hidden colt-a border border-hartie-umbra bg-hartie-calda p-8 sm:p-10">
+            <Decor
+              semn="stea"
+              className="absolute top-6 right-8 size-8 text-miere-300"
+            />
+            <h2 className="relative text-h3 text-cerneala">
+              Scrii despre noi?
+            </h2>
+            <p className="relative mt-4 text-amplu text-cerneala-moale">
+              Răspundem la întrebări, confirmăm cifre și putem pune la
+              dispoziție fotografii din tabere. Scrie la{" "}
+              <a
+                href={`mailto:${EMAIL.contact}`}
+                className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
+              >
+                {EMAIL.contact}
+              </a>{" "}
+              sau sună la{" "}
+              <a
+                href={`tel:${TELEFOANE[0].apel}`}
+                className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
+              >
+                {TELEFOANE[0].afisat}
+              </a>
+              .
+            </p>
+            <dl className="relative mt-6 grid gap-x-8 gap-y-3 text-mic sm:grid-cols-2">
+              <div>
+                <dt className="font-titlu font-semibold text-cerneala">
+                  Denumirea completă
+                </dt>
+                <dd className="text-cerneala-moale">{ASOCIATIA.denumire}</dd>
+              </div>
+              <div>
+                <dt className="font-titlu font-semibold text-cerneala">CIF</dt>
+                <dd className="text-cerneala-moale">{ASOCIATIA.cif}</dd>
+              </div>
+              <div>
+                <dt className="font-titlu font-semibold text-cerneala">
+                  Ce facem
+                </dt>
+                <dd className="text-cerneala-moale">
+                  Tabere pentru copii cu nevoi speciale și pentru părinții lor,
+                  Casa Teona și cazuri umanitare, la Suceava.
+                </dd>
+              </div>
+              <div>
+                <dt className="font-titlu font-semibold text-cerneala">
+                  Fotografii
+                </dt>
+                <dd className="text-cerneala-moale">
+                  Din arhiva asociației, la cerere. Nu dăm poze cu copii fără
+                  acordul părinților.
+                </dd>
+              </div>
+            </dl>
+          </div>
         </div>
       </section>
 

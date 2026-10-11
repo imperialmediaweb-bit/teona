@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
-import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
+import { JsonLd, jsonLdFir, jsonLdGalerie, metadate } from "@/app/seo";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RUTE } from "@/date/asociatie";
-import { proiectDupaSlug, proiecteAfisate } from "@/date/proiecte";
-import { CATEGORII, type ProiectAfisat } from "@/date/proiecte-tipuri";
+import {
+  pozeleProiectului,
+  proiectDupaSlug,
+  proiecteAfisate,
+} from "@/date/proiecte";
+import { CATEGORII } from "@/date/proiecte-tipuri";
 import Decor from "@/componente/Decor";
 import IndemnFinal from "@/componente/IndemnFinal";
 import Pictograma from "@/componente/Pictograma";
@@ -19,19 +23,6 @@ export function generateStaticParams() {
 /** Textul alternativ al unei fotografii din proiect: numerotat, ca niciunul să nu fie identic cu vecinul. */
 function altFotografie(titlu: string, index: number, total: number) {
   return `${titlu} — fotografia ${index} din ${total}`;
-}
-
-/**
- * Toate fotografiile unui proiect, coperta inclusă.
- *
- * Două proiecte au `pozaPrincipala`, dar lista `poze` goală: pagina lor
- * rămânea fără nicio imagine, deși cardul din listă afișa coperta, iar textul
- * de dedesubt promitea fotografii.
- */
-function pozeleProiectului(proiect: ProiectAfisat): string[] {
-  return proiect.coperta && !proiect.poze.includes(proiect.coperta)
-    ? [proiect.coperta, ...proiect.poze]
-    : proiect.poze;
 }
 
 export async function generateMetadata({
@@ -86,10 +77,30 @@ export default async function PaginaProiect({
   return (
     <>
       <JsonLd
-        date={jsonLdFir([
-          { nume: "Proiecte", cale: RUTE.proiecte },
-          { nume: proiect.titlu, cale: `/proiecte/${proiect.slug}` },
-        ])}
+        date={[
+          jsonLdFir([
+            { nume: "Proiecte", cale: RUTE.proiecte },
+            { nume: proiect.titlu, cale: `/proiecte/${proiect.slug}` },
+          ]),
+          /*
+            Galeria, declarată pentru Google Imagini. Aici e tot conținutul
+            paginii: descrierile proiectelor nu sunt scrise încă, dar pozele
+            sunt reale și sunt ce caută oamenii. Un proiect fără poze nu
+            declară o galerie goală.
+          */
+          ...(total > 0
+            ? [
+                jsonLdGalerie({
+                  titlu: proiect.titlu,
+                  cale: `/proiecte/${proiect.slug}`,
+                  poze: toatePozele.map((cale, i) => ({
+                    cale,
+                    alt: altFotografie(proiect.titlu, i + 1, total),
+                  })),
+                }),
+              ]
+            : []),
+        ]}
       />
       <section className="granulatie relative isolate overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-12 lg:pb-32">
         <div

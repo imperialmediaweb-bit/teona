@@ -133,3 +133,183 @@ Verificate și **corecte**, lăsate așa: eroul (3), parcul de aventură, Casa T
 - Build de probă cu `ADRESA_SITE=https://site-production-641f.up.railway.app`: `robots.txt` → `Disallow: /`, paginile → `noindex, nofollow`, canonical și og:image pe adresa Railway.
 
 Fișiere atinse: `src/app/layout.tsx`, `src/app/page.tsx`, toate `src/app/**/page.tsx`, noi `src/app/seo.tsx`, `src/app/sitemap.ts`, `src/app/robots.ts`; componente doar pentru alt: `FasieDeFotografii.tsx`, `NeSustin.tsx`, `Realizari.tsx`, `Sustinere.tsx`. Neatinse: `next.config.ts`, `src/app/api/**`, `src/lib/**`.
+
+---
+
+# Runda a doua — 11 octombrie 2026
+
+Prima rundă a pus temelia (metadate, sitemap, robots, date structurate, texte
+alternative). Runda asta pornește de la **ce caută oamenii în Google**, nu de
+la ce credem noi, și repară un defect de viteză care se vedea pe toate
+paginile.
+
+## Ce se caută, în cifre (România, căutări pe lună)
+
+Date din Ubersuggest, 11 octombrie 2026. Contează pentru că au răsturnat o
+presupunere: credeam că pagina de 3,5% trebuie să se cheme „Redirecționează
+3,5%”, cum scrie în meniu.
+
+| interogare | căutări/lună | dificultate |
+|---|---:|---:|
+| **formular 230** | 6.600 | 31 |
+| formular 230 anaf 2025 / 2026 | 1.300 / 1.000 | 21 / 25 |
+| noul formular 230 editabil | 590 | 15 |
+| formular 230 anaf | 720 | 29 |
+| formular 230 pdf / editabil / download | 320 / 390 / 260 | 19 / 12 / 24 |
+| depunere formular 230 online | 320 | 12 |
+| **declarația 177** | 720 | 24 |
+| declarația 177 termen depunere 2025 / 2026 | 320 / 170 | 10 / 10 |
+| contract sponsorizare declarația 177 | 110 | 8 |
+| redirecționare 3,5 din impozit 2025 / 2026 | 170 / 140 | 28 / 21 |
+| voluntariat suceava | sub pragul de raportare | — |
+
+Două lucruri reies:
+
+1. **Numele formularului e interogarea**, nu numele mecanismului. „Formular
+   230” și variantele lui adună peste 10.000 de căutări pe lună; „redirecționare
+   3,5% din impozit” adună 310. La fel, „Declarația 177” bate „direcționează
+   20%”.
+2. **Intenția e „dă-mi formularul”**: editabil, PDF, de descărcat, completat.
+   Asociațiile care prind traficul ăsta îl prind cu un formular precompletat,
+   gata de descărcat (în listă apare și o asociație mare, pe exact interogarea
+   asta).
+
+## Ce am schimbat
+
+**Titluri, după cifrele de mai sus**
+
+- `/redirectioneaza-3-5`: „Formularul 230 · 3,5% pentru Asociația Teona Ariana”
+  (51 de caractere, intră întreg în rezultate).
+- `/directioneaza-20`: „Declarația 177 și sponsorizare 20% · Teona Ariana” (49).
+- Titlurile din meniu și `h1`-urile de pe pagini **nu s-au schimbat**: acolo
+  contează ce înțelege omul care e deja pe site.
+- `/doneaza-ti-ziua`: descrierea avea 170 de caractere, se tăia; acum 154.
+
+**Fotografiile, în sitemap (sitemap de imagini)**
+
+`sitemap.xml` declară acum **186 de fotografii**, fiecare pe pagina de proiect
+pe care chiar se află, cu adresa fișierului din `public/poze/` (nu cea prin
+`/_next/image`, care se naște la prima cerere). Numai paginile de proiect:
+pentru ele lista se calculează din aceleași date care randează galeria
+(`pozeleProiectului`, mutată în `src/date/proiecte.ts`), deci sitemapul nu
+poate promite o poză care nu e pe pagină.
+
+**Date structurate noi**
+
+- `ImageGallery` pe fiecare pagină de proiect, cu fiecare fotografie ca
+  `ImageObject` (adresă + descriere). Fără `copyrightHolder`: nu știu cine a
+  făcut pozele.
+- `openingHoursSpecification` și `hasMap` pe Casa Teona (luni–vineri,
+  9:00–17:00, din aceeași sursă ca textul de pe pagină). Fără coordonate — nu
+  le-am măsurat.
+- `DonateAction` pe asociație, cu ținta pagina Donează.
+- `FAQPage` pe Devino voluntar (șase întrebări noi, vezi mai jos).
+
+**Verificarea proprietății, din variabilă de mediu**
+
+`VERIFICARE_GOOGLE` și `VERIFICARE_BING` în Railway → eticheta `meta` apare în
+pagină. Lipsă = nu se scrie nimic. Pașii întregi sunt în `LANSARE.md`.
+
+**Paginile subțiri**
+
+Trei pagini aveau sub 250 de cuvinte, cele mai puține din site:
+
+- **Devino voluntar** (244): șase întrebări frecvente, toate cu răspunsul deja
+  hotărât în caiet sau în formular (vârsta minimă, experiența, timpul,
+  „pot alege unde ajut”, unde se face, ce urmează după trimitere). Nimic
+  inventat: despre contract sau certificat de voluntariat nu scrie nicăieri,
+  deci nu promit nimic.
+- **Sponsori și parteneri** (172): secțiunea „Cum poate firma ta să ne fie
+  alături”, cu cele trei căi (contract de sponsorizare, Declarația 177,
+  donație directă) și linkuri către paginile care le explică. Fără „beneficii”
+  pe care nu le-a promis nimeni.
+- **Suntem în presă** (217): blocul „Scrii despre noi?”, cu omul de contact,
+  denumirea completă și CIF-ul de copiat (apar greșit în presă destul de des)
+  și regula despre fotografii cu copii.
+
+**Contact** (185 de cuvinte) a rămas cum e: o pagină de contact scurtă e
+normală, iar umflarea ei cu text ar fi exact genul de conținut pe care nimeni
+nu-l citește.
+
+## Saltul paginii (CLS) — defectul care se vedea pe tot site-ul
+
+Măsurat pe build-ul de producție, cu procesorul încetinit de patru ori (cât un
+telefon de mijloc):
+
+| pagină | CLS înainte | CLS acum |
+|---|---:|---:|
+| prima pagină, 1280 px | 0,160 | 0,018 |
+| prima pagină, 390 px | 0,205 | 0,040 |
+| Casa Teona, 1280 px | 0,159 | 0,000 |
+| Casa Teona, 390 px | 0,151 | 0,000 |
+
+Google numără „bun” sub 0,1, iar CLS e unul dintre cele trei semnale Core Web
+Vitals care intră în clasare. Cauzele, amândouă în `layout.tsx`:
+
+1. **Antetul stătea într-un `<Suspense>` fără `fallback`.** Antetul citește
+   calea paginii curente, deci trebuie să fie într-un `<Suspense>`; fără
+   `fallback`, primul HTML n-avea nimic în locul lui. Pagina se desena cu
+   conținutul lipit de sus, iar după ~1,3 secunde antetul apărea și împingea
+   totul în jos cu 68–167 px. Acum locul e ținut de un bloc de aceeași
+   înălțime (`LocAntet`).
+2. **Bara de anunț nu se scria pe server.** Starea „închisă” stă în
+   `sessionStorage`, pe care serverul nu-l vede, așa că bara apărea abia după
+   ce pornea JavaScriptul: încă 45 px (70 pe telefon), pentru toată lumea, la
+   fiecare pagină. Acum bara se scrie pe server, iar cine a închis-o n-o vede
+   totuși: două rânduri de script în `<head>` citesc `sessionStorage`
+   **înainte de prima desenare** și pun o clasă pe `<html>`, pe care CSS-ul o
+   folosește ca s-o ascundă. Verificat: fără clipire, fără salt, bara revine
+   la o vizită nouă, zero erori în consolă.
+
+Restul măsurătorilor, pe aceeași încetinire: LCP între 464 și 860 ms (pragul
+„bun” e 2.500 ms), TTFB sub 35 ms, pagini de 0,32–0,57 MB, nicio imagine peste
+200 KB.
+
+**Probă nouă**: `scripts/qa/salt-layout.mjs` măsoară CLS pe patru pagini × două
+lățimi și pică peste 0,08. Se rulează pe build-ul de producție:
+
+```bash
+npm run build && PORT=3101 npm run start &
+BAZA_PROD=http://localhost:3101 node scripts/qa/salt-layout.mjs
+```
+
+De asemenea, `scripts/qa/cont.mjs` nu mai raportează nouă verificări picate
+când serverul de probă n-are cheie de e-mail (contul donatorului e oprit din
+construcție atunci): iese cu 2, „sărit”, ca la lipsa bazei de date.
+
+## Ce rămâne — și cine o poate face
+
+**Asociația, în ordinea câștigului**
+
+1. **Formularul 230 precompletat, de descărcat** (PDF editabil). E cea mai mare
+   ușă de intrare din tot site-ul: peste 10.000 de căutări pe lună, iar
+   intenția e fix „dă-mi formularul”. Pagina are deja locul pregătit — cardul
+   „Formularul 230” de la „Documente de descărcat” devine buton în clipa în
+   care fișierul există. Fără el, pagina răspunde la întrebare, dar nu dă
+   lucrul căutat.
+2. **Declarația 177 și contractul de sponsorizare**, la fel, pentru firme
+   („contract sponsorizare declarația 177”: 110 căutări pe lună, dificultate 8
+   — practic liber).
+3. **Fișa Google Business Profile** pentru Casa Teona (Strada Zamca 22). Pentru
+   „ong suceava” și pentru harta din dreapta rezultatelor contează fișa, nu
+   site-ul. Pașii sunt în `LANSARE.md`.
+4. **Descrierile proiectelor.** 31 de pagini de proiect au acum titlu, dată și
+   poze, dar niciun text. Pozele sunt declarate pentru Google Imagini, deci
+   paginile nu sunt goale — dar două-trei fraze pe fiecare le-ar face să
+   răspundă și la căutări scrise.
+5. **Linkuri de la publicațiile locale.** Articolele din „Suntem în presă”
+   există; dacă în ele ar fi și un link către site, ar conta mult mai mult
+   decât orice schimbare de titlu.
+
+**Dezvoltatorul, la lansare**: pașii din `LANSARE.md`, secțiunea 1.
+
+**De cântărit mai târziu**
+
+- Numele fișierelor de poze sunt cele din Facebook
+  (`462119250_122094741458569469_…jpg`). Google Imagini se uită mai ales la
+  textul alternativ și la pagina din jur, dar un nume de fișier descriptiv
+  ajută. Redenumirea celor 389 de fișiere ar rupe maparea din `continut/`;
+  merită doar odată cu un CMS.
+- Cele șase articole vechi de blog redirecționează acum către pagini. O
+  secțiune de noutăți ar da conținut proaspăt, dar fără un CMS fiecare articol
+  trece prin dezvoltator (vezi „Decizii încă deschise” din `CLAUDE.md`).

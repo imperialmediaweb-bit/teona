@@ -447,3 +447,15 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/*
+  Bara de anunț, ascunsă pentru cine a închis-o în vizita asta.
+
+  Clasa o pune scriptul din `<head>` (vezi `layout.tsx`), înainte de prima
+  desenare. Bara se scrie pe server ca să nu împingă pagina în jos când
+  pornește JavaScriptul; regula asta o scoate din ochii celor care au apăsat
+  deja „închide”, fără să mai aștepte React.
+*/
+:root.fara-bara-anunt [data-bara-anunt] {
+  display: none;
+}
