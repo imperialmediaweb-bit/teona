@@ -57,7 +57,19 @@ async function cereJeton(page, email) {
   return r;
 }
 
-const page = await b.newPage();
+/*
+  Cererea de link e limitată la 5 pe 15 minute, pe adresă — apărarea care
+  împiedică folosirea site-ului ca să bombardezi pe cineva cu e-mailuri. În
+  dezvoltare toate cererile vin de la aceeași adresă, deci a doua rulare a
+  probei ar primi 429, iar testul „răspunsul e identic" ar pica pe limită, nu
+  pe o scurgere. O adresă nouă la fiecare rulare îl face repetabil.
+*/
+const ctx = await b.newContext({
+  extraHTTPHeaders: {
+    "x-forwarded-for": `203.0.113.${1 + Math.floor(Math.random() * 250)}`,
+  },
+});
+const page = await ctx.newPage();
 const erori = urmaresteErori(page);
 
 // ─── Nu se scurge cine a donat ────────────────────────────────────────────
@@ -136,7 +148,7 @@ verifica(
 
 // ─── Jetonul nu se refolosește ────────────────────────────────────────────
 console.log("\n=== Jetonul ===");
-const altul = await b.newPage();
+const altul = await ctx.newPage();
 await altul.goto(`${BAZA}/contul-meu/intra?jeton=${brut}`, {
   waitUntil: "networkidle",
 });
@@ -156,7 +168,7 @@ verifica("un jeton inventat nu intră", altul.url().includes("expirat=1"));
 
 // ─── Un om nu vede datele altuia ──────────────────────────────────────────
 console.log("\n=== Izolarea datelor ===");
-const alDoilea = await b.newPage();
+const alDoilea = await ctx.newPage();
 const brut2 = randomBytes(32).toString("base64url");
 await sql.query(
   `INSERT INTO jetoane_cont (amprenta, email, expira_la)
@@ -233,7 +245,7 @@ verifica(
 );
 
 // ─── Fără sesiune, setările nu merg ───────────────────────────────────────
-const anonim = await b.newPage();
+const anonim = await b.newPage(); // context curat: fără sesiune
 const refuz = await anonim.request.post(BAZA + "/api/cont/setari", {
   form: { ce: "stergere", confirmare: "ȘTERGE" },
 });

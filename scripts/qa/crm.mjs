@@ -59,17 +59,62 @@ const carduri = await page.locator("#panou-admin section").count();
 verifica("are carduri de grafice", carduri >= 6, `${carduri} carduri`);
 
 // Tabelele ascunse: cifrele trebuie să ajungă și la cititoarele de ecran.
-const tabele = await page.locator("table.sr-only").count();
+const tabele = await page.locator(".sr-only table").count();
 verifica("graficele au tabel citibil cu voce tare", tabele >= 3, `${tabele} tabele`);
-const captions = await page.locator("table.sr-only caption").allInnerTexts();
+const captions = await page.locator(".sr-only table caption").allInnerTexts();
 verifica("fiecare tabel are titlu", captions.every((c) => c.trim().length > 3), JSON.stringify(captions));
+
+/*
+  Ascunse vizual, dar fără să lățească pagina.
+
+  `sr-only` pe `<table>` nu ajunge: un tabel nu se îngustează sub lățimea
+  conținutului, deci rămâne lat de câteva sute de pixeli și împinge pagina.
+  Clasa trebuie să stea pe un `div` din jur. Verificarea e aici fiindcă
+  bug-ul a stat ascuns zile întregi, apărând doar când sumele erau destul de
+  lungi.
+*/
+const scapate = await page.evaluate(() =>
+  [...document.querySelectorAll(".sr-only table")]
+    .filter((t) => {
+      const cs = getComputedStyle(t.parentElement);
+      return cs.position !== "absolute" || parseFloat(cs.width) > 1;
+    })
+    .map((t) => t.querySelector("caption")?.textContent ?? "?"),
+);
+verifica(
+  "tabelele ascunse sunt chiar tăiate de părinte",
+  scapate.length === 0,
+  JSON.stringify(scapate),
+);
+const expuse = await page.locator('.sr-only table caption').count();
+verifica("și rămân citibile de cititoarele de ecran", expuse >= 3, `${expuse}`);
 
 // Fără derulare laterală.
 for (const w of [1280, 390]) {
   await page.setViewportSize({ width: w, height: 1200 });
   await page.waitForTimeout(200);
-  const lat = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
-  verifica(`fără derulare laterală la ${w}px`, !lat);
+  /*
+    Când pagina se lățește, scriem *cine* a lățit-o.
+
+    Un „fără derulare laterală: pică" fără vinovat trimite la o vânătoare de
+    o jumătate de oră. Aici a fost un grafic a cărui etichetă creștea odată
+    cu sumele din baza de date, deci proba pica doar uneori.
+  */
+  const lat = await page.evaluate(() => {
+    const prag = document.documentElement.clientWidth;
+    if (document.documentElement.scrollWidth <= prag + 1) return null;
+    const vinovati = [];
+    for (const el of document.querySelectorAll("#panou-admin *")) {
+      const r = el.getBoundingClientRect();
+      if (r.width > 0 && r.right > prag + 1) {
+        vinovati.push(
+          `${el.tagName.toLowerCase()}.${String(el.className).slice(0, 40)} „${(el.textContent || "").trim().slice(0, 24)}" până la ${Math.round(r.right)}`,
+        );
+      }
+    }
+    return vinovati.slice(0, 3);
+  });
+  verifica(`fără derulare laterală la ${w}px`, lat === null, JSON.stringify(lat));
 }
 await page.setViewportSize({ width: 1280, height: 1200 });
 
@@ -94,10 +139,21 @@ await page.goto(BAZA + "/admin/firme", { waitUntil: "networkidle" });
 const toate = await page.locator("#panou-admin ul > li").count();
 verifica("lista are firme", toate >= 2, `${toate} firme`);
 
-await page.click('a:has-text("Contract semnat")');
+/*
+  Proba își pune singură o firmă în stadiul pe care apoi îl filtrează.
+
+  Înainte se baza pe o firmă lăsată „semnat" de o rulare anterioară — iar
+  rulările următoare o mutau, deci filtrul găsea zero și proba pica fără să
+  fie nimic stricat. O probă nu trebuie să depindă de ce a lăsat în urmă alta.
+*/
+const deFiltrat = page.locator("#panou-admin ul > li").first();
+await deFiltrat.locator('select[name="stadiu"]').selectOption("semnat");
+await deFiltrat.locator('button:has-text("Salvează")').click();
 await page.waitForLoadState("networkidle");
+
+await page.goto(BAZA + "/admin/firme?stadiu=semnat", { waitUntil: "networkidle" });
 const semnate = await page.locator("#panou-admin ul > li").count();
-verifica("filtrul pe stadiu reduce lista", semnate < toate && semnate >= 1, `${semnate} din ${toate}`);
+verifica("filtrul pe stadiu reduce lista", semnate >= 1 && semnate < toate, `${semnate} din ${toate}`);
 
 await page.goto(BAZA + "/admin/firme", { waitUntil: "networkidle" });
 await page.fill('input[name="cauta"]', "lemnul");
@@ -170,9 +226,26 @@ await page.goto(BAZA + "/admin/cereri", { waitUntil: "networkidle" });
 const nrCereri = await page.locator("#panou-admin ul > li").count();
 verifica("lista are cereri", nrCereri >= 2, `${nrCereri} cereri`);
 
+/*
+  Filtrul se verifică prin ce *înseamnă*, nu printr-un număr fix.
+
+  Înainte aștepta exact o cerere de voluntariat. Orice rulare a altei probe
+  care mai adăuga una făcea verificarea să pice, deși filtrul își făcea
+  treaba perfect. Un număr fix într-o probă pe o bază de date comună e o
+  alarmă falsă care așteaptă să sune.
+*/
 await page.click('a:has-text("Voluntariat")');
 await page.waitForLoadState("networkidle");
-verifica("filtrul pe fel", (await page.locator("#panou-admin ul > li").count()) === 1);
+const filtrate = await page.locator("#panou-admin ul > li").count();
+verifica("filtrul pe fel lasă ceva", filtrate >= 1 && filtrate <= nrCereri, `${filtrate} din ${nrCereri}`);
+const feluri = await page
+  .locator("#panou-admin ul > li")
+  .evaluateAll((li) => li.map((e) => e.innerText.split("\n").slice(0, 4).join(" ")));
+verifica(
+  "și arată numai cereri de voluntariat",
+  feluri.every((t) => t.includes("Voluntariat")),
+  JSON.stringify(feluri.filter((t) => !t.includes("Voluntariat")).slice(0, 2)),
+);
 
 await page.goto(BAZA + "/admin/cereri", { waitUntil: "networkidle" });
 const cerere = page.locator("#panou-admin ul > li").first();

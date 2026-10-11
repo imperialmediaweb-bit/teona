@@ -6,14 +6,45 @@ const log = (...a) => console.log(...a);
 const DIR = "/tmp/claude-0/-home-user-teona/4a139e8f-245b-53d8-993d-5496bf182b26/scratchpad/capturi";
 mkdirSync(DIR, { recursive: true });
 const ACORD = () => localStorage.setItem("teona:acord-cookieuri", JSON.stringify({ necesare: true, statistici: false, marketing: false, laData: new Date().toISOString() }));
-const PAGINI = ["/", "/despre-noi", "/casa-teona", "/proiecte", "/sponsori-si-parteneri", "/redirectioneaza-3-5", "/directioneaza-20", "/suntem-in-presa", "/devino-voluntar", "/contact", "/doneaza", "/politica-de-confidentialitate", "/raport-de-activitate-2025", "/proiecte/tabara-respiro-dedicata-copiilor-cu-sindrom-down-si-autism-30-septembrie", "/pagina-inexistenta"];
+const PAGINI = ["/", "/despre-noi", "/casa-teona", "/proiecte", "/sponsori-si-parteneri", "/redirectioneaza-3-5", "/directioneaza-20", "/suntem-in-presa", "/devino-voluntar", "/contact", "/doneaza", "/contul-meu", "/politica-de-confidentialitate", "/raport-de-activitate-2025", "/proiecte/tabara-respiro-dedicata-copiilor-cu-sindrom-down-si-autism-30-septembrie", "/pagina-inexistenta"];
+
+/*
+  Paginile panoului, la fel de măturate ca restul.
+
+  Lipseau fiindcă cer parolă, iar scriptul ăsta nu se autentica. A costat: un
+  tabel ascuns de pe tabloul de bord lăța pagina pe telefon, și n-a prins-o
+  nimeni până când o altă probă n-a dat peste el din întâmplare. Cu
+  `PAROLA_ADMIN` în mediu, intră și le verifică; fără, le sare și o spune.
+*/
+const PAGINI_ADMIN = ["/admin", "/admin/donatii", "/admin/donatori", "/admin/firme", "/admin/cereri", "/admin/campanii", "/admin/email"];
+const PAROLA = process.env.PAROLA_ADMIN;
 const LATIMI = [320, 360, 390, 430, 1280, 1440, 1920];
 
 for (const w of LATIMI) {
-  const ctx = await b.newContext({ viewport: { width: w, height: w < 500 ? 740 : 900 }, deviceScaleFactor: 1 });
+  // Adresă proprie per lățime: intrarea în panou e limitată la 5 încercări
+  // la 15 minute pe adresă, iar aici sunt șapte lățimi, deci șapte intrări.
+  const ctx = await b.newContext({
+    viewport: { width: w, height: w < 500 ? 740 : 900 },
+    deviceScaleFactor: 1,
+    extraHTTPHeaders: { "x-forwarded-for": `198.51.100.${100 + LATIMI.indexOf(w)}` },
+  });
   await ctx.addInitScript(ACORD);
   const page = await ctx.newPage();
-  for (const cale of PAGINI) {
+
+  // O singură autentificare per lățime; cookie-ul ține pentru tot contextul.
+  let admin = false;
+  if (PAROLA) {
+    await page.goto(BAZA + "/admin", { waitUntil: "networkidle" });
+    const camp = page.locator('input[name="parola"]');
+    if ((await camp.count()) > 0) {
+      await camp.fill(PAROLA);
+      await page.click('button[type="submit"]');
+      await page.waitForLoadState("networkidle");
+    }
+    admin = (await page.locator('input[name="parola"]').count()) === 0;
+  }
+
+  for (const cale of [...PAGINI, ...(admin ? PAGINI_ADMIN : [])]) {
     await page.goto(BAZA + cale, { waitUntil: "networkidle" });
     await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 900) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 60)); } window.scrollTo(0, 0); });
     const r = await page.evaluate(() => {
