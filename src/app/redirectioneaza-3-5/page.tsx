@@ -411,20 +411,21 @@ export default async function Redirectioneaza35() {
               />
               <div className="mt-6 grid gap-4 text-amplu text-cerneala-moale">
                 <p>
-                  Pentru copiii cu nevoi speciale și pentru familiile lor, o zi
-                  bună nu vine de la sine. De aceea organizăm tabere în care
-                  copiii se joacă, își fac prieteni și descoperă că pot, iar
-                  părinții respiră și află că nu sunt singuri. Am organizat 33
-                  de tabere și am avut alături peste 1.500 de participanți.
+                  În tabere vin și copiii, și părinții. Copiii se joacă, își fac
+                  prieteni și descoperă că pot mai mult decât credeau; părinții
+                  se odihnesc cu adevărat, poate pentru prima dată în anul
+                  acela, și stau de vorbă cu oameni care trec prin același
+                  lucru. Până acum s-au făcut 33 de tabere, cu peste 1.500 de
+                  participanți.
                 </p>
                 <p>
-                  Bucuria nu ține doar câteva zile pe an. La Casa Teona, copiii
-                  vin pe tot parcursul anului la jocuri și ateliere, iar
-                  părinții găsesc consiliere și întâlniri de grup.
+                  Pe urmă vine restul anului, și pe el îl ține Casa Teona: peste
+                  80 de copii care au unde să meargă la ateliere și la jocuri,
+                  părinți care au unde să ceară un sfat.
                 </p>
                 <p>
-                  Fiecare sumă redirecționată ajută la acest lucru: tabere,
-                  activități și un loc sigur pentru copii și familiile lor.
+                  Acolo ajung cei 3,5% din impozitul tău: în săptămâna de tabără
+                  și în zilele de după ea.
                 </p>
               </div>
             </div>

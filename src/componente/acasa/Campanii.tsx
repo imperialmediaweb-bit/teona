@@ -34,7 +34,7 @@ const CAMPANII: ReadonlyArray<{
   },
   {
     titlu: "Casa Teona",
-    text: "Un loc în care copiii învață prin joacă, iar părinții găsesc consiliere și sprijin.",
+    text: "Ateliere, jocuri și terapie în Suceava, pe strada Zamca, pentru copii și pentru părinții lor.",
     destinatie: "casa-teona",
     poza: {
       cale: "/poze/2024/11/poza1_enhanced-1.webp",

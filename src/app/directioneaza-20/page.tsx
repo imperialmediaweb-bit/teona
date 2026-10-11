@@ -418,20 +418,22 @@ export default function Directioneaza20() {
             />
             <div className="mt-6 grid gap-4 text-amplu text-cerneala-moale">
               <p>
-                Pentru copiii cu nevoi speciale și pentru familiile lor, o zi
-                bună nu vine de la sine. De aceea organizăm tabere în care
-                copiii se joacă, își fac prieteni și descoperă că pot, iar
-                părinții respiră și află că nu sunt singuri. Am organizat 33 de
-                tabere și am avut alături peste 1.500 de participanți.
+                Taberele sunt partea cea mai scumpă din ce facem: cazare,
+                transport, masă, materiale și oameni care știu să stea lângă un
+                copil cu autism sau cu sindrom Down o săptămână întreagă —
+                voluntari, terapeuți, cadre didactice. Am ajuns la 33 de tabere
+                și peste 1.500 de participanți.
               </p>
               <p>
-                Bucuria nu ține doar câteva zile pe an. La Casa Teona, copiii
-                vin pe tot parcursul anului la jocuri și ateliere, iar părinții
-                găsesc consiliere și întâlniri de grup.
+                Între tabere rămâne Casa Teona, pe strada Zamca. Peste 80 de
+                copii vin acolo la ateliere și la jocuri, iar părinții la
+                consiliere și la întâlniri de grup. Un centru deschis tot anul
+                are cheltuieli tot anul, inclusiv în lunile în care nu e nicio
+                tabără de povestit.
               </p>
               <p>
-                Fiecare sumă direcționată ajută la acest lucru: tabere,
-                activități și un loc sigur pentru copii și familiile lor.
+                Aici intră o sponsorizare: în taberele de la vară și în lunile
+                în care casa trebuie să rămână deschisă.
               </p>
             </div>
 
