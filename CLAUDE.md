@@ -91,6 +91,29 @@ Ce înseamnă asta în practică:
 - proba `node scripts/qa/poze-cloud.mjs` verifică potrivirea fără cheile
   adevărate, cu un server care imită Cloudinary.
 
+## Firma se completează din CUI
+
+Pe `/directioneaza-20`, în formularul de sponsorizare și la contact, o firmă
+scrie doar CUI-ul. Restul vine din datele publice ale ANAF (`src/lib/anaf.ts`,
+prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
+în calculator cifra de afaceri și impozitul din ultimul bilanț depus.
+
+- **Impozitul e o propunere, nu o certitudine.** Bilanțul nu conține „impozit
+  pe profit”; conține profit brut și profit net, iar diferența dintre ele e
+  impozitul plătit. Pentru o firmă pe impozit pe profit asta e cifra căutată,
+  pentru una pe impozit pe venit nu e. De aceea pagina scrie de unde vine cifra
+  și din ce an, câmpul rămâne editabil, iar „Calculul este orientativ” rămâne
+  unde era.
+- **Procentele din calculator:** 20% din impozitul pe profit și 0,75% din cifra
+  de afaceri; suma e cea mai mică dintre ele.
+- **Cifra de control a CUI-ului** se verifică în browser înainte de orice
+  cerere: cheia e aliniată la dreapta, cu zerouri în față (`src/lib/cui.ts`).
+- Căutarea nu blochează nimic: dacă ANAF nu răspunde, câmpurile se completează
+  de mână. O firmă înființată luna trecută n-are bilanț și trebuie totuși să
+  poată trimite formularul.
+- Probă: `BAZA=http://localhost:3000 node scripts/qa/firma-anaf.mjs` (cere
+  internet — datele vin de la ANAF, în direct).
+
 ## Adresele inexistente răspund 404, nu 200
 
 `/proiecte/<slug care nu există>` răspundea cu **codul 200** și pagina „nu a

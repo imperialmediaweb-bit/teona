@@ -5,6 +5,7 @@ import { EMAIL } from "@/date/asociatie";
 import Buton from "../Buton";
 import Pictograma from "../Pictograma";
 import Camp, { claseControl, claseControlGresit } from "../formular/Camp";
+import CampCui, { type Firma } from "../formular/CampCui";
 import { citesteSuma, laBan, scrieSuma } from "@/lib/suma";
 
 /**
@@ -22,12 +23,52 @@ import { citesteSuma, laBan, scrieSuma } from "@/lib/suma";
  *
  * Nu scriem aici nimic despre lege dincolo de regula de mai sus și nu dăm
  * termene de depunere: caietul le lasă „[de confirmat]”.
+ *
+ * **Cele două cifre se completează singure, din CUI.** Firma scrie CUI-ul,
+ * iar cifra de afaceri și impozitul vin din ultimul bilanț depus la ANAF.
+ * Rămân editabile, și sub ele scrie din ce an sunt: un contabil care vede
+ * anul își dă seama singur dacă vrea să pună cifrele anului curent.
+ *
+ * **Impozitul e o propunere, nu o certitudine.** Bilanțul nu conține
+ * „impozit pe profit”; conține profitul brut și pe cel net, iar diferența
+ * dintre ele e impozitul plătit. Pentru o firmă pe impozit pe profit asta e
+ * chiar cifra căutată, pentru una pe impozit pe venit nu e. De aceea scrie
+ * negru pe alb de unde vine cifra, și de aceea mențiunea „Calculul este
+ * orientativ” rămâne unde era.
  */
 
 export default function CalculatorSponsorizare() {
   const id = useId();
+  const [cuiText, setCuiText] = useState("");
   const [cifraText, setCifraText] = useState("");
   const [impozitText, setImpozitText] = useState("");
+  const [dinBilant, setDinBilant] = useState<{
+    denumire: string;
+    an: number;
+    cifra: boolean;
+    impozit: boolean;
+  } | null>(null);
+
+  /** Completează cele două câmpuri din ultimul bilanț depus. */
+  function completeaza(firma: Firma) {
+    const bilant = firma.bilant;
+    if (!bilant) {
+      setDinBilant(null);
+      return;
+    }
+    if (bilant.cifraDeAfaceri !== null) {
+      setCifraText(String(bilant.cifraDeAfaceri));
+    }
+    if (bilant.impozitEstimat !== null) {
+      setImpozitText(String(bilant.impozitEstimat));
+    }
+    setDinBilant({
+      denumire: firma.denumire,
+      an: bilant.an,
+      cifra: bilant.cifraDeAfaceri !== null,
+      impozit: bilant.impozitEstimat !== null,
+    });
+  }
 
   const cifra = citesteSuma(cifraText);
   const impozit = citesteSuma(impozitText);
@@ -79,10 +120,23 @@ export default function CalculatorSponsorizare() {
             Cât poate direcționa firma ta?
           </h3>
           <p className="mt-2 text-mic text-cerneala-moale">
-            Scrie cele două cifre din bilanțul anului, în lei. Rezultatul apare
-            pe loc.
+            Scrie CUI-ul și luăm cifrele din ultimul bilanț depus la ANAF. Poți
+            să le și scrii de mână — rezultatul apare pe loc.
           </p>
         </div>
+
+        <CampCui
+          id={`${id}-cui`}
+          // Nume propriu: pe aceeași pagină e și formularul de sponsorizare,
+          // cu câmpul lui de CUI. Două câmpuri cu același `name` pe o pagină
+          // încurcă și completarea automată a browserului, și probele.
+          name="cui-calculator"
+          eticheta="CUI-ul firmei"
+          nota="Opțional. Completează singur cifra de afaceri și impozitul."
+          valoare={cuiText}
+          onValoare={setCuiText}
+          onFirma={completeaza}
+        />
 
         <Camp
           id={`${id}-cifra`}
@@ -115,6 +169,7 @@ export default function CalculatorSponsorizare() {
           nota="Impozitul datorat pe același an."
           eroare={impozit.eroare}
         >
+
           <input
             id={`${id}-impozit`}
             name="impozit-pe-profit"
@@ -131,6 +186,27 @@ export default function CalculatorSponsorizare() {
             className={impozit.eroare ? claseControlGresit : claseControl}
           />
         </Camp>
+
+        {/* De unde vin cifrele. Fără asta, două sume apărute singure într-un
+            formular sunt doar două sume apărute singure. */}
+        {dinBilant && (
+          <p className="text-mic text-cerneala-moale">
+            Completat pentru <strong>{dinBilant.denumire}</strong>, din
+            bilanțul depus la ANAF pe <strong>{dinBilant.an}</strong>.
+            {dinBilant.impozit && (
+              <>
+                {" "}
+                Impozitul e diferența dintre profitul brut și cel net din acel
+                bilanț — e cifra plătită ca impozit, dar verific-o cu
+                contabilitatea.
+              </>
+            )}
+            {!dinBilant.cifra && !dinBilant.impozit && (
+              <> Bilanțul nu conține cifrele astea; scrie-le de mână.</>
+            )}{" "}
+            Poți schimba orice.
+          </p>
+        )}
       </form>
 
       {/* Rezultatul, pe câmp de culoare: e lucrul pentru care a venit firma. */}

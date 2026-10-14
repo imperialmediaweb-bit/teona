@@ -12,6 +12,7 @@ import Camp, {
   claseControl,
   claseControlGresit,
 } from "./Camp";
+import CampCui, { type Firma } from "./CampCui";
 
 /**
  * Cererea unei firme care vrea să sponsorizeze (8).
@@ -28,6 +29,12 @@ import Camp, {
  * Validarea e scrisă de mână, ca peste tot pe site: mesajele implicite ale
  * browserului apar în limba sistemului, deci cineva cu Windows în engleză ar
  * primi „Please fill out this field” pe un site în română.
+ *
+ * **Denumirea se completează din CUI.** Cine scrie CUI-ul nu mai scrie și
+ * denumirea: vine din datele publice ale ANAF, exact cum e înregistrată, deci
+ * contractul nu mai pleacă cu „SC Ceva SRL” într-un loc și „Ceva S.R.L.” în
+ * altul. Câmpul rămâne editabil — căutarea e un ajutor, nu o poartă: o firmă
+ * pe care ANAF n-o are încă trebuie să poată trimite formularul.
  */
 
 type Erori = Partial<
@@ -49,6 +56,13 @@ export default function FormularSponsorizare() {
   const id = useId();
   const [erori, setErori] = useState<Erori>({});
   const [stare, setStare] = useState<Stare>({ fel: "gol" });
+  const [cui, setCui] = useState("");
+  const [firma, setFirma] = useState("");
+
+  /** Denumirea, luată de la ANAF. Nu suprascrie ce a scris omul deja. */
+  function dinAnaf(gasita: Firma) {
+    setFirma((scris) => (scris.trim() === "" ? gasita.denumire : scris));
+  }
 
   function verifica(date: FormData): Erori {
     const gasite: Erori = {};
@@ -183,24 +197,23 @@ export default function FormularSponsorizare() {
               name="firma"
               type="text"
               autoComplete="organization"
+              value={firma}
+              onChange={(ev) => setFirma(ev.target.value)}
               aria-invalid={Boolean(erori.firma)}
               aria-describedby={erori.firma ? `${id}-firma-eroare` : undefined}
               className={erori.firma ? claseControlGresit : claseControl}
             />
           </Camp>
 
-          <Camp id={`${id}-cui`} eticheta="CUI" obligatoriu eroare={erori.cui}>
-            <input
-              id={`${id}-cui`}
-              name="cui"
-              type="text"
-              inputMode="numeric"
-              placeholder="RO12345678"
-              aria-invalid={Boolean(erori.cui)}
-              aria-describedby={erori.cui ? `${id}-cui-eroare` : undefined}
-              className={erori.cui ? claseControlGresit : claseControl}
-            />
-          </Camp>
+          <CampCui
+            id={`${id}-cui`}
+            obligatoriu
+            nota="Completăm denumirea din datele publice ale ANAF."
+            eroare={erori.cui}
+            valoare={cui}
+            onValoare={setCui}
+            onFirma={dinAnaf}
+          />
 
           <Camp
             id={`${id}-persoana`}

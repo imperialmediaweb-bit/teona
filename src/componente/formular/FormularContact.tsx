@@ -11,6 +11,7 @@ import Camp, {
   claseControl,
   claseControlGresit,
 } from "./Camp";
+import CampCui, { type Firma } from "./CampCui";
 
 /** 10.4 — alegerile din „Sunt interesat de”, în ordinea din caiet. */
 const INTERESE = [
@@ -49,6 +50,12 @@ export default function FormularContact() {
   const id = useId();
   const [erori, setErori] = useState<Erori>({});
   const [stare, setStare] = useState<Stare>({ fel: "gol" });
+  const [cui, setCui] = useState("");
+  const [firma, setFirma] = useState<{
+    denumire: string;
+    nrRegCom: string;
+    adresa: string;
+  } | null>(null);
 
   function verifica(date: FormData): Erori {
     const gasite: Erori = {};
@@ -66,6 +73,14 @@ export default function FormularContact() {
       gasite.acord = "Bifează acordul pentru a continua.";
 
     return gasite;
+  }
+
+  async function dinAnaf(gasita: Firma) {
+    setFirma({
+      denumire: gasita.denumire,
+      nrRegCom: gasita.nrRegCom,
+      adresa: gasita.adresa,
+    });
   }
 
   async function trimite(ev: React.FormEvent<HTMLFormElement>) {
@@ -86,6 +101,10 @@ export default function FormularContact() {
           email: date.get("email"),
           telefon: date.get("telefon"),
           interes: date.get("interes"),
+          cui: cui.trim() || undefined,
+          firma: firma?.denumire || undefined,
+          nrRegCom: firma?.nrRegCom || undefined,
+          adresaFirmei: firma?.adresa || undefined,
           mesaj: date.get("mesaj"),
           acord: date.get("acord") === "da",
         }),
@@ -221,6 +240,76 @@ export default function FormularContact() {
           defaultValue={INTERESE[0].valoare}
           obligatoriu
         />
+
+        {/*
+          Datele firmei, pentru cine scrie din partea uneia.
+
+          Opțional, și ultimul lucru dinaintea mesajului: un om care scrie în
+          nume propriu trece pe lângă el. Cine scrie CUI-ul nu mai scrie nimic
+          altceva — denumirea, numărul de la registrul comerțului și sediul vin
+          din datele publice ale ANAF.
+
+          **De ce rămân editabile și de ce scrie „verifică”.** Datele vin de la
+          ANAF, dar firma poate să-și fi schimbat sediul luna trecută, iar din
+          ele se face un contract de sponsorizare. Mai bine le confirmă cineva
+          acum decât să fie corectate după semnătură.
+        */}
+        <CampCui
+          id={`${id}-cui`}
+          eticheta="CUI (dacă scrii în numele unei firme)"
+          nota="Opțional. Completăm noi datele firmei, din ANAF."
+          valoare={cui}
+          onValoare={setCui}
+          onFirma={dinAnaf}
+        />
+
+        {firma && (
+          <fieldset className="colt-mic-a grid gap-4 border border-hartie-umbra bg-hartie-calda p-5">
+            <legend className="px-2 font-titlu text-mic font-bold text-cerneala">
+              Verifică datele firmei
+            </legend>
+            <p className="text-mic text-cerneala-moale">
+              Le-am luat de la ANAF. Dacă s-a schimbat ceva, corectează aici —
+              din ele se face contractul.
+            </p>
+
+            <Camp id={`${id}-denumire`} eticheta="Denumirea firmei">
+              <input
+                id={`${id}-denumire`}
+                type="text"
+                value={firma.denumire}
+                onChange={(ev) =>
+                  setFirma({ ...firma, denumire: ev.target.value })
+                }
+                className={claseControl}
+              />
+            </Camp>
+
+            <Camp id={`${id}-regcom`} eticheta="Nr. de la registrul comerțului">
+              <input
+                id={`${id}-regcom`}
+                type="text"
+                value={firma.nrRegCom}
+                onChange={(ev) =>
+                  setFirma({ ...firma, nrRegCom: ev.target.value })
+                }
+                className={claseControl}
+              />
+            </Camp>
+
+            <Camp id={`${id}-sediu`} eticheta="Sediul">
+              <input
+                id={`${id}-sediu`}
+                type="text"
+                value={firma.adresa}
+                onChange={(ev) =>
+                  setFirma({ ...firma, adresa: ev.target.value })
+                }
+                className={claseControl}
+              />
+            </Camp>
+          </fieldset>
+        )}
 
         <Camp
           id={`${id}-mesaj`}

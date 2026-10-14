@@ -46,6 +46,8 @@ const MAXIM = {
   nume: 120,
   telefon: 40,
   scurt: 120,
+  /** Adresa unei firme, așa cum o scrie ANAF, e mai lungă decât un oraș. */
+  adresa: 300,
   mesaj: 5_000,
 } as const;
 
@@ -110,6 +112,12 @@ export async function POST(cerere: Request) {
     [corp.permis, MAXIM.scurt],
     [corp.aflat, MAXIM.scurt],
     [corp.nastere, MAXIM.scurt],
+    // Datele firmei, când mesajul vine din partea uneia. Se completează din
+    // CUI, din datele publice ale ANAF, și se pot corecta de mână.
+    [corp.firma, MAXIM.nume],
+    [corp.cui, MAXIM.telefon],
+    [corp.nrRegCom, MAXIM.scurt],
+    [corp.adresaFirmei, MAXIM.adresa],
     [corp.mesaj, MAXIM.mesaj],
     [corp.motiv, MAXIM.mesaj],
   ];
@@ -150,6 +158,10 @@ export async function POST(cerere: Request) {
         (
           [
             ["Interesat de", corp.interes],
+            ["Firma", corp.firma],
+            ["CUI", corp.cui],
+            ["Nr. reg. com.", corp.nrRegCom],
+            ["Sediul firmei", corp.adresaFirmei],
             ["Localitate", corp.localitate],
             ["Data nașterii", corp.nastere],
             ["Disponibilitate", corp.disponibilitate],
@@ -180,6 +192,10 @@ export async function POST(cerere: Request) {
     ["E-mail", adresaOmului],
     ["Telefon", String(corp.telefon ?? "")],
     ["Interesat de", String(corp.interes ?? "")],
+    ["Firma", String(corp.firma ?? "")],
+    ["CUI", String(corp.cui ?? "")],
+    ["Nr. reg. com.", String(corp.nrRegCom ?? "")],
+    ["Sediul firmei", String(corp.adresaFirmei ?? "")],
     ["Localitate", String(corp.localitate ?? "")],
     ["Data nașterii", String(corp.nastere ?? "")],
     ["Disponibilitate", String(corp.disponibilitate ?? "")],
