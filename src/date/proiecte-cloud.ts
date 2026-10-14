@@ -166,10 +166,13 @@ export async function pozeCloudProiect(
   const anul = `${RADACINA}/${an}`;
 
   // Folder scris de mână: nu mai are rost să citim lista și să potrivim.
+  // Calea e față de rădăcină, nu față de an: campaniile stau direct sub
+  // `Teona`, nu într-un folder de an.
   if (dosarScris) {
-    const poze = await pozeCuSubdosare(`${anul}/${dosarScris}`);
+    const cale = `${RADACINA}/${dosarScris}`;
+    const poze = await pozeCuSubdosare(cale);
     if (poze.length === 0) {
-      console.warn(`[poze] folderul scris ${anul}/${dosarScris} n-a dat nimic`);
+      console.warn(`[poze] folderul scris ${cale} n-a dat nimic`);
     }
     return poze;
   }
@@ -214,7 +217,7 @@ export async function cuPozeDinCloud<T extends ProiectAfisat>(
 
   const poze = await pozeCloudProiect(
     proiect.data.slice(0, 4),
-    proiect.dataCitita,
+    proiect.dataCitita ?? "",
     proiect.dosarCloud,
   );
   if (poze.length === 0) return proiect;

@@ -154,11 +154,15 @@ export default async function PaginaProiect({
           </Link>
 
           <div className="mt-6 flex flex-wrap items-center gap-2.5">
-            <span className="colt-mic-a bg-caramiziu-700 px-4 py-1.5 text-hartie shadow-[0_10px_24px_-10px_rgba(247,79,34,0.9)]">
-              <span className="scris text-corp leading-none">
-                <time dateTime={proiect.data}>{proiect.dataCitita}</time>
+            {/* Fără dată cunoscută, pastila lipsește: mai bine nimic decât
+                o dată pusă ca să fie ceva acolo. */}
+            {proiect.dataCitita && (
+              <span className="colt-mic-a bg-caramiziu-700 px-4 py-1.5 text-hartie shadow-[0_10px_24px_-10px_rgba(247,79,34,0.9)]">
+                <span className="scris text-corp leading-none">
+                  <time dateTime={proiect.data}>{proiect.dataCitita}</time>
+                </span>
               </span>
-            </span>
+            )}
             {categorie && (
               <span className="rounded-full border-2 border-miere-300 bg-miere-50 px-4 py-1 font-titlu text-mic font-bold text-miere-800">
                 {categorie.eticheta}

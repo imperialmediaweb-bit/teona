@@ -154,7 +154,7 @@ async function Continut({
   const numeleDosarelor = subdosare.map((d) => d.nume);
   const legatura = new Map<string, { titlu: string; slug: string }>();
   for (const proiect of proiecteAfisate()) {
-    const dosar = alegeDosar(numeleDosarelor, proiect.dataCitita);
+    const dosar = alegeDosar(numeleDosarelor, proiect.dataCitita ?? "");
     if (dosar && !legatura.has(dosar)) {
       legatura.set(dosar, { titlu: proiect.titlu, slug: proiect.slug });
     }

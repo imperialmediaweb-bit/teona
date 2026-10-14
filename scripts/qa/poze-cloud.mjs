@@ -49,6 +49,8 @@ const DOSARE = {
   // doar ce era direct în folder, iar tabăra a 32-a a ajuns pe site cu două
   // fotografii din câteva sute.
   "Teona/2026/TABĂRĂ ONCOLOGIE 2026": ["ZIUA 1", "GRUP"],
+  // Campaniile stau direct sub rădăcină, nu într-un folder de an.
+  Teona: ["2025", "2026", "BANCA PENTRU ALIMENTE", "aniversari"],
 };
 
 /** Ce se așteaptă pe fiecare pagină: slugul proiectului și folderul lui. */
@@ -216,6 +218,25 @@ try {
     verifica(
       strainele.length === 0,
       `${slug}: nicio poză din altă tabără${strainele.length ? ` (a intrat „${strainele[0]}”)` : ""}`,
+    );
+  }
+
+  // Campaniile: folder scris explicit, direct sub rădăcină.
+  for (const [slug, dosar] of [
+    ["banca-pentru-alimente", "BANCA PENTRU ALIMENTE"],
+    ["aniversari", "aniversari"],
+  ]) {
+    const html = await (
+      await fetch(`http://127.0.0.1:${PORT_SITE}/proiecte/${slug}`)
+    ).text();
+    verifica(
+      html.includes(encodeURI(`Teona/${dosar}/poza-1`)),
+      `${slug}: pozele vin din „${dosar}”`,
+    );
+    // Fără dată cunoscută, pagina nu are voie să arate una.
+    verifica(
+      !/<time dateTime="[^"]+">[^<]+<\/time>/.test(html),
+      `${slug}: nu arată nicio dată`,
     );
   }
 

@@ -173,15 +173,19 @@ export default function ListaProiecte({
                             />
                           </span>
                         )}
-                        <span
-                          className={`absolute top-4 left-4 rounded-full px-4 py-1.5 shadow-[0_10px_24px_-10px_rgba(35,35,35,0.5)] ${PASTILE[i % 3]}`}
-                        >
-                          <span className="scris text-corp leading-none">
-                            <time dateTime={proiect.data}>
-                              {proiect.dataCitita}
-                            </time>
+                        {/* Campaniile n-au dată: pastila lipsește de tot, în
+                            loc să stea goală peste colțul pozei. */}
+                        {proiect.dataCitita && (
+                          <span
+                            className={`absolute top-4 left-4 rounded-full px-4 py-1.5 shadow-[0_10px_24px_-10px_rgba(35,35,35,0.5)] ${PASTILE[i % 3]}`}
+                          >
+                            <span className="scris text-corp leading-none">
+                              <time dateTime={proiect.data}>
+                                {proiect.dataCitita}
+                              </time>
+                            </span>
                           </span>
-                        </span>
+                        )}
                       </div>
 
                       {/* Cardul de text, tras peste poză; marginile laterale

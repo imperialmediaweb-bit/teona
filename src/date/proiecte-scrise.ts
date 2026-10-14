@@ -59,7 +59,7 @@ export const PROIECTE_SCRISE: readonly ProiectScris[] = [
     categorie: "2026",
     coperta: null,
     poze: [],
-    dosarCloud: "TABĂRĂ PERFORMANȚA 2026",
+    dosarCloud: "2026/TABĂRĂ PERFORMANȚA 2026",
     descriere: [
       "Tabăra a adus împreună 38 de copii și tineri din sistemul de protecție socială din județul Suceava, premiați pentru rezultatele obținute la învățătură, în artă și în sport. Cinci zile la Pensiunea „La Brazi” din Vama, între 6 și 10 iulie 2026.",
       "Programul a mers dincolo de pensiune: Mocănița „Huțulca”, roata panoramică, telegondola și pista de coaster din Gura Humorului au primit grupul, iar în tabără au fost activități, jocuri și timp de odihnă.",
@@ -74,7 +74,7 @@ export const PROIECTE_SCRISE: readonly ProiectScris[] = [
     categorie: "2026",
     coperta: null,
     poze: [],
-    dosarCloud: "TABĂRĂ ONCOLOGIE 2026",
+    dosarCloud: "2026/TABĂRĂ ONCOLOGIE 2026",
     descriere: [
       "A 32-a tabără a asociației și prima din regiunea Moldovei dedicată copiilor aflați în remisiune după cancer și familiilor lor. Douăsprezece familii au venit la Vama fără grija costurilor, între 31 august și 4 septembrie 2026.",
       "Tabăra a pornit de la un lucru simplu: când un copil trece prin cancer, prin cancer trece toată familia, iar după tratament familia are nevoie de timp ca să-și regăsească ritmul. Cinci zile în care boala n-a fost în centrul tuturor lucrurilor — înot, dans, desen, tiroliană, plimbări și o zi la Mănăstirea Voroneț.",
@@ -110,6 +110,36 @@ export const PROIECTE_SCRISE: readonly ProiectScris[] = [
       "Copiii au încercat tiroliana, pictura, modelajul și jocurile, fiecare după puterile și ritmul lui, alături de voluntari. Șase fizioterapeute voluntare au ținut ședințe de masaj pentru mame. Tabăra s-a încheiat cu o fotografie de grup.",
       "Proiectul „Tabăra RESPIRO – Recuperare, Integrare și Respiro pentru copii cu nevoi speciale și părinți din județul Suceava” s-a făcut cu sprijinul Consiliului Județean Suceava, prin finanțare nerambursabilă acordată în baza Legii nr. 350/2005. Tarsin a asigurat transportul, iar DGASPC Suceava a fost partener.",
     ],
+  },
+  /*
+    Campaniile.
+
+    N-au nici text, nici dată: asociația a urcat folderele de poze și atât.
+    Paginile lor arată titlul și fotografiile, iar descrierea se adaugă când o
+    scriu. `data` e doar cheie de ordonare — nu se vede nicăieri, de aceea
+    `dataCitita` e `null` în loc de o dată inventată.
+  */
+  {
+    slug: "banca-pentru-alimente",
+    titlu: "Banca pentru Alimente",
+    data: "2026-10-01",
+    dataCitita: null,
+    categorie: "campanii",
+    coperta: null,
+    poze: [],
+    dosarCloud: "BANCA PENTRU ALIMENTE",
+    descriere: [],
+  },
+  {
+    slug: "aniversari",
+    titlu: "Aniversări",
+    data: "2026-09-01",
+    dataCitita: null,
+    categorie: "campanii",
+    coperta: null,
+    poze: [],
+    dosarCloud: "aniversari",
+    descriere: [],
   },
   {
     slug: "tabara-respiro-copii-cu-autism-aprilie-2026",
