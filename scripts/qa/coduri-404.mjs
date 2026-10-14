@@ -13,27 +13,36 @@
 
 const BAZA = process.env.BAZA ?? "http://localhost:3000";
 
-/** [adresă, cod așteptat, o bucată din titlu care trebuie să apară] */
+/**
+ * [adresă, coduri acceptate, o bucată din titlu care trebuie să apară]
+ *
+ * Adresa cu procente stricate are două răspunsuri bune: pe serverul nostru
+ * ajunge la 404, dar în producție o oprește înaintea noastră gazda, cu 400.
+ * Ambele spun „nu există”; important e să nu fie 200.
+ */
 const PROBE = [
-  ["/proiecte/ceva-ce-nu-exista", 404, "Proiectul nu a fost găsit"],
-  ["/proiecte/tabara-respiro-dedicata-copiilor-cu-auti", 404, "Proiectul nu a fost găsit"],
-  ["/proiecte/%zz", 404, "Proiectul nu a fost găsit"],
-  ["/pagina-care-nu-exista", 404, "Pagina nu a fost găsită"],
+  ["/proiecte/ceva-ce-nu-exista", [404], "Proiectul nu a fost găsit"],
+  ["/proiecte/tabara-respiro-dedicata-copiilor-cu-auti", [404], "Proiectul nu a fost găsit"],
+  ["/proiecte/%zz", [404, 400], ""],
+  ["/pagina-care-nu-exista", [404], "Pagina nu a fost găsită"],
   // Paginile adevărate nu au voie să fie prinse de filtru.
-  ["/proiecte", 200, "Proiecte"],
-  ["/proiecte/tabara-respiro-septembrie-2026", 200, "ediția EGGER"],
-  ["/", 200, ""],
+  ["/proiecte", [200], "Proiecte"],
+  ["/proiecte/tabara-respiro-septembrie-2026", [200], "ediția EGGER"],
+  ["/", [200], ""],
 ];
 
 let rele = 0;
-for (const [cale, cod, titluAsteptat] of PROBE) {
+for (const [cale, coduri, titluAsteptat] of PROBE) {
   const r = await fetch(BAZA + cale, { redirect: "follow" });
   const html = await r.text();
   const titlu = (html.match(/<title>([^<]*)<\/title>/) ?? [])[1] ?? "";
-  const ok = r.status === cod && titlu.includes(titluAsteptat);
+  // Titlul se verifică doar dacă răspunsul a venit de la noi: gazda poate
+  // opri o adresă stricată înaintea aplicației, cu pagina ei.
+  const alNostru = coduri.includes(r.status);
+  const ok = alNostru && (titluAsteptat === "" || titlu.includes(titluAsteptat));
   if (!ok) rele++;
   console.log(
-    `${ok ? "ok  " : "CADE"} ${cale} → ${r.status} (aștept ${cod}) ${titlu.slice(0, 55)}`,
+    `${ok ? "ok  " : "CADE"} ${cale} → ${r.status} (aștept ${coduri.join(" sau ")}) ${titlu.slice(0, 55)}`,
   );
 }
 
