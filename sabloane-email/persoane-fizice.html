@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="ro">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <title>Asociația Teona Ariana Suceava</title>
+    <!--
+      ȘABLON DE CAMPANIE · PERSOANE FIZICE
+
+      Se încarcă în MailerLite: Campaigns → Create campaign → alege „Custom
+      HTML" (sau „Rich-text / paste HTML", după cum e numit în contul tău) și
+      lipește tot fișierul.
+
+      ── Ce schimbi la fiecare campanie ───────────────────────────────────
+      Caută în fișier cuvântul SCHIMBĂ. Sunt șase locuri:
+        1. textul ascuns de previzualizare (se vede în inbox, lângă subiect);
+        2. titlul;
+        3. cele două-trei paragrafe;
+        4. fotografia de sus și descrierea ei;
+        5. textul butonului principal, dacă e nevoie;
+        6. adresa de dezabonare, din editorul MailerLite.
+
+      ── Două lucruri care NU se schimbă ──────────────────────────────────
+      Datele asociației din subsol și linkul de dezabonare. Fără ele, e-mailul
+      e ilegal în UE și ajunge la spam.
+
+      ── De ce arată codul așa ────────────────────────────────────────────
+      Tabele, nu `div`-uri, și stiluri scrise direct pe fiecare element:
+      Outlook pe Windows randează cu motorul lui Word, care nu știe `flex`,
+      `grid` și nici foi de stil întregi. Butoanele sunt celule de tabel
+      colorate, nu `<a>` cu umplutură — altfel în Outlook rămâne doar textul
+      albastru subliniat. Lățimea e 600 px, cât intră în panoul de
+      previzualizare al Outlook fără derulare laterală.
+
+      Culorile sunt cele ale asociației, în variantele închise: portocaliul de
+      brand (#F74F22) pe alb dă un contrast de 3,44:1, sub pragul la care un
+      text de 16 px se citește pe un telefon ținut în soare. #B82B09 dă 6,2:1
+      și arată aproape la fel.
+
+      Fotografiile se încarcă de pe site. Până la lansare, adresele de mai jos
+      nu răspund — dacă trimiți o campanie înainte, urcă pozele în MailerLite
+      și înlocuiește `src`-urile.
+    -->
+    <style>
+      /* Clienții care citesc `<style>` (nu Outlook) primesc aceste ajustări. */
+      @media only screen and (max-width: 620px) {
+        .coloana { display: block !important; width: 100% !important; }
+        .pad { padding-left: 20px !important; padding-right: 20px !important; }
+        .titlu { font-size: 24px !important; }
+      }
+      /* Modul întunecat: păstrăm fundalul alb, ca pozele să nu plutească. */
+      @media (prefers-color-scheme: dark) {
+        .fundal { background-color: #ffffff !important; }
+      }
+      a { color: #b82b09; }
+    </style>
+  </head>
+  <body style="margin:0;padding:0;background-color:#f9f5f2;">
+    <!-- SCHIMBĂ 1 · textul de previzualizare: prima linie pe care o vede omul
+         în inbox, lângă subiect. Maximum ~90 de caractere. -->
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
+      Vara asta, 33 de tabere și o casă deschisă tot anul. Iată ce s-a
+      întâmplat.
+      &#8203;&#8203;&#8203;&#8203;&#8203;&#8203;&#8203;&#8203;&#8203;&#8203;&#8203;&#8203;&#8203;&#8203;&#8203;
+    </div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f9f5f2;">
+      <tr>
+        <td align="center" style="padding:24px 12px;">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" class="fundal" style="width:100%;max-width:600px;background-color:#ffffff;border-radius:16px;overflow:hidden;">
+
+            <!-- ── Antet ───────────────────────────────────────────────── -->
+            <tr>
+              <td align="center" style="padding:28px 32px 20px;">
+                <img
+                  src="https://www.teona-ariana.ro/poze/2024/11/cropped-Screenshot11removebgpreview-2512x512-1.png"
+                  width="54" height="54" alt="Asociația Teona Ariana Suceava"
+                  style="display:block;border:0;width:54px;height:54px;" />
+                <p style="margin:10px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:bold;color:#b82b09;">
+                  Asociația Teona Ariana Suceava
+                </p>
+                <p style="margin:2px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#666666;">
+                  Nimic fără Dumnezeu
+                </p>
+              </td>
+            </tr>
+
+            <!-- ── SCHIMBĂ 4 · fotografia de sus ─────────────────────────
+                 Pune o fotografie ORIZONTALĂ. Una verticală, la 600 px
+                 lățime, iese de 800 px înălțime: omul derulează un ecran
+                 întreg înainte să ajungă la primul cuvânt, iar pe telefon
+                 renunță. Raportul bun e între 3:2 și 16:9. -->
+            <tr>
+              <td style="padding:0;">
+                <img
+                  src="https://www.teona-ariana.ro/poze/2024/11/462119250_122094741458569469_941841061673534153_n.jpg"
+                  width="600" alt="Copii, părinți și voluntari în tricouri albe, pe iarbă, în fața pensiunii din tabăra RESPIRO"
+                  style="display:block;width:100%;max-width:600px;height:auto;border:0;" />
+              </td>
+            </tr>
+
+            <!-- ── Titlu și text ──────────────────────────────────────── -->
+            <tr>
+              <td class="pad" style="padding:32px 40px 0;">
+                <!-- SCHIMBĂ 2 · titlul campaniei -->
+                <h1 class="titlu" style="margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;font-size:27px;line-height:1.3;color:#232323;">
+                  O săptămână care ține un an întreg
+                </h1>
+
+                <!--
+                  PERSONALIZARE (opțional). Dacă vrei „Bună, Maria!", pune aici
+                  câmpul de prenume din contul tău MailerLite: în editorul lor,
+                  butonul de personalizare îți dă eticheta exactă, pentru că
+                  diferă de la un cont la altul. Lăsat așa, e-mailul începe cu
+                  „Bună ziua," și e corect pentru toată lumea.
+                -->
+                <p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.65;color:#444444;">
+                  Bună ziua,
+                </p>
+
+                <!-- SCHIMBĂ 3 · textul campaniei, două-trei paragrafe -->
+                <p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.65;color:#444444;">
+                  Pentru un copil cu autism sau cu sindrom Down, o săptămână de
+                  tabără nu e o vacanță. E locul unde se joacă cu alți copii
+                  fără să se simtă altfel, iar părinții lui se odihnesc cu
+                  adevărat, poate pentru prima dată în anul acela.
+                </p>
+                <p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.65;color:#444444;">
+                  Am ajuns la 33 de tabere și peste 1.500 de participanți. Iar
+                  restul anului îl ține Casa Teona, unde vin peste 80 de copii
+                  la ateliere, jocuri și terapie, și unde părinții găsesc
+                  consiliere.
+                </p>
+              </td>
+            </tr>
+
+            <!-- ── Butonul principal ──────────────────────────────────── -->
+            <tr>
+              <td align="center" class="pad" style="padding:14px 40px 8px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td align="center" bgcolor="#b82b09" style="border-radius:999px;">
+                      <!-- SCHIMBĂ 5 · textul și adresa butonului -->
+                      <a href="https://www.teona-ariana.ro/doneaza"
+                         style="display:inline-block;padding:15px 36px;font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:999px;">
+                        Donează acum
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- ── Celelalte căi de a ajuta ───────────────────────────── -->
+            <tr>
+              <td class="pad" style="padding:28px 40px 8px;">
+                <p style="margin:0 0 14px;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#666666;">
+                  Mai poți ajuta și așa
+                </p>
+
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td style="padding:12px 0;border-top:1px solid #efe6e0;">
+                      <p style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:bold;color:#232323;">
+                        Redirecționează 3,5% din impozit
+                      </p>
+                      <p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.55;color:#444444;">
+                        Nu te costă nimic în plus — suma e deja reținută din
+                        venit. Se completează Formularul 230, până la 25 mai.
+                      </p>
+                      <a href="https://www.teona-ariana.ro/redirectioneaza-3-5"
+                         style="font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#b82b09;text-decoration:underline;">
+                        Vezi pașii
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:12px 0;border-top:1px solid #efe6e0;">
+                      <p style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:bold;color:#232323;">
+                        Donează lunar prin SMS
+                      </p>
+                      <p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.55;color:#444444;">
+                        Trimite <strong style="color:#232323;">SUSTIN la 8835</strong>
+                        și donezi 5 € pe lună, fără formulare. Oprire oricând
+                        cu <strong style="color:#232323;">SUSTIN STOP</strong>, gratuit.
+                      </p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:12px 0;border-top:1px solid #efe6e0;border-bottom:1px solid #efe6e0;">
+                      <p style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:bold;color:#232323;">
+                        Vino voluntar
+                      </p>
+                      <p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.55;color:#444444;">
+                        De la 18 ani, fără experiență. Completezi un formular,
+                        te sunăm și stabilim împreună unde poți ajuta.
+                      </p>
+                      <a href="https://www.teona-ariana.ro/devino-voluntar"
+                         style="font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#b82b09;text-decoration:underline;">
+                        Înscrie-te
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- ── Subsol ─────────────────────────────────────────────── -->
+            <tr>
+              <td class="pad" style="padding:26px 40px 32px;">
+                <p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.6;color:#666666;">
+                  <strong style="color:#444444;">Asociația Teona Ariana Suceava</strong><br />
+                  CIF 43533953 · Strada Nicolae Milescu nr. 7, Suceava<br />
+                  Casa Teona: Strada Zamca 22, Suceava 720215
+                </p>
+                <p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.6;color:#666666;">
+                  0754 510 167 · 0748 250 704 ·
+                  <a href="mailto:contact@teona-ariana.ro" style="color:#b82b09;">contact@teona-ariana.ro</a>
+                </p>
+                <p style="margin:0 0 14px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.6;color:#666666;">
+                  <a href="https://facebook.com/asociatia.teona.ariana" style="color:#b82b09;">Facebook</a> ·
+                  <a href="https://instagram.com/teonaariana_sv" style="color:#b82b09;">Instagram</a> ·
+                  <a href="https://tiktok.com/@teonaarianasv" style="color:#b82b09;">TikTok</a> ·
+                  <a href="https://www.teona-ariana.ro/" style="color:#b82b09;">teona-ariana.ro</a>
+                </p>
+                <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#8a8a8a;">
+                  Primești acest mesaj pentru că te-ai abonat la noutățile
+                  asociației.
+                  <!--
+                    SCHIMBĂ 6 · DEZABONAREA, OBLIGATORIE.
+                    Înlocuiește `#` de mai jos cu eticheta de dezabonare din
+                    contul tău MailerLite (în editorul lor, blocul de subsol îți
+                    dă linkul corect). Fără el, e-mailul încalcă GDPR și
+                    nimerește în spam.
+                  -->
+                  <a href="#" style="color:#8a8a8a;text-decoration:underline;">Dezabonează-te</a>
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
