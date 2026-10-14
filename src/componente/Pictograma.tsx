@@ -85,6 +85,16 @@ const CAI: Record<string, string | string[]> = {
     "M12 13a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z",
   ],
   sageata: "M4.5 12h15M13.5 6l6 6-6 6",
+
+  // ── Panoul de administrare ──────────────────────────────────────────────
+  // Patru cadrane: semnul obișnuit pentru „tabloul de bord”, înțeles fără
+  // text. Nu e nevoie să semene cu nimic din lume.
+  panou: [
+    "M4 4.5h6v6H4zM14 4.5h6v4h-6z",
+    "M14 12.5h6v7h-6zM4 14.5h6v5H4z",
+  ],
+  // Trei bare de înălțimi diferite: statistici.
+  grafic: ["M5 19.5V11M12 19.5V5M19 19.5v-6", "M3.5 19.5h17"],
 };
 
 export type NumePictograma = keyof typeof CAI;
