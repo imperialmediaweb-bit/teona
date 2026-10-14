@@ -78,6 +78,12 @@ Ce înseamnă asta în practică:
 - dacă nimic nu se potrivește, sau dacă două foldere ies la egalitate, nu se
   alege niciunul: mai bine o galerie goală decât pozele altei tabere, cu alți
   copii, pe pagina greșită;
+- două foldere din 2026 n-au nicio dată în nume („TABĂRĂ ONCOLOGIE 2026”,
+  „TABĂRĂ PERFORMANȚA 2026”), deci proiectele lor scriu numele folderului
+  explicit, prin `dosarCloud`;
+- contul e pe „dynamic folders”: folderul e un câmp separat de identificatorul
+  pozei, deci listarea se face cu `resources/by_asset_folder`, nu cu `prefix`.
+  Căutarea pe identificator rămâne ca rezervă, pentru conturile în modul vechi;
 - în panou, la `/admin/poze`, se vede sub fiecare folder la ce proiect au
   ajuns pozele lui, sau că n-a ajuns la niciunul;
 - proba `node scripts/qa/poze-cloud.mjs` verifică potrivirea fără cheile

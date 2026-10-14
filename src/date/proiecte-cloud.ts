@@ -127,6 +127,8 @@ export function alegeDosar(
 export async function pozeCloudProiect(
   an: string,
   dataCitita: string,
+  /** Numele folderului, când e scris explicit în proiect. */
+  dosarScris?: string,
 ): Promise<string[]> {
   "use cache";
   cacheLife("hours");
@@ -134,6 +136,16 @@ export async function pozeCloudProiect(
   if (!areCheiCloudinary()) return [];
 
   const anul = `${RADACINA}/${an}`;
+
+  // Folder scris de mână: nu mai are rost să citim lista și să potrivim.
+  if (dosarScris) {
+    const poze = await pozeDinDosar(`${anul}/${dosarScris}`);
+    if (poze.length === 0) {
+      console.warn(`[poze] folderul scris ${anul}/${dosarScris} n-a dat nimic`);
+    }
+    return poze.map((p) => `${PREFIX_CLOUD}${p.id}`);
+  }
+
   const subdosare = await dosare(anul);
   if (subdosare.length === 0) {
     console.warn(`[poze] n-am găsit niciun folder în ${anul}`);
@@ -172,7 +184,11 @@ export async function cuPozeDinCloud<T extends ProiectAfisat>(
 ): Promise<T> {
   if (proiect.poze.length > 0 || proiect.coperta) return proiect;
 
-  const poze = await pozeCloudProiect(proiect.data.slice(0, 4), proiect.dataCitita);
+  const poze = await pozeCloudProiect(
+    proiect.data.slice(0, 4),
+    proiect.dataCitita,
+    proiect.dosarCloud,
+  );
   if (poze.length === 0) return proiect;
 
   return { ...proiect, coperta: poze[0], poze };

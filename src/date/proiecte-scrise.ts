@@ -33,6 +33,10 @@ import type { ProiectAfisat } from "./proiecte-tipuri";
  * Doar una dintre ele are descriere — cea din 8–12 septembrie, pentru care
  * asociația a trimis textul. Celelalte trei au titlu, dată și fotografii.
  *
+ * **Tabăra din aprilie 2026** a apărut la fel: nu era în niciun material
+ * trimis, dar există folderul „TABĂRĂ AUTISM 20-24 APRILIE 2026”. Are titlu,
+ * dată și fotografii; descrierea o scrie asociația.
+ *
  * **O tabără lipsește încă.** Materialele conțineau și a 29-a tabără RESPIRO,
  * fără nicio dată. Fără dată nu poate fi așezată pe pagina Proiecte, care e
  * organizată pe ani, nu poate primi o adresă stabilă și nu-și poate găsi
@@ -55,6 +59,7 @@ export const PROIECTE_SCRISE: readonly ProiectScris[] = [
     categorie: "2026",
     coperta: null,
     poze: [],
+    dosarCloud: "TABĂRĂ PERFORMANȚA 2026",
     descriere: [
       "Tabăra a adus împreună 38 de copii și tineri din sistemul de protecție socială din județul Suceava, premiați pentru rezultatele obținute la învățătură, în artă și în sport. Cinci zile la Pensiunea „La Brazi” din Vama, între 6 și 10 iulie 2026.",
       "Programul a mers dincolo de pensiune: Mocănița „Huțulca”, roata panoramică, telegondola și pista de coaster din Gura Humorului au primit grupul, iar în tabără au fost activități, jocuri și timp de odihnă.",
@@ -69,6 +74,7 @@ export const PROIECTE_SCRISE: readonly ProiectScris[] = [
     categorie: "2026",
     coperta: null,
     poze: [],
+    dosarCloud: "TABĂRĂ ONCOLOGIE 2026",
     descriere: [
       "A 32-a tabără a asociației și prima din regiunea Moldovei dedicată copiilor aflați în remisiune după cancer și familiilor lor. Douăsprezece familii au venit la Vama fără grija costurilor, între 31 august și 4 septembrie 2026.",
       "Tabăra a pornit de la un lucru simplu: când un copil trece prin cancer, prin cancer trece toată familia, iar după tratament familia are nevoie de timp ca să-și regăsească ritmul. Cinci zile în care boala n-a fost în centrul tuturor lucrurilor — înot, dans, desen, tiroliană, plimbări și o zi la Mănăstirea Voroneț.",
@@ -106,8 +112,18 @@ export const PROIECTE_SCRISE: readonly ProiectScris[] = [
     ],
   },
   {
+    slug: "tabara-respiro-copii-cu-autism-aprilie-2026",
+    titlu: "Tabăra RESPIRO pentru copii cu autism — aprilie 2026",
+    data: "2026-04-20",
+    dataCitita: "20 – 24 aprilie 2026",
+    categorie: "2026",
+    coperta: null,
+    poze: [],
+    descriere: [],
+  },
+  {
     slug: "tabara-respiro-copii-cu-autism-15-19-septembrie-2025",
-    titlu: "Tabăra RESPIRO pentru copii cu autism",
+    titlu: "Tabăra RESPIRO pentru copii cu autism — septembrie 2025",
     data: "2025-09-15",
     dataCitita: "15 – 19 septembrie 2025",
     categorie: "2025",

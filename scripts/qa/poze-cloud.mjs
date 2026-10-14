@@ -33,10 +33,17 @@ const DOSARE = {
     "TABĂRĂ SURDO-MUȚI 16-20 IUNIE 2025",
     "POZE NESORTATE",
   ],
+  /*
+    Folderele din 2026, exact cum le-a numit asociația — citite din jurnalul
+    Railway, nu ghicite. Două n-au nicio dată în nume, deci nu pot fi găsite
+    prin potrivire: proiectele lor scriu numele folderului explicit, prin
+    `dosarCloud`.
+  */
   "Teona/2026": [
-    "TABĂRĂ SUSȚINEM PERFORMANȚA 6-10 IULIE 2026",
-    "RESPIRO ÎMPREUNĂ 31 AUGUST - 4 SEPTEMBRIE 2026",
-    "TABĂRĂ EGGER 7-11 SEPTEMBRIE 2026",
+    "TABĂRĂ AUTISM 20-24 APRILIE 2026",
+    "TABĂRĂ AUTISM 7-11 SEPTEMBRIE 2026",
+    "TABĂRĂ ONCOLOGIE 2026",
+    "TABĂRĂ PERFORMANȚA 2026",
   ],
 };
 
@@ -46,9 +53,10 @@ const ASTEPTAT = [
   ["tabara-respiro-copii-cu-autism-15-19-septembrie-2025", "TABĂRĂ AUTISM 15-19 SEPTEMBRIE 2025"],
   ["tabara-respiro-copii-cu-deficiente-grave-de-vedere-iunie-2025", "TABĂRĂ NEVĂZĂTORI 9-13 IUNIE 2025"],
   ["tabara-respiro-copii-cu-deficiente-de-auz-si-vorbire-iunie-2025", "TABĂRĂ SURDO-MUȚI 16-20 IUNIE 2025"],
-  ["tabara-respiro-sustinem-performanta-iulie-2026", "TABĂRĂ SUSȚINEM PERFORMANȚA 6-10 IULIE 2026"],
-  ["respiro-impreuna-a-32-a-tabara-septembrie-2026", "RESPIRO ÎMPREUNĂ 31 AUGUST - 4 SEPTEMBRIE 2026"],
-  ["tabara-respiro-septembrie-2026", "TABĂRĂ EGGER 7-11 SEPTEMBRIE 2026"],
+  ["tabara-respiro-sustinem-performanta-iulie-2026", "TABĂRĂ PERFORMANȚA 2026"],
+  ["respiro-impreuna-a-32-a-tabara-septembrie-2026", "TABĂRĂ ONCOLOGIE 2026"],
+  ["tabara-respiro-septembrie-2026", "TABĂRĂ AUTISM 7-11 SEPTEMBRIE 2026"],
+  ["tabara-respiro-copii-cu-autism-aprilie-2026", "TABĂRĂ AUTISM 20-24 APRILIE 2026"],
 ];
 
 const api = createServer((cer, raspunde) => {
@@ -71,13 +79,21 @@ const api = createServer((cer, raspunde) => {
     });
   }
 
-  // `/v1_1/<cont>/resources/image?prefix=...`
-  if (adresa.pathname.endsWith("/resources/image")) {
-    const prefix = adresa.searchParams.get("prefix") ?? "";
+  /*
+    `/v1_1/<cont>/resources/by_asset_folder?asset_folder=...`
+
+    Contul asociației e pe „dynamic folders”, unde folderul e un câmp separat
+    de identificator. Serverul de probă se purta ca un cont în modul vechi, de
+    aceea proba trecea în timp ce producția raporta toate folderele goale. Acum
+    imită modul nou: răspunde pe folder, iar căutarea pe identificator
+    (`prefix`) întoarce zero, exact ca Cloudinary.
+  */
+  if (adresa.pathname.endsWith("/resources/by_asset_folder")) {
+    const dosar = adresa.searchParams.get("asset_folder") ?? "";
     return trimite({
       resources: [1, 2, 3].map((i) => ({
-        public_id: `${prefix}/poza-${i}`,
-        secure_url: `https://res.cloudinary.com/${CONT}/image/upload/${prefix}/poza-${i}.jpg`,
+        public_id: `${dosar}/poza-${i}`,
+        secure_url: `https://res.cloudinary.com/${CONT}/image/upload/${dosar}/poza-${i}.jpg`,
         width: 2000,
         height: 1333,
         format: "jpg",
@@ -85,6 +101,11 @@ const api = createServer((cer, raspunde) => {
         created_at: `2026-10-0${i}T10:00:00Z`,
       })),
     });
+  }
+
+  // Căutarea pe identificator nu întoarce nimic într-un cont „dynamic”.
+  if (adresa.pathname.endsWith("/resources/image")) {
+    return trimite({ resources: [] });
   }
 
   raspunde.writeHead(404);
@@ -112,9 +133,39 @@ function verifica(ok, mesaj) {
   if (!ok) greseli.push(mesaj);
 }
 
+/** Portul e liber? Dacă nu, acolo stă un server străin și proba n-are sens. */
+async function liber(port) {
+  try {
+    await fetch(`http://127.0.0.1:${port}/`, {
+      signal: AbortSignal.timeout(2000),
+    });
+    return false;
+  } catch {
+    return true;
+  }
+}
+
+if (!(await liber(PORT_SITE))) {
+  console.error(
+    `Portul ${PORT_SITE} e deja ocupat. Oprește serverul de acolo: proba ar verifica alt cod decât cel de acum.`,
+  );
+  process.exit(1);
+}
+
 await new Promise((r) => api.listen(PORT_API, r));
 
+/*
+  Serverul de probă pornește într-un grup de procese separat.
+
+  `npm run dev` pornește la rândul lui `next dev`. Un `kill` pe npm îl lasă pe
+  `next` în viață, cu portul ocupat: la rulările următoare proba se conecta la
+  serverul rămas de la rularea dinainte și verifica o versiune veche a
+  codului. A dat două „căderi” care nu existau, pe foldere care între timp
+  fuseseră redenumite în probă. Cu `detached`, `kill` pe grup îi ia pe
+  amândoi.
+*/
 const site = spawn("npm", ["run", "dev"], {
+  detached: true,
   env: {
     ...process.env,
     PORT: String(PORT_SITE),
@@ -139,9 +190,18 @@ try {
       html.includes("res.cloudinary.com"),
       `${slug}: pozele vin de la Cloudinary`,
     );
+    const gasite = [
+      ...new Set(
+        (html.match(/res\.cloudinary\.com\/[^"\\ ]+/g) ?? []).map((u) =>
+          u.replace(/^.*\/upload\/[^/]+\//, ""),
+        ),
+      ),
+    ];
     verifica(
       html.includes(asteptata),
-      `${slug}: pozele sunt din „${dosar}”`,
+      `${slug}: pozele sunt din „${dosar}”${
+        html.includes(asteptata) ? "" : ` (am găsit: ${gasite.join(", ")})`
+      }`,
     );
 
     // Niciun alt folder din același an nu are voie să apară pe pagina asta.
@@ -164,7 +224,11 @@ try {
     "un folder fără dată în nume nu ajunge pe nicio pagină",
   );
 } finally {
-  site.kill("SIGTERM");
+  try {
+    process.kill(-site.pid, "SIGTERM");
+  } catch {
+    site.kill("SIGTERM");
+  }
   api.close();
 }
 

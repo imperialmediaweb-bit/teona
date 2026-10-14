@@ -129,29 +129,50 @@ export async function dosare(cale?: string): Promise<Dosar[]> {
 /**
  * Pozele dintr-un folder, cele mai noi primele.
  *
+ * **De ce două capete de API.** Cloudinary are două moduri de a ține
+ * folderele, iar contul asociației e pe cel nou („dynamic folders”). În modul
+ * vechi, folderul făcea parte din identificatorul pozei, deci se putea căuta
+ * cu `prefix=Teona/2025/…`. În modul nou, folderul e un câmp separat, iar
+ * identificatorul n-are nicio legătură cu el — `prefix` întoarce zero
+ * rezultate, exact ce s-a întâmplat la prima încercare: toate cele șapte
+ * tabere au găsit folderul corect și au raportat că e gol.
+ *
+ * Așa că se cere întâi pe folder (`by_asset_folder`), iar dacă nu vine nimic
+ * se încearcă și pe identificator, pentru conturile în modul vechi. Un cont
+ * nu poate fi în ambele moduri, deci a doua cerere se face doar când prima
+ * n-a adus nimic.
+ *
  * `max_results` e 100: destul cât să vezi o tabără întreagă, puțin cât să nu
  * aștepți. Cloudinary întoarce un cursor pentru restul, dar o pagină de panou
  * cu 500 de poze nu se mai poate folosi oricum.
  */
+type ResursaBruta = {
+  public_id: string;
+  secure_url: string;
+  width: number;
+  height: number;
+  format: string;
+  bytes: number;
+  created_at: string;
+};
+
 export async function pozeDinDosar(
   cale: string,
   limita = 100,
 ): Promise<PozaCloud[]> {
-  const date = await cere<{
-    resources?: Array<{
-      public_id: string;
-      secure_url: string;
-      width: number;
-      height: number;
-      format: string;
-      bytes: number;
-      created_at: string;
-    }>;
-  }>(
-    `resources/image?type=upload&prefix=${encodeURIComponent(cale)}&max_results=${limita}`,
+  const peFolder = await cere<{ resources?: ResursaBruta[] }>(
+    `resources/by_asset_folder?asset_folder=${encodeURIComponent(cale)}&max_results=${limita}`,
   );
 
-  return (date?.resources ?? [])
+  let resurse = peFolder?.resources ?? [];
+  if (resurse.length === 0) {
+    const peIdentificator = await cere<{ resources?: ResursaBruta[] }>(
+      `resources/image?type=upload&prefix=${encodeURIComponent(cale)}&max_results=${limita}`,
+    );
+    resurse = peIdentificator?.resources ?? [];
+  }
+
+  return resurse
     .map((r) => ({
       id: r.public_id,
       adresa: r.secure_url,

@@ -33,4 +33,14 @@ export type ProiectAfisat = {
    * familii și diagnostice de copii, iar caietul interzice publicarea lor.
    */
   descriere?: readonly string[];
+  /**
+   * Numele folderului de poze din Cloudinary, scris explicit.
+   *
+   * De obicei nu e nevoie: folderul se găsește singur, după zilele și luna
+   * din numele lui. Dar două foldere din 2026 n-au nicio dată în nume —
+   * „TABĂRĂ ONCOLOGIE 2026” și „TABĂRĂ PERFORMANȚA 2026” — iar pentru ele
+   * potrivirea pe dată nu are de ce să se prindă. Aici se scrie numele, ca să
+   * nu fie nevoie ca asociația să redenumească ce a urcat deja.
+   */
+  dosarCloud?: string;
 };
