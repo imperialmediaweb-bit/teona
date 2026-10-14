@@ -86,8 +86,25 @@ Ce înseamnă asta în practică:
   Căutarea pe identificator rămâne ca rezervă, pentru conturile în modul vechi;
 - în panou, la `/admin/poze`, se vede sub fiecare folder la ce proiect au
   ajuns pozele lui, sau că n-a ajuns la niciunul;
+- taberele mari au pozele pe subfoldere („ZIUA 1”, „GRUP”); se citesc două
+  niveluri în adâncime;
 - proba `node scripts/qa/poze-cloud.mjs` verifică potrivirea fără cheile
   adevărate, cu un server care imită Cloudinary.
+
+## Adresele inexistente răspund 404, nu 200
+
+`/proiecte/<slug care nu există>` răspundea cu **codul 200** și pagina „nu a
+fost găsită” în corp — un „soft 404”, pe care Google îl indexează ca pagină
+adevărată. Cauza e randarea parțială: antetul pleacă spre browser înainte ca
+pagina să ajungă la `notFound()`.
+
+Trei remedii nu merg cu `cacheComponents` pornit, toate încercate:
+`dynamicParams = false` (Next o refuză explicit), `notFound()` mutat în
+`generateMetadata`, și `NextResponse.rewrite(…, { status: 404 })` (ignoră
+codul). Ce merge e în `src/proxy.ts`: filtrează slugurile înainte de randare
+și întoarce corpul paginii `/proiect-inexistent` cu codul 404.
+
+Proba: `BAZA=http://localhost:3000 node scripts/qa/coduri-404.mjs`.
 
 ## Decizii încă deschise
 

@@ -45,6 +45,10 @@ const DOSARE = {
     "TABĂRĂ ONCOLOGIE 2026",
     "TABĂRĂ PERFORMANȚA 2026",
   ],
+  // Taberele mari au pozele împărțite pe subfoldere. Prima versiune citea
+  // doar ce era direct în folder, iar tabăra a 32-a a ajuns pe site cu două
+  // fotografii din câteva sute.
+  "Teona/2026/TABĂRĂ ONCOLOGIE 2026": ["ZIUA 1", "GRUP"],
 };
 
 /** Ce se așteaptă pe fiecare pagină: slugul proiectului și folderul lui. */
@@ -212,6 +216,19 @@ try {
     verifica(
       strainele.length === 0,
       `${slug}: nicio poză din altă tabără${strainele.length ? ` (a intrat „${strainele[0]}”)` : ""}`,
+    );
+  }
+
+  // Pozele din subfoldere ajung și ele pe pagina taberei.
+  const oncologie = await (
+    await fetch(
+      `http://127.0.0.1:${PORT_SITE}/proiecte/respiro-impreuna-a-32-a-tabara-septembrie-2026`,
+    )
+  ).text();
+  for (const sub of DOSARE["Teona/2026/TABĂRĂ ONCOLOGIE 2026"]) {
+    verifica(
+      oncologie.includes(encodeURI(`${sub}/poza-1`)),
+      `a 32-a tabără: pozele din subfolderul „${sub}” sunt pe pagină`,
     );
   }
 

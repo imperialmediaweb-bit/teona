@@ -17,7 +17,7 @@ import { ADRESA_SITE, INDEXABIL } from "./seo";
   căutărilor și dacă cineva uită vreodată metadata. Distribuirea pe Facebook
   nu e afectată: rețelele citesc `og:`, nu `robots.txt`.
 */
-const INTERZISE = ["/api/", "/admin/", "/ziua-ta/"];
+const INTERZISE = ["/api/", "/admin/", "/ziua-ta/", "/proiect-inexistent"];
 
 /**
  * Roboții care alimentează răspunsurile din ChatGPT, Claude, Perplexity și

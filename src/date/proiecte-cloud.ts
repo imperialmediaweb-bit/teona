@@ -118,6 +118,34 @@ export function alegeDosar(
 }
 
 /**
+ * Pozele dintr-un folder și din subfolderele lui.
+ *
+ * Asociația nu ține întotdeauna toate pozele la același nivel: taberele mai
+ * mari au subfoldere („zi 1”, „grup”, cine a fotografiat). Prima versiune
+ * citea doar ce era direct în folder, iar tabăra a 32-a — cea cu douăsprezece
+ * familii — a ajuns pe site cu două fotografii din câteva sute.
+ *
+ * Două niveluri sunt destul: un folder de tabără cu subfoldere de subfoldere
+ * n-a existat, iar o adâncime nelimitată ar face un număr necunoscut de
+ * cereri la fiecare reconstruire.
+ */
+async function pozeCuSubdosare(cale: string, adancime = 2): Promise<string[]> {
+  const aici = await pozeDinDosar(cale);
+  const cai = aici.map((p) => `${PREFIX_CLOUD}${p.id}`);
+  if (adancime <= 0) return cai;
+
+  const subdosare = await dosare(cale);
+  if (subdosare.length === 0) return cai;
+
+  const dedesubt = await Promise.all(
+    subdosare.map((d) => pozeCuSubdosare(d.cale, adancime - 1)),
+  );
+  // Fără duplicate: un cont în modul vechi de foldere întoarce, la căutarea pe
+  // identificator, și pozele din subfoldere.
+  return [...new Set([...cai, ...dedesubt.flat()])];
+}
+
+/**
  * Pozele unui proiect din Cloudinary, ca liste de căi `/cloud/…`.
  *
  * Se ține la cache câteva ore: folderele unei tabere încheiate nu se mai
@@ -139,11 +167,11 @@ export async function pozeCloudProiect(
 
   // Folder scris de mână: nu mai are rost să citim lista și să potrivim.
   if (dosarScris) {
-    const poze = await pozeDinDosar(`${anul}/${dosarScris}`);
+    const poze = await pozeCuSubdosare(`${anul}/${dosarScris}`);
     if (poze.length === 0) {
       console.warn(`[poze] folderul scris ${anul}/${dosarScris} n-a dat nimic`);
     }
-    return poze.map((p) => `${PREFIX_CLOUD}${p.id}`);
+    return poze;
   }
 
   const subdosare = await dosare(anul);
@@ -165,11 +193,11 @@ export async function pozeCloudProiect(
     return [];
   }
 
-  const poze = await pozeDinDosar(`${anul}/${ales}`);
+  const poze = await pozeCuSubdosare(`${anul}/${ales}`);
   if (poze.length === 0) {
     console.warn(`[poze] folderul ${anul}/${ales} e gol`);
   }
-  return poze.map((p) => `${PREFIX_CLOUD}${p.id}`);
+  return poze;
 }
 
 /**

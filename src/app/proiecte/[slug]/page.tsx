@@ -32,9 +32,23 @@ export async function generateMetadata({
 }: PageProps<"/proiecte/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const gasit = proiectDupaSlug(slug);
-  // Un slug inexistent ajunge la 404; pagina aceea nu se indexează.
-  if (!gasit)
-    return { title: "Proiect", robots: { index: false, follow: false } };
+  /*
+    Un slug inexistent se oprește aici, nu în corpul paginii.
+
+    Înainte, `notFound()` era chemat mai jos, în pagină, iar
+    `/proiecte/ceva-ce-nu-exista` răspundea cu **codul 200** și pagina „Pagina
+    nu a fost găsită” în corp — verificat pe producție. Cauza e randarea
+    parțială: antetul răspunsului pleacă spre browser înainte ca pagina să
+    ajungă la `notFound()`, iar codul nu se mai poate schimba.
+
+    Pentru Google asta e un „soft 404”: o adresă inexistentă care se declară
+    validă. Le indexează ca pagini adevărate și pune apoi la îndoială și
+    restul site-ului.
+
+    `generateMetadata` rulează înaintea antetului — e nevoie de titlu ca să se
+    poată scrie `<head>` — deci de aici 404-ul chiar ajunge în răspuns.
+  */
+  if (!gasit) notFound();
   const proiect = await cuPozeDinCloud(gasit);
 
   // Fără dată: `data` e data postării în WordPress, care nu e mereu data
