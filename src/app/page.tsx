@@ -165,7 +165,7 @@ export default function PrimaPagina() {
                   className={`${i % 2 === 0 ? "colt-a" : "colt-b"} flex items-center gap-4 border border-turcoaz-100 bg-turcoaz-50 p-4 shadow-[0_16px_32px_-20px_rgba(42,159,163,0.9)] sm:p-5`}
                 >
                   <span
-                    className={`${i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"} flex size-12 shrink-0 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]`}
+                    className={`${i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"} flex size-12 shrink-0 items-center justify-center bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]`}
                   >
                     <Pictograma nume={punct.pictograma} className="size-6" />
                   </span>

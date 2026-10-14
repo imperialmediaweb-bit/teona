@@ -74,7 +74,7 @@ export default function Newsletter() {
 
       <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-16 lg:px-8 lg:py-20">
         <div>
-          <span className="colt-mic-a mb-5 inline-flex size-12 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_12px_26px_-12px_rgba(42,159,163,0.9)]">
+          <span className="colt-mic-a mb-5 inline-flex size-12 items-center justify-center bg-turcoaz-600 text-hartie shadow-[0_12px_26px_-12px_rgba(42,159,163,0.9)]">
             <svg
               viewBox="0 0 24 24"
               className="size-6"
@@ -116,7 +116,7 @@ export default function Newsletter() {
                   htmlFor={`${id}-email`}
                   className="mb-1.5 block font-titlu text-mic font-semibold"
                 >
-                  Email <span className="text-caramiziu-600">*</span>
+                  Email <span className="text-caramiziu-700">*</span>
                 </label>
                 <input
                   id={`${id}-email`}
@@ -158,7 +158,7 @@ export default function Newsletter() {
               <span>
                 Sunt de acord să primesc mesaje de la Asociația Teona Ariana. Mă
                 pot dezabona oricând.{" "}
-                <span className="text-caramiziu-600">*</span>
+                <span className="text-caramiziu-700">*</span>
               </span>
             </label>
 
@@ -180,7 +180,7 @@ export default function Newsletter() {
             <button
               type="submit"
               disabled={stare.fel === "trimite"}
-              className="inline-flex w-fit items-center justify-center rounded-full bg-caramiziu-500 px-8 py-3.5 font-titlu font-semibold text-hartie shadow-[0_12px_26px_-12px_rgba(247,79,34,0.9)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:bg-caramiziu-600 disabled:opacity-60 motion-reduce:hover:translate-y-0"
+              className="inline-flex w-fit items-center justify-center rounded-full bg-caramiziu-700 px-8 py-3.5 font-titlu font-semibold text-hartie shadow-[0_12px_26px_-12px_rgba(247,79,34,0.9)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:bg-caramiziu-600 disabled:opacity-60 motion-reduce:hover:translate-y-0"
             >
               {stare.fel === "trimite" ? "Se trimite…" : "Abonează-mă"}
             </button>

@@ -59,13 +59,13 @@ const UNDE: ReadonlyArray<{
     pictograma: "plic",
     titlu: "Pe email",
     clase:
-      "bg-caramiziu-500 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]",
+      "bg-caramiziu-700 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]",
     text: (
       <>
         Scanat sau fotografiat, la{" "}
         <a
           href={`mailto:${EMAIL.redirectionare}`}
-          className="font-titlu font-bold text-caramiziu-600 underline-offset-4 hover:underline"
+          className="font-titlu font-bold text-caramiziu-700 underline-offset-4 hover:underline"
         >
           {EMAIL.redirectionare}
         </a>
@@ -89,7 +89,7 @@ const UNDE: ReadonlyArray<{
     pictograma: "comunicare",
     titlu: "Primești confirmare",
     clase:
-      "bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
+      "bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
     text: "Îți confirmăm că am primit formularul și, ulterior, că a fost depus la ANAF.",
   },
 ];
@@ -198,7 +198,7 @@ export default async function Redirectioneaza35() {
               </p>
             </div>
 
-            <div className="granulatie relative flex flex-col items-start gap-2 overflow-hidden colt-b bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 p-8 text-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.9)]">
+            <div className="granulatie relative flex flex-col items-start gap-2 overflow-hidden colt-b bg-gradient-to-br from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 p-8 text-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.9)]">
               <span
                 aria-hidden="true"
                 className="absolute -right-12 -bottom-16 size-48 rounded-full border-2 border-hartie/20"
@@ -305,7 +305,7 @@ export default async function Redirectioneaza35() {
             pe care nimeni nu s-a angajat să o țină.
           */}
           <p className="mt-8 flex items-start gap-4 colt-mic-b bg-turcoaz-50 px-5 py-4 text-corp text-turcoaz-900">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-turcoaz-500 text-hartie">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-turcoaz-600 text-hartie">
               <Pictograma nume="maini" className="size-5" />
             </span>
             <span className="pt-1.5">
@@ -522,21 +522,21 @@ export default async function Redirectioneaza35() {
             Ai întrebări? Scrie-ne la{" "}
             <a
               href={`mailto:${EMAIL.contact}`}
-              className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
+              className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
             >
               {EMAIL.contact}
             </a>{" "}
             sau sună-ne la{" "}
             <a
               href={`tel:${TELEFON_PRINCIPAL.apel}`}
-              className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
+              className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
             >
               {TELEFON_PRINCIPAL.afisat}
             </a>
             . Pentru firme, vezi{" "}
             <Link
               href={RUTE.directionare20}
-              className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
+              className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
             >
               Direcționează 20%
             </Link>

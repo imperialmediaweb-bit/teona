@@ -204,7 +204,7 @@ export default function Formular230({
           >
             Completează Formularul 230 direct aici
           </h3>
-          <p className="relative mt-3 max-w-2xl text-corp text-miere-900/85">
+          <p className="relative mt-3 max-w-2xl text-corp text-miere-900">
             Formularul vine de la <strong>formular230.ro</strong>, un serviciu
             din afara site-ului nostru. Îl completezi și îl semnezi pe ecran,
             fără să printezi nimic. Ca să-l încărcăm, trebuie să accepți
@@ -213,7 +213,7 @@ export default function Formular230({
           <button
             type="button"
             onClick={acceptaFormularul}
-            className="relative mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-caramiziu-500 px-7 py-3 font-titlu text-corp font-semibold text-hartie shadow-[0_14px_30px_-12px_rgba(247,79,34,0.9)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:bg-caramiziu-600 motion-reduce:hover:translate-y-0"
+            className="relative mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-caramiziu-700 px-7 py-3 font-titlu text-corp font-semibold text-hartie shadow-[0_14px_30px_-12px_rgba(247,79,34,0.9)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:bg-caramiziu-600 motion-reduce:hover:translate-y-0"
           >
             Accept și încarcă formularul
             <Pictograma nume="sageata" className="size-4" />
@@ -259,7 +259,7 @@ export default function Formular230({
                   setStare("incarca");
                   setIncercare((n) => n + 1);
                 }}
-                className="mt-4 inline-flex min-h-11 items-center justify-center rounded-full border-2 border-cerneala/15 bg-hartie px-5 py-2 font-titlu text-mic font-semibold text-cerneala transition-all duration-200 ease-cald hover:border-caramiziu-500 hover:text-caramiziu-600"
+                className="mt-4 inline-flex min-h-11 items-center justify-center rounded-full border-2 border-cerneala/15 bg-hartie px-5 py-2 font-titlu text-mic font-semibold text-cerneala transition-all duration-200 ease-cald hover:border-caramiziu-500 hover:text-caramiziu-700"
               >
                 Încearcă din nou
               </button>
@@ -291,13 +291,13 @@ export default function Formular230({
         </h3>
         <ul className="mt-5 grid gap-4 sm:grid-cols-2">
           <li className="flex items-start gap-4">
-            <span className="colt-mic-b flex size-11 shrink-0 items-center justify-center bg-caramiziu-100 text-caramiziu-600">
+            <span className="colt-mic-b flex size-11 shrink-0 items-center justify-center bg-caramiziu-100 text-caramiziu-700">
               <Pictograma nume="document" className="size-5" />
             </span>
             <p className="text-mic text-cerneala-moale">
               <a
                 href={linkDescarcare}
-                className="inline-block min-h-10 font-titlu text-corp font-bold text-caramiziu-600 underline-offset-4 hover:underline"
+                className="inline-block min-h-10 font-titlu text-corp font-bold text-caramiziu-700 underline-offset-4 hover:underline"
               >
                 Descarcă formularul
               </a>
@@ -322,7 +322,7 @@ export default function Formular230({
                 href={ADRESE.casaTeona.harta}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block min-h-10 font-titlu text-corp font-bold text-caramiziu-600 underline-offset-4 hover:underline"
+                className="inline-block min-h-10 font-titlu text-corp font-bold text-caramiziu-700 underline-offset-4 hover:underline"
               >
                 Vino la Casa Teona
               </a>

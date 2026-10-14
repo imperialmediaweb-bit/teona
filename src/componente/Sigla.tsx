@@ -61,14 +61,14 @@ export default function Sigla({
         <span className="flex flex-col font-titlu whitespace-nowrap">
           <span
             className={`text-[0.27em] leading-[1.15] font-bold tracking-[0.03em] ${
-              peFundalInchis ? "text-caramiziu-300" : "text-caramiziu-500"
+              peFundalInchis ? "text-caramiziu-300" : "text-caramiziu-700"
             }`}
           >
             Asociația
           </span>
           <span
             className={`text-[0.4em] leading-[1.05] font-extrabold tracking-[-0.025em] ${
-              peFundalInchis ? "text-miere-300" : "text-miere-400"
+              peFundalInchis ? "text-miere-300" : "text-miere-700"
             }`}
           >
             Teona Ariana

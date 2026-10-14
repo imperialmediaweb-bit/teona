@@ -120,7 +120,7 @@ export default function FormularContact() {
           strokeWidth={0.8}
           className="absolute -top-8 -right-8 size-36 text-turcoaz-200"
         />
-        <span className="relative flex size-14 items-center justify-center colt-mic-a bg-turcoaz-500 text-hartie shadow-[0_12px_26px_-12px_rgba(42,159,163,0.9)]">
+        <span className="relative flex size-14 items-center justify-center colt-mic-a bg-turcoaz-600 text-hartie shadow-[0_12px_26px_-12px_rgba(42,159,163,0.9)]">
           <svg
             viewBox="0 0 24 24"
             className="size-7"
@@ -149,7 +149,7 @@ export default function FormularContact() {
     >
       {/* Capul formularului: un câmp de culoare, ca formularul să nu fie o
           cutie albă pe hârtie albă. */}
-      <div className="granulatie relative overflow-hidden bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 px-6 py-5 text-hartie sm:px-8">
+      <div className="granulatie relative overflow-hidden bg-gradient-to-br from-caramiziu-700 to-caramiziu-900 px-6 py-5 text-hartie sm:px-8">
         <Decor
           semn="unda"
           strokeWidth={0.9}

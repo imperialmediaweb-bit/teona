@@ -31,8 +31,8 @@ export default function IndemnFinal({
 }) {
   return (
     <>
-      <Val culoare="text-caramiziu-500" className={peste ? VAL_PESTE : ""} />
-      <section className="granulatie relative overflow-hidden bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-700 pb-20 lg:pb-24">
+      <Val culoare="text-caramiziu-700" className={peste ? VAL_PESTE : ""} />
+      <section className="granulatie relative overflow-hidden bg-gradient-to-br from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 pb-20 lg:pb-24">
         {/* Cercuri mari, abia vizibile, în loc de un fundal plat. */}
         <div
           aria-hidden="true"
@@ -53,7 +53,7 @@ export default function IndemnFinal({
               href={RUTE.doneaza}
               varianta="contur"
               marime="mare"
-              className="border-hartie bg-hartie text-caramiziu-600 hover:border-hartie hover:text-caramiziu-700"
+              className="border-hartie bg-hartie text-caramiziu-700 hover:border-hartie hover:text-caramiziu-700"
             >
               Donează
             </Buton>

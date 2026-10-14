@@ -12,7 +12,7 @@ export default function PaginaNegasita() {
   return (
     <section className="flex min-h-[60vh] items-center py-20">
       <div className="mx-auto max-w-2xl px-4 text-center sm:px-6 lg:px-8">
-        <p className="scris text-h2 text-miere-400">404</p>
+        <p className="scris text-h2 text-miere-700">404</p>
         <h1 className="mt-3 text-h1 text-cerneala">Pagina nu a fost găsită</h1>
         <p className="mt-5 text-amplu text-cerneala-moale">
           Se pare că ai ajuns într-un loc care nu există. Hai înapoi la început.

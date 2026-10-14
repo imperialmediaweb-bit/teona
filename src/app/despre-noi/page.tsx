@@ -178,10 +178,10 @@ const ECHIPA: ReadonlyArray<{
 
 /** Câmpurile de culoare ale cardurilor fără fotografie, pe rând. */
 const CAMPURI_ECHIPA = [
-  "bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 text-hartie",
+  "bg-gradient-to-br from-caramiziu-700 to-caramiziu-900 text-hartie",
   "bg-miere-300 text-miere-900",
   "bg-turcoaz-100 text-turcoaz-700",
-  "bg-caramiziu-100 text-caramiziu-600",
+  "bg-caramiziu-100 text-caramiziu-700",
 ] as const;
 
 /** 3.6 — fotografii cu voluntari. Descrieri scrise după ce m-am uitat la ele. */
@@ -328,7 +328,7 @@ export default function DespreNoi() {
             {/* Misiunea, pe culoarea de identitate: e cardul care contează. */}
             <li>
               <Aparitie className="h-full">
-                <article className="granulatie relative flex h-full flex-col overflow-hidden colt-a bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 p-7 text-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.8)] sm:p-8">
+                <article className="granulatie relative flex h-full flex-col overflow-hidden colt-a bg-gradient-to-br from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 p-7 text-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.8)] sm:p-8">
                   <span
                     aria-hidden="true"
                     className="absolute -right-16 -bottom-20 size-56 rounded-full border-2 border-hartie/20"
@@ -358,7 +358,7 @@ export default function DespreNoi() {
                     strokeWidth={0.7}
                     className="absolute -top-10 -right-12 size-52 text-turcoaz-100"
                   />
-                  <span className="colt-mic-a relative flex size-14 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
+                  <span className="colt-mic-a relative flex size-14 items-center justify-center bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
                     <Pictograma
                       nume={MISIUNE[1].pictograma}
                       className="size-7"
@@ -399,7 +399,7 @@ export default function DespreNoi() {
                           semn="stea"
                           className="mt-1 size-5 shrink-0 text-miere-800"
                         />
-                        <span className="text-corp text-miere-900/85">
+                        <span className="text-corp text-miere-900">
                           <span className="font-titlu font-bold text-miere-900">
                             {valoare.nume}:
                           </span>{" "}
@@ -667,7 +667,7 @@ export default function DespreNoi() {
             className="grid scroll-mt-32 overflow-hidden colt-a border border-hartie-umbra bg-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.5)] lg:grid-cols-[2fr_3fr]"
           >
             {/* Anul raportului, scris cât cardul: e lucrul de reținut. */}
-            <div className="granulatie relative flex min-h-[12rem] flex-col justify-between overflow-hidden bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 p-7 text-hartie">
+            <div className="granulatie relative flex min-h-[12rem] flex-col justify-between overflow-hidden bg-gradient-to-br from-caramiziu-700 to-caramiziu-900 p-7 text-hartie">
               <span
                 aria-hidden="true"
                 className="absolute -right-10 -bottom-14 size-44 rounded-full border-2 border-hartie/20"

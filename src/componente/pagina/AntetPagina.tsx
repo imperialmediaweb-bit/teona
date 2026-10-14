@@ -28,9 +28,9 @@ const ACCENTE = {
   caramiziu: {
     bloc: "bg-caramiziu-100",
     umbra: "shadow-[0_32px_64px_-30px_rgba(247,79,34,0.55)]",
-    scris: "text-caramiziu-600",
+    scris: "text-caramiziu-700",
     pastila:
-      "bg-caramiziu-500 text-hartie shadow-[0_12px_28px_-12px_rgba(247,79,34,0.9)]",
+      "bg-caramiziu-700 text-hartie shadow-[0_12px_28px_-12px_rgba(247,79,34,0.9)]",
     pata: "bg-caramiziu-100/60",
   },
   miere: {
@@ -46,7 +46,7 @@ const ACCENTE = {
     umbra: "shadow-[0_32px_64px_-30px_rgba(42,159,163,0.5)]",
     scris: "text-turcoaz-700",
     pastila:
-      "bg-turcoaz-500 text-hartie shadow-[0_12px_28px_-12px_rgba(42,159,163,0.9)]",
+      "bg-turcoaz-600 text-hartie shadow-[0_12px_28px_-12px_rgba(42,159,163,0.9)]",
     pata: "bg-turcoaz-100/70",
   },
 } as const;
@@ -92,7 +92,7 @@ export default function AntetPagina({
           <span className="pata pata-2 absolute bottom-[-8rem] left-[-8rem] size-[24rem] rounded-full bg-miere-100/60 blur-3xl" />
           <Decor
             semn="stea"
-            className="pluteste-lent absolute top-8 right-[5%] hidden size-10 text-miere-400 lg:block"
+            className="pluteste-lent absolute top-8 right-[5%] hidden size-10 text-miere-700 lg:block"
           />
           <Decor
             semn="unda"

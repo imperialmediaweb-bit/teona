@@ -107,7 +107,7 @@ export default function SponsoriSiParteneri() {
                         {/* Ghilimelele desenate, nu un semn de citat în text. */}
                         <span
                           aria-hidden="true"
-                          className="scris absolute top-1 left-7 text-[6rem] leading-none text-miere-500/70"
+                          className="scris absolute top-1 left-7 text-[6rem] leading-none text-miere-700/70"
                         >
                           „
                         </span>
@@ -211,7 +211,7 @@ export default function SponsoriSiParteneri() {
             USV, Colegiul Psihologilor, Consiliul Județean — sunt pe pagina{" "}
             <Link
               href={RUTE.despre}
-              className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
+              className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
             >
               Despre noi
             </Link>
@@ -256,10 +256,10 @@ export default function SponsoriSiParteneri() {
                   href={RUTE.directionare20}
                   className="group flex h-full flex-col colt-a border border-hartie-umbra bg-hartie p-6 shadow-[0_24px_50px_-26px_rgba(35,35,35,0.4)] transition-all duration-500 ease-cald hover:-translate-y-1.5 hover:shadow-[0_30px_56px_-26px_rgba(247,79,34,0.55)] motion-reduce:hover:translate-y-0 sm:p-7"
                 >
-                  <span className="colt-mic-b flex size-12 items-center justify-center bg-caramiziu-500 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]">
+                  <span className="colt-mic-b flex size-12 items-center justify-center bg-caramiziu-700 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]">
                     <Pictograma nume="document" className="size-6" />
                   </span>
-                  <h3 className="mt-5 text-h4 text-cerneala transition-colors duration-300 group-hover:text-caramiziu-600">
+                  <h3 className="mt-5 text-h4 text-cerneala transition-colors duration-300 group-hover:text-caramiziu-700">
                     Contract de sponsorizare
                   </h3>
                   <p className="mt-2 flex-1 text-mic text-cerneala-moale">
@@ -267,7 +267,7 @@ export default function SponsoriSiParteneri() {
                     asociație în loc să meargă la stat. Firma semnează un
                     contract, face plata și scade suma din impozit.
                   </p>
-                  <span className="mt-5 inline-flex items-center gap-2 font-titlu text-mic font-semibold text-caramiziu-600">
+                  <span className="mt-5 inline-flex items-center gap-2 font-titlu text-mic font-semibold text-caramiziu-700">
                     Calculator și pași
                     <Pictograma nume="sageata" className="size-4" />
                   </span>
@@ -307,7 +307,7 @@ export default function SponsoriSiParteneri() {
                   <span className="colt-mic-b flex size-12 items-center justify-center bg-miere-400 text-cerneala shadow-[0_10px_22px_-10px_rgba(255,172,0,0.9)]">
                     <Pictograma nume="card" className="size-6" />
                   </span>
-                  <h3 className="mt-5 text-h4 text-cerneala transition-colors duration-300 group-hover:text-miere-600">
+                  <h3 className="mt-5 text-h4 text-cerneala transition-colors duration-300 group-hover:text-miere-700">
                     Donație din partea firmei
                   </h3>
                   <p className="mt-2 flex-1 text-mic text-cerneala-moale">
@@ -315,7 +315,7 @@ export default function SponsoriSiParteneri() {
                     cu destinația aleasă: tabere, Casa Teona sau cazuri
                     umanitare.
                   </p>
-                  <span className="mt-5 inline-flex items-center gap-2 font-titlu text-mic font-semibold text-miere-600">
+                  <span className="mt-5 inline-flex items-center gap-2 font-titlu text-mic font-semibold text-miere-700">
                     Conturile și destinațiile
                     <Pictograma nume="sageata" className="size-4" />
                   </span>
@@ -329,7 +329,7 @@ export default function SponsoriSiParteneri() {
             orice întrebare, scrie-ne la{" "}
             <a
               href={`mailto:${EMAIL.contact}`}
-              className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
+              className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
             >
               {EMAIL.contact}
             </a>
@@ -340,8 +340,8 @@ export default function SponsoriSiParteneri() {
 
       {/* 6.4 — „Vrei să te alături lor?”, cu butonul Donează. Pe aceeași
           fâșie de identitate cu care se închid celelalte pagini. */}
-      <Val culoare="text-caramiziu-500" className={VAL_PESTE} />
-      <section className="granulatie relative overflow-hidden bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-700 pb-20 lg:pb-24">
+      <Val culoare="text-caramiziu-700" className={VAL_PESTE} />
+      <section className="granulatie relative overflow-hidden bg-gradient-to-br from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 pb-20 lg:pb-24">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
@@ -357,7 +357,7 @@ export default function SponsoriSiParteneri() {
               href={RUTE.doneaza}
               varianta="contur"
               marime="mare"
-              className="border-hartie bg-hartie text-caramiziu-600 hover:border-hartie hover:text-caramiziu-700"
+              className="border-hartie bg-hartie text-caramiziu-700 hover:border-hartie hover:text-caramiziu-700"
             >
               Donează
             </Buton>

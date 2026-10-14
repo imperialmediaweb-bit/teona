@@ -62,7 +62,7 @@ export default function Intrebari({
                 {String(i + 1).padStart(2, "0")}
               </span>
               <span className="flex-1">{item.intrebare}</span>
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-caramiziu-100 text-caramiziu-600 transition-transform duration-300 ease-cald group-open:rotate-90">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-caramiziu-100 text-caramiziu-700 transition-transform duration-300 ease-cald group-open:rotate-90">
                 <Pictograma nume="sageata" className="size-4" />
               </span>
             </summary>
@@ -110,7 +110,7 @@ export default function Intrebari({
                   />
                 </div>
                 {poza.legenda && (
-                  <figcaption className="colt-mic-b absolute -bottom-3.5 left-5 bg-caramiziu-500 px-4 py-1.5 shadow-[0_10px_24px_-10px_rgba(247,79,34,0.9)]">
+                  <figcaption className="colt-mic-b absolute -bottom-3.5 left-5 bg-caramiziu-700 px-4 py-1.5 shadow-[0_10px_24px_-10px_rgba(247,79,34,0.9)]">
                     <span className="scris text-corp leading-none text-hartie">
                       {poza.legenda}
                     </span>

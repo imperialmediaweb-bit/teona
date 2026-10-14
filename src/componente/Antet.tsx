@@ -278,7 +278,7 @@ export default function Antet() {
           href={`tel:${TELEFON_PRINCIPAL.apel}`}
           className="group/tel ml-auto hidden items-center gap-3 rounded-full py-1.5 pr-5 pl-1.5 transition-colors duration-200 hover:bg-tenta-cald xl:flex"
         >
-          <span className="grid size-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 text-hartie shadow-[0_10px_20px_-10px_rgba(247,79,34,0.95)]">
+          <span className="grid size-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-caramiziu-700 to-caramiziu-900 text-hartie shadow-[0_10px_20px_-10px_rgba(247,79,34,0.95)]">
             <Pictograma nume="telefon" className="size-5" />
           </span>
           <span className="flex flex-col leading-none">
@@ -309,7 +309,7 @@ export default function Antet() {
           <Link
             href={RUTE.doneaza}
             aria-label="Donează"
-            className={`group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 p-2.5 font-titlu font-bold text-hartie shadow-[0_2px_0_0_var(--color-caramiziu-700),0_12px_28px_-12px_rgba(247,79,34,0.9)] transition-all duration-200 ease-cald hover:translate-y-px hover:shadow-[0_1px_0_0_var(--color-caramiziu-700),0_10px_30px_-8px_rgba(247,79,34,1)] motion-reduce:hover:translate-y-0 min-[360px]:px-3.5 min-[360px]:py-2.5 min-[412px]:px-4 ${
+            className={`group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 p-2.5 font-titlu font-bold text-hartie shadow-[0_2px_0_0_var(--color-caramiziu-700),0_12px_28px_-12px_rgba(247,79,34,0.9)] transition-all duration-200 ease-cald hover:translate-y-px hover:shadow-[0_1px_0_0_var(--color-caramiziu-700),0_10px_30px_-8px_rgba(247,79,34,1)] motion-reduce:hover:translate-y-0 min-[360px]:px-3.5 min-[360px]:py-2.5 min-[412px]:px-4 ${
               compact ? "text-mic xl:py-2.5" : "xl:px-6 xl:py-3 xl:text-amplu"
             }`}
           >
@@ -471,7 +471,7 @@ export default function Antet() {
                             aria-hidden="true"
                             className={`size-2 shrink-0 rounded-full ${
                               activ(sub.href)
-                                ? "bg-caramiziu-500"
+                                ? "bg-caramiziu-700"
                                 : j % 2 === 0
                                   ? "bg-miere-400"
                                   : "bg-turcoaz-400"
@@ -528,9 +528,9 @@ export default function Antet() {
             >
               {MENIU.map((element, i) => {
                 const culoare = [
-                  "bg-caramiziu-500",
+                  "bg-caramiziu-700",
                   "bg-miere-400",
-                  "bg-turcoaz-500",
+                  "bg-turcoaz-600",
                 ][i % 3];
                 const miscare = {
                   transitionDelay: meniuDeschis ? `${i * 35}ms` : "0ms",
@@ -598,7 +598,7 @@ export default function Antet() {
             <div className="mx-auto mt-4 flex max-w-7xl flex-col gap-3 border-t border-hartie-umbra pt-4 sm:flex-row sm:items-center sm:justify-between">
               <Link
                 href={RUTE.doneaza}
-                className="group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 px-6 py-3 font-titlu text-amplu font-bold text-hartie shadow-[0_2px_0_0_var(--color-caramiziu-700),0_12px_28px_-12px_rgba(247,79,34,0.9)] transition-all duration-200 ease-cald hover:translate-y-px motion-reduce:hover:translate-y-0 sm:order-2"
+                className="group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 px-6 py-3 font-titlu text-amplu font-bold text-hartie shadow-[0_2px_0_0_var(--color-caramiziu-700),0_12px_28px_-12px_rgba(247,79,34,0.9)] transition-all duration-200 ease-cald hover:translate-y-px motion-reduce:hover:translate-y-0 sm:order-2"
               >
                 <Inima className="bate-la-hover size-5" />
                 Donează
@@ -611,7 +611,7 @@ export default function Antet() {
                   <a
                     key={telefon.apel}
                     href={`tel:${telefon.apel}`}
-                    className="inline-flex min-h-10 items-center font-titlu font-bold text-cerneala transition-colors hover:text-caramiziu-600"
+                    className="inline-flex min-h-10 items-center font-titlu font-bold text-cerneala transition-colors hover:text-caramiziu-700"
                   >
                     {telefon.afisat}
                   </a>

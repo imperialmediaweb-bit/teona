@@ -124,7 +124,7 @@ export default function FormularAniversare() {
         role="status"
         className="granulatie colt-a border border-turcoaz-100 bg-turcoaz-50 p-7 shadow-[0_24px_50px_-26px_rgba(42,159,163,0.7)] sm:p-9"
       >
-        <span className="colt-mic-a flex size-12 items-center justify-center bg-turcoaz-500 text-hartie">
+        <span className="colt-mic-a flex size-12 items-center justify-center bg-turcoaz-600 text-hartie">
           <Pictograma nume="inima" className="size-6" />
         </span>
         <h3 className="mt-5 text-h3 text-cerneala">Am primit campania ta</h3>
@@ -177,7 +177,7 @@ export default function FormularAniversare() {
 
       <fieldset className="border-0 p-0">
         <legend className="mb-3 font-titlu text-mic font-bold text-cerneala">
-          Ce sărbătorești? <span className="text-caramiziu-600">*</span>
+          Ce sărbătorești? <span className="text-caramiziu-700">*</span>
         </legend>
         <div className="grid gap-2 sm:grid-cols-2">
           {OCAZII.map((ocazie, i) => (

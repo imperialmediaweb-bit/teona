@@ -72,7 +72,7 @@ export default function BannerCookieuri() {
           înțelege cum este folosit. Poți alege ce accepți.{" "}
           <Link
             href={RUTE.cookieuri}
-            className="font-semibold text-caramiziu-600 underline underline-offset-2"
+            className="font-semibold text-caramiziu-700 underline underline-offset-2"
           >
             Politica de cookie-uri
           </Link>
@@ -134,7 +134,7 @@ export default function BannerCookieuri() {
           <button
             type="button"
             onClick={() => salveaza({ statistici: true, marketing: true })}
-            className="rounded-full bg-caramiziu-500 px-6 py-2.5 font-titlu text-mic font-semibold text-hartie transition hover:bg-caramiziu-600"
+            className="rounded-full bg-caramiziu-700 px-6 py-2.5 font-titlu text-mic font-semibold text-hartie transition hover:bg-caramiziu-600"
           >
             Acceptă toate
           </button>
@@ -149,7 +149,7 @@ export default function BannerCookieuri() {
             <button
               type="button"
               onClick={() => salveaza({ statistici, marketing })}
-              className="rounded-full px-5 py-2.5 font-titlu text-mic font-semibold text-caramiziu-600 underline-offset-4 transition hover:underline"
+              className="rounded-full px-5 py-2.5 font-titlu text-mic font-semibold text-caramiziu-700 underline-offset-4 transition hover:underline"
             >
               Salvează alegerea
             </button>
@@ -157,7 +157,7 @@ export default function BannerCookieuri() {
             <button
               type="button"
               onClick={() => setAratSetari(true)}
-              className="rounded-full px-5 py-2.5 font-titlu text-mic font-semibold text-caramiziu-600 underline-offset-4 transition hover:underline"
+              className="rounded-full px-5 py-2.5 font-titlu text-mic font-semibold text-caramiziu-700 underline-offset-4 transition hover:underline"
             >
               Setări
             </button>

@@ -75,7 +75,7 @@ export default function Campanii() {
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <p className="scris text-amplu text-caramiziu-600">
+        <p className="scris text-amplu text-caramiziu-700">
           Schimbăm vieți, construim speranță.
         </p>
         <h2 className="mt-2 max-w-2xl text-h2 text-cerneala">
@@ -115,7 +115,7 @@ export default function Campanii() {
                             className="object-cover transition-transform duration-[1100ms] ease-cald group-hover:scale-[1.06] motion-reduce:group-hover:scale-100"
                           />
                           {/* Legenda stă sus, nu jos: jos vine cardul de text. */}
-                          <span className="absolute top-4 left-4 rounded-full bg-caramiziu-500 px-4 py-1.5 shadow-[0_10px_24px_-10px_rgba(247,79,34,0.9)]">
+                          <span className="absolute top-4 left-4 rounded-full bg-caramiziu-700 px-4 py-1.5 shadow-[0_10px_24px_-10px_rgba(247,79,34,0.9)]">
                             <span className="scris text-corp leading-none text-hartie">
                               {campanie.poza.legenda}
                             </span>
@@ -134,7 +134,7 @@ export default function Campanii() {
                           />
                           <Decor
                             semn="soare"
-                            className="absolute top-16 right-10 size-12 text-miere-400"
+                            className="absolute top-16 right-10 size-12 text-miere-700"
                           />
                           <div className="relative flex size-full items-center justify-center px-8">
                             <p className="scris text-center text-h3 leading-tight text-caramiziu-700">

@@ -44,7 +44,7 @@ export default function Retele({
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`${retea.nume}, ${context} (se deschide într-o filă nouă)`}
-            className="flex size-10 items-center justify-center rounded-full border border-current/15 text-current transition hover:border-caramiziu-500 hover:bg-caramiziu-500 hover:text-hartie"
+            className="flex size-10 items-center justify-center rounded-full border border-current/15 text-current transition hover:border-caramiziu-500 hover:bg-caramiziu-700 hover:text-hartie"
           >
             <PictogramaRetea nume={retea.nume} className="size-5" />
           </a>

@@ -122,7 +122,7 @@ async function Continut({
             key={c.id}
             className="colt-a border border-hartie-umbra bg-hartie p-6 shadow-[0_20px_44px_-26px_rgba(35,35,35,0.3)]"
           >
-            <p className="scris text-amplu text-caramiziu-600">
+            <p className="scris text-amplu text-caramiziu-700">
               {etichetaOcaziei(c.ocazie)}
             </p>
             <h2 className="mt-1 text-h3 text-cerneala">{c.titlu}</h2>

@@ -51,7 +51,7 @@ export default function Testimoniale({
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         {/* Rândul scris de mână și fraza de sub titlu sunt textele de la
             testimonialele de pe site-ul vechi; titlul e cel din caiet. */}
-        <p className="scris text-center text-amplu text-caramiziu-600">
+        <p className="scris text-center text-amplu text-caramiziu-700">
           Oameni frumoși, cuvinte de suflet
         </p>
         <h2 className="mt-2 text-center text-h2 text-cerneala">
@@ -86,7 +86,7 @@ export default function Testimoniale({
                 „{curent.citat}”
               </blockquote>
               <figcaption className="mt-6">
-                <span className="font-titlu font-semibold text-caramiziu-600">
+                <span className="font-titlu font-semibold text-caramiziu-700">
                   {curent.semnatura}
                 </span>
                 {curent.sursa && (
@@ -104,7 +104,7 @@ export default function Testimoniale({
             <button
               type="button"
               onClick={() => muta(-1)}
-              className="flex items-center gap-2 rounded-full border-2 border-cerneala/15 px-5 py-2.5 font-titlu text-mic font-semibold text-cerneala transition hover:border-caramiziu-500 hover:text-caramiziu-600"
+              className="flex items-center gap-2 rounded-full border-2 border-cerneala/15 px-5 py-2.5 font-titlu text-mic font-semibold text-cerneala transition hover:border-caramiziu-500 hover:text-caramiziu-700"
             >
               <svg
                 viewBox="0 0 20 20"
@@ -126,7 +126,7 @@ export default function Testimoniale({
             <button
               type="button"
               onClick={() => muta(1)}
-              className="flex items-center gap-2 rounded-full border-2 border-cerneala/15 px-5 py-2.5 font-titlu text-mic font-semibold text-cerneala transition hover:border-caramiziu-500 hover:text-caramiziu-600"
+              className="flex items-center gap-2 rounded-full border-2 border-cerneala/15 px-5 py-2.5 font-titlu text-mic font-semibold text-cerneala transition hover:border-caramiziu-500 hover:text-caramiziu-700"
             >
               Următorul
               <svg

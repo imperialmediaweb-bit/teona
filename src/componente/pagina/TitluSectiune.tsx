@@ -13,7 +13,7 @@ import type { ReactNode } from "react";
  */
 
 const CULORI = {
-  caramiziu: "text-caramiziu-600",
+  caramiziu: "text-caramiziu-700",
   miere: "text-miere-700",
   turcoaz: "text-turcoaz-700",
 } as const;

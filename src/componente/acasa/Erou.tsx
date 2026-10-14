@@ -106,7 +106,7 @@ export default function Erou() {
         <span className="pata pata-2 absolute bottom-[-10rem] left-[-8rem] size-[26rem] rounded-full bg-caramiziu-100/60 blur-3xl" />
         <Decor
           semn="stea"
-          className="pluteste-lent absolute top-5 right-[4%] hidden size-10 text-miere-400 lg:block"
+          className="pluteste-lent absolute top-5 right-[4%] hidden size-10 text-miere-700 lg:block"
         />
         <Decor
           semn="soare"
@@ -118,7 +118,7 @@ export default function Erou() {
         {/* Textul e primul în pagină (titlul rămâne primul lucru citit),
             dar pe telefon se vede sub poză: clientul a cerut poza sus. */}
         <div className="order-2 lg:order-1">
-          <p className="scris text-amplu text-caramiziu-600">
+          <p className="scris text-amplu text-caramiziu-700">
             „{ASOCIATIA.motto}”
           </p>
 
@@ -127,13 +127,13 @@ export default function Erou() {
           <h1 className="mt-3 text-h1 text-cerneala lg:text-[3.25rem] xl:text-[4rem]">
             Împreună,
             <br />
-            <span className="relative inline-block text-caramiziu-500">
+            <span className="relative inline-block text-caramiziu-700">
               aducem bucurie
               <svg
                 viewBox="0 0 300 16"
                 preserveAspectRatio="none"
                 aria-hidden="true"
-                className="absolute -bottom-1 left-0 h-3 w-full text-miere-400 sm:-bottom-2 sm:h-4"
+                className="absolute -bottom-1 left-0 h-3 w-full text-miere-700 sm:-bottom-2 sm:h-4"
               >
                 <path
                   d="M3 11C70 4 150 3 215 6c30 1.5 55 4 82 5"
@@ -176,7 +176,7 @@ export default function Erou() {
             >
               <svg
                 viewBox="0 0 24 24"
-                className="size-6 shrink-0 text-caramiziu-500"
+                className="size-6 shrink-0 text-caramiziu-700"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={1.6}
@@ -231,7 +231,7 @@ export default function Erou() {
 
             <p
               aria-live="polite"
-              className="colt-mic-b absolute -bottom-4 left-5 z-30 bg-caramiziu-500 px-5 py-2 shadow-[0_12px_28px_-12px_rgba(247,79,34,0.9)]"
+              className="colt-mic-b absolute -bottom-4 left-5 z-30 bg-caramiziu-700 px-5 py-2 shadow-[0_12px_28px_-12px_rgba(247,79,34,0.9)]"
             >
               <span className="scris text-amplu leading-none text-hartie">
                 {fotografie.legenda}
@@ -263,7 +263,7 @@ export default function Erou() {
                   {i === activ && (
                     <span
                       key={`${activ}-${oprit}`}
-                      className={`block h-full rounded-full bg-caramiziu-500 ${
+                      className={`block h-full rounded-full bg-caramiziu-700 ${
                         fara_miscare || oprit ? "w-full" : "umple"
                       }`}
                       style={{ animationDuration: `${INTERVAL}ms` }}

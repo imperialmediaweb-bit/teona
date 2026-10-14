@@ -38,7 +38,7 @@ const POZE = {
 
 /** Butonul alb, pentru fundalurile colorate: acolo portocaliul ar dispărea. */
 const BUTON_ALB =
-  "border-hartie bg-hartie text-caramiziu-600 hover:border-hartie hover:text-caramiziu-700";
+  "border-hartie bg-hartie text-caramiziu-700 hover:border-hartie hover:text-caramiziu-700";
 
 /** Cardurile mici se ridică puțin la trecerea cu mouse-ul; forma nu se schimbă. */
 const RIDICARE =
@@ -73,7 +73,7 @@ export default function Sustinere() {
           {/* Cardul 1 · Donează — mare, portocaliu, cu fotografie. */}
           <li className="sm:col-span-2 lg:col-span-1 lg:row-span-2">
             <Aparitie className="h-full">
-              <article className="granulatie relative flex h-full flex-col overflow-hidden colt-a bg-gradient-to-b from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 text-hartie shadow-[0_36px_70px_-28px_rgba(247,79,34,0.85)]">
+              <article className="granulatie relative flex h-full flex-col overflow-hidden colt-a bg-gradient-to-b from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 text-hartie shadow-[0_36px_70px_-28px_rgba(247,79,34,0.85)]">
                 <div className="relative aspect-[4/3] w-full sm:aspect-[16/9] lg:aspect-auto lg:min-h-[19rem] lg:flex-1">
                   <Image
                     src={POZE.doneaza.cale}
@@ -140,14 +140,14 @@ export default function Sustinere() {
                   className="relative mt-5 font-titlu text-[3rem] leading-none font-extrabold tracking-tight text-hartie"
                 >
                   {SMS.text}
-                  <span className="mt-1 block text-[1.35rem] text-miere-900/80">
+                  <span className="mt-1 block text-[1.35rem] text-miere-900">
                     la {SMS.numar}
                   </span>
                 </p>
                 <h3 className="relative mt-4 text-h4 text-miere-900">
                   Donează lunar prin SMS
                 </h3>
-                <p className="relative mt-2 flex-1 text-mic text-miere-900/85">
+                <p className="relative mt-2 flex-1 text-mic text-miere-900">
                   Trimite {SMS.text} la {SMS.numar} și donezi {SMS.sumaLunara}{" "}
                   pe lună, fără formulare.
                 </p>
@@ -175,7 +175,7 @@ export default function Sustinere() {
                   strokeWidth={0.8}
                   className="absolute -right-12 -bottom-12 size-48 text-turcoaz-200"
                 />
-                <span className="colt-mic-b relative flex size-12 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
+                <span className="colt-mic-b relative flex size-12 items-center justify-center bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
                   <Pictograma nume="document" className="size-6" />
                 </span>
                 <p
@@ -255,7 +255,7 @@ export default function Sustinere() {
                     sizes="(min-width: 1024px) 400px, (min-width: 640px) 46vw, 92vw"
                     className="object-cover"
                   />
-                  <span className="colt-mic-b absolute top-4 left-4 flex size-12 items-center justify-center bg-caramiziu-500 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]">
+                  <span className="colt-mic-b absolute top-4 left-4 flex size-12 items-center justify-center bg-caramiziu-700 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]">
                     <Pictograma nume="familie" className="size-6" />
                   </span>
                 </div>

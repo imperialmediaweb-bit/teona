@@ -110,7 +110,7 @@ export default async function PaginaProiect({
           <span className="pata absolute -top-32 right-[-8%] size-[26rem] rounded-full bg-miere-100/70 blur-3xl" />
           <Decor
             semn="stea"
-            className="pluteste-lent absolute top-10 right-[6%] hidden size-10 text-miere-400 lg:block"
+            className="pluteste-lent absolute top-10 right-[6%] hidden size-10 text-miere-700 lg:block"
           />
           <Decor
             semn="unda"
@@ -121,14 +121,14 @@ export default async function PaginaProiect({
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <Link
             href={RUTE.proiecte}
-            className="inline-flex min-h-10 items-center gap-2 font-titlu text-mic font-semibold text-caramiziu-600 transition hover:text-caramiziu-700"
+            className="inline-flex min-h-10 items-center gap-2 font-titlu text-mic font-semibold text-caramiziu-700 transition hover:text-caramiziu-700"
           >
             <Pictograma nume="sageata" className="size-4 rotate-180" />
             Toate proiectele
           </Link>
 
           <div className="mt-6 flex flex-wrap items-center gap-2.5">
-            <span className="colt-mic-a bg-caramiziu-500 px-4 py-1.5 text-hartie shadow-[0_10px_24px_-10px_rgba(247,79,34,0.9)]">
+            <span className="colt-mic-a bg-caramiziu-700 px-4 py-1.5 text-hartie shadow-[0_10px_24px_-10px_rgba(247,79,34,0.9)]">
               <span className="scris text-corp leading-none">
                 <time dateTime={proiect.data}>{proiect.dataCitita}</time>
               </span>

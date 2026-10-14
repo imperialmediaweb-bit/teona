@@ -24,9 +24,9 @@ const UMBRE = [
 ] as const;
 
 const PASTILE = [
-  "bg-caramiziu-500 text-hartie",
+  "bg-caramiziu-700 text-hartie",
   "bg-miere-400 text-cerneala",
-  "bg-turcoaz-500 text-hartie",
+  "bg-turcoaz-600 text-hartie",
 ] as const;
 
 type Forma = { celula: string; raport: string; dimensiuni: string };

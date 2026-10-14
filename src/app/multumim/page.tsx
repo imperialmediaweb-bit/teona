@@ -43,11 +43,11 @@ export default function Multumim() {
       </div>
 
       <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-        <span className="mx-auto flex size-20 items-center justify-center colt-a bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 text-hartie shadow-[0_20px_44px_-18px_rgba(247,79,34,0.9)]">
+        <span className="mx-auto flex size-20 items-center justify-center colt-a bg-gradient-to-br from-caramiziu-700 to-caramiziu-900 text-hartie shadow-[0_20px_44px_-18px_rgba(247,79,34,0.9)]">
           <Pictograma nume="inima" className="size-10" />
         </span>
 
-        <p className="scris mt-7 text-amplu text-caramiziu-600">
+        <p className="scris mt-7 text-amplu text-caramiziu-700">
           {ASOCIATIA.motto}
         </p>
         <h1 className="mt-2 text-h1 text-cerneala">
@@ -65,7 +65,7 @@ export default function Multumim() {
             <li className="flex gap-3">
               <span
                 aria-hidden="true"
-                className="mt-2 size-2 shrink-0 rounded-full bg-caramiziu-500"
+                className="mt-2 size-2 shrink-0 rounded-full bg-caramiziu-700"
               />
               <span>
                 Confirmarea plății îți vine pe e-mail, de la procesator. Ea e
@@ -92,7 +92,7 @@ export default function Multumim() {
             <li className="flex gap-3">
               <span
                 aria-hidden="true"
-                className="mt-2 size-2 shrink-0 rounded-full bg-turcoaz-500"
+                className="mt-2 size-2 shrink-0 rounded-full bg-turcoaz-600"
               />
               <span>
                 Ai nevoie de o confirmare scrisă din partea asociației? Sună la{" "}

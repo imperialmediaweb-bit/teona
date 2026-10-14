@@ -152,7 +152,7 @@ export default function DoneazaTiZiua() {
                 strokeWidth={0.8}
                 className="absolute -top-8 -right-8 size-36 text-turcoaz-100"
               />
-              <span className="colt-mic-a relative flex size-12 items-center justify-center bg-turcoaz-500 text-hartie">
+              <span className="colt-mic-a relative flex size-12 items-center justify-center bg-turcoaz-600 text-hartie">
                 <Pictograma nume="inima" className="size-6" />
               </span>
               <h3 className="relative mt-5 text-h3 text-cerneala">

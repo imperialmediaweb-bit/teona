@@ -32,7 +32,7 @@ export const metadata: Metadata = metadate({
 
 /** Butonul alb, pentru fundalurile colorate: acolo portocaliul ar dispărea. */
 const BUTON_ALB =
-  "border-hartie bg-hartie text-caramiziu-600 hover:border-hartie hover:text-caramiziu-700";
+  "border-hartie bg-hartie text-caramiziu-700 hover:border-hartie hover:text-caramiziu-700";
 
 /** Scurtăturile din antet spre celelalte modalități (2.3 cere ancore). */
 const SCURTATURI: ReadonlyArray<{
@@ -64,7 +64,7 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
         ajutor, scrie-ne la{" "}
         <a
           href={`mailto:${EMAIL.contact}`}
-          className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
+          className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
         >
           {EMAIL.contact}
         </a>{" "}
@@ -93,7 +93,7 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
         Detalii găsești la pagina{" "}
         <Link
           href={RUTE.redirectionare35}
-          className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
+          className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
         >
           Redirecționează 3,5%
         </Link>
@@ -128,7 +128,7 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
           profit, la pagina{" "}
           <Link
             href={RUTE.directionare20}
-            className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
+            className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
           >
             Direcționează 20%
           </Link>
@@ -207,7 +207,7 @@ export default function Doneaza() {
 
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:px-8">
           <div className="lg:pt-4">
-            <p className="scris text-amplu text-caramiziu-600">
+            <p className="scris text-amplu text-caramiziu-700">
               „{ASOCIATIA.motto}”
             </p>
             <h1 className="mt-3 text-h1 text-cerneala">Donează</h1>
@@ -223,9 +223,9 @@ export default function Doneaza() {
                     href={link.href}
                     className={`flex min-h-14 items-center gap-3 ${
                       i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"
-                    } border border-hartie-umbra bg-hartie px-4 py-3 font-titlu text-mic font-bold text-cerneala shadow-[0_14px_30px_-20px_rgba(35,35,35,0.45)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:text-caramiziu-600 motion-reduce:hover:translate-y-0`}
+                    } border border-hartie-umbra bg-hartie px-4 py-3 font-titlu text-mic font-bold text-cerneala shadow-[0_14px_30px_-20px_rgba(35,35,35,0.45)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:text-caramiziu-700 motion-reduce:hover:translate-y-0`}
                   >
-                    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-caramiziu-100 text-caramiziu-600">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-caramiziu-100 text-caramiziu-700">
                       <Pictograma nume={link.pictograma} className="size-5" />
                     </span>
                     {link.eticheta}
@@ -249,7 +249,7 @@ export default function Doneaza() {
                   className="object-cover"
                 />
               </div>
-              <figcaption className="colt-mic-b absolute -bottom-3.5 left-5 bg-caramiziu-500 px-4 py-1.5 shadow-[0_10px_24px_-10px_rgba(247,79,34,0.9)]">
+              <figcaption className="colt-mic-b absolute -bottom-3.5 left-5 bg-caramiziu-700 px-4 py-1.5 shadow-[0_10px_24px_-10px_rgba(247,79,34,0.9)]">
                 <span className="scris text-corp leading-none text-hartie">
                   La Casa Teona
                 </span>
@@ -315,7 +315,7 @@ export default function Doneaza() {
                   className="relative mt-5 font-titlu text-[3.2rem] leading-none font-extrabold tracking-tight text-hartie sm:text-[3.8rem]"
                 >
                   {SMS.text}
-                  <span className="mt-1 block text-[1.5rem] text-miere-900/80">
+                  <span className="mt-1 block text-[1.5rem] text-miere-900">
                     la {SMS.numar}
                   </span>
                 </p>
@@ -331,7 +331,7 @@ export default function Doneaza() {
                   și donezi {SMS.sumaLunara} lunar
                 </p>
 
-                <div className="relative mt-5 grid gap-3 text-mic text-miere-900/85">
+                <div className="relative mt-5 grid gap-3 text-mic text-miere-900">
                   <p>
                     Numărul este valabil în rețelele Digi Mobil, Orange, Telekom
                     România Mobile și Vodafone. Taxarea se face în doi pași.
@@ -374,7 +374,7 @@ export default function Doneaza() {
                   strokeWidth={0.8}
                   className="absolute -right-12 -bottom-12 size-48 text-turcoaz-200"
                 />
-                <span className="colt-mic-a relative flex size-14 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
+                <span className="colt-mic-a relative flex size-14 items-center justify-center bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
                   <Pictograma nume="cladire" className="size-7" />
                 </span>
                 <h3 className="relative mt-5 text-h3 text-turcoaz-900">
@@ -525,7 +525,7 @@ export default function Doneaza() {
 
             {/* 3,5% — pe culoarea de identitate, cu procentul scris mare. */}
             <Aparitie intarziere={0.14} className="h-full">
-              <section className="granulatie relative flex h-full flex-col overflow-hidden colt-a bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 p-7 text-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.85)] sm:p-9">
+              <section className="granulatie relative flex h-full flex-col overflow-hidden colt-a bg-gradient-to-br from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 p-7 text-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.85)] sm:p-9">
                 <span
                   aria-hidden="true"
                   className="absolute -right-16 -bottom-20 size-56 rounded-full border-2 border-hartie/20"
@@ -594,7 +594,7 @@ export default function Doneaza() {
                       sizes="(min-width: 1024px) 400px, 92vw"
                       className="object-cover"
                     />
-                    <span className="colt-mic-b absolute top-4 left-4 flex size-12 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
+                    <span className="colt-mic-b absolute top-4 left-4 flex size-12 items-center justify-center bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
                       <Pictograma nume="cladire" className="size-6" />
                     </span>
                   </div>

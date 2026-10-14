@@ -18,18 +18,18 @@ const formateaza = new Intl.NumberFormat("ro-RO").format;
 */
 const CULORI = [
   {
-    cifra: "text-caramiziu-500",
+    cifra: "text-caramiziu-700",
     linie: "text-caramiziu-300",
     pata: "bg-caramiziu-100",
   },
-  { cifra: "text-miere-600", linie: "text-miere-300", pata: "bg-miere-100" },
+  { cifra: "text-miere-700", linie: "text-miere-300", pata: "bg-miere-100" },
   {
     cifra: "text-turcoaz-500",
     linie: "text-turcoaz-300",
     pata: "bg-turcoaz-100",
   },
   {
-    cifra: "text-caramiziu-600",
+    cifra: "text-caramiziu-700",
     linie: "text-caramiziu-300",
     pata: "bg-caramiziu-100",
   },

@@ -136,7 +136,7 @@ export default function CalculatorSponsorizare() {
       {/* Rezultatul, pe câmp de culoare: e lucrul pentru care a venit firma. */}
       <div
         aria-live="polite"
-        className="granulatie relative flex flex-col overflow-hidden colt-b bg-gradient-to-b from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 p-6 text-hartie shadow-[0_36px_70px_-28px_rgba(247,79,34,0.85)] sm:p-8"
+        className="granulatie relative flex flex-col overflow-hidden colt-b bg-gradient-to-b from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 p-6 text-hartie shadow-[0_36px_70px_-28px_rgba(247,79,34,0.85)] sm:p-8"
       >
         <span
           aria-hidden="true"
@@ -200,7 +200,7 @@ export default function CalculatorSponsorizare() {
           <Buton
             href={`mailto:${EMAIL.contact}?subject=${encodeURIComponent("Contract de sponsorizare")}`}
             varianta="contur"
-            className="border-hartie bg-hartie text-caramiziu-600 hover:border-hartie hover:text-caramiziu-700"
+            className="border-hartie bg-hartie text-caramiziu-700 hover:border-hartie hover:text-caramiziu-700"
           >
             Vreau contract de sponsorizare
             <Pictograma nume="sageata" className="size-4" />

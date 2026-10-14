@@ -112,9 +112,9 @@ const APARITII: ReadonlyArray<{
 
 /** Culoarea pastilei cu data, pe rând. */
 const PASTILE = [
-  "bg-caramiziu-500 text-hartie",
+  "bg-caramiziu-700 text-hartie",
   "bg-miere-400 text-cerneala",
-  "bg-turcoaz-500 text-hartie",
+  "bg-turcoaz-600 text-hartie",
 ] as const;
 
 const LINII = [
@@ -282,14 +282,14 @@ export default function SuntemInPresa() {
               dispoziție fotografii din tabere. Scrie la{" "}
               <a
                 href={`mailto:${EMAIL.contact}`}
-                className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
+                className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
               >
                 {EMAIL.contact}
               </a>{" "}
               sau sună la{" "}
               <a
                 href={`tel:${TELEFOANE[0].apel}`}
-                className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
+                className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
               >
                 {TELEFOANE[0].afisat}
               </a>

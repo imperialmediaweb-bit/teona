@@ -27,11 +27,11 @@ export const claseControlGresit =
 
 /** Butonul principal al unui formular. */
 export const claseButonTrimite =
-  "inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-caramiziu-500 px-8 py-3.5 font-titlu font-semibold text-hartie shadow-[0_12px_26px_-12px_rgba(247,79,34,0.9)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:bg-caramiziu-600 disabled:opacity-60 disabled:hover:translate-y-0 motion-reduce:hover:translate-y-0";
+  "inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-caramiziu-700 px-8 py-3.5 font-titlu font-semibold text-hartie shadow-[0_12px_26px_-12px_rgba(247,79,34,0.9)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:bg-caramiziu-600 disabled:opacity-60 disabled:hover:translate-y-0 motion-reduce:hover:translate-y-0";
 
 /** Butonul secundar: „Înapoi”. */
 export const claseButonInapoi =
-  "inline-flex min-h-12 items-center justify-center gap-2 rounded-full border-2 border-cerneala/15 bg-hartie px-6 py-3 font-titlu font-semibold text-cerneala transition-all duration-200 ease-cald hover:border-caramiziu-500 hover:text-caramiziu-600";
+  "inline-flex min-h-12 items-center justify-center gap-2 rounded-full border-2 border-cerneala/15 bg-hartie px-6 py-3 font-titlu font-semibold text-cerneala transition-all duration-200 ease-cald hover:border-caramiziu-500 hover:text-caramiziu-700";
 
 export function Eroare({ id, text }: { id?: string; text?: string }) {
   if (!text) return null;
@@ -42,7 +42,7 @@ export function Eroare({ id, text }: { id?: string; text?: string }) {
     >
       <span
         aria-hidden="true"
-        className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-caramiziu-500 text-[0.65rem] text-hartie"
+        className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-caramiziu-700 text-[0.65rem] text-hartie"
       >
         !
       </span>
@@ -76,7 +76,7 @@ export default function Camp({
       >
         {eticheta}{" "}
         {obligatoriu ? (
-          <span className="text-caramiziu-600" aria-hidden="true">
+          <span className="text-caramiziu-700" aria-hidden="true">
             *
           </span>
         ) : (
@@ -140,7 +140,7 @@ export function Bifa({
           {obligatoriu && (
             <>
               {" "}
-              <span className="text-caramiziu-600" aria-hidden="true">
+              <span className="text-caramiziu-700" aria-hidden="true">
                 *
               </span>
             </>
@@ -185,7 +185,7 @@ export function Optiuni({
       <legend className="mb-2 font-titlu text-mic font-bold text-cerneala">
         {legenda}{" "}
         {obligatoriu ? (
-          <span className="text-caramiziu-600" aria-hidden="true">
+          <span className="text-caramiziu-700" aria-hidden="true">
             *
           </span>
         ) : (
@@ -212,7 +212,7 @@ export function Optiuni({
               className="size-5 shrink-0 accent-caramiziu-500"
             />
             {optiune.pictograma && (
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-caramiziu-100 text-caramiziu-600">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-caramiziu-100 text-caramiziu-700">
                 <Pictograma nume={optiune.pictograma} className="size-5" />
               </span>
             )}

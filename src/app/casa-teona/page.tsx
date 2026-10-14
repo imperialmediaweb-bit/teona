@@ -37,7 +37,7 @@ const BLOCURI: ReadonlyArray<{
     titlu: "Jocuri și ateliere",
     pictograma: "senzorial",
     pictogramaClase:
-      "bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
+      "bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
     paragrafe: [
       "Zilele la Casa Teona sunt pline de activități. Copiii se joacă prin jocuri senzoriale, care îi ajută să-și descopere simțurile și să se liniștească. Desenează, pictează și lucrează în ateliere creative, unde contează mai mult cât se bucură decât cât de bine le iese. Învață prin joacă, pentru că așa învață cel mai bine, și își fac prieteni cu care se simt în largul lor.",
     ],
@@ -71,7 +71,7 @@ const BLOCURI: ReadonlyArray<{
     titlu: "Întâlnirile cu părinții",
     pictograma: "familie",
     pictogramaClase:
-      "bg-caramiziu-500 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]",
+      "bg-caramiziu-700 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]",
     paragrafe: [
       "Părinții sunt la fel de importanți ca și copiii. Mulți dintre ei duc zilnic o încărcătură pe care puțini o văd. De aceea, la Casa Teona au loc întâlniri de terapie de grup pentru părinți, în care pot vorbi deschis despre ce îi preocupă, pot primi consiliere și pot descoperi că alți părinți trec prin aceleași lucruri. Uneori, simplul fapt de a fi ascultat și înțeles face o mare diferență.",
       "Casa Teona înseamnă, în același timp, joacă, încredere, sprijin și apartenență la o comunitate. Este locul în care copiii pot fi copii, iar părinții pot respira. Dacă vrei să ne cunoști mai bine, să ne vizitezi sau să ne sprijini, ne bucurăm să te primim.",
@@ -263,14 +263,14 @@ export default function CasaTeona() {
                 Pentru programare, sună-ne la{" "}
                 <a
                   href={`tel:${TELEFON_PRINCIPAL.apel}`}
-                  className="font-titlu font-bold text-caramiziu-600 underline-offset-4 hover:underline"
+                  className="font-titlu font-bold text-caramiziu-700 underline-offset-4 hover:underline"
                 >
                   {TELEFON_PRINCIPAL.afisat}
                 </a>{" "}
                 sau scrie-ne la{" "}
                 <a
                   href={`mailto:${EMAIL.contact}`}
-                  className="font-titlu font-bold text-caramiziu-600 underline-offset-4 hover:underline"
+                  className="font-titlu font-bold text-caramiziu-700 underline-offset-4 hover:underline"
                 >
                   {EMAIL.contact}
                 </a>
@@ -291,7 +291,7 @@ export default function CasaTeona() {
             {/* Programul, scris mare pe un câmp turcoaz: e lucrul pe care
                 un părinte vine să-l afle. */}
             <div className="lg:col-span-5">
-              <div className="granulatie relative overflow-hidden colt-a bg-turcoaz-500 p-7 text-hartie shadow-[0_30px_60px_-28px_rgba(42,159,163,0.8)] sm:p-8">
+              <div className="granulatie relative overflow-hidden colt-a bg-turcoaz-600 p-7 text-hartie shadow-[0_30px_60px_-28px_rgba(42,159,163,0.8)] sm:p-8">
                 <Decor
                   semn="soare"
                   strokeWidth={0.8}
@@ -309,7 +309,7 @@ export default function CasaTeona() {
                 <p className="relative mt-2 font-titlu text-h3 font-extrabold">
                   9:00–17:00
                 </p>
-                <p className="relative mt-5 inline-flex rounded-full bg-hartie/20 px-4 py-1.5 font-titlu text-mic font-semibold">
+                <p className="relative mt-5 inline-flex rounded-full bg-cerneala/15 px-4 py-1.5 font-titlu text-mic font-semibold">
                   {casaTeona.acces}
                 </p>
               </div>
@@ -345,7 +345,7 @@ export default function CasaTeona() {
                     pictograma: "harta" as NumePictograma,
                     titlu: "Adresă",
                     continut: `${casaTeona.strada}, ${casaTeona.oras} ${casaTeona.cod}`,
-                    clase: "bg-caramiziu-500 text-hartie",
+                    clase: "bg-caramiziu-700 text-hartie",
                   },
                   {
                     pictograma: "respiro" as NumePictograma,
@@ -358,14 +358,14 @@ export default function CasaTeona() {
                     titlu: "Telefon",
                     continut: TELEFON_PRINCIPAL.afisat,
                     href: `tel:${TELEFON_PRINCIPAL.apel}`,
-                    clase: "bg-turcoaz-500 text-hartie",
+                    clase: "bg-turcoaz-600 text-hartie",
                   },
                   {
                     pictograma: "plic" as NumePictograma,
                     titlu: "Email",
                     continut: EMAIL.contact,
                     href: `mailto:${EMAIL.contact}`,
-                    clase: "bg-caramiziu-100 text-caramiziu-600",
+                    clase: "bg-caramiziu-100 text-caramiziu-700",
                   },
                 ].map((rand, i) => (
                   <li key={rand.titlu} className="flex items-start gap-4">
@@ -383,7 +383,7 @@ export default function CasaTeona() {
                       {rand.href ? (
                         <a
                           href={rand.href}
-                          className="font-titlu text-amplu font-bold break-words text-cerneala transition hover:text-caramiziu-600"
+                          className="font-titlu text-amplu font-bold break-words text-cerneala transition hover:text-caramiziu-700"
                         >
                           {rand.continut}
                         </a>
@@ -411,7 +411,7 @@ export default function CasaTeona() {
                 semn="stea"
                 className="absolute top-6 right-8 size-8 text-turcoaz-300"
               />
-              <span className="colt-mic-a relative flex size-14 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
+              <span className="colt-mic-a relative flex size-14 items-center justify-center bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
                 <Pictograma nume="harta" className="size-7" />
               </span>
               <p className="relative mt-6 font-titlu text-h3 font-extrabold text-turcoaz-900">
@@ -438,7 +438,7 @@ export default function CasaTeona() {
           <h2 className="sr-only">Rezultate</h2>
           <p
             aria-hidden="true"
-            className="font-titlu text-[clamp(4rem,18vw,7rem)] leading-none font-extrabold tracking-tight text-caramiziu-500"
+            className="font-titlu text-[clamp(4rem,18vw,7rem)] leading-none font-extrabold tracking-tight text-caramiziu-700"
           >
             80+
           </p>

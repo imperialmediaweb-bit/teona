@@ -58,9 +58,9 @@ const CAI: ReadonlyArray<{
     titlu: "Declarația 177",
     text: "Direcționarea bugetului de sponsorizare nealocat din anii anteriori.",
     pictograma: "document",
-    card: "granulatie bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 text-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.85)]",
+    card: "granulatie bg-gradient-to-br from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 text-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.85)]",
     pictogramaClase: "bg-hartie/20 text-hartie",
-    numar: "bg-hartie text-caramiziu-600",
+    numar: "bg-hartie text-caramiziu-700",
     pasi: [
       "Calculezi suma disponibilă.",
       "Semnezi contractul de sponsorizare.",
@@ -74,8 +74,8 @@ const CAI: ReadonlyArray<{
     pictograma: "cladire",
     card: "granulatie bg-turcoaz-100 text-cerneala shadow-[0_30px_60px_-28px_rgba(42,159,163,0.6)]",
     pictogramaClase:
-      "bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
-    numar: "bg-turcoaz-500 text-hartie",
+      "bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
+    numar: "bg-turcoaz-600 text-hartie",
     pasi: [
       "Calculezi suma.",
       "Completezi contractul de sponsorizare.",
@@ -87,7 +87,7 @@ const CAI: ReadonlyArray<{
 
 /** Câmpurile cardurilor cu persoanele de contact (8.7), fără fotografii. */
 const CAMPURI_CONTACT = [
-  "bg-caramiziu-100 text-caramiziu-600",
+  "bg-caramiziu-100 text-caramiziu-700",
   "bg-miere-200 text-miere-800",
 ] as const;
 
@@ -272,7 +272,7 @@ export default function Directioneaza20() {
 
                   {/* Termenul vine de la asociație — vezi comentariul de la CAI. */}
                   <p
-                    className={`relative mt-6 text-nota ${i === 0 ? "text-hartie/80" : "text-turcoaz-900/70"}`}
+                    className={`relative mt-6 text-nota ${i === 0 ? "text-hartie" : "text-turcoaz-900"}`}
                   >
                     Termenul de depunere îl confirmăm împreună cu contabilitatea
                     firmei tale, pentru anul fiscal în curs.
@@ -310,7 +310,7 @@ export default function Directioneaza20() {
                 Vrei un contract personalizat? Scrie-ne la{" "}
                 <a
                   href={`mailto:${EMAIL.contact}`}
-                  className="font-titlu font-bold text-caramiziu-600 underline-offset-4 hover:underline"
+                  className="font-titlu font-bold text-caramiziu-700 underline-offset-4 hover:underline"
                 >
                   {EMAIL.contact}
                 </a>{" "}
@@ -497,14 +497,14 @@ export default function Directioneaza20() {
                       </span>
                       <a
                         href={`mailto:${persoana.email}`}
-                        className="mt-4 flex min-h-10 items-center gap-2 text-mic break-all text-cerneala-moale transition hover:text-caramiziu-600"
+                        className="mt-4 flex min-h-10 items-center gap-2 text-mic break-all text-cerneala-moale transition hover:text-caramiziu-700"
                       >
                         <Pictograma nume="plic" className="size-4 shrink-0" />
                         {persoana.email}
                       </a>
                       <a
                         href={`tel:${persoana.telefon.apel}`}
-                        className="flex min-h-10 items-center gap-2 font-titlu text-corp font-bold text-cerneala transition hover:text-caramiziu-600"
+                        className="flex min-h-10 items-center gap-2 font-titlu text-corp font-bold text-cerneala transition hover:text-caramiziu-700"
                       >
                         <Pictograma
                           nume="telefon"
@@ -543,7 +543,7 @@ export default function Directioneaza20() {
             Ești persoană fizică? Atunci te interesează{" "}
             <Link
               href={RUTE.redirectionare35}
-              className="font-titlu font-semibold text-caramiziu-600 underline-offset-4 hover:underline"
+              className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
             >
               Redirecționează 3,5%
             </Link>

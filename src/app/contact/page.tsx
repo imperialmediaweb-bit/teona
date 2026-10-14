@@ -43,7 +43,7 @@ const CAI_DE_CONTACT: ReadonlyArray<{
     valoare: TELEFOANE[0].afisat,
     href: `tel:${TELEFOANE[0].apel}`,
     clase:
-      "granulatie bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 text-hartie shadow-[0_28px_56px_-26px_rgba(247,79,34,0.85)]",
+      "granulatie bg-gradient-to-br from-caramiziu-700 to-caramiziu-900 text-hartie shadow-[0_28px_56px_-26px_rgba(247,79,34,0.85)]",
     pictogramaClase: "bg-hartie/20 text-hartie",
   },
   {
@@ -63,7 +63,7 @@ const CAI_DE_CONTACT: ReadonlyArray<{
     clase:
       "granulatie bg-turcoaz-100 text-turcoaz-900 shadow-[0_28px_56px_-26px_rgba(42,159,163,0.6)]",
     pictogramaClase:
-      "bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
+      "bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
   },
 ];
 
@@ -156,7 +156,7 @@ export default function Contact() {
                     sizes="(min-width: 1024px) 320px, 92vw"
                     className="object-cover"
                   />
-                  <span className="colt-mic-b absolute top-4 left-4 bg-caramiziu-500 px-4 py-1.5 shadow-[0_10px_24px_-10px_rgba(247,79,34,0.9)]">
+                  <span className="colt-mic-b absolute top-4 left-4 bg-caramiziu-700 px-4 py-1.5 shadow-[0_10px_24px_-10px_rgba(247,79,34,0.9)]">
                     <span className="scris text-corp leading-none text-hartie">
                       {casaTeona.nume}
                     </span>
@@ -232,7 +232,7 @@ export default function Contact() {
                   Dacă preferi, ne poți scrie direct la{" "}
                   <a
                     href={`mailto:${EMAIL.contact}`}
-                    className="font-titlu font-bold text-caramiziu-600 underline-offset-4 hover:underline"
+                    className="font-titlu font-bold text-caramiziu-700 underline-offset-4 hover:underline"
                   >
                     {EMAIL.contact}
                   </a>
@@ -337,7 +337,7 @@ export default function Contact() {
               Cum folosim fiecare donație găsești la{" "}
               <Link
                 href={`${RUTE.despre}#transparenta`}
-                className="font-titlu font-bold text-caramiziu-600 underline-offset-4 hover:underline"
+                className="font-titlu font-bold text-caramiziu-700 underline-offset-4 hover:underline"
               >
                 secțiunea Transparență
               </Link>{" "}

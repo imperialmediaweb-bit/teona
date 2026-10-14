@@ -191,7 +191,7 @@ export default function DevinoVoluntar() {
                     aria-hidden="true"
                     // Treapta 600, nu 500: la mărimea asta pragul e 3:1, iar `miere-500`
                     // dă 2,52:1 pe alb.
-                    className="relative mt-5 font-titlu text-[3.4rem] leading-none font-extrabold tracking-tight text-miere-600"
+                    className="relative mt-5 font-titlu text-[3.4rem] leading-none font-extrabold tracking-tight text-miere-700"
                   >
                     18+
                   </p>
@@ -273,18 +273,18 @@ export default function DevinoVoluntar() {
                       sizes="(min-width: 1024px) 400px, 92vw"
                       className="object-cover"
                     />
-                    <span className="colt-mic-b absolute top-4 left-4 flex size-12 items-center justify-center bg-caramiziu-500 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]">
+                    <span className="colt-mic-b absolute top-4 left-4 flex size-12 items-center justify-center bg-caramiziu-700 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]">
                       <Pictograma nume="inima" className="size-6" />
                     </span>
                   </div>
                   <div className="flex flex-1 flex-col p-6 sm:p-7">
-                    <h3 className="text-h4 text-cerneala transition-colors duration-300 group-hover:text-caramiziu-600">
+                    <h3 className="text-h4 text-cerneala transition-colors duration-300 group-hover:text-caramiziu-700">
                       Donează
                     </h3>
                     <p className="mt-2 flex-1 text-mic text-cerneala-moale">
                       O dată sau lunar, cu cardul, prin SMS sau prin transfer bancar.
                     </p>
-                    <span className="mt-5 inline-flex items-center gap-2 font-titlu text-mic font-semibold text-caramiziu-600">
+                    <span className="mt-5 inline-flex items-center gap-2 font-titlu text-mic font-semibold text-caramiziu-700">
                       Află cum
                       <Pictograma nume="sageata" className="size-4" />
                     </span>
@@ -301,7 +301,7 @@ export default function DevinoVoluntar() {
                   className="granulatie group relative flex h-full flex-col overflow-hidden colt-b bg-turcoaz-100 p-6 shadow-[0_28px_56px_-26px_rgba(42,159,163,0.7)] transition-all duration-500 ease-cald hover:-translate-y-1.5 motion-reduce:hover:translate-y-0 sm:p-7"
                 >
                   <Decor semn="spirala" strokeWidth={0.8} className="absolute -right-12 -bottom-12 size-48 text-turcoaz-200" />
-                  <span className="colt-mic-a relative flex size-12 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
+                  <span className="colt-mic-a relative flex size-12 items-center justify-center bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
                     <Pictograma nume="document" className="size-6" />
                   </span>
                   <p
@@ -340,7 +340,7 @@ export default function DevinoVoluntar() {
                     20%
                   </p>
                   <h3 className="relative mt-4 text-h4 text-miere-900">Direcționează 20%</h3>
-                  <p className="relative mt-2 flex-1 text-mic text-miere-900/85">
+                  <p className="relative mt-2 flex-1 text-mic text-miere-900">
                     Pentru firme: din impozitul pe profit, prin contract de sponsorizare.
                   </p>
                   <span className="relative mt-5 inline-flex items-center gap-2 font-titlu text-mic font-semibold text-miere-900">
@@ -384,7 +384,7 @@ export default function DevinoVoluntar() {
               Scrie-ne la{" "}
               <a
                 href={`mailto:${EMAIL.contact}`}
-                className="font-titlu font-bold text-caramiziu-600 underline-offset-4 hover:underline"
+                className="font-titlu font-bold text-caramiziu-700 underline-offset-4 hover:underline"
               >
                 {EMAIL.contact}
               </a>{" "}
@@ -394,7 +394,7 @@ export default function DevinoVoluntar() {
                   {i > 0 && " / "}
                   <a
                     href={`tel:${telefon.apel}`}
-                    className="font-titlu font-bold text-caramiziu-600 underline-offset-4 hover:underline"
+                    className="font-titlu font-bold text-caramiziu-700 underline-offset-4 hover:underline"
                   >
                     {telefon.afisat}
                   </a>

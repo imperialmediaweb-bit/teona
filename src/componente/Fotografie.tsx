@@ -89,7 +89,7 @@ export default function Fotografie({
       </div>
 
       {legenda && (
-        <figcaption className="absolute -bottom-3.5 left-5 rounded-full bg-caramiziu-500 px-4 py-1.5 shadow-[0_10px_24px_-10px_rgba(247,79,34,0.9)] transition-transform duration-500 ease-cald group-hover:-translate-y-1.5 motion-reduce:group-hover:translate-y-0">
+        <figcaption className="absolute -bottom-3.5 left-5 rounded-full bg-caramiziu-700 px-4 py-1.5 shadow-[0_10px_24px_-10px_rgba(247,79,34,0.9)] transition-transform duration-500 ease-cald group-hover:-translate-y-1.5 motion-reduce:group-hover:translate-y-0">
           <span className="scris text-corp leading-none text-hartie">
             {legenda}
           </span>

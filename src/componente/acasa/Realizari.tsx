@@ -126,7 +126,7 @@ export default function Realizari() {
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <p className="scris text-amplu text-caramiziu-600">
+        <p className="scris text-amplu text-caramiziu-700">
           Impactul campaniilor noastre.
         </p>
         <h2 className="mt-2 max-w-3xl text-h2 text-cerneala">
@@ -139,7 +139,7 @@ export default function Realizari() {
           {/* 1 — portocaliu plin: prima tabără de felul ăsta merită culoarea
               de identitate. */}
           <li className="lg:col-span-2">
-            <article className="granulatie relative flex h-full min-h-[18rem] flex-col overflow-hidden colt-a bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 p-7 text-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.8)]">
+            <article className="granulatie relative flex h-full min-h-[18rem] flex-col overflow-hidden colt-a bg-gradient-to-br from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 p-7 text-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.8)]">
               <Numar
                 n={1}
                 className="absolute -top-6 -right-3 text-[9rem] text-hartie/15"
@@ -175,7 +175,7 @@ export default function Realizari() {
                     className="size-6"
                   />
                 </span>
-                <Numar n={2} className="text-[4.5rem] text-miere-400" />
+                <Numar n={2} className="text-[4.5rem] text-miere-700" />
               </div>
               <h3 className="relative mt-auto pt-8 text-h3 text-cerneala">
                 {performanta.titlu}
@@ -193,7 +193,7 @@ export default function Realizari() {
                 poza={autism.poza}
                 n={3}
                 colt="b"
-                culoare="bg-turcoaz-500 shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]"
+                culoare="bg-turcoaz-600 shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]"
                 dimensiuni="(min-width: 1024px) 400px, 92vw"
                 className="aspect-[16/10] w-full"
               />
@@ -213,12 +213,12 @@ export default function Realizari() {
                 poza={casa.poza}
                 n={4}
                 colt="a"
-                culoare="bg-caramiziu-500 shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]"
+                culoare="bg-caramiziu-700 shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]"
                 dimensiuni="(min-width: 1024px) 300px, 92vw"
                 className="aspect-[16/10] w-full lg:aspect-auto lg:min-h-[15rem] lg:w-[46%]"
               />
               <div className="flex flex-1 flex-col justify-center p-6 sm:p-7 lg:p-8">
-                <span className="colt-mic-b flex size-11 items-center justify-center bg-caramiziu-100 text-caramiziu-600">
+                <span className="colt-mic-b flex size-11 items-center justify-center bg-caramiziu-100 text-caramiziu-700">
                   <Pictograma nume={casa.pictograma} className="size-6" />
                 </span>
                 <h3 className="mt-5 text-h3 text-cerneala">{casa.titlu}</h3>
@@ -241,7 +241,7 @@ export default function Realizari() {
                 strokeWidth={0.8}
                 className="absolute -bottom-10 -left-6 size-40 text-turcoaz-200/80"
               />
-              <span className="colt-mic-a relative flex size-12 items-center justify-center bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
+              <span className="colt-mic-a relative flex size-12 items-center justify-center bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
                 <Pictograma nume={umanitare.pictograma} className="size-6" />
               </span>
               <h3 className="relative mt-5 text-h3 text-turcoaz-900">

@@ -43,11 +43,11 @@ export const metadata: Metadata = metadate({
 
 /** Câmpurile de culoare ale celor șase cifre, pe rând: niciuna ca vecina ei. */
 const CAMPURI_CIFRE = [
-  "granulatie bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 text-hartie shadow-[0_24px_50px_-26px_rgba(247,79,34,0.8)]",
-  "border border-hartie-umbra bg-hartie text-caramiziu-500 shadow-[0_18px_38px_-24px_rgba(35,35,35,0.45)]",
+  "granulatie bg-gradient-to-br from-caramiziu-700 to-caramiziu-900 text-hartie shadow-[0_24px_50px_-26px_rgba(247,79,34,0.8)]",
+  "border border-hartie-umbra bg-hartie text-caramiziu-700 shadow-[0_18px_38px_-24px_rgba(35,35,35,0.45)]",
   "granulatie bg-miere-300 text-miere-900 shadow-[0_24px_50px_-26px_rgba(255,172,0,0.8)]",
   "granulatie bg-turcoaz-100 text-turcoaz-700 shadow-[0_24px_50px_-26px_rgba(42,159,163,0.6)]",
-  "border border-hartie-umbra bg-hartie text-caramiziu-500 shadow-[0_18px_38px_-24px_rgba(35,35,35,0.45)]",
+  "border border-hartie-umbra bg-hartie text-caramiziu-700 shadow-[0_18px_38px_-24px_rgba(35,35,35,0.45)]",
   "granulatie bg-hartie-calda text-turcoaz-700 shadow-[0_18px_38px_-24px_rgba(42,159,163,0.4)]",
 ] as const;
 
@@ -336,7 +336,7 @@ function Tabel({
               <td className="px-5 py-3.5 font-titlu font-bold text-cerneala">
                 Total
               </td>
-              <td className="px-5 py-3.5 text-right font-titlu font-extrabold tabular-nums text-caramiziu-600">
+              <td className="px-5 py-3.5 text-right font-titlu font-extrabold tabular-nums text-caramiziu-700">
                 {total}
               </td>
             </tr>
@@ -364,7 +364,7 @@ export default function Raport2025() {
           <span className="pata absolute -top-32 right-[-8%] size-[26rem] rounded-full bg-caramiziu-100/60 blur-3xl" />
           <Decor
             semn="stea"
-            className="pluteste-lent absolute top-10 right-[6%] hidden size-10 text-miere-400 lg:block"
+            className="pluteste-lent absolute top-10 right-[6%] hidden size-10 text-miere-700 lg:block"
           />
           <Decor
             semn="unda"
@@ -374,7 +374,7 @@ export default function Raport2025() {
         <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <Link
             href={`${RUTE.despre}#transparenta`}
-            className="inline-flex min-h-10 items-center gap-2 font-titlu text-mic font-semibold text-caramiziu-600 transition hover:text-caramiziu-700"
+            className="inline-flex min-h-10 items-center gap-2 font-titlu text-mic font-semibold text-caramiziu-700 transition hover:text-caramiziu-700"
           >
             <Pictograma nume="sageata" className="size-4 rotate-180" />
             Transparență
@@ -386,7 +386,7 @@ export default function Raport2025() {
           <h1 className="mt-2 text-h1 text-cerneala">
             Raport anual de activitate 2025
           </h1>
-          <p className="scris mt-5 text-h4 text-caramiziu-600">
+          <p className="scris mt-5 text-h4 text-caramiziu-700">
             Sprijin pentru copii. Respiro pentru părinți. Incluziune și
             comunitate. Zâmbet!
           </p>
@@ -595,7 +595,7 @@ export default function Raport2025() {
           />
         </div>
         <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <p className="scris text-amplu text-caramiziu-600">
+          <p className="scris text-amplu text-caramiziu-700">
             Tuturor celor care au fost alături de noi
           </p>
           <h2 className="mt-2 text-h2 text-cerneala">Mulțumiri</h2>

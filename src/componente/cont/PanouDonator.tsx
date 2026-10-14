@@ -87,7 +87,7 @@ export default function PanouDonator({ cont }: { cont: ContulMeu }) {
   return (
     <>
       {/* Mulțumirea. Caldă, dar fără nicio cifră pe care n-o știm. */}
-      <section className="granulatie relative overflow-hidden colt-a bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 p-8 text-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.85)] sm:p-10">
+      <section className="granulatie relative overflow-hidden colt-a bg-gradient-to-br from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 p-8 text-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.85)] sm:p-10">
         <Decor
           semn="inima"
           strokeWidth={0.8}

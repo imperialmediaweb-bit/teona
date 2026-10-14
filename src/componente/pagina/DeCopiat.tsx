@@ -68,8 +68,8 @@ export default function DeCopiat({
           onClick={copiaza}
           className={`inline-flex min-h-11 items-center gap-2 rounded-full border-2 px-4 py-2 font-titlu text-mic font-semibold transition-all duration-200 ease-cald ${
             stare === "copiat"
-              ? "border-turcoaz-500 bg-turcoaz-500 text-hartie"
-              : "border-cerneala/15 bg-hartie text-cerneala hover:border-caramiziu-500 hover:text-caramiziu-600"
+              ? "border-turcoaz-500 bg-turcoaz-600 text-hartie"
+              : "border-cerneala/15 bg-hartie text-cerneala hover:border-caramiziu-500 hover:text-caramiziu-700"
           }`}
         >
           {stare === "copiat" ? (

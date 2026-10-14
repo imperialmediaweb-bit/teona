@@ -36,7 +36,7 @@ export default function DocumentDeDescarcat({
       <span
         className={`relative flex h-28 items-end justify-between overflow-hidden px-6 pb-4 ${
           fisier
-            ? "bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 text-hartie"
+            ? "bg-gradient-to-br from-caramiziu-700 to-caramiziu-900 text-hartie"
             : "bg-hartie-umbra text-cerneala-slab"
         }`}
       >
@@ -70,7 +70,7 @@ export default function DocumentDeDescarcat({
           {descriere}
         </span>
         {fisier ? (
-          <span className="mt-5 inline-flex items-center gap-2 font-titlu text-mic font-semibold text-caramiziu-600">
+          <span className="mt-5 inline-flex items-center gap-2 font-titlu text-mic font-semibold text-caramiziu-700">
             Descarcă
             <Pictograma nume="sageata" className="size-4 rotate-90" />
           </span>

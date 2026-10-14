@@ -206,7 +206,7 @@ export default function FormularVoluntar() {
         id="formular"
         className="relative scroll-mt-32 overflow-hidden colt-a border border-hartie-umbra bg-hartie shadow-[0_30px_60px_-28px_rgba(42,159,163,0.6)]"
       >
-        <div className="granulatie relative overflow-hidden bg-gradient-to-br from-turcoaz-400 to-turcoaz-600 px-7 pt-10 pb-12 text-hartie sm:px-10">
+        <div className="granulatie relative overflow-hidden bg-gradient-to-br from-turcoaz-600 to-turcoaz-800 px-7 pt-10 pb-12 text-hartie sm:px-10">
           <Decor
             semn="stea"
             strokeWidth={0.8}
@@ -252,7 +252,7 @@ export default function FormularVoluntar() {
                     href={retea.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-cerneala/15 px-5 py-2 font-titlu text-mic font-semibold text-cerneala transition hover:border-caramiziu-500 hover:text-caramiziu-600"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-cerneala/15 px-5 py-2 font-titlu text-mic font-semibold text-cerneala transition hover:border-caramiziu-500 hover:text-caramiziu-700"
                   >
                     <PictogramaRetea nume={retea.nume} className="size-5" />
                     {retea.nume}
@@ -275,7 +275,7 @@ export default function FormularVoluntar() {
       className="relative scroll-mt-32 overflow-hidden colt-a border border-hartie-umbra bg-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.5)]"
     >
       {/* Firul pașilor: unde ești și cât mai e. */}
-      <ol className="granulatie relative grid grid-cols-3 gap-2 overflow-hidden bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 px-4 py-5 text-hartie sm:px-7">
+      <ol className="granulatie relative grid grid-cols-3 gap-2 overflow-hidden bg-gradient-to-br from-caramiziu-700 to-caramiziu-900 px-4 py-5 text-hartie sm:px-7">
         <Decor
           semn="unda"
           strokeWidth={0.9}
@@ -295,7 +295,7 @@ export default function FormularVoluntar() {
               <span
                 className={`flex size-9 shrink-0 items-center justify-center rounded-full font-titlu text-mic font-extrabold transition-colors duration-300 ${
                   activ
-                    ? "bg-hartie text-caramiziu-600 shadow-[0_8px_18px_-8px_rgba(35,35,35,0.5)]"
+                    ? "bg-hartie text-caramiziu-700 shadow-[0_8px_18px_-8px_rgba(35,35,35,0.5)]"
                     : facut
                       ? "bg-miere-400 text-cerneala"
                       : "border-2 border-hartie/60 text-hartie"
@@ -333,7 +333,7 @@ export default function FormularVoluntar() {
         {PASI.map((p, i) => (
           <div key={p.titlu} hidden={i !== pas} className="grid gap-5">
             <div>
-              <p className="font-titlu text-nota font-bold tracking-wider text-caramiziu-600 uppercase">
+              <p className="font-titlu text-nota font-bold tracking-wider text-caramiziu-700 uppercase">
                 Pasul {i + 1} din {PASI.length}
               </p>
               <h3

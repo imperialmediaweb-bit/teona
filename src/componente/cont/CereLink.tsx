@@ -71,7 +71,7 @@ export default function CereLink() {
         role="status"
         className="granulatie colt-a bg-turcoaz-100 p-8 shadow-[0_24px_50px_-26px_rgba(42,159,163,0.7)]"
       >
-        <span className="flex size-14 items-center justify-center colt-mic-a bg-turcoaz-500 text-hartie">
+        <span className="flex size-14 items-center justify-center colt-mic-a bg-turcoaz-600 text-hartie">
           <Pictograma nume="plic" className="size-7" />
         </span>
         <p className="mt-5 font-titlu text-h4 font-bold text-turcoaz-900">

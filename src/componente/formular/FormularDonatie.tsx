@@ -226,7 +226,7 @@ function Formular({
                 href={LINKURI_EXTERNE.galantom}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-4 colt-mic-a bg-caramiziu-500 px-5 py-4 font-titlu font-semibold text-hartie shadow-[0_14px_30px_-14px_rgba(247,79,34,0.9)] transition hover:bg-caramiziu-600"
+                className="flex items-center gap-4 colt-mic-a bg-caramiziu-700 px-5 py-4 font-titlu font-semibold text-hartie shadow-[0_14px_30px_-14px_rgba(247,79,34,0.9)] transition hover:bg-caramiziu-600"
               >
                 <span className="flex size-11 shrink-0 items-center justify-center colt-mic-b bg-hartie/20">
                   <Pictograma nume="inima" className="size-5" />
@@ -263,7 +263,7 @@ function Formular({
                 onClick={() => setFaraPlata(false)}
                 className="flex items-center gap-4 colt-mic-a bg-turcoaz-50 px-5 py-4 font-titlu font-semibold text-cerneala transition hover:bg-turcoaz-100"
               >
-                <span className="flex size-11 shrink-0 items-center justify-center colt-mic-b bg-turcoaz-500 text-hartie">
+                <span className="flex size-11 shrink-0 items-center justify-center colt-mic-b bg-turcoaz-600 text-hartie">
                   <Pictograma nume="cladire" className="size-5" />
                 </span>
                 <span>
@@ -318,7 +318,7 @@ function Formular({
         />
       </p>
 
-      <div className="granulatie relative overflow-hidden bg-gradient-to-br from-caramiziu-400 to-caramiziu-600 px-6 py-5 text-hartie sm:px-8">
+      <div className="granulatie relative overflow-hidden bg-gradient-to-br from-caramiziu-700 to-caramiziu-900 px-6 py-5 text-hartie sm:px-8">
         <Decor
           semn="inima"
           strokeWidth={0.9}
@@ -337,7 +337,7 @@ function Formular({
         <fieldset>
           <legend className="mb-3 font-titlu text-mic font-bold text-cerneala">
             Suma{" "}
-            <span className="text-caramiziu-600" aria-hidden="true">
+            <span className="text-caramiziu-700" aria-hidden="true">
               *
             </span>
           </legend>
@@ -356,7 +356,7 @@ function Formular({
                   i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"
                 } px-3 py-2 font-titlu font-extrabold transition-all duration-200 ease-cald ${
                   suma === valoare
-                    ? "bg-caramiziu-500 text-hartie shadow-[0_12px_26px_-12px_rgba(247,79,34,0.9)]"
+                    ? "bg-caramiziu-700 text-hartie shadow-[0_12px_26px_-12px_rgba(247,79,34,0.9)]"
                     : "border-2 border-hartie-umbra bg-hartie text-cerneala hover:border-caramiziu-400"
                 }`}
               >
@@ -507,7 +507,7 @@ function Formular({
           <button
             type="submit"
             disabled={seTrimite}
-            className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-caramiziu-500 px-8 py-4 font-titlu text-amplu font-bold text-hartie shadow-[0_16px_32px_-12px_rgba(247,79,34,0.9)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:bg-caramiziu-600 disabled:cursor-not-allowed disabled:opacity-70 motion-reduce:hover:translate-y-0"
+            className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-caramiziu-700 px-8 py-4 font-titlu text-amplu font-bold text-hartie shadow-[0_16px_32px_-12px_rgba(247,79,34,0.9)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:bg-caramiziu-600 disabled:cursor-not-allowed disabled:opacity-70 motion-reduce:hover:translate-y-0"
           >
             <Pictograma nume="inima" className="size-5" />
             {seTrimite ? "Te ducem la plată…" : etichetaButon}

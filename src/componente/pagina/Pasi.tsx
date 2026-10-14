@@ -17,7 +17,7 @@ import Pictograma, { type NumePictograma } from "../Pictograma";
 
 const FELURI = [
   {
-    card: "granulatie bg-gradient-to-br from-caramiziu-400 via-caramiziu-500 to-caramiziu-600 text-hartie shadow-[0_28px_56px_-26px_rgba(247,79,34,0.85)]",
+    card: "granulatie bg-gradient-to-br from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 text-hartie shadow-[0_28px_56px_-26px_rgba(247,79,34,0.85)]",
     numar: "text-hartie/20",
     text: "text-hartie",
     pictograma: "bg-hartie/20 text-hartie",
@@ -35,14 +35,14 @@ const FELURI = [
     numar: "text-turcoaz-200",
     text: "text-turcoaz-900",
     pictograma:
-      "bg-turcoaz-500 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
+      "bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
     semn: "text-turcoaz-200",
   },
   {
     card: "border border-hartie-umbra bg-hartie text-cerneala shadow-[0_24px_50px_-26px_rgba(35,35,35,0.45)]",
     numar: "text-caramiziu-100",
     text: "text-cerneala",
-    pictograma: "bg-caramiziu-100 text-caramiziu-600",
+    pictograma: "bg-caramiziu-100 text-caramiziu-700",
     semn: "text-caramiziu-100",
   },
 ] as const;

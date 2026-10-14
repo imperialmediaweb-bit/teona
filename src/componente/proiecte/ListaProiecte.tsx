@@ -39,9 +39,9 @@ const UMBRE = [
 ] as const;
 
 const PASTILE = [
-  "bg-caramiziu-500 text-hartie",
+  "bg-caramiziu-700 text-hartie",
   "bg-miere-400 text-cerneala",
-  "bg-turcoaz-500 text-hartie",
+  "bg-turcoaz-600 text-hartie",
 ] as const;
 
 export default function ListaProiecte({
@@ -77,15 +77,15 @@ export default function ListaProiecte({
               onClick={() => setAleasa(categorie.id)}
               className={`inline-flex min-h-11 items-center rounded-full px-5 py-2.5 font-titlu text-mic font-bold transition-all duration-300 ease-cald ${
                 activa
-                  ? "bg-caramiziu-500 text-hartie shadow-[0_12px_26px_-12px_rgba(247,79,34,0.9)]"
-                  : "border-2 border-cerneala/15 bg-hartie text-cerneala hover:border-caramiziu-400 hover:text-caramiziu-600"
+                  ? "bg-caramiziu-700 text-hartie shadow-[0_12px_26px_-12px_rgba(247,79,34,0.9)]"
+                  : "border-2 border-cerneala/15 bg-hartie text-cerneala hover:border-caramiziu-400 hover:text-caramiziu-700"
               }`}
             >
               {categorie.eticheta}
               <span
                 className={`ml-2 rounded-full px-2 py-0.5 text-nota ${
                   activa
-                    ? "bg-hartie/20 text-hartie"
+                    ? "bg-cerneala/15 text-hartie"
                     : "bg-hartie-umbra text-cerneala-moale"
                 }`}
               >
@@ -111,7 +111,7 @@ export default function ListaProiecte({
             <p className="relative max-w-xl font-titlu text-h4 font-bold text-miere-900">
               Pregătim această secțiune.
             </p>
-            <p className="relative mt-2 max-w-xl text-amplu text-miere-900/80">
+            <p className="relative mt-2 max-w-xl text-amplu text-miere-900">
               Proiectele apar aici de îndată ce strângem fotografiile și
               descrierile lor.
             </p>
@@ -194,7 +194,7 @@ export default function ListaProiecte({
                         }`}
                       >
                         <h3
-                          className={`flex-1 leading-snug text-cerneala transition-colors duration-300 group-hover:text-caramiziu-600 ${
+                          className={`flex-1 leading-snug text-cerneala transition-colors duration-300 group-hover:text-caramiziu-700 ${
                             mare ? "text-h3" : "text-h4"
                           }`}
                         >
@@ -204,7 +204,7 @@ export default function ListaProiecte({
                           {proiect.poze.length > 0 && (
                             <span>{proiect.poze.length} fotografii</span>
                           )}
-                          <span className="inline-flex items-center gap-2 text-caramiziu-600 normal-case tracking-normal">
+                          <span className="inline-flex items-center gap-2 text-caramiziu-700 normal-case tracking-normal">
                             Vezi proiectul
                             <Pictograma nume="sageata" className="size-4" />
                           </span>

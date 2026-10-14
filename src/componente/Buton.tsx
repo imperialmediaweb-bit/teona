@@ -5,13 +5,13 @@ type Varianta = "principal" | "secundar" | "contur" | "discret";
 
 const variante: Record<Varianta, string> = {
   principal:
-    "bg-caramiziu-500 text-hartie hover:bg-caramiziu-600 shadow-[0_2px_0_0_var(--color-caramiziu-700)] hover:shadow-[0_1px_0_0_var(--color-caramiziu-700)] hover:translate-y-px",
+    "bg-caramiziu-700 text-hartie hover:bg-caramiziu-800 shadow-[0_2px_0_0_var(--color-caramiziu-900)] hover:shadow-[0_1px_0_0_var(--color-caramiziu-900)] hover:translate-y-px",
   secundar:
     "bg-miere-400 text-cerneala hover:bg-miere-300 shadow-[0_2px_0_0_var(--color-miere-600)] hover:shadow-[0_1px_0_0_var(--color-miere-600)] hover:translate-y-px",
   contur:
-    "border-2 border-cerneala/15 text-cerneala hover:border-caramiziu-500 hover:text-caramiziu-600 bg-hartie",
+    "border-2 border-cerneala/15 text-cerneala hover:border-caramiziu-500 hover:text-caramiziu-700 bg-hartie",
   discret:
-    "text-caramiziu-600 hover:text-caramiziu-700 underline-offset-4 hover:underline",
+    "text-caramiziu-700 hover:text-caramiziu-700 underline-offset-4 hover:underline",
 };
 
 const marimi = {

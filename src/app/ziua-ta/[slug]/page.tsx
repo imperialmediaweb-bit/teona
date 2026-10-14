@@ -162,7 +162,7 @@ async function Continut(proprietati: Proprietati) {
         </div>
 
         <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <p className="scris text-center text-amplu text-caramiziu-600">
+          <p className="scris text-center text-amplu text-caramiziu-700">
             {etichetaOcaziei(campanie.ocazie)}
           </p>
           <h1 className="mt-2 text-center text-h1 text-cerneala">

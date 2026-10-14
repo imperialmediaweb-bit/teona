@@ -105,7 +105,7 @@ export default function FormularRedirectionare() {
           strokeWidth={0.8}
           className="absolute -top-8 -right-8 size-36 text-turcoaz-200"
         />
-        <span className="relative flex size-14 items-center justify-center colt-mic-a bg-turcoaz-500 text-hartie shadow-[0_12px_26px_-12px_rgba(42,159,163,0.9)]">
+        <span className="relative flex size-14 items-center justify-center colt-mic-a bg-turcoaz-600 text-hartie shadow-[0_12px_26px_-12px_rgba(42,159,163,0.9)]">
           <Pictograma nume="plic" className="size-7" />
         </span>
         <p className="relative mt-5 font-titlu text-h4 font-bold text-turcoaz-900">
@@ -132,7 +132,7 @@ export default function FormularRedirectionare() {
       noValidate
       className="relative overflow-hidden colt-b border border-hartie-umbra bg-hartie shadow-[0_26px_52px_-26px_rgba(42,159,163,0.45)]"
     >
-      <div className="granulatie relative overflow-hidden bg-gradient-to-br from-turcoaz-400 to-turcoaz-600 px-6 py-5 text-hartie sm:px-8">
+      <div className="granulatie relative overflow-hidden bg-gradient-to-br from-turcoaz-600 to-turcoaz-800 px-6 py-5 text-hartie sm:px-8">
         <Decor
           semn="unda"
           strokeWidth={0.9}
