@@ -46,6 +46,12 @@ componente înainte s-o publici, nu doar pe cele la care te-ai gândit.
 - Cifre: **33** tabere organizate · **1.500+** participanți · **80+** copii la Casa Teona · **300+** voluntari
 - Rețele: facebook.com/asociatia.teona.ariana · instagram.com/teonaariana_sv · tiktok.com/@teonaarianasv
 - Motto: „Nimic fără Dumnezeu"
+- Din contractul de sponsorizare (`continut/contract-sponsorizare-2026.pdf`,
+  primit pe 14 octombrie 2026): înscrisă în registrul persoanelor juridice cu
+  **nr. 1/14.01.2021** · reprezentant legal **Corneliu Cristea Costiuc,
+  Președinte** · conturile UniCredit sunt la **Suc. Curtea Domnească Suceava**,
+  cel BCR la **BCR Suceava** · pe antetul lor apare și adresa
+  **ata.suceava@gmail.com**
 
 ## Date personale — ce NU intră aici
 
@@ -71,7 +77,7 @@ buletine informative.
 
 Caietul de sarcini cere materiale care încă n-au venit: clasificarea pozelor pe
 proiecte și ani, lista proiectelor 2025 și 2026, cazurile umanitare publicabile,
-Formularul 230 și Declarația 177 precompletate, contractul de sponsorizare,
+Formularul 230 și Declarația 177 precompletate,
 testimonialele, siglele și adresele sponsorilor, fotografiile recente,
 poza și descrierea Mihaelei Sfichi (lipsește de pe site-ul actual),
 conturile „Culegătorii de Zâmbete", certificatul de înregistrare.

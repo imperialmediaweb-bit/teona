@@ -27,4 +27,10 @@ export type ProiectAfisat = {
   categorie: IdCategorie;
   coperta: string | null;
   poze: string[];
+  /**
+   * Două-trei paragrafe despre proiect. Lipsesc la proiectele venite din
+   * exportul WordPress: textele de acolo erau postări de Facebook, cu nume de
+   * familii și diagnostice de copii, iar caietul interzice publicarea lor.
+   */
+  descriere?: readonly string[];
 };

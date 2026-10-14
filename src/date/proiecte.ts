@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { pozaLocala, proiecte as proiecteBrute } from "@/lib/continut";
 import { curataTitlu, faSlug } from "@/lib/slug-proiecte.mjs";
+import { PROIECTE_SCRISE } from "./proiecte-scrise";
 import type { IdCategorie, ProiectAfisat } from "./proiecte-tipuri";
 
 export { CATEGORII } from "./proiecte-tipuri";
@@ -77,9 +78,12 @@ function pozaCareExista(cale: string | null): string | null {
 
 /** Proiectele preluate, curățate și cu slug unic. */
 export function proiecteAfisate(): ProiectAfisat[] {
-  const folosite = new Set<string>();
+  // Slugurile scrise de mână se rezervă primele: dacă vreodată un proiect din
+  // export ar genera același slug, el primește sufixul cu data, nu invers.
+  // Altfel o adresă deja trimisă într-un e-mail ar ajunge pe alt proiect.
+  const folosite = new Set<string>(PROIECTE_SCRISE.map((p) => p.slug));
 
-  return proiecteBrute()
+  const dinExport = proiecteBrute()
     .map((proiect) => {
       const titlu = curataTitlu(proiect.titlu);
       const data = proiect.data.slice(0, 10);
@@ -116,8 +120,11 @@ export function proiecteAfisate(): ProiectAfisat[] {
           pozaCareExista(pozaLocala(proiect.pozaPrincipala)) ?? poze[0] ?? null,
         poze,
       };
-    })
-    .sort((a, b) => b.data.localeCompare(a.data));
+    });
+
+  return [...PROIECTE_SCRISE, ...dinExport].sort((a, b) =>
+    b.data.localeCompare(a.data),
+  );
 }
 
 export function proiectDupaSlug(slug: string): ProiectAfisat | undefined {

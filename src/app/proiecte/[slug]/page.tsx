@@ -150,6 +150,29 @@ export default async function PaginaProiect({
         </div>
       </section>
 
+      {/*
+        Descrierea, acolo unde există.
+
+        Proiectele venite din exportul WordPress n-au una: textele de acolo
+        erau postări de Facebook, cu nume de familii și diagnostice de copii,
+        iar caietul interzice publicarea lor. Cele scrise de asociație o au, și
+        atunci pagina începe cu ce s-a întâmplat, nu cu o galerie fără context.
+      */}
+      {proiect.descriere && proiect.descriere.length > 0 && (
+        <>
+          <Val culoare="text-hartie-calda" className={VAL_PESTE} />
+          <section className="relative bg-hartie-calda pt-6 pb-16 lg:pt-10 lg:pb-20">
+            <div className="relative mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+              <div className="grid gap-5 text-amplu text-cerneala-moale">
+                {proiect.descriere.map((paragraf) => (
+                  <p key={paragraf.slice(0, 40)}>{paragraf}</p>
+                ))}
+              </div>
+            </div>
+          </section>
+        </>
+      )}
+
       <Val culoare="text-hartie" className={VAL_PESTE} />
 
       <section className="relative bg-hartie pb-24 lg:pb-32">
@@ -173,8 +196,11 @@ export default async function PaginaProiect({
             </figure>
           )}
 
-          {/* Locul descrierii. Vizibil, nu ascuns: cine deschide pagina vede
-              că textul e în pregătire, nu că site-ul e gol. */}
+          {/* Locul descrierii, numai la proiectele care încă n-au una.
+              Vizibil, nu ascuns: cine deschide pagina vede că textul e în
+              pregătire, nu că site-ul e gol. La proiectele scrise de asociație
+              descrierea e deja mai sus, deci nota ar fi o minciună. */}
+          {!proiect.descriere?.length && (
           <div className="granulatie relative mt-12 overflow-hidden colt-b bg-miere-100 px-7 py-7 shadow-[0_24px_50px_-26px_rgba(255,172,0,0.7)] sm:px-9 lg:mt-16">
             <Decor
               semn="soare"
@@ -192,6 +218,7 @@ export default async function PaginaProiect({
               </span>
             </p>
           </div>
+          )}
         </div>
       </section>
 
