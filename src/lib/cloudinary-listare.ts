@@ -24,7 +24,18 @@ import "server-only";
  * nu circulă prin adresă, unde ar ajunge în jurnalele serverelor.
  */
 
-const BAZA = "https://api.cloudinary.com/v1_1";
+/**
+ * Adresa API-ului.
+ *
+ * `CLOUDINARY_API` o înlocuiește, dar **numai în afara producției**: proba
+ * automată din `scripts/qa/poze-cloud.mjs` pornește un server care imită
+ * Cloudinary, ca potrivirea folder–proiect să poată fi verificată fără
+ * cheile adevărate. În producție variabila e ignorată: altfel ar fi o pârghie
+ * prin care cheile asociației ar putea fi trimise în altă parte.
+ */
+const BAZA =
+  (process.env.NODE_ENV !== "production" && process.env.CLOUDINARY_API?.trim()) ||
+  "https://api.cloudinary.com/v1_1";
 
 export type PozaCloud = {
   /** `Teona/2026/tabara-respiro/DSC_0012` — identificatorul din Cloudinary. */
@@ -77,10 +88,18 @@ async function cere<T>(cale: string): Promise<T | null> {
   }
 }
 
-/** Folderele de la un nivel. Fără `cale`, cele de la rădăcină. */
+/**
+ * Folderele de la un nivel. Fără `cale`, cele de la rădăcină.
+ *
+ * Calea se codifică pe bucăți, nu dintr-o dată: `encodeURIComponent` pe tot
+ * `Teona/2025` ar transforma și bara în `%2F`, iar Cloudinary ar căuta un
+ * folder cu numele „Teona/2025” la rădăcină și n-ar găsi nimic. Numele de
+ * foldere sunt scrise de mână, cu spații și diacritice („TABĂRĂ SURDO-MUȚI
+ * 16-20 IUNIE 2025”), deci codificarea e oricum necesară.
+ */
 export async function dosare(cale?: string): Promise<Dosar[]> {
   const date = await cere<{ folders?: Array<{ name: string; path: string }> }>(
-    cale ? `folders/${encodeURIComponent(cale)}` : "folders",
+    cale ? `folders/${cale.split("/").map(encodeURIComponent).join("/")}` : "folders",
   );
   return (date?.folders ?? []).map((f) => ({ nume: f.name, cale: f.path }));
 }

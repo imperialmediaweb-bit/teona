@@ -63,6 +63,26 @@ e nevoie de acord explicit, bifat separat de donație — donatorii existenți *
 un astfel de acord înregistrat, deci nu pot fi adăugați retroactiv pe o listă de
 buletine informative.
 
+## Pozele taberelor: legătura se face pe dată
+
+Asociația urcă pozele în Cloudinary, în foldere cu numele scris de mână:
+`Teona/2025/TABĂRĂ AUTISM 8-12 SEPTEMBRIE 2025`. Site-ul **nu** ține lista
+fișierelor; `src/date/proiecte-cloud.ts` citește zilele și luna din numele
+folderului și le potrivește cu data proiectului.
+
+Ce înseamnă asta în practică:
+
+- o tabără nouă apare pe site **fără modificări de cod** — e destul ca pozele
+  să fie urcate într-un folder cu data în nume, iar proiectul să existe cu
+  aceeași dată;
+- dacă nimic nu se potrivește, sau dacă două foldere ies la egalitate, nu se
+  alege niciunul: mai bine o galerie goală decât pozele altei tabere, cu alți
+  copii, pe pagina greșită;
+- în panou, la `/admin/poze`, se vede sub fiecare folder la ce proiect au
+  ajuns pozele lui, sau că n-a ajuns la niciunul;
+- proba `node scripts/qa/poze-cloud.mjs` verifică potrivirea fără cheile
+  adevărate, cu un server care imită Cloudinary.
+
 ## Decizii încă deschise
 
 1. **Donațiile.** Acum merg prin GiveWP + Stripe pe WordPress, în lei, cu plată
@@ -75,8 +95,10 @@ buletine informative.
 
 ## Ce lipsește de la client
 
-Caietul de sarcini cere materiale care încă n-au venit: clasificarea pozelor pe
-proiecte și ani, lista proiectelor 2025 și 2026, cazurile umanitare publicabile,
+Caietul de sarcini cere materiale care încă n-au venit: data celei de-a 29-a
+tabere RESPIRO (textul a venit fără nicio dată, deci tabăra n-are încă pagină),
+descrierile taberelor din 9–13 iunie, 16–20 iunie și 15–19 septembrie 2025,
+cazurile umanitare publicabile,
 Formularul 230 și Declarația 177 precompletate,
 testimonialele, siglele și adresele sponsorilor, fotografiile recente,
 poza și descrierea Mihaelei Sfichi (lipsește de pe site-ul actual),

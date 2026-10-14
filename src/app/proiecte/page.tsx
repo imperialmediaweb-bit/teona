@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
 import { RUTE } from "@/date/asociatie";
 import { proiecteAfisate } from "@/date/proiecte";
+import { listaCuPozeDinCloud } from "@/date/proiecte-cloud";
 import Decor from "@/componente/Decor";
 import IndemnFinal from "@/componente/IndemnFinal";
 import AntetPagina from "@/componente/pagina/AntetPagina";
@@ -14,8 +15,10 @@ export const metadata: Metadata = metadate({
   cale: "/proiecte",
 });
 
-export default function Proiecte() {
-  const proiecte = proiecteAfisate();
+export default async function Proiecte() {
+  // Taberele noi n-au poze pe disc: fotografiile lor stau în Cloudinary, în
+  // folderul cu aceeași dată. Fără asta, cardul lor din listă ar fi gol.
+  const proiecte = await listaCuPozeDinCloud(proiecteAfisate());
 
   return (
     <>

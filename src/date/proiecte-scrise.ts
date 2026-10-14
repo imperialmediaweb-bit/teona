@@ -22,11 +22,25 @@ import type { ProiectAfisat } from "./proiecte-tipuri";
  * **Ce nu s-a adăugat.** Nicio cifră care nu era în materialul primit. Unde
  * textul spunea „38 de copii”, scrie 38; unde nu spunea nimic, nu scrie nimic.
  *
- * **Două tabere lipsesc încă.** Materialele mai conțineau o tabără pentru mame
- * și copii cu autism (8–12 septembrie, fără an) și a 29-a tabără RESPIRO (fără
- * nicio dată). Fără an nu pot fi așezate pe pagina Proiecte, care e organizată
- * pe ani, și nici nu pot primi o adresă stabilă. Se adaugă în clipa în care
- * asociația spune datele.
+ * **Taberele din 2025.** Exportul WordPress se oprește în noiembrie 2024, așa
+ * că anul 2025 lipsea cu totul de pe site. Cele patru tabere de aici au fost
+ * reconstituite din numele folderelor de poze din Cloudinary, scrise de
+ * asociație: grupul de copii și datele exacte sunt acolo („TABĂRĂ NEVĂZĂTORI
+ * 9-13 IUNIE 2025”). Formularea titlurilor o urmează pe cea pe care asociația
+ * o folosește deja pe proiectele mai vechi („copii cu deficiențe grave de
+ * vedere”), nu eticheta scurtă din folder.
+ *
+ * Doar una dintre ele are descriere — cea din 8–12 septembrie, pentru care
+ * asociația a trimis textul. Celelalte trei au titlu, dată și fotografii.
+ *
+ * **O tabără lipsește încă.** Materialele conțineau și a 29-a tabără RESPIRO,
+ * fără nicio dată. Fără dată nu poate fi așezată pe pagina Proiecte, care e
+ * organizată pe ani, nu poate primi o adresă stabilă și nu-și poate găsi
+ * folderul de poze. Se adaugă în clipa în care asociația spune când a fost.
+ *
+ * **Pozele nu sunt scrise aici.** Proiectele de mai jos au `poze: []` și
+ * `coperta: null` intenționat: fotografiile se iau din Cloudinary, din
+ * folderul cu aceeași dată — vezi `proiecte-cloud.ts`.
  */
 
 /** Un proiect scris de mână: ca cele din export, plus descrierea. */
@@ -75,5 +89,50 @@ export const PROIECTE_SCRISE: readonly ProiectScris[] = [
       "Au fost alături un preot, un pastor și o psihologă, pentru cine a vrut să stea de vorbă, iar kinetoterapeuții voluntari au ținut ședințe de masaj pentru mame și pentru voluntari.",
       "Ediția a fost susținută de EGGER Group. Au mai fost alături Direcția Generală de Asistență Socială și Protecția Copilului Suceava, și Tarsin, care a asigurat transportul.",
     ],
+  },
+  {
+    slug: "tabara-respiro-mame-si-copii-cu-autism-septembrie-2025",
+    titlu: "Tabăra RESPIRO — mame și copii cu autism",
+    data: "2025-09-08",
+    dataCitita: "8 – 12 septembrie 2025",
+    categorie: "2025",
+    coperta: null,
+    poze: [],
+    descriere: [
+      "„Această Tabără RESPIRO este despre a învăța să mergem mai departe împreună!” — cu sentimentul ăsta au plecat acasă mamele și copiii care au stat, între 8 și 12 septembrie 2025, la pensiunea La Brazi din Vama.",
+      "Pentru multe mame, mereu în căutarea unor răspunsuri la întrebările pe care autismul le ridică, tabăra a însemnat mai mult decât o pauză: un loc unde au găsit ascultare, sprijin și încurajare. Au stat de vorbă cu o psihologă de la DGASPC Suceava, cu un preot și cu un pastor, iar emoțiile grele au primit nume și înțelegere.",
+      "Copiii au încercat tiroliana, pictura, modelajul și jocurile, fiecare după puterile și ritmul lui, alături de voluntari. Șase fizioterapeute voluntare au ținut ședințe de masaj pentru mame. Tabăra s-a încheiat cu o fotografie de grup.",
+      "Proiectul „Tabăra RESPIRO – Recuperare, Integrare și Respiro pentru copii cu nevoi speciale și părinți din județul Suceava” s-a făcut cu sprijinul Consiliului Județean Suceava, prin finanțare nerambursabilă acordată în baza Legii nr. 350/2005. Tarsin a asigurat transportul, iar DGASPC Suceava a fost partener.",
+    ],
+  },
+  {
+    slug: "tabara-respiro-copii-cu-autism-15-19-septembrie-2025",
+    titlu: "Tabăra RESPIRO pentru copii cu autism",
+    data: "2025-09-15",
+    dataCitita: "15 – 19 septembrie 2025",
+    categorie: "2025",
+    coperta: null,
+    poze: [],
+    descriere: [],
+  },
+  {
+    slug: "tabara-respiro-copii-cu-deficiente-de-auz-si-vorbire-iunie-2025",
+    titlu: "Tabăra RESPIRO pentru copii cu deficiențe de auz și vorbire",
+    data: "2025-06-16",
+    dataCitita: "16 – 20 iunie 2025",
+    categorie: "2025",
+    coperta: null,
+    poze: [],
+    descriere: [],
+  },
+  {
+    slug: "tabara-respiro-copii-cu-deficiente-grave-de-vedere-iunie-2025",
+    titlu: "Tabăra RESPIRO pentru copii cu deficiențe grave de vedere",
+    data: "2025-06-09",
+    dataCitita: "9 – 13 iunie 2025",
+    categorie: "2025",
+    coperta: null,
+    poze: [],
+    descriere: [],
   },
 ];

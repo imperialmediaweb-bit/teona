@@ -10,6 +10,8 @@ import {
   pozeDinDosar,
   type PozaCloud,
 } from "@/lib/cloudinary-listare";
+import { proiecteAfisate } from "@/date/proiecte";
+import { alegeDosar } from "@/date/proiecte-cloud";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
 import DeCopiat from "@/componente/pagina/DeCopiat";
@@ -139,6 +141,25 @@ async function Continut({
   /** Firimiturile de navigare: Teona / 2026 / tabara-respiro. */
   const bucati = cale ? cale.split("/") : [];
 
+  /*
+    Ce folder a ajuns la ce proiect.
+
+    Legătura dintre un folder de poze și o pagină de proiect se face pe dată:
+    în numele folderului sunt scrise zilele și luna taberei, aceleași care sunt
+    scrise și în proiect. Aici se vede rezultatul negru pe alb, ca să nu
+    trebuiască nimeni să ghicească dacă pozele au ajuns unde trebuie. Un folder
+    care nu se potrivește cu nimic e marcat ca atare: ori proiectul lipsește
+    de pe site, ori data din numele folderului nu e scrisă la fel.
+  */
+  const numeleDosarelor = subdosare.map((d) => d.nume);
+  const legatura = new Map<string, { titlu: string; slug: string }>();
+  for (const proiect of proiecteAfisate()) {
+    const dosar = alegeDosar(numeleDosarelor, proiect.dataCitita);
+    if (dosar && !legatura.has(dosar)) {
+      legatura.set(dosar, { titlu: proiect.titlu, slug: proiect.slug });
+    }
+  }
+
   return (
     <Cadru
       titlu="Poze"
@@ -174,17 +195,31 @@ async function Continut({
       </nav>
 
       {subdosare.length > 0 && (
-        <ul className="mt-6 flex flex-wrap gap-2">
-          {subdosare.map((d) => (
-            <li key={d.cale}>
-              <Link
-                href={`/admin/poze?dosar=${encodeURIComponent(d.cale)}`}
-                className="inline-flex items-center gap-2 colt-mic-a border border-hartie-umbra bg-hartie px-4 py-2 font-titlu text-mic font-semibold text-cerneala transition-colors hover:border-caramiziu-400 hover:text-caramiziu-700"
-              >
-                {d.nume}
-              </Link>
-            </li>
-          ))}
+        <ul className="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {subdosare.map((d) => {
+            const proiect = legatura.get(d.nume);
+            return (
+              <li key={d.cale}>
+                <Link
+                  href={`/admin/poze?dosar=${encodeURIComponent(d.cale)}`}
+                  className="block h-full colt-mic-a border border-hartie-umbra bg-hartie px-4 py-3 transition-colors hover:border-caramiziu-400"
+                >
+                  <span className="block font-titlu text-mic font-semibold text-cerneala">
+                    {d.nume}
+                  </span>
+                  {proiect ? (
+                    <span className="mt-1 block text-nota text-turcoaz-700">
+                      pozele apar la „{proiect.titlu}”
+                    </span>
+                  ) : (
+                    <span className="mt-1 block text-nota text-cerneala-slab">
+                      nelegat de niciun proiect
+                    </span>
+                  )}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       )}
 

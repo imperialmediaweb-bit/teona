@@ -6,8 +6,11 @@
  * propriu și fișierul ăsta nu e chemat niciodată — motivul e explicat acolo.
  *
  * Fișierul e serializat și trimis și în browser, deci citește doar variabile
- * `NEXT_PUBLIC_*` și nu are dependențe.
+ * `NEXT_PUBLIC_*`, iar singurul lucru pe care îl importă — `cloud.ts` — are
+ * aceeași regulă.
  */
+
+import { adresaCloud, esteCloud } from "./cloud";
 
 type Parametri = { src: string; width: number; quality?: number };
 
@@ -17,6 +20,11 @@ const FOLDER = process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || "Teona";
 export default function incarcator({ src, width, quality }: Parametri): string {
   // O adresă completă (o siglă externă, o poză de pe alt domeniu) se lasă așa.
   if (/^https?:\/\//.test(src)) return src;
+
+  // `/cloud/Teona/2025/TABĂRĂ .../DSC_0012` — o poză urcată de asociație,
+  // care nu există pe disc. Identificatorul e deja complet; nu se mai
+  // adaugă folderul în față.
+  if (esteCloud(src)) return adresaCloud(src, width, quality ?? "auto");
 
   if (CLOUD) {
     // `/poze/2024/11/nume.webp` -> `Teona/2024/11/nume`. Extensia lipsește

@@ -9,7 +9,9 @@ import {
   proiectDupaSlug,
   proiecteAfisate,
 } from "@/date/proiecte";
+import { cuPozeDinCloud } from "@/date/proiecte-cloud";
 import { CATEGORII } from "@/date/proiecte-tipuri";
+import { adresaPublica } from "@/lib/cloud";
 import Decor from "@/componente/Decor";
 import IndemnFinal from "@/componente/IndemnFinal";
 import Pictograma from "@/componente/Pictograma";
@@ -29,10 +31,11 @@ export async function generateMetadata({
   params,
 }: PageProps<"/proiecte/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const proiect = proiectDupaSlug(slug);
+  const gasit = proiectDupaSlug(slug);
   // Un slug inexistent ajunge la 404; pagina aceea nu se indexează.
-  if (!proiect)
+  if (!gasit)
     return { title: "Proiect", robots: { index: false, follow: false } };
+  const proiect = await cuPozeDinCloud(gasit);
 
   // Fără dată: `data` e data postării în WordPress, care nu e mereu data
   // taberei (câteva proiecte au fost publicate abia în noiembrie 2024).
@@ -46,7 +49,12 @@ export async function generateMetadata({
     cale: `/proiecte/${proiect.slug}`,
     // Fotografia proiectului spune mai mult decât imaginea generală a site-ului.
     imagine: proiect.coperta
-      ? { cale: proiect.coperta, alt: altFotografie(proiect.titlu, 1, total) }
+      ? {
+          // O poză din Cloudinary are nevoie de adresa ei completă: Facebook
+          // n-o caută pe domeniul nostru.
+          cale: adresaPublica(proiect.coperta),
+          alt: altFotografie(proiect.titlu, 1, total),
+        }
       : undefined,
   });
 }
@@ -66,8 +74,12 @@ export default async function PaginaProiect({
   params,
 }: PageProps<"/proiecte/[slug]">) {
   const { slug } = await params;
-  const proiect = proiectDupaSlug(slug);
-  if (!proiect) notFound();
+  const gasit = proiectDupaSlug(slug);
+  if (!gasit) notFound();
+
+  // Taberele scrise de asociație n-au poze în cod: și le iau din folderul
+  // Cloudinary cu aceeași dată. Vezi `proiecte-cloud.ts`.
+  const proiect = await cuPozeDinCloud(gasit);
 
   const categorie = CATEGORII.find((c) => c.id === proiect.categorie);
   const toatePozele = pozeleProiectului(proiect);
@@ -94,7 +106,7 @@ export default async function PaginaProiect({
                   titlu: proiect.titlu,
                   cale: `/proiecte/${proiect.slug}`,
                   poze: toatePozele.map((cale, i) => ({
-                    cale,
+                    cale: adresaPublica(cale),
                     alt: altFotografie(proiect.titlu, i + 1, total),
                   })),
                 }),
