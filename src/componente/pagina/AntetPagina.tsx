@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import Decor from "../Decor";
 import Val, { VAL_PESTE } from "../Val";
+import { taietura } from "@/date/taieturi";
 
 /**
  * Antetul unei pagini interioare.
@@ -133,7 +134,8 @@ export default function AntetPagina({
                   fill
                   priority
                   sizes="(min-width: 1280px) 660px, (min-width: 1024px) 54vw, 94vw"
-                  className="object-cover"
+                  style={{ objectPosition: taietura(poza.cale) }}
+                      className="object-cover"
                 />
               </div>
 
@@ -155,6 +157,7 @@ export default function AntetPagina({
                       alt={pozaMica.alt}
                       fill
                       sizes="(min-width: 1024px) 260px, 40vw"
+                      style={{ objectPosition: taietura(pozaMica.cale) }}
                       className="object-cover"
                     />
                   </div>

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Decor from "../Decor";
 import Pictograma from "../Pictograma";
 import TitluSectiune from "./TitluSectiune";
+import { taietura } from "@/date/taieturi";
 
 export type Intrebare = { intrebare: string; raspuns: React.ReactNode };
 
@@ -106,7 +107,8 @@ export default function Intrebari({
                     alt={poza.alt}
                     fill
                     sizes="(min-width: 1024px) 440px, 0px"
-                    className="object-cover"
+                    style={{ objectPosition: taietura(poza.cale) }}
+                      className="object-cover"
                   />
                 </div>
                 {poza.legenda && (

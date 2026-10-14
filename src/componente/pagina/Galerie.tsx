@@ -2,6 +2,7 @@ import Image from "next/image";
 import Aparitie from "../Aparitie";
 import Decor from "../Decor";
 import TitluSectiune from "./TitluSectiune";
+import { taietura } from "@/date/taieturi";
 
 export type PozaGalerie = { cale: string; alt: string; legenda?: string };
 
@@ -150,7 +151,8 @@ export default function Galerie({
                       alt={poza.alt}
                       fill
                       sizes={forma.dimensiuni}
-                      className="object-cover transition-transform duration-[1100ms] ease-cald group-hover:scale-[1.06] motion-reduce:group-hover:scale-100"
+                      style={{ objectPosition: taietura(poza.cale) }}
+          className="object-cover transition-transform duration-[1100ms] ease-cald group-hover:scale-[1.06] motion-reduce:group-hover:scale-100"
                     />
                     {poza.legenda && (
                       <figcaption

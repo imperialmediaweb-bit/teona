@@ -393,3 +393,66 @@ pe Contact și cere să fie aceleași în `llms.txt`; verifică apoi că fiecare
 din fișier răspunde cu 200 și că grupul AI din `robots.txt` repetă
 interdicțiile. Dacă cineva scrie vreodată ceva de mână în fișier și rămâne în
 urmă, proba pică.
+
+---
+
+# Fotografiile — 14 octombrie 2026
+
+Clientul a semnalat că „pozele arată nașpa, la Casa Teona se văd numai
+picioarele". Verificat pe toate cele **73 de fotografii** folosite pe site, cu
+planșe de contact care arată fiecare poză exact cum e tăiată în pagină.
+
+## Ce era de fapt
+
+Nu pozele. **Tăietura.** Toate stau în cutii cu raport fix, tăiate cu
+`object-fit: cover` din centru. O poză făcută cu telefonul ținut vertical,
+pusă într-o cutie lată, pierde banda de sus — adică fețele.
+
+Măsurat: **29 de fotografii pierd peste un sfert din cadru**, unele 58%, toate
+tăiate din mijloc. Poza semnalată de client (băiatul de pe podeaua interactivă
+de la Casa Teona) pierdea 44%: rămâneau steaua proiectată și două picioare. La
+alta, o fetiță care sărută un băiețel pe obraz, rămâneau covorul și bețișoarele.
+
+**Reparat** la patru fotografii, acolo unde ridicarea tăieturii chiar schimbă
+ce se vede: podeaua interactivă, fetele la masa de lucru, fetița cu mingea
+portocalie, masa de atelier văzută de sus. Tăietura stă în `src/date/taieturi.ts`,
+legată de fișier, nu de locul unde e pusă poza — aceeași poză apare pe două-trei
+pagini, în cutii de forme diferite, iar subiectul e în același loc peste tot.
+Restul celor 29 au fost comparate una câte una, în varianta de acum și în cea
+ridicată; la ele centrul e mai bun și au rămas neatinse.
+
+Probă nouă: `scripts/qa/taieturi.mjs` desenează fiecare poză portret dintr-o
+cutie lată, acum și ridicată, una lângă alta.
+
+## Poze de stoc în arhivă — nefolosite, dar acolo
+
+Patru fișiere din `public/poze/` sunt poze de stoc rămase de la tema WordPress:
+
+- `happy-girl-with-down-syndrome-posing-while-drawing-scaled.webp`
+- `portrait-beautiful-girl-have-fun-park-scaled.webp`
+- `diverse-people-refugee-camps-1-scaled.webp`
+- `boy-with-scissors-removebg-preview.png`
+
+**Niciuna nu e folosită pe site-ul nou** — verificat. Site-ul arată numai copii
+și voluntari reali, ceea ce pentru o asociație nu e un amănunt: o poză de stoc
+cu „happy girl with Down syndrome" în locul copiilor pe care chiar îi ajuți e
+genul de lucru care se observă.
+
+Nu le-am șters: sunt trecute în `continut/media.json` și `continut/pagini.json`,
+arhiva site-ului vechi, iar ștergerea ar strica fidelitatea arhivei. Dacă
+cineva alege poze de acolo, astea patru sunt de ocolit.
+
+## Ce rămâne de hotărât
+
+**Pagina Proiecte e un zid cu aceeași poză.** Douăzeci din cele 31 de proiecte
+au drept copertă o fotografie de grup în tricouri albe, în fața aceleiași
+pensiuni. Fiecare e reală și e a proiectului ei, dar puse una lângă alta nu se
+deosebesc. Coperta se alege acum automat — prima poză a proiectului. S-ar putea
+alege alta (a doua, a treia), dar fără să mă uit la fiecare galerie n-am de
+unde să știu care e mai bună. Dacă asociația trimite, pentru proiectele
+importante, care poză să fie coperta, se rezolvă în câteva minute.
+
+**Pozele din 2025 și 2026 sunt în Cloudinary**, în două foldere. Sesiunea asta
+n-are cheile (sunt în Railway, și acolo e locul lor). Cu ele, pozele noi pot
+intra în galeriile proiectelor din 2026 și pot înlocui câteva dintre cele
+vechi, de rezoluție mică.

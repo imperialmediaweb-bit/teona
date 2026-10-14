@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { taietura } from "@/date/taieturi";
 
 /**
  * O fotografie cu colțuri rotunjite și umbră caldă.
@@ -80,6 +81,7 @@ export default function Fotografie({
           fill
           priority={prioritara}
           sizes={dimensiuni}
+          style={{ objectPosition: taietura(cale) }}
           className={`object-cover ${
             cuApropiere
               ? "transition-transform duration-[1100ms] ease-cald group-hover:scale-[1.07]"
