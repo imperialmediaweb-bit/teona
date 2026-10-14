@@ -71,9 +71,22 @@ function acreditari() {
   };
 }
 
+/**
+ * O cerere la API-ul de administrare.
+ *
+ * **De ce se scrie în jurnal.** Prima versiune înghițea orice eroare în
+ * silență și întorcea `null`. Rezultatul: pozele taberelor n-au apărut pe
+ * site, iar din afară nu se putea vedea de ce — cheie greșită, folder cu alt
+ * nume, limită depășită, toate arătau la fel. Acum fiecare eșec lasă o linie
+ * în jurnalul Railway, cu codul și calea cerută. Nici cheia, nici secretul nu
+ * ajung în jurnal: antetul nu e scris niciodată.
+ */
 async function cere<T>(cale: string): Promise<T | null> {
   const a = acreditari();
-  if (!a) return null;
+  if (!a) {
+    console.warn("[cloudinary] cheile lipsesc; listarea nu se face");
+    return null;
+  }
   try {
     const raspuns = await fetch(`${BAZA}/${a.cont}/${cale}`, {
       headers: { Authorization: a.antet },
@@ -81,9 +94,16 @@ async function cere<T>(cale: string): Promise<T | null> {
       // după ce asociația tocmai a urcat ceva. Un minut e compromisul.
       next: { revalidate: 60 },
     });
-    if (!raspuns.ok) return null;
+    if (!raspuns.ok) {
+      console.warn(`[cloudinary] ${raspuns.status} la /${cale}`);
+      return null;
+    }
     return (await raspuns.json()) as T;
-  } catch {
+  } catch (eroare) {
+    console.warn(
+      `[cloudinary] cererea la /${cale} a căzut:`,
+      eroare instanceof Error ? eroare.message : eroare,
+    );
     return null;
   }
 }
@@ -99,7 +119,9 @@ async function cere<T>(cale: string): Promise<T | null> {
  */
 export async function dosare(cale?: string): Promise<Dosar[]> {
   const date = await cere<{ folders?: Array<{ name: string; path: string }> }>(
-    cale ? `folders/${cale.split("/").map(encodeURIComponent).join("/")}` : "folders",
+    cale
+      ? `folders/${cale.split("/").map(encodeURIComponent).join("/")}?max_results=500`
+      : "folders?max_results=500",
   );
   return (date?.folders ?? []).map((f) => ({ nume: f.name, cale: f.path }));
 }

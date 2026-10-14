@@ -135,15 +135,28 @@ export async function pozeCloudProiect(
 
   const anul = `${RADACINA}/${an}`;
   const subdosare = await dosare(anul);
-  if (subdosare.length === 0) return [];
+  if (subdosare.length === 0) {
+    console.warn(`[poze] n-am găsit niciun folder în ${anul}`);
+    return [];
+  }
 
   const ales = alegeDosar(
     subdosare.map((d) => d.nume),
     dataCitita,
   );
-  if (!ales) return [];
+  if (!ales) {
+    console.warn(
+      `[poze] „${dataCitita}” nu se potrivește cu niciun folder din ${anul}: ${subdosare
+        .map((d) => d.nume)
+        .join(" · ")}`,
+    );
+    return [];
+  }
 
   const poze = await pozeDinDosar(`${anul}/${ales}`);
+  if (poze.length === 0) {
+    console.warn(`[poze] folderul ${anul}/${ales} e gol`);
+  }
   return poze.map((p) => `${PREFIX_CLOUD}${p.id}`);
 }
 
