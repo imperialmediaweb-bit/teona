@@ -32,23 +32,61 @@ function verifica(ok, mesaj) {
   if (!ok) rele++;
 }
 
+/**
+ * Scrie într-un câmp și se asigură că React a văzut ce s-a scris.
+ *
+ * Pe producție, unde pagina vine prin rețea, `fill` poate ajunge înaintea
+ * hidratării: valoarea apare în câmp, dar componenta n-o primește niciodată și
+ * căutarea nu pornește. Proba cădea din motivul ăsta, pe un site care
+ * funcționa. Se completează din nou, până când pagina reacționează.
+ */
+async function scrie(pagina, camp, valoare, semn, argument) {
+  for (let incercare = 0; incercare < 4; incercare++) {
+    await camp.fill("");
+    await camp.fill(valoare);
+    try {
+      await pagina.waitForFunction(semn, argument, { timeout: 8000 });
+      return true;
+    } catch {
+      // Încă o dată: probabil pagina nu era hidratată.
+    }
+  }
+  return false;
+}
+
+/*
+  Semnele se scriu ca funcții, nu ca șiruri de evaluat.
+
+  Politica de conținut a site-ului nu permite `eval`, iar `waitForFunction` cu
+  un șir exact asta face: în producție a dat „Evaluating a string as JavaScript
+  is blocked by CSP” la fiecare încercare, iar proba raporta zece căderi pe un
+  site care funcționa perfect. CSP-ul are dreptate — proba trebuia schimbată.
+*/
+
+/** Câmpul are o valoare lungă — semn că s-a completat singur. */
+function campCompletat(selector) {
+  const c = document.querySelector(selector);
+  return Boolean(c && c.value && c.value.length > 3);
+}
+
 const b = await browser();
 const pagina = await b.newPage();
 
 try {
   // 1. Calculatorul
-  await pagina.goto(`${BAZA}/directioneaza-20`, { waitUntil: "domcontentloaded" });
-  const campCui = pagina.getByLabel(/CUI-ul firmei/i);
-  await campCui.fill(CUI);
-
+  await pagina.goto(`${BAZA}/directioneaza-20`, { waitUntil: "networkidle" });
   const cifra = pagina.getByLabel(/Cifra de afaceri/i);
   await cifra.waitFor();
-  await pagina.waitForFunction(
-    () => {
-      const c = document.querySelector('input[name="cifra-de-afaceri"]');
-      return c instanceof HTMLInputElement && c.value.length > 3;
-    },
-    { timeout: 20_000 },
+
+  verifica(
+    await scrie(
+      pagina,
+      pagina.getByLabel(/CUI-ul firmei/i),
+      CUI,
+      campCompletat,
+      'input[name="cifra-de-afaceri"]',
+    ),
+    "calculatorul a răspuns la CUI",
   );
 
   const valCifra = await cifra.inputValue();
@@ -82,17 +120,16 @@ try {
 
   // 2. Formularul de sponsorizare, pe aceeași pagină sau pe cea de firme.
   for (const cale of ["/directioneaza-20", "/sponsori-si-parteneri"]) {
-    await pagina.goto(`${BAZA}${cale}`, { waitUntil: "domcontentloaded" });
+    await pagina.goto(`${BAZA}${cale}`, { waitUntil: "networkidle" });
     const denumire = pagina.locator('input[name="firma"]');
     if ((await denumire.count()) === 0) continue;
 
-    await pagina.locator('input[name="cui"]').first().fill(CUI);
-    await pagina.waitForFunction(
-      () => {
-        const c = document.querySelector('input[name="firma"]');
-        return c instanceof HTMLInputElement && c.value.length > 2;
-      },
-      { timeout: 20_000 },
+    await scrie(
+      pagina,
+      pagina.locator('input[name="cui"]').first(),
+      CUI,
+      campCompletat,
+      'input[name="firma"]',
     );
     verifica(
       DENUMIRE.test(await denumire.first().inputValue()),
@@ -102,11 +139,13 @@ try {
   }
 
   // 3. Formularul de contact
-  await pagina.goto(`${BAZA}/contact`, { waitUntil: "domcontentloaded" });
-  await pagina.getByLabel(/CUI \(dacă scrii/i).fill(CUI);
-  await pagina
-    .getByText(/Verifică datele firmei/i)
-    .waitFor({ timeout: 20_000 });
+  await pagina.goto(`${BAZA}/contact`, { waitUntil: "networkidle" });
+  await scrie(
+    pagina,
+    pagina.getByLabel(/CUI \(dacă scrii/i),
+    CUI,
+    () => /Verifică datele firmei/i.test(document.body.innerText),
+  );
   const contact = await pagina.locator("body").innerText();
   verifica(DENUMIRE.test(contact), "contact: datele firmei sunt pe ecran");
   verifica(
