@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { proiecteAfisate } from "@/date/proiecte";
+import { areBazaDeDate, intreaba } from "@/lib/baza";
 
 /**
  * O adresă de proiect care nu există răspunde cu 404, nu cu 200.
@@ -43,30 +44,81 @@ import { proiecteAfisate } from "@/date/proiecte";
  * convenția. Rulează întotdeauna pe Node, deci citirea proiectelor cu
  * `node:fs` e în regulă — `runtime` nici nu se mai poate scrie aici.
  */
-export const config = { matcher: "/proiecte/:slug" };
+export const config = {
+  matcher: ["/proiecte/:slug", "/noutati/:slug", "/campanii/:slug"],
+};
 
 const SLUGURI = new Set(proiecteAfisate().map((p) => p.slug));
 
-export default async function proxy(cerere: NextRequest) {
-  const cale = cerere.nextUrl.pathname.replace(/^\/proiecte\//, "");
-  let slug = cale;
+/**
+ * Există slugul ăsta, publicat?
+ *
+ * **Fără memorie, deși e o întrebare la fiecare cerere.** Două încercări de a
+ * ține minte au eșuat, fiecare în alt fel, și amândouă au fost prinse de
+ * probă:
+ *
+ * - lista tuturor slugurilor, reîmprospătată la treizeci de secunde: cine
+ *   publica o noutate și apăsa „Vezi pe site” primea 404 pe textul lui
+ *   proaspăt publicat;
+ * - ținut minte doar ce există: un text șters rămânea accesibil, pentru că
+ *   filtrul îl lăsa să treacă și pagina răspundea cu 200 și „nu a fost
+ *   găsit” în corp — exact soft-404-ul pentru care există filtrul.
+ *
+ * E o singură interogare pe un index unic, pentru un site cu zeci de vizite
+ * pe oră. Costul e sub o milisecundă; greșeala pe care o evită se vede.
+ */
+async function estePublicat(fel: string, slug: string): Promise<boolean | null> {
+  if (!areBazaDeDate()) return null;
+
   try {
-    slug = decodeURIComponent(cale);
+    const randuri = await intreaba<{ unu: number }>(
+      `SELECT 1 AS unu FROM texte
+        WHERE fel = $1 AND slug = $2 AND stare = 'publicat' LIMIT 1`,
+      [fel, slug],
+    );
+    return randuri.length > 0;
+  } catch {
+    // Baza de date e picată. Lăsăm cererea să treacă: pagina va spune ea ce
+    // poate. Un 404 pus aici ar transforma o pană de un minut într-o adresă
+    // care pare ștearsă.
+    return null;
+  }
+}
+
+export default async function proxy(cerere: NextRequest) {
+  const potriveste = cerere.nextUrl.pathname.match(
+    /^\/(proiecte|noutati|campanii)\/(.+)$/,
+  );
+  if (!potriveste) return NextResponse.next();
+
+  const [, sectiune, brut] = potriveste;
+  let slug = brut;
+  try {
+    slug = decodeURIComponent(brut);
   } catch {
     // O adresă cu procente stricate (`%zz`) nu e un slug valid oricum.
   }
 
-  if (SLUGURI.has(slug)) return NextResponse.next();
+  if (sectiune === "proiecte") {
+    return SLUGURI.has(slug)
+      ? NextResponse.next()
+      : await paginaDe404(cerere, "proiect");
+  }
 
-  return await paginaDe404(cerere);
+  const fel = sectiune === "noutati" ? "noutate" : "campanie";
+  const exista = await estePublicat(fel, slug);
+  // `null` = baza de date n-a răspuns; cererea trece mai departe.
+  if (exista !== false) return NextResponse.next();
+  return await paginaDe404(cerere, fel);
 }
 
-/** Pagina „Proiectul nu a fost găsit”, întoarsă cu codul 404. */
-async function paginaDe404(cerere: NextRequest) {
+/** Pagina „nu a fost găsit”, întoarsă cu codul 404. */
+async function paginaDe404(cerere: NextRequest, ce: string) {
   const port = process.env.PORT || "3000";
-  const acasa = `http://127.0.0.1:${port}/proiect-inexistent`;
+  const cale = `/proiect-inexistent?ce=${ce}`;
+  const acasa = `http://127.0.0.1:${port}${cale}`;
 
-  for (const unde of [acasa, new URL("/proiect-inexistent", cerere.nextUrl).toString()]) {
+  for (const unde of [acasa, new URL(cale, cerere.nextUrl).toString()]) {
     try {
       const raspuns = await fetch(unde, {
         headers: { "accept-language": cerere.headers.get("accept-language") ?? "ro" },
@@ -86,8 +138,8 @@ async function paginaDe404(cerere: NextRequest) {
     }
   }
 
-  return new NextResponse(
-    "Proiectul nu a fost găsit. Toate proiectele: /proiecte",
-    { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } },
-  );
+  return new NextResponse("Pagina nu a fost găsită.", {
+    status: 404,
+    headers: { "content-type": "text/plain; charset=utf-8" },
+  });
 }

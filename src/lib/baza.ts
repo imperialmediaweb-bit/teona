@@ -237,6 +237,44 @@ const DEFINITIE = `
   CREATE INDEX IF NOT EXISTS jetoane_dupa_expirare
     ON jetoane_cont (expira_la);
 
+  /*
+    Textele scrise de asociație din panou: noutăți și campanii.
+
+    Un singur tabel pentru amândouă, cu coloana „fel" ca să le deosebească. Au
+    aceeași formă — titlu, rezumat, text, o poză — iar o campanie adaugă doar
+    ținta de bani. Două tabele identice ar fi însemnat două editoare, două
+    liste și două feluri de a greși.
+
+    Descrierea pozei nu e opțională din scăpare: pe site nicio fotografie n-are
+    voie să rămână fără, iar pe site-ul vechi 199 din 216 o aveau goală. Aici
+    editorul o cere odată cu poza.
+
+    Slugul e unic pe fel: o noutate și o campanie pot avea același titlu fără
+    să se calce, pentru că stau pe adrese diferite.
+  */
+  CREATE TABLE IF NOT EXISTS texte (
+    id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    fel           text NOT NULL,
+    slug          text NOT NULL,
+    titlu         text NOT NULL,
+    rezumat       text NOT NULL DEFAULT '',
+    continut      text NOT NULL,
+    poza_id       text,
+    poza_latime   integer,
+    poza_inaltime integer,
+    poza_alt      text,
+    /* Doar la campanii: cât s-a propus să se strângă, în bani. */
+    tinta_bani    bigint,
+    /* ciorna → publicat. O ciornă nu se vede nicăieri pe site. */
+    stare         text NOT NULL DEFAULT 'ciorna',
+    publicat_la   timestamptz,
+    creat_la      timestamptz NOT NULL DEFAULT now(),
+    schimbat_la   timestamptz NOT NULL DEFAULT now(),
+    UNIQUE (fel, slug)
+  );
+  CREATE INDEX IF NOT EXISTS texte_publicate
+    ON texte (fel, stare, publicat_la DESC);
+
   CREATE TABLE IF NOT EXISTS evenimente_plati (
     procesator  text NOT NULL,
     eveniment   text NOT NULL,

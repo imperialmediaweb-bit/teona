@@ -237,3 +237,161 @@ export async function peMonede(): Promise<
     nr: Number(r.nr),
   }));
 }
+
+/**
+ * Ce așteaptă un răspuns chiar acum.
+ *
+ * Tabloul arăta un singur număr — „de rezolvat” — care aduna cereri de feluri
+ * diferite. Un număr nu spune ce să faci: cineva care deschide panoul
+ * dimineața vrea să vadă unde să apese, nu cât de mult are de lucru.
+ *
+ * Fiecare rând de aici e un loc în care se poate intra. Când toate sunt zero,
+ * panoul o spune și atât: un fundraiser n-are nevoie de o listă goală care
+ * ocupă jumătate de ecran.
+ */
+export async function deFacutAcum(): Promise<
+  Array<{ eticheta: string; nr: number; unde: string }>
+> {
+  const [cereri, aniversari, ciorne, firme] = await Promise.all([
+    intreaba<{ nr: string }>(
+      `SELECT count(*) AS nr FROM cereri WHERE stadiu = 'nou'`,
+    ),
+    intreaba<{ nr: string }>(
+      `SELECT count(*) AS nr FROM campanii_aniversare
+        WHERE stare = 'in_asteptare'`,
+    ),
+    intreaba<{ nr: string }>(
+      `SELECT count(*) AS nr FROM texte WHERE stare = 'ciorna'`,
+    ),
+    // O firmă căreia i s-a trimis contractul acum trei săptămâni și care
+    // n-a semnat nu e „în lucru”, e uitată.
+    intreaba<{ nr: string }>(
+      `SELECT count(*) AS nr FROM firme
+        WHERE stadiu IN ('cerere', 'contract_trimis')
+          AND schimbat_la < now() - interval '14 days'`,
+    ),
+  ]);
+
+  return [
+    { eticheta: "cereri noi", nr: Number(cereri[0]?.nr ?? 0), unde: "/admin/cereri" },
+    {
+      eticheta: "aniversări de aprobat",
+      nr: Number(aniversari[0]?.nr ?? 0),
+      unde: "/admin/aniversari",
+    },
+    {
+      eticheta: "firme fără răspuns de două săptămâni",
+      nr: Number(firme[0]?.nr ?? 0),
+      unde: "/admin/firme",
+    },
+    {
+      eticheta: "ciorne nepublicate",
+      nr: Number(ciorne[0]?.nr ?? 0),
+      unde: "/admin/scrie",
+    },
+  ].filter((r) => r.nr > 0);
+}
+
+/**
+ * Banii care vin lună de lună, de la donatorii cu plată recurentă.
+ *
+ * E cifra pe care un fundraiser o urmărește înaintea totalului: din ea se
+ * poate plăti chiria unei luni fără să se strângă nimic nou. Totalul de până
+ * acum spune ce s-a întâmplat; asta spune pe ce te poți baza luna viitoare.
+ *
+ * Se numără doar donațiile lunare încasate în ultimele 35 de zile: o plată
+ * recurentă oprită acum un an n-ar trebui să mai apară în ce „vine lunar”.
+ */
+export async function venitLunarRecurent(): Promise<{
+  bani: number;
+  donatori: number;
+}> {
+  const randuri = await intreaba<{ bani: string | null; nr: string }>(
+    `SELECT SUM(suma_bani) AS bani, COUNT(DISTINCT email) AS nr
+       FROM donatii
+      WHERE moneda = 'RON'
+        AND frecventa = 'lunar'
+        AND stare = 'platita'
+        AND platita_la >= now() - interval '35 days'`,
+  );
+  return {
+    bani: Number(randuri[0]?.bani ?? 0),
+    donatori: Number(randuri[0]?.nr ?? 0),
+  };
+}
+
+/** Ultimele donații încasate, pentru un ochi aruncat dimineața. */
+export async function ultimeleDonatii(cate = 8): Promise<
+  Array<{
+    cine: string;
+    bani: number;
+    moneda: string;
+    frecventa: string;
+    cand: string;
+  }>
+> {
+  const randuri = await intreaba<{
+    prenume: string | null;
+    nume: string | null;
+    email: string | null;
+    suma_bani: string;
+    moneda: string;
+    frecventa: string;
+    platita_la: Date | null;
+  }>(
+    `SELECT prenume, nume, email, suma_bani, moneda, frecventa, platita_la
+       FROM donatii
+      WHERE stare = 'platita'
+      ORDER BY platita_la DESC NULLS LAST
+      LIMIT $1`,
+    [cate],
+  );
+
+  return randuri.map((r) => ({
+    // Numele dacă există, altfel partea de dinaintea lui @ din e-mail. Adresa
+    // întreagă n-are ce căuta pe un ecran care poate fi văzut peste umăr.
+    cine:
+      [r.prenume, r.nume].filter(Boolean).join(" ").trim() ||
+      (r.email ? r.email.split("@")[0] : "cineva"),
+    bani: Number(r.suma_bani),
+    moneda: r.moneda,
+    frecventa: r.frecventa,
+    cand: (r.platita_la ?? new Date()).toISOString(),
+  }));
+}
+
+/**
+ * Cât s-a strâns pe fiecare campanie publicată, față de ținta ei.
+ *
+ * Se leagă prin `campanie_slug` de pe donație — câmpul pe care îl pune
+ * butonul „Donează pentru campania asta”. O campanie fără țintă apare și ea,
+ * doar cu suma: faptul că nu s-a anunțat o sumă nu înseamnă că nu vrei să
+ * știi cât a intrat.
+ */
+export async function progresulCampaniilor(): Promise<
+  Array<{ slug: string; titlu: string; tintaBani: number | null; bani: number }>
+> {
+  const randuri = await intreaba<{
+    slug: string;
+    titlu: string;
+    tinta_bani: string | null;
+    bani: string | null;
+  }>(
+    `SELECT t.slug, t.titlu, t.tinta_bani,
+            (SELECT SUM(d.suma_bani) FROM donatii d
+              WHERE d.campanie_slug = t.slug
+                AND d.moneda = 'RON'
+                AND d.stare = 'platita') AS bani
+       FROM texte t
+      WHERE t.fel = 'campanie' AND t.stare = 'publicat'
+      ORDER BY t.publicat_la DESC NULLS LAST
+      LIMIT 8`,
+  );
+
+  return randuri.map((r) => ({
+    slug: r.slug,
+    titlu: r.titlu,
+    tintaBani: r.tinta_bani === null ? null : Number(r.tinta_bani),
+    bani: Number(r.bani ?? 0),
+  }));
+}

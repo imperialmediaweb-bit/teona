@@ -148,6 +148,15 @@ const nextConfig: NextConfig = {
       ({ de_la, la }) => ({ source: de_la, destination: la, permanent: true }),
     );
 
+    // Pagina de verificare a aniversărilor s-a numit „campanii" până când
+    // campaniile asociației au ajuns și ele în panou. Semnul de carte al
+    // cuiva nu trebuie să se rupă pentru asta.
+    reguli.push({
+      source: "/admin/campanii",
+      destination: "/admin/aniversari",
+      permanent: false,
+    });
+
     // Ultima, după cele punctuale: orice altă adresă veche de proiect duce la
     // lista de proiecte, nu la 404.
     reguli.push({

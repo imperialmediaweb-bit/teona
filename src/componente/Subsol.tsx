@@ -125,6 +125,35 @@ export default async function Subsol() {
               />
             </div>
 
+            {/*
+              Noutățile și campaniile.
+
+              N-au loc în meniul principal — caietul îl fixează la nouă
+              intrări, iar a zecea rupe antetul — dar trebuie să se ajungă la
+              ele de pe orice pagină. Subsolul e locul unde se caută oricum
+              „ce mai e nou".
+            */}
+            <div>
+              <h2 className={titlu}>Pe site</h2>
+              <ul className="mt-2 grid">
+                <li>
+                  <Link href={RUTE.noutati} className={link}>
+                    Noutăți
+                  </Link>
+                </li>
+                <li>
+                  <Link href={RUTE.campanii} className={link}>
+                    Campanii
+                  </Link>
+                </li>
+                <li>
+                  <Link href={RUTE.proiecte} className={link}>
+                    Proiecte
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
             <div>
               <h2 className={titlu}>Unde ne găsești</h2>
               <ul className="mt-2 grid gap-3 text-mic leading-snug">

@@ -7,7 +7,7 @@
  */
 export default function Intrare({
   gresit,
-  unde = "/admin/campanii",
+  unde = "/admin/aniversari",
 }: {
   gresit?: boolean;
   unde?: string;

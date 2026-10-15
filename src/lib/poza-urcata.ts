@@ -64,21 +64,27 @@ export function areCloudinary(): boolean {
 /**
  * Urcă octeții și întoarce identificatorul public plus dimensiunile.
  *
- * `moderation: "manual"` nu e pus degeaba: poza rămâne în Cloudinary într-o
- * stare în care nu se servește public până n-o aprobă cineva. Noi oricum
- * ținem campania nepublicată până o verifică asociația, deci e a doua plasă
- * sub prima — dacă vreodată se scurge un identificator, poza tot nu se vede.
+ * **Poza e publică din clipa în care e urcată.** Cloudinary are o moderare
+ * care ar ține-o nevăzută până o aprobă cineva, dar e un supliment care
+ * trebuie activat pe cont, iar fără el cererea de urcare cade cu totul. Ce ne
+ * apără e altceva: identificatorul nu apare nicăieri până când asociația nu
+ * aprobă campania, iar fără identificator adresa nu poate fi ghicită.
+ *
+ * (Comentariul de dinainte spunea că moderarea e pornită. Nu era: parametrul
+ * nu fusese trimis niciodată.)
  */
 export async function urcaPoza(
   octeti: Uint8Array,
   tip: string,
+  /** Subfolderul din Cloudinary. Pozele de la vizitatori stau separat de ale asociației. */
+  subdosar = "aniversari",
 ): Promise<PozaUrcata | null> {
   const cont = process.env.CLOUDINARY_CLOUD_NAME;
   const cheie = process.env.CLOUDINARY_API_KEY;
   const secret = process.env.CLOUDINARY_API_SECRET;
   if (!cont || !cheie || !secret) return null;
 
-  const dosar = `${process.env.CLOUDINARY_FOLDER || "Teona"}/aniversari`;
+  const dosar = `${process.env.CLOUDINARY_FOLDER || "Teona"}/${subdosar}`;
   const parametri: Record<string, string> = {
     folder: dosar,
     timestamp: String(Math.floor(Date.now() / 1000)),

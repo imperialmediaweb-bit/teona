@@ -38,7 +38,7 @@ export async function POST(cerere: Request) {
       motiv,
     }).catch(() => undefined);
   }
-  return NextResponse.redirect(new URL("/admin/campanii", cerere.url), {
+  return NextResponse.redirect(new URL("/admin/aniversari", cerere.url), {
     status: 303,
   });
 }

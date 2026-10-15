@@ -25,6 +25,12 @@ const PROBE = [
   ["/proiecte/tabara-respiro-dedicata-copiilor-cu-auti", [404], "Proiectul nu a fost găsit"],
   ["/proiecte/%zz", [404, 400], ""],
   ["/pagina-care-nu-exista", [404], "Pagina nu a fost găsită"],
+  // Noutățile și campaniile se scriu din panou, deci lista lor nu se știe la
+  // construire: filtrul o întreabă pe cea din baza de date.
+  ["/noutati/nu-exista-asa-ceva", [404], "Noutatea nu a fost găsită"],
+  ["/campanii/nu-exista-asa-ceva", [404], "Campania nu a fost găsită"],
+  ["/noutati", [200], "Noutăți"],
+  ["/campanii", [200], "Campanii"],
   // Paginile adevărate nu au voie să fie prinse de filtru.
   ["/proiecte", [200], "Proiecte"],
   ["/proiecte/tabara-respiro-septembrie-2026", [200], "ediția EGGER"],

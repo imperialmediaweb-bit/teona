@@ -12,12 +12,13 @@ import { COOKIE_ADMIN, parolaCorecta, valoareaCookieului } from "@/lib/admin";
  */
 const PAGINI = new Set([
   "/admin",
-  "/admin/campanii",
+  "/admin/aniversari",
+  "/admin/scrie",
   "/admin/cereri",
   "/admin/donatii",
   "/admin/donatori",
-  "/admin/email",
   "/admin/firme",
+  "/admin/poze",
 ]);
 
 function unde(formular: FormData | null): string {

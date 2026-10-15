@@ -83,7 +83,10 @@ export default function Asistent() {
         return;
       }
       completeaza("titlu", corp.titlu);
+      // Câmpul textului se numește altfel în editorul de noutăți decât în
+      // formularul de e-mail. Se completează cel care există pe pagină.
       completeaza("text", corp.text);
+      completeaza("continut", corp.text);
       if (!(document.querySelector('[name="subiect"]') as HTMLInputElement)
         ?.value) {
         completeaza("subiect", corp.titlu);

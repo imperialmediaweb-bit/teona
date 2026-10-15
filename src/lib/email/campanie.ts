@@ -62,7 +62,7 @@ type Anunt = { numePublic: string; titlu: string; email: string };
 
 /** 1b. Asociația află că are ceva de verificat. */
 export function compuneAnunt(d: Anunt): Compus {
-  const unde = `${ADRESA_SITE}/admin/campanii`;
+  const unde = `${ADRESA_SITE}/admin/aniversari`;
   const titlu = "O campanie nouă, de verificat";
   const corp = `
     <p style="${P}"><strong>${curat(d.numePublic)}</strong> (${curat(d.email)}) a trimis campania <strong>${curat(d.titlu)}</strong>.</p>

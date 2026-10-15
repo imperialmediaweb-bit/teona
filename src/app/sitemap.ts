@@ -1,7 +1,11 @@
 import type { MetadataRoute } from "next";
+import { cacheLife } from "next/cache";
 import { RUTE } from "@/date/asociatie";
 import { pozeleProiectului, proiecteAfisate } from "@/date/proiecte";
 import { listaCuPozeDinCloud } from "@/date/proiecte-cloud";
+import { areBazaDeDate } from "@/lib/baza";
+import { FELURI, textePublicate } from "@/lib/texte";
+import { adresaPentruDistribuire } from "@/lib/poza-urcata";
 import { adresaPublica } from "@/lib/cloud";
 import { ADRESA_SITE } from "./seo";
 
@@ -16,6 +20,18 @@ import { ADRESA_SITE } from "./seo";
  * Pagina 404 nu intră; e marcată `noindex` în `not-found.tsx`.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  /*
+    Se reface din oră în oră.
+
+    Fără asta, fișierul se naște o dată, la construire, și rămâne așa: o
+    noutate publicată din panou marți n-ar ajunge în sitemap până la
+    următoarea publicare de cod. Cu `cacheComponents` pornit, `revalidate` ca
+    export de rută nu e permis — `cacheLife` e felul în care se cere același
+    lucru.
+  */
+  "use cache";
+  cacheLife("hours");
+
   /*
     Pagina de mulțumire e `noindex` — se ajunge la ea doar după o plată. O
     adresă `noindex` trecută în sitemap e un semnal contradictoriu pentru
@@ -62,5 +78,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   );
 
-  return [...pagini, ...proiecte];
+  /*
+    Noutățile și campaniile scrise din panou.
+
+    Nu sunt în cod, deci nu pot fi știute la construire: se citesc din baza de
+    date. Fără bază de date — în dezvoltare, de pildă — sitemapul rămâne cel
+    al paginilor fixe, în loc să cadă cu totul.
+  */
+  const scrise = areBazaDeDate()
+    ? (
+        await Promise.all(
+          FELURI.map(async (fel) => {
+            const texte = await textePublicate(fel.id, 500).catch(() => []);
+            return texte.map((text) => ({
+              url: `${ADRESA_SITE}${fel.cale}/${text.slug}`,
+              ...(text.publicatLa
+                ? { lastModified: new Date(text.publicatLa) }
+                : {}),
+              ...(text.poza
+                ? { images: [adresaPentruDistribuire(text.poza.id)] }
+                : {}),
+            }));
+          }),
+        )
+      ).flat()
+    : [];
+
+  return [...pagini, ...proiecte, ...scrise];
 }

@@ -125,6 +125,8 @@ export const RUTE = {
   sponsori: "/sponsori-si-parteneri",
   redirectionare35: "/redirectioneaza-3-5",
   directionare20: "/directioneaza-20",
+  noutati: "/noutati",
+  campanii: "/campanii",
   media: "/suntem-in-presa",
   voluntar: "/devino-voluntar",
   contact: "/contact",
@@ -137,7 +139,15 @@ export const RUTE = {
   multumim: "/multumim",
 } as const;
 
-/** Meniul principal, în ordinea cerută de caietul de sarcini (12.1). */
+/**
+ * Meniul principal, în ordinea cerută de caietul de sarcini (12.1).
+ *
+ * **Noutățile și campaniile nu sunt aici, deși au pagini.** Caietul fixează
+ * exact nouă intrări, iar măsurătoarea arată de ce: cu a zecea, meniul
+ * depășește cu 5 px spațiul rămas la fiecare lățime peste 1300 px și s-ar
+ * rupe pe al doilea rând (`scripts/qa/antet-latimi.mjs`). Se ajunge la ele
+ * din subsol și de pe prima pagină.
+ */
 export const MENIU: ReadonlyArray<{
   eticheta: string;
   href?: string;

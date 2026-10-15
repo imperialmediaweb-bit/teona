@@ -23,7 +23,13 @@ export const REDIRECTIONARI: ReadonlyArray<{ de_la: string; la: string }> = [
   { de_la: "/sponsori", la: "/sponsori-si-parteneri" },
   { de_la: "/35-2", la: "/redirectioneaza-3-5" },
   { de_la: "/contact-us", la: "/contact" },
-  { de_la: "/campanii", la: "/doneaza" },
+  /*
+    `/campanii` nu mai e o redirecționare: e o pagină adevărată.
+
+    Pe site-ul vechi, adresa asta ducea la o pagină care nu mai exista, iar
+    cel mai apropiat lucru era formularul de donație. Acum asociația își scrie
+    campaniile din panou, iar adresa veche duce exact unde promite.
+  */
   { de_la: "/faqs", la: "/doneaza" },
   { de_la: "/events", la: "/proiecte" },
   { de_la: "/resurse", la: "/despre-noi" },
@@ -59,7 +65,14 @@ export const REDIRECTIONARI: ReadonlyArray<{ de_la: string; la: string }> = [
 
   // Articolele de blog. Patru dintre ele descriau exact ce e acum o pagină
   // întreagă, deci duc acolo.
-  { de_la: "/blog", la: "/proiecte" },
+  /*
+    Blogul vechi duce acum la Noutăți, nu la Proiecte.
+
+    Până să existe secțiunea de noutăți, cel mai apropiat lucru de un blog
+    erau paginile de proiect. Acum există chiar ce caută cineva care deschide
+    un link vechi de blog.
+  */
+  { de_la: "/blog", la: "/noutati" },
   {
     de_la:
       "/2024/11/18/redirectioneaza-35-catre-asociatia-teona-ariana-un-singur-click-pentru-o-diferenta-reala",

@@ -8,12 +8,16 @@ import { numeleMetodei, rezumat } from "@/lib/plati/donatori";
 import {
   apasariPeLuna,
   cereriDeLucru,
+  deFacutAcum,
   palniaFirmelor,
   peDestinatii,
   peFrecventa,
   peLuni,
   peMetode,
   peMonede,
+  progresulCampaniilor,
+  ultimeleDonatii,
+  venitLunarRecurent,
 } from "@/lib/statistici";
 import { FELURI_CERERE, STADII_FIRMA } from "@/lib/crm";
 import { DESTINATII_DONATIE } from "@/date/asociatie";
@@ -33,6 +37,13 @@ export const metadata: Metadata = {
   title: "Tabloul de bord",
   robots: { index: false, follow: false },
 };
+
+const CAND_SCURT = new Intl.DateTimeFormat("ro-RO", {
+  day: "numeric",
+  month: "short",
+  hour: "2-digit",
+  minute: "2-digit",
+});
 
 /** Numele citibil al unei destinații; dacă apare una nouă, se arată ca atare. */
 function numeleDestinatiei(id: string): string {
@@ -104,6 +115,10 @@ async function Continut({
     deLucru,
     apasari,
     monede,
+    deFacut,
+    recurent,
+    ultimele,
+    campanii,
   ] = await Promise.all([
     rezumat(),
     peLuni(12),
@@ -114,6 +129,10 @@ async function Continut({
     cereriDeLucru(),
     apasariPeLuna(6),
     peMonede(),
+    deFacutAcum(),
+    venitLunarRecurent(),
+    ultimeleDonatii(8),
+    progresulCampaniilor(),
   ]);
 
   // Tot ce nu e în lei se arată separat, nu se adună.
@@ -124,8 +143,59 @@ async function Continut({
   const lunar = frecvente.find((f) => f.eticheta === "Lunar")?.bani ?? 0;
   const totalFrecvente = frecvente.reduce((s, f) => s + f.bani, 0);
 
+  /* Luna trecută, pentru comparație: penultima din cele douăsprezece. */
+  const lunaTrecuta = luni.at(-2)?.bani ?? 0;
+  const fataDeLunaTrecuta =
+    lunaTrecuta > 0
+      ? Math.round(((cifre.lunaAsta - lunaTrecuta) / lunaTrecuta) * 100)
+      : null;
+
   return (
-    <Cadru titlu="Tabloul de bord" activ="/admin">
+    <Cadru
+      titlu="Tabloul de bord"
+      descriere="Cum stă asociația cu banii și ce așteaptă un răspuns."
+      activ="/admin"
+    >
+      {/*
+        Ce așteaptă un răspuns, înaintea oricărei cifre.
+
+        Panoul începea cu totalul strâns — o cifră frumoasă, dar din care nu
+        rezultă nimic de făcut. Cineva care deschide panoul dimineața vrea
+        întâi să vadă unde să apese.
+      */}
+      <section
+        aria-label="De făcut acum"
+        className="mb-6 colt-a border border-hartie-umbra bg-hartie p-5 sm:p-6"
+      >
+        {deFacut.length === 0 ? (
+          <p className="text-amplu text-cerneala-moale">
+            Nimic nu așteaptă un răspuns. Toate cererile sunt rezolvate,
+            aniversările aprobate și nu e nicio ciornă nepublicată.
+          </p>
+        ) : (
+          <>
+            <h2 className="font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
+              De făcut acum
+            </h2>
+            <ul className="mt-3 flex flex-wrap gap-2.5">
+              {deFacut.map((lucru) => (
+                <li key={lucru.unde + lucru.eticheta}>
+                  <Link
+                    href={lucru.unde}
+                    className="inline-flex items-center gap-2.5 colt-mic-a bg-caramiziu-50 px-4 py-2.5 font-titlu text-mic font-semibold text-caramiziu-900 transition-colors hover:bg-caramiziu-100"
+                  >
+                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-caramiziu-700 text-nota font-bold text-hartie">
+                      {lucru.nr}
+                    </span>
+                    {lucru.eticheta}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </section>
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/*
           Totalul e în lei, și numai în lei.
@@ -148,18 +218,30 @@ async function Continut({
         <Cifra
           eticheta="Luna asta"
           valoare={scrieSuma(cifre.lunaAsta / 100)}
+          nota={
+            fataDeLunaTrecuta === null
+              ? "Luna trecută n-a intrat nimic"
+              : `${fataDeLunaTrecuta >= 0 ? "+" : ""}${fataDeLunaTrecuta}% față de luna trecută`
+          }
           culoare="turcoaz"
+        />
+        {/*
+          Venitul recurent, nu numărul de donatori.
+
+          E cifra pe care un fundraiser o urmărește înaintea totalului: din ea
+          se poate plăti o lună fără să se strângă nimic nou. Totalul spune ce
+          s-a întâmplat; asta spune pe ce te poți baza luna viitoare.
+        */}
+        <Cifra
+          eticheta="Vine lunar"
+          valoare={scrieSuma(recurent.bani / 100)}
+          nota={`${recurent.donatori} ${recurent.donatori === 1 ? "donator" : "donatori"} cu plată recurentă activă`}
+          culoare="miere"
         />
         <Cifra
           eticheta="Donatori"
           valoare={String(cifre.donatori)}
-          nota={`${cifre.lunari} cu donație lunară`}
-          culoare="miere"
-        />
-        <Cifra
-          eticheta="De rezolvat"
-          valoare={String(totalDeLucru)}
-          nota="Cereri care așteaptă un răspuns"
+          nota={`${totalDeLucru} ${totalDeLucru === 1 ? "cerere așteaptă" : "cereri așteaptă"} un răspuns`}
           culoare="cerneala"
         />
       </div>
@@ -173,6 +255,119 @@ async function Continut({
             <Coloane date={luni} />
           </Card>
         </div>
+
+        {/*
+          Ultimele donații, cu nume.
+
+          Nu e o statistică, e o listă de oameni cărora li se poate mulțumi
+          azi. Adresa de e-mail nu se arată întreagă: panoul se deschide și
+          într-un birou prin care trec oameni.
+        */}
+        <Card
+          titlu="Ultimele donații"
+          nota="Cele mai recente opt, încasate."
+        >
+          {ultimele.length === 0 ? (
+            <p className="text-mic text-cerneala-moale">
+              Nicio donație încasată încă.
+            </p>
+          ) : (
+            <ul className="grid gap-2.5">
+              {ultimele.map((d, i) => (
+                <li
+                  key={`${d.cand}-${i}`}
+                  className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-hartie-umbra pb-2 last:border-0 last:pb-0"
+                >
+                  <span className="font-titlu text-mic font-semibold text-cerneala">
+                    {d.cine}
+                    {d.frecventa === "lunar" && (
+                      <span className="ml-2 rounded-full bg-miere-100 px-2 py-0.5 text-nota font-bold text-miere-900">
+                        lunar
+                      </span>
+                    )}
+                  </span>
+                  <span className="font-titlu text-mic font-bold text-cerneala">
+                    {scrieSuma(d.bani / 100, d.moneda)}
+                  </span>
+                  <span className="basis-full text-nota text-cerneala-slab">
+                    {CAND_SCURT.format(new Date(d.cand))}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+
+        {/*
+          Campaniile scrise din panou, cu cât s-a strâns pe fiecare.
+
+          Legătura se face prin `campanie_slug` de pe donație — câmpul pe care
+          îl pune butonul „Donează pentru campania asta”. O campanie fără
+          țintă apare și ea: faptul că nu s-a anunțat o sumă nu înseamnă că nu
+          vrei să știi cât a intrat.
+        */}
+        <Card
+          titlu="Campanii"
+          nota="Cât s-a strâns pe fiecare campanie publicată."
+        >
+          {campanii.length === 0 ? (
+            <p className="text-mic text-cerneala-moale">
+              Nicio campanie publicată.{" "}
+              <Link
+                href="/admin/scrie?fel=campanie"
+                className="font-semibold text-caramiziu-700 hover:underline"
+              >
+                Scrie una
+              </Link>
+              .
+            </p>
+          ) : (
+            <ul className="grid gap-4">
+              {campanii.map((c) => {
+                const procent =
+                  c.tintaBani && c.tintaBani > 0
+                    ? Math.min(
+                        100,
+                        Math.round((c.bani / c.tintaBani) * 100),
+                      )
+                    : null;
+                return (
+                  <li key={c.slug}>
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+                      <Link
+                        href={`/campanii/${c.slug}`}
+                        className="font-titlu text-mic font-semibold text-cerneala hover:text-caramiziu-700"
+                      >
+                        {c.titlu}
+                      </Link>
+                      <span className="font-titlu text-mic font-bold text-cerneala">
+                        {scrieSuma(c.bani / 100)}
+                        {c.tintaBani !== null && (
+                          <span className="font-semibold text-cerneala-slab">
+                            {" "}
+                            din {scrieSuma(c.tintaBani / 100)}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                    {procent !== null && (
+                      <div
+                        className="mt-1.5 h-2 overflow-hidden rounded-full bg-hartie-umbra"
+                        role="img"
+                        aria-label={`${procent}% din țintă`}
+                      >
+                        <div
+                          className="h-full rounded-full bg-caramiziu-600"
+                          style={{ width: `${procent}%` }}
+                        />
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </Card>
 
         <Card
           titlu="Donatori noi"

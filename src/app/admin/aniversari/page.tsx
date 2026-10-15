@@ -9,7 +9,7 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "Verificare campanii",
+  title: "Aniversări de aprobat",
   robots: { index: false, follow: false },
 };
 
@@ -32,7 +32,7 @@ export default function Verificare({
   searchParams: Promise<{ gresit?: string }>;
 }) {
   return (
-    <Suspense fallback={<Cadru titlu="Verificare campanii">Se încarcă…</Cadru>}>
+    <Suspense fallback={<Cadru titlu="Aniversări de aprobat">Se încarcă…</Cadru>}>
       <Continut searchParams={searchParams} />
     </Suspense>
   );
@@ -48,7 +48,7 @@ async function Continut({
 
   if (!areParolaConfigurata()) {
     return (
-      <Cadru titlu="Verificare campanii">
+      <Cadru titlu="Aniversări de aprobat">
         <p className="text-amplu text-cerneala-moale">
           Zona asta nu e configurată. Setează variabila{" "}
           <code className="rounded bg-hartie-umbra px-1.5 py-0.5">
@@ -62,7 +62,7 @@ async function Continut({
 
   if (!(await esteAutentificat())) {
     return (
-      <Cadru titlu="Verificare campanii">
+      <Cadru titlu="Aniversări de aprobat">
         <form action="/api/admin/intrare" method="post" className="max-w-sm">
           <label
             htmlFor="parola"
@@ -98,7 +98,7 @@ async function Continut({
 
   if (!areBazaDeDate()) {
     return (
-      <Cadru titlu="Verificare campanii">
+      <Cadru titlu="Aniversări de aprobat">
         <p className="text-amplu text-cerneala-moale">
           Baza de date nu e legată la site (lipsește `DATABASE_URL`).
         </p>
@@ -154,7 +154,7 @@ async function Continut({
             )}
 
             <div className="mt-6 flex flex-wrap gap-3 border-t border-hartie-umbra pt-5">
-              <form action="/api/admin/campanii" method="post">
+              <form action="/api/admin/aniversari" method="post">
                 <input type="hidden" name="id" value={c.id} />
                 <input type="hidden" name="hotarare" value="publicata" />
                 <button
@@ -164,7 +164,7 @@ async function Continut({
                   Publică
                 </button>
               </form>
-              <form action="/api/admin/campanii" method="post">
+              <form action="/api/admin/aniversari" method="post">
                 <input type="hidden" name="id" value={c.id} />
                 <input type="hidden" name="hotarare" value="respinsa" />
                 <button

@@ -114,6 +114,30 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
 - Probă: `BAZA=http://localhost:3000 node scripts/qa/firma-anaf.mjs` (cere
   internet — datele vin de la ANAF, în direct).
 
+## Panoul: ce se face de unde
+
+- **`/admin`** — tabloul de bord. Începe cu „De făcut acum" (cereri noi,
+  aniversări de aprobat, firme fără răspuns de două săptămâni, ciorne), apoi
+  cifrele: total, luna asta față de luna trecută, **cât vine lunar** din plăți
+  recurente, ultimele donații cu nume, progresul campaniilor.
+- **`/admin/scrie`** — noutăți și campanii, scrise de asociație. Ciornă până
+  când cineva apasă „Publică". Textul e simplu: rând gol = paragraf nou,
+  `##` = subtitlu, `-` = punct de listă. Poza cere descriere, altfel nu se
+  urcă. Asistentul (cu `ANTHROPIC_API_KEY`) scrie o primă ciornă.
+- **`/admin/aniversari`** — aprobarea campaniilor de ziua cuiva. Se numea
+  `/admin/campanii`; adresa veche redirecționează.
+- **`/admin/poze`** — ce e în Cloudinary și la ce proiect au ajuns pozele.
+- **Buletinele și campaniile de e-mail se fac în MailerLite**, nu în panou.
+  Pagina care lăsa o ciornă acolo a fost scoasă: trecea pe lângă tot ce face
+  un instrument de e-mail. În bara din stânga e un link către el.
+
+Publicul: **`/noutati`** și **`/campanii`**, cu paginile lor. Nu sunt în meniul
+principal — caietul îl fixează la nouă intrări (12.1), iar a zecea rupe antetul
+la orice lățime peste 1300 px — ci în subsol.
+
+Textele stau în tabelul `texte`, nu în cod. Probă:
+`BAZA=… PAROLA_ADMIN=… node scripts/qa/scrie-pe-site.mjs`.
+
 ## Adresele inexistente răspund 404, nu 200
 
 `/proiecte/<slug care nu există>` răspundea cu **codul 200** și pagina „nu a
@@ -134,9 +158,10 @@ Proba: `BAZA=http://localhost:3000 node scripts/qa/coduri-404.mjs`.
 1. **Donațiile.** Acum merg prin GiveWP + Stripe pe WordPress, în lei, cu plată
    recurentă. Fie se rescrie peste Stripe aici, fie site-ul nou trimite la
    WordPress-ul existent pentru plăți. Nimic nu s-a decis.
-2. **Cine editează conținutul.** Caietul de sarcini cere de peste șapte ori ca
-   asociația să poată modifica singură textele, campaniile, testimonialele,
-   proiectele și documentele. Fără un CMS, totul trece prin dezvoltator.
+2. **Cine editează conținutul.** Rezolvat pe jumătate: noutățile și campaniile
+   se scriu din panou, cu poze (`/admin/scrie`). Rămân prin dezvoltator
+   testimonialele, descrierile proiectelor, documentele și textele paginilor
+   fixe.
 3. **CRM pentru donatori**, cu campanii de e-mail — urmează.
 
 ## Ce lipsește de la client
