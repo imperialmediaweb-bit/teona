@@ -140,6 +140,8 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
 - **Segmente de donatori**: „s-au oprit" (au dat de cel puțin două ori, nimic
   în ultimele patru luni) și „donatori mari" (peste 1.000 de lei adunat;
   pragul e în `src/lib/plati/donatori.ts`).
+- **Formularele 230** primite de pe site, cu fișierul lor, sunt la
+  `/admin/formulare`.
 - **Buletinele și campaniile de e-mail se fac în MailerLite**, nu în panou.
   Pagina care lăsa o ciornă acolo a fost scoasă: trecea pe lângă tot ce face
   un instrument de e-mail. În bara din stânga e un link către el.
@@ -151,6 +153,31 @@ la orice lățime peste 1300 px — ci în subsol.
 Textele stau în tabelul `texte`, nu în cod. Probe:
 `BAZA=… PAROLA_ADMIN=… node scripts/qa/scrie-pe-site.mjs` și
 `… node scripts/qa/panou-fundraising.mjs`.
+
+## Formularul 230 pe hârtie: fișiere în R2, nu în Cloudinary
+
+Cine preferă pixul descarcă formularul de la `/formular-230`, îl semnează, îi
+face o fotografie și o trimite de pe `/redirectioneaza-3-5`. Asociația le vede
+la `/admin/formulare`, cu nume, e-mail, telefon și stadiu
+(primit → verificat → depus la ANAF).
+
+- **Fotografia nu ține loc de hârtie.** Originalul semnat tot trebuie să ajungă
+  la asociație — ANAF îl poate cere. Scrie pe pagină, în răspunsul de după
+  trimitere și în panou. Ce aduce poza e timpul: se știe din ziua aceea cine
+  redirecționează și pe cine mai trebuie sunat după plic.
+- **Fișierele stau în Cloudflare R2, privat**, nu în Cloudinary: pe un 230
+  scrie nume, adresă, **CNP** și o semnătură, iar Cloudinary e o rețea publică
+  de livrare a imaginilor. Nu există nicio adresă permanentă — panoul cere o
+  legătură semnată, valabilă zece minute.
+- Cheile se pun în Railway: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`,
+  `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`. Fără ele, formularul spune cinstit că
+  primirea nu e pornită și dă telefonul.
+- Ștergerea din panou scoate **întâi fișierul din R2**, apoi rândul: invers, o
+  cădere ar lăsa în depozit o fotografie cu un CNP pe care nimeni n-ar mai
+  putea s-o găsească.
+- Semnătura AWS v4 e scrisă de mână (`src/lib/r2.ts`), fără SDK. Probă:
+  `node scripts/qa/semnatura-r2.mjs` — o verifică pe cazurile publicate de AWS,
+  pentru că o semnătură greșită nu dă un rezultat parțial, ci niciunul.
 
 ## Adresele inexistente răspund 404, nu 200
 

@@ -20,6 +20,7 @@ import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
 import Val, { VAL_PESTE } from "@/componente/Val";
 import Formular230 from "@/componente/pagina/Formular230";
 import FormularRedirectionare from "@/componente/formular/FormularRedirectionare";
+import TrimiteFormular230 from "@/componente/formular/TrimiteFormular230";
 import AntetPagina from "@/componente/pagina/AntetPagina";
 import DeCopiat from "@/componente/pagina/DeCopiat";
 import DocumentDeDescarcat from "@/componente/pagina/DocumentDeDescarcat";
@@ -392,6 +393,27 @@ export default async function Redirectioneaza35() {
           />
           <div className="mt-10">
             <Formular230 linkDescarcare="#documente" />
+          </div>
+
+          {/*
+            Calea pe hârtie, pentru cine n-o vrea pe cea online.
+
+            Descarcă formularul cu datele asociației deja completate, îl
+            semnează, îi face o fotografie și ne-o trimite. Fotografia nu ține
+            loc de hârtie — originalul tot trebuie să ajungă la asociație, și
+            scrie asta în ambii pași — dar asociația vede din ziua aceea cine
+            redirecționează, în loc să afle în mai, când deschide plicurile.
+          */}
+          <div id="pe-hartie" className="mt-16 scroll-mt-32">
+            <TitluSectiune
+              scris="Sau pe hârtie"
+              titlu="Descarcă, semnează, trimite-ne poza"
+              text="Pentru cine preferă pixul. Fotografia ne ajută să începem; hârtia semnată tot trebuie să ajungă la noi."
+              culoare="caramiziu"
+            />
+            <div className="mt-10">
+              <TrimiteFormular230 />
+            </div>
           </div>
 
           {/*

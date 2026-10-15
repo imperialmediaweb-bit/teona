@@ -68,6 +68,7 @@ for (const cale of [
   "/admin/scrie",
   "/admin/poze",
   "/admin/cauta",
+  "/admin/formulare",
 ]) {
   const html = await (await cere(cale)).text();
   verifica(
