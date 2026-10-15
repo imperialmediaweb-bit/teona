@@ -107,6 +107,67 @@ function citesteJson(brut: string): { titlu: string; text: string } | null {
   }
 }
 
+/**
+ * Îndreaptă un text scris de un vizitator, fără să-l rescrie.
+ *
+ * Îl folosește pagina de campanie de ziua cuiva: omul scrie cum îi vine, apoi
+ * cere să-i fie îndreptat. Diacriticele, greșelile de scris, punctuația — atât.
+ * Nu i se schimbă înțelesul, nu i se adaugă cifre și nu i se adaugă îndemnuri:
+ * textul de pe pagina lui trebuie să rămână al lui, altfel prietenii care îl
+ * citesc recunosc vocea unui robot și nu mai dă nimeni nimic.
+ *
+ * Întoarce `null` la orice împiedicare. Formularul spune atunci că n-a mers, iar
+ * textul omului rămâne exact cum era.
+ */
+export async function indreaptaTextul(text: string): Promise<string | null> {
+  const cheie = process.env.ANTHROPIC_API_KEY;
+  if (!cheie) return null;
+
+  const instructiuni = [
+    "Ești corector de limba română pentru o asociație de copii cu dizabilități.",
+    "Primești textul scris de un om pentru pagina lui de strângere de fonduri.",
+    "",
+    "Ce ai voie să faci: pui diacriticele, îndrepți greșelile de scriere și",
+    "punctuația, desparți în paragrafe dacă e un bloc compact.",
+    "",
+    "Ce NU ai voie să faci: să schimbi înțelesul, să rescrii în alt stil, să",
+    "adaugi fraze noi, cifre, nume sau îndemnuri la donație. Dacă textul e deja",
+    "corect, întoarce-l neschimbat. Păstrează tonul lui, chiar dacă e simplu.",
+    "",
+    "Răspunzi NUMAI cu textul îndreptat, fără ghilimele și fără explicații.",
+  ].join("\n");
+
+  try {
+    const raspuns = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "x-api-key": cheie,
+        "anthropic-version": "2023-06-01",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: PLAFON_RASPUNS,
+        system: instructiuni,
+        messages: [{ role: "user", content: text }],
+      }),
+    });
+    if (!raspuns.ok) return null;
+
+    const corp = (await raspuns.json()) as {
+      content?: Array<{ type?: string; text?: string }>;
+    };
+    const iesit = (corp.content ?? [])
+      .filter((b) => b.type === "text" && typeof b.text === "string")
+      .map((b) => b.text)
+      .join("")
+      .trim();
+    return iesit || null;
+  } catch {
+    return null;
+  }
+}
+
 export async function scrieCiorna(cerere: {
   fel: Fel;
   despre: string;

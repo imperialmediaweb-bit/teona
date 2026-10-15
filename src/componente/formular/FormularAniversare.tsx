@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { LIMITE, OCAZII, POZA_MAXIM } from "@/date/aniversari";
+import {
+  LIMITE,
+  OCAZII,
+  POZA_MAXIM,
+  textGataFacut,
+} from "@/date/aniversari";
 import { RUTE } from "@/date/asociatie";
 import Pictograma from "@/componente/Pictograma";
 import Camp, {
@@ -45,13 +50,75 @@ type Trimisa = { slug: string; jeton: string };
 
 const MARIME_MAXIMA_TEXT = "6 MB";
 
-export default function FormularAniversare() {
+export default function FormularAniversare({
+  areAsistent = false,
+}: {
+  /** Dacă asistentul e pornit în Railway. Butonul de îndreptat apare doar atunci. */
+  areAsistent?: boolean;
+}) {
   const [erori, setErori] = useState<Erori>({});
   const [seTrimite, setSeTrimite] = useState(false);
   const [trimisa, setTrimisa] = useState<Trimisa | null>(null);
   const [numePoza, setNumePoza] = useState<string | null>(null);
   const [lungimeMesaj, setLungimeMesaj] = useState(0);
   const formular = useRef<HTMLFormElement>(null);
+  const mesaj = useRef<HTMLTextAreaElement>(null);
+  const [indrept, setIndrept] = useState(false);
+  const [notaMesaj, setNotaMesaj] = useState("");
+
+  /** Pune în casetă un text gata scris, cu numele și ocazia alese. */
+  function scrieTextul() {
+    const el = mesaj.current;
+    const form = formular.current;
+    if (!el || !form) return;
+    const date = new FormData(form);
+    const text = textGataFacut(
+      String(date.get("ocazie") ?? ""),
+      String(date.get("nume_public") ?? ""),
+    ).slice(0, LIMITE.mesaj);
+    el.value = text;
+    setLungimeMesaj(text.length);
+    setNotaMesaj("Gata — schimbă-l cum vrei, e doar un punct de plecare.");
+    el.focus();
+  }
+
+  /**
+   * Trimite textul omului la asistent, care îl îndreaptă.
+   *
+   * Nu-l rescrie: corectează diacriticele și greșelile, nu schimbă ce a vrut
+   * să spună. Dacă nu merge, textul rămâne exact cum era — nimic nu se pierde.
+   */
+  async function indreaptaTextul() {
+    const el = mesaj.current;
+    if (!el || el.value.trim().length < 20) {
+      setNotaMesaj("Scrie întâi câteva rânduri, apoi ți le îndrept.");
+      return;
+    }
+    setIndrept(true);
+    setNotaMesaj("");
+    try {
+      const raspuns = await fetch("/api/asistent/aniversare", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: el.value }),
+      });
+      const corp = (await raspuns.json().catch(() => ({}))) as {
+        text?: string;
+        mesaj?: string;
+      };
+      if (!raspuns.ok || !corp.text) {
+        setNotaMesaj(corp.mesaj ?? "N-am putut îndrepta textul acum.");
+        return;
+      }
+      el.value = corp.text.slice(0, LIMITE.mesaj);
+      setLungimeMesaj(el.value.length);
+      setNotaMesaj("Îndreptat. Citește-l — dacă ți-a schimbat înțelesul, scrie-l tu.");
+    } catch {
+      setNotaMesaj("N-am putut îndrepta textul acum. Verifică-ți conexiunea.");
+    } finally {
+      setIndrept(false);
+    }
+  }
 
   async function trimite(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
@@ -243,6 +310,7 @@ export default function FormularAniversare() {
         <textarea
           id="an-mesaj"
           name="mesaj"
+          ref={mesaj}
           rows={6}
           maxLength={LIMITE.mesaj}
           onChange={(ev) => setLungimeMesaj(ev.currentTarget.value.length)}
@@ -252,6 +320,38 @@ export default function FormularAniversare() {
         <p className="mt-1.5 text-right text-nota text-cerneala-slab">
           {lungimeMesaj} / {LIMITE.mesaj}
         </p>
+
+        {/*
+          Foaia albă e partea cea mai grea dintr-un formular. Butonul întâi
+          pune un text gata scris, cu numele și ocazia alese; al doilea
+          îndreaptă ce a scris omul, fără să-i schimbe înțelesul.
+        */}
+        <div className="mt-1 flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={scrieTextul}
+            className="colt-mic-a border-2 border-caramiziu-200 bg-caramiziu-50 px-4 py-2 font-titlu text-mic font-bold text-caramiziu-800 transition-colors hover:border-caramiziu-400"
+          >
+            {lungimeMesaj > 0
+              ? "Înlocuiește cu un text gata scris"
+              : "Scrie-mi tu un text"}
+          </button>
+          {areAsistent && (
+            <button
+              type="button"
+              onClick={indreaptaTextul}
+              disabled={indrept}
+              className="colt-mic-b border-2 border-hartie-umbra bg-hartie px-4 py-2 font-titlu text-mic font-bold text-cerneala transition-colors hover:border-turcoaz-400 disabled:opacity-60"
+            >
+              {indrept ? "Se îndreaptă…" : "Îndreaptă-mi textul"}
+            </button>
+          )}
+        </div>
+        {notaMesaj && (
+          <p role="status" className="mt-2 text-nota text-cerneala-moale">
+            {notaMesaj}
+          </p>
+        )}
       </Camp>
 
       <Camp

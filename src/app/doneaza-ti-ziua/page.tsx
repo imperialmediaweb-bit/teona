@@ -12,6 +12,7 @@ import Intrebari from "@/componente/pagina/Intrebari";
 import Pasi from "@/componente/pagina/Pasi";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
 import FormularAniversare from "@/componente/formular/FormularAniversare";
+import { areAsistent } from "@/lib/asistent";
 
 export const metadata: Metadata = metadate({
   titlu: "Donează-ți ziua de naștere",
@@ -190,7 +191,7 @@ export default function DoneazaTiZiua() {
             culoare="caramiziu"
           />
           <div className="mt-12">
-            <FormularAniversare />
+            <FormularAniversare areAsistent={areAsistent()} />
           </div>
         </div>
       </section>
