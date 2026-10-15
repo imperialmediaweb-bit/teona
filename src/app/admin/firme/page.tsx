@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
@@ -12,6 +13,7 @@ import {
 } from "@/lib/crm";
 import { scrieSuma } from "@/lib/suma";
 import Cadru from "@/componente/admin/Cadru";
+import Descarca from "@/componente/admin/Descarca";
 import Intrare from "@/componente/admin/Intrare";
 import Jurnal from "@/componente/admin/Jurnal";
 
@@ -110,7 +112,11 @@ async function Continut({
     : [];
 
   return (
-    <Cadru titlu="Firme" activ="/admin/firme">
+    <Cadru
+      titlu="Firme"
+      activ="/admin/firme"
+      actiuni={<Descarca ce="firme" />}
+    >
       {eroare && (
         <p
           role="alert"
@@ -213,6 +219,16 @@ async function Continut({
                       Încasat: {scrieSuma(f.sumaBani / 100)}
                     </p>
                   )}
+                  {/* Contractul, de la fișa firmei: datele pe care le-ar
+                      completa cineva de mână sunt deja aici. */}
+                  <p className="sm:col-span-2">
+                    <Link
+                      href={`/admin/firme/${f.id}/contract`}
+                      className="font-titlu font-semibold text-caramiziu-700 underline underline-offset-2"
+                    >
+                      Fă contractul de sponsorizare →
+                    </Link>
+                  </p>
                 </div>
 
                 {f.mesaj && (

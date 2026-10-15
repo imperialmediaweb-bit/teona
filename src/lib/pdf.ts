@@ -106,7 +106,7 @@ export class Cursor {
     text: string,
     {
       gros = false,
-      marime = 10.5,
+      marime = 10,
       culoare = CERNEALA,
       spatiuDupa = 6,
       indent = 0,
@@ -139,16 +139,47 @@ export class Cursor {
     return this;
   }
 
+  /**
+   * Trece pe pagină nouă dacă blocul care urmează n-ar încăpea întreg.
+   *
+   * Pentru lucruri care n-au voie să se rupă: un bloc de semnături despicat
+   * între pagini arată ca un document trimis greșit, iar cineva care primește
+   * un contract cu semnăturile orfane pe pagina trei se întreabă dacă lipsește
+   * ceva.
+   */
+  rezerva(inaltime: number): this {
+    this.locPentru(inaltime);
+    return this;
+  }
+
+  /**
+   * Unde a ajuns cursorul, și cum se pune înapoi acolo.
+   *
+   * `pdf-lib` scrie la coordonate absolute, iar cursorul merge doar în jos.
+   * Două coloane alăturate — semnăturile — se scriu scriind prima, revenind
+   * la înălțimea de dinainte și scriind-o pe a doua cu un `indent`. Se
+   * folosește numai după `rezerva`, ca amândouă să fie sigur pe aceeași
+   * pagină.
+   */
+  pozitia(): number {
+    return this.y;
+  }
+
+  laPozitia(y: number): this {
+    this.y = y;
+    return this;
+  }
+
   linie(): this {
     this.locPentru(12);
-    this.y -= 8;
+    this.y -= 6;
     this.pagina.drawLine({
       start: { x: MARGINE, y: this.y },
       end: { x: A4.latime - MARGINE, y: this.y },
       thickness: 0.6,
       color: rgb(0.85, 0.82, 0.8),
     });
-    this.y -= 8;
+    this.y -= 6;
     return this;
   }
 

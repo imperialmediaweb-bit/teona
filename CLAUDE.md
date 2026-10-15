@@ -127,6 +127,19 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
 - **`/admin/aniversari`** — aprobarea campaniilor de ziua cuiva. Se numea
   `/admin/campanii`; adresa veche redirecționează.
 - **`/admin/poze`** — ce e în Cloudinary și la ce proiect au ajuns pozele.
+- **Contractul de sponsorizare** se generează din fișa firmei
+  (`/admin/firme/<id>/contract`): denumirea și contactul vin din fișă, sediul
+  și nr. de la registrul comerțului de la ANAF după CUI, clauzele sunt cele
+  din contractul asociației, cuvânt cu cuvânt. Iese PDF de două pagini, cu
+  diacritice, și mută firma la „contract trimis".
+- **Export pentru Excel** pe donații, donatori, firme și cereri: `;` ca
+  separator, BOM la început și virgulă zecimală — fără ele, Excel-ul românesc
+  citește 150 de lei ca 150 de milioane de miliarde.
+- **Căutare peste tot**, din bara din stânga: nume, e-mail, telefon sau CUI, în
+  donatori, firme și cereri deodată.
+- **Segmente de donatori**: „s-au oprit" (au dat de cel puțin două ori, nimic
+  în ultimele patru luni) și „donatori mari" (peste 1.000 de lei adunat;
+  pragul e în `src/lib/plati/donatori.ts`).
 - **Buletinele și campaniile de e-mail se fac în MailerLite**, nu în panou.
   Pagina care lăsa o ciornă acolo a fost scoasă: trecea pe lângă tot ce face
   un instrument de e-mail. În bara din stânga e un link către el.
@@ -135,8 +148,9 @@ Publicul: **`/noutati`** și **`/campanii`**, cu paginile lor. Nu sunt în meniu
 principal — caietul îl fixează la nouă intrări (12.1), iar a zecea rupe antetul
 la orice lățime peste 1300 px — ci în subsol.
 
-Textele stau în tabelul `texte`, nu în cod. Probă:
-`BAZA=… PAROLA_ADMIN=… node scripts/qa/scrie-pe-site.mjs`.
+Textele stau în tabelul `texte`, nu în cod. Probe:
+`BAZA=… PAROLA_ADMIN=… node scripts/qa/scrie-pe-site.mjs` și
+`… node scripts/qa/panou-fundraising.mjs`.
 
 ## Adresele inexistente răspund 404, nu 200
 

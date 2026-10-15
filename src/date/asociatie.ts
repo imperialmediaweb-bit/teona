@@ -86,6 +86,41 @@ export const CONTURI = [
   },
 ] as const;
 
+/**
+ * Datele cu care asociația semnează un contract.
+ *
+ * Luate din contractul de sponsorizare primit de la asociație
+ * (`continut/contract-sponsorizare-2026.pdf`, 14 octombrie 2026), nu
+ * reconstituite. Un număr de registru greșit într-un contract semnat e o
+ * problemă de altă categorie decât un titlu scris aiurea pe o pagină.
+ *
+ * `email` e cel de pe antetul lor, care nu e același cu adresa de contact de
+ * pe site: contractele pleacă și vin pe adresa aia.
+ */
+export const JURIDIC = {
+  registru: "nr. 1/14.01.2021 (registrul persoanelor juridice)",
+  reprezentant: "Corneliu Cristea Costiuc",
+  calitate: "Președinte",
+  email: "ata.suceava@gmail.com",
+  conturi: [
+    {
+      moneda: "LEI",
+      iban: "RO57 BACX 0000 0021 0940 3001",
+      banca: "UniCredit Bank, Suc. Curtea Domnească Suceava",
+    },
+    {
+      moneda: "EURO",
+      iban: "RO30 BACX 0000 0021 0940 3002",
+      banca: "UniCredit Bank, Suc. Curtea Domnească Suceava",
+    },
+    {
+      moneda: "LEI",
+      iban: "RO16 RNCB 0234 1852 3366 0001",
+      banca: "BCR Suceava",
+    },
+  ],
+} as const;
+
 export const SMS = {
   text: "SUSTIN",
   numar: "8835",

@@ -11,6 +11,7 @@ import {
 import { DESTINATII_DONATIE } from "@/date/asociatie";
 import { scrieSuma } from "@/lib/suma";
 import Cadru from "@/componente/admin/Cadru";
+import Descarca from "@/componente/admin/Descarca";
 import Intrare from "@/componente/admin/Intrare";
 
 export const metadata: Metadata = {
@@ -83,7 +84,11 @@ async function Continut({
   const azi = new Date().toISOString().slice(0, 10);
 
   return (
-    <Cadru titlu="Donații" activ="/admin/donatii">
+    <Cadru
+      titlu="Donații"
+      activ="/admin/donatii"
+      actiuni={<Descarca ce="donatii" />}
+    >
       {gata && (
         <p
           role="status"

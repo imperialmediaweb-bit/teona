@@ -6,6 +6,7 @@ import { areBazaDeDate } from "@/lib/baza";
 import { donatori, rezumat, type Filtru } from "@/lib/plati/donatori";
 import { scrieSuma } from "@/lib/suma";
 import Cadru from "@/componente/admin/Cadru";
+import Descarca from "@/componente/admin/Descarca";
 import Intrare from "@/componente/admin/Intrare";
 import Jurnal from "@/componente/admin/Jurnal";
 import { interactiuni } from "@/lib/crm";
@@ -18,6 +19,10 @@ export const metadata: Metadata = {
 const FILTRE: Array<{ id: Filtru; eticheta: string }> = [
   { id: "toti", eticheta: "Toți" },
   { id: "lunari", eticheta: "Donatori lunari" },
+  // Primele două liste cu care se începe săptămâna: cine a tăcut și cine dă
+  // mult. Stau înaintea filtrelor de buletin, care sunt treabă de MailerLite.
+  { id: "opriti", eticheta: "S-au oprit" },
+  { id: "mari", eticheta: "Donatori mari" },
   { id: "cu-acord", eticheta: "Cu acord de buletin" },
   { id: "fara-acord", eticheta: "Fără acord" },
   { id: "neduși", eticheta: "Cu acord, neurcați în listă" },
@@ -96,7 +101,11 @@ async function Continut({
   const inapoiLa = `/admin/donatori${parametri.size ? `?${parametri}` : ""}`;
 
   return (
-    <Cadru titlu="Donatori" activ="/admin/donatori">
+    <Cadru
+      titlu="Donatori"
+      activ="/admin/donatori"
+      actiuni={<Descarca ce="donatori" />}
+    >
       <div className="grid gap-3 sm:grid-cols-4">
         <Cifra
           eticheta="Total strâns"

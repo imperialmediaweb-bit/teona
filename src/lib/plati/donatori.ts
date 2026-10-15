@@ -44,11 +44,35 @@ type Rand = {
 };
 
 /** Filtrele listei. Fiecare răspunde la o întrebare pe care chiar o pune cineva. */
-export type Filtru = "toti" | "lunari" | "cu-acord" | "fara-acord" | "neduși";
+export type Filtru =
+  | "toti"
+  | "lunari"
+  | "opriti"
+  | "mari"
+  | "cu-acord"
+  | "fara-acord"
+  | "neduși";
 
 const CONDITII: Record<Filtru, string> = {
   toti: "TRUE",
   lunari: "SUM(CASE WHEN d.frecventa = 'lunar' THEN 1 ELSE 0 END) > 0",
+  /*
+    S-au oprit: au dat de cel puțin două ori, dar nu în ultimele patru luni.
+
+    E lista cu care un fundraiser începe săptămâna. Cine a dat o singură dată
+    acum un an nu s-a „oprit" — n-a început. Cine a dat de trei ori și a
+    tăcut patru luni s-a oprit, și de obicei dintr-un motiv care se poate
+    afla cu un telefon.
+  */
+  opriti:
+    "COUNT(*) > 1 AND MAX(d.platita_la) < now() - interval '4 months'",
+  /*
+    Donatori mari: peste 1.000 de lei adunat.
+
+    Pragul e ales, nu calculat, și e scris aici ca să poată fi schimbat
+    într-un singur loc când asociația spune altul.
+  */
+  mari: "SUM(d.suma_bani) FILTER (WHERE d.moneda = 'RON') >= 100000",
   "cu-acord": "bool_or(d.acord_buletin)",
   "fara-acord": "NOT bool_or(d.acord_buletin)",
   // Au bifat acordul, dar n-au ajuns încă în MailerLite — de obicei pentru că

@@ -155,6 +155,31 @@ export default function Cadru({
           </span>
         </div>
 
+        {/*
+          Căutarea peste tot, în bara din stânga.
+
+          Sună cineva și spune un nume. Până acum trebuia ghicit în ce listă e
+          — donator, firmă, om care a trimis un formular — și deschise trei
+          pagini. Un singur câmp le caută pe toate trei.
+        */}
+        <form
+          action="/admin/cauta"
+          method="get"
+          role="search"
+          className="px-3 pb-3 lg:pb-1"
+        >
+          <label htmlFor="cautare-panou" className="sr-only">
+            Caută în panou
+          </label>
+          <input
+            id="cautare-panou"
+            name="q"
+            type="search"
+            placeholder="Caută nume, e-mail, CUI…"
+            className="w-full rounded-lg border border-hartie/20 bg-hartie/10 px-3 py-2 text-mic text-hartie placeholder:text-hartie/45 focus:border-hartie/40 focus:outline-none"
+          />
+        </form>
+
         <nav
           aria-label="Panou"
           className="overflow-x-auto px-3 pb-4 lg:overflow-visible lg:pb-8"

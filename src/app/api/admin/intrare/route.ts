@@ -19,6 +19,7 @@ const PAGINI = new Set([
   "/admin/donatori",
   "/admin/firme",
   "/admin/poze",
+  "/admin/cauta",
 ]);
 
 function unde(formular: FormData | null): string {

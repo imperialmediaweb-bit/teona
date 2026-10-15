@@ -13,6 +13,7 @@ import {
   esteStadiuCerere,
 } from "@/lib/crm";
 import Cadru from "@/componente/admin/Cadru";
+import Descarca from "@/componente/admin/Descarca";
 import Intrare from "@/componente/admin/Intrare";
 
 export const metadata: Metadata = {
@@ -88,7 +89,11 @@ async function Continut({
   const lista = await cereri(felAles, stadiuAles);
 
   return (
-    <Cadru titlu="Cereri" activ="/admin/cereri">
+    <Cadru
+      titlu="Cereri"
+      activ="/admin/cereri"
+      actiuni={<Descarca ce="cereri" />}
+    >
       <div className="flex flex-wrap items-center gap-2">
         <Filtru href="/admin/cereri" activ={!felAles && !stadiuAles}>
           Toate
