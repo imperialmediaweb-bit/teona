@@ -125,6 +125,33 @@ export async function contracte(limita = 100): Promise<Contract[]> {
   }));
 }
 
+/**
+ * Contractele semnate pe site, pe firme.
+ *
+ * Pentru lista de firme din panou: fără asta, cine deschide fișa unei firme
+ * n-ar afla de acolo că a semnat deja un contract — ar trebui să țină minte
+ * să se uite și în cealaltă listă.
+ */
+export async function contracteDupaFirma(): Promise<
+  Map<string, { id: string; stare: string }>
+> {
+  const randuri = await intreaba<{
+    id: string;
+    firma_id: string | null;
+    stare: string;
+  }>(
+    `SELECT DISTINCT ON (firma_id) id, firma_id, stare
+       FROM contracte
+      WHERE firma_id IS NOT NULL
+      ORDER BY firma_id, creat_la DESC`,
+  );
+  const dupaFirma = new Map<string, { id: string; stare: string }>();
+  for (const r of randuri) {
+    if (r.firma_id) dupaFirma.set(r.firma_id, { id: r.id, stare: r.stare });
+  }
+  return dupaFirma;
+}
+
 /** Câte contracte așteaptă contrasemnătura asociației. */
 export async function cateContracteNoi(): Promise<number> {
   const randuri = await intreaba<{ cate: string }>(

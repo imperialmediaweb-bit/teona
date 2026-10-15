@@ -11,6 +11,7 @@ import {
   firme,
   interactiuni,
 } from "@/lib/crm";
+import { contracteDupaFirma } from "@/lib/contracte";
 import { scrieSuma } from "@/lib/suma";
 import Cadru from "@/componente/admin/Cadru";
 import Descarca from "@/componente/admin/Descarca";
@@ -95,6 +96,10 @@ async function Continut({
     ? stadiu
     : undefined;
   const lista = await firme(ales, cauta);
+  // Ce firmă a semnat deja un contract pe site, ca să se vadă în rândul ei.
+  const contracteFirme = await contracteDupaFirma().catch(
+    () => new Map<string, { id: string; stare: string }>(),
+  );
 
   /*
     Jurnalul se încarcă doar pentru firma deschisă: altfel fiecare pagină ar
@@ -184,6 +189,26 @@ async function Continut({
                   </div>
                   <Eticheta stadiu={f.stadiu} />
                 </div>
+
+                {/*
+                  Contractul semnat pe site, în rândul firmei: altfel ar trebui
+                  ținut minte că există și cealaltă listă.
+                */}
+                {contracteFirme.get(f.id) && (
+                  <p className="mt-3 flex flex-wrap items-center gap-2 text-mic">
+                    <span className="rounded-full bg-turcoaz-100 px-2.5 py-0.5 font-titlu text-nota font-bold text-turcoaz-900">
+                      {contracteFirme.get(f.id)!.stare === "contrasemnat"
+                        ? "Contract semnat de amândoi"
+                        : "A semnat contractul pe site"}
+                    </span>
+                    <a
+                      href={`/admin/contracte/${contracteFirme.get(f.id)!.id}/pdf`}
+                      className="font-titlu font-semibold text-caramiziu-700 underline underline-offset-2"
+                    >
+                      Descarcă PDF-ul
+                    </a>
+                  </p>
+                )}
 
                 <div className="mt-4 grid gap-x-8 gap-y-1.5 text-mic sm:grid-cols-2">
                   <p className="text-cerneala-moale">

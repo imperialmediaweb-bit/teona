@@ -1,5 +1,12 @@
+import { after } from "next/server";
 import { limitaDeRata, raspuns, text } from "@/lib/api";
 import { email as emailValid } from "@/lib/api";
+import { areBazaDeDate } from "@/lib/baza";
+import { salveazaFirma, scrieInteractiune } from "@/lib/crm";
+import {
+  anuntaDescarcarea,
+  trimiteContractulNesemnat,
+} from "@/lib/email/contract";
 import {
   contractDeSponsorizare,
   numeleFisierului,
@@ -120,16 +127,69 @@ export async function POST(cerere: Request) {
   }
 
   try {
-    if (fel === "word") {
-      const document = await contractWord(citit.date);
-      return fisier(
-        document,
-        numeleFisierului(citit.date).replace(/\.pdf$/, ".docx"),
-        WORD,
-      );
+    const nume =
+      fel === "word"
+        ? numeleFisierului(citit.date).replace(/\.pdf$/, ".docx")
+        : numeleFisierului(citit.date);
+    const document =
+      fel === "word"
+        ? await contractWord(citit.date)
+        : await contractDeSponsorizare(citit.date);
+
+    /*
+      Urma din CRM și copia pe e-mail, după ce fișierul a plecat.
+
+      `after` lasă răspunsul să plece întâi: descărcarea nu trebuie să aștepte
+      nici baza de date, nici Resend. Fără e-mail nu se scrie nimic nicăieri —
+      n-am avea cum să ne întoarcem la firma aceea, iar un rând în CRM pe care
+      nu-l poți folosi e doar o colecție de date.
+    */
+    if (citit.date.email && areBazaDeDate()) {
+      const date = citit.date;
+      after(async () => {
+        const firma = await salveazaFirma({
+          cui: date.cui,
+          denumire: date.denumire,
+          persoana: date.reprezentant || date.denumire,
+          email: date.email,
+          telefon: date.telefon || undefined,
+          cale: "Contract de sponsorizare",
+          sumaEstimata: date.valoare || undefined,
+        }).catch(() => null);
+
+        if (firma) {
+          await scrieInteractiune({
+            firmaId: firma.id,
+            fel: "email",
+            rezumat: `Și-a descărcat de pe site contractul completat (${
+              fel === "word" ? "Word" : "PDF"
+            })${date.valoare ? `, pentru ${date.valoare} lei` : ""}.`,
+          }).catch(() => undefined);
+        }
+
+        await Promise.allSettled([
+          trimiteContractulNesemnat({
+            denumire: date.denumire,
+            reprezentant: date.reprezentant,
+            email: date.email,
+            valoare: date.valoare,
+            numeFisier: nume,
+            pdf: document,
+          }),
+          anuntaDescarcarea({
+            denumire: date.denumire,
+            cui: date.cui,
+            reprezentant: date.reprezentant,
+            email: date.email,
+            telefon: date.telefon || undefined,
+            valoare: date.valoare,
+            fel: fel === "word" ? "Word" : "PDF",
+          }),
+        ]);
+      });
     }
-    const document = await contractDeSponsorizare(citit.date);
-    return fisier(document, numeleFisierului(citit.date), "application/pdf");
+
+    return fisier(document, nume, fel === "word" ? WORD : "application/pdf");
   } catch {
     return raspuns(
       "Nu am putut scrie contractul. Încercați din nou în câteva minute.",

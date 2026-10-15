@@ -9,6 +9,11 @@ import { areBazaDeDate } from "@/lib/baza";
 import { contractDeSponsorizare, numeleFisierului } from "@/lib/contract";
 import { salveazaContract } from "@/lib/contracte";
 import {
+  salveazaFirma,
+  schimbaStadiulFirmei,
+  scrieInteractiune,
+} from "@/lib/crm";
+import {
   anuntaContractulLaAsociatie,
   trimiteContractulFirmei,
 } from "@/lib/email/contract";
@@ -174,7 +179,25 @@ export async function POST(cerere: Request) {
     );
   }
 
+  /*
+    Firma intră în CRM înaintea contractului, ca să le putem lega.
+
+    Fără legătura asta, panoul are două liste care nu se văd una pe alta:
+    „Contracte semnate" și „Firme". Cine deschide fișa firmei trebuie să afle
+    de acolo că a semnat, nu dintr-o altă pagină.
+  */
+  const firma = await salveazaFirma({
+    cui,
+    denumire,
+    persoana: reprezentant,
+    email: adresa,
+    telefon: date.telefon || undefined,
+    cale: "Contract de sponsorizare",
+    sumaEstimata: date.valoare,
+  }).catch(() => null);
+
   const salvat = await salveazaContract({
+    firmaId: firma?.id,
     denumire,
     cui,
     sediu: date.sediu || undefined,
@@ -205,6 +228,17 @@ export async function POST(cerere: Request) {
     numeFisier: numeleFisierului(date),
     pdf,
   };
+
+  if (firma) {
+    await Promise.allSettled([
+      schimbaStadiulFirmei(firma.id, "semnat"),
+      scrieInteractiune({
+        firmaId: firma.id,
+        fel: "email",
+        rezumat: `A semnat contractul pe site, pentru ${date.valoare} lei. Așteaptă contrasemnătura asociației.`,
+      }),
+    ]);
+  }
 
   // E-mailurile nu opresc răspunsul: contractul e deja salvat, iar dacă
   // Resend nu răspunde, asociația îl vede oricum în panou.

@@ -78,6 +78,97 @@ ${SEMNATURA_TEXT}`,
   });
 }
 
+/**
+ * Către firmă: contractul completat, nesemnat încă.
+ *
+ * Firma l-a descărcat de pe site; copia pe e-mail nu e un dublu inutil. E
+ * locul în care documentul se regăsește peste o săptămână, când cel care l-a
+ * descărcat nu mai știe unde l-a pus, și e dovada că adresa scrisă în contract
+ * chiar funcționează — altfel am afla asta abia când încercăm să-i trimitem
+ * exemplarul contrasemnat.
+ */
+export async function trimiteContractulNesemnat(
+  d: Omit<ContractSemnat, "amprenta">,
+) {
+  const titlu = "Contractul de sponsorizare, completat";
+  const corp = `
+    <p style="${P}">Bună ziua,</p>
+    <p style="${P}">Atașat e contractul de sponsorizare, completat cu datele firmei <strong>${curat(d.denumire)}</strong>, așa cum l-ați descărcat de pe site.</p>
+    ${pasi([
+      "Verificați datele din el — orice se poate schimba direct în document.",
+      "Semnați-l: cu certificatul calificat al firmei, în Adobe Reader sau în aplicația furnizorului, ori tipărit, cu pixul.",
+      "Trimiteți-ni-l înapoi, ca răspuns la mesajul acesta. Îl contrasemnăm și vă trimitem exemplarul semnat de amândoi.",
+    ])}
+    ${caseta(
+      `<p style="${MIC}margin-bottom:0;"><strong style="color:#232323;">Valoarea din contract</strong> · ${curat(d.valoare)} lei</p>`,
+    )}
+    <p style="${P}">Dacă ceva nu e în regulă, răspundeți aici sau sunați la ${curat(FUNDRAISING.telefon.afisat)}.</p>
+    ${buton("Pagina pentru firme", `${ADRESA_SITE}${RUTE.directionare20}`)}`;
+
+  return trimiteEmail({
+    catre: d.email,
+    subiect: titlu,
+    html: pagina(titlu, corp),
+    text: `Bună ziua,
+
+Atașat e contractul de sponsorizare, completat cu datele firmei ${d.denumire}, așa cum l-ați descărcat de pe site.
+
+1. Verificați datele din el.
+2. Semnați-l: cu certificatul calificat al firmei sau tipărit, cu pixul.
+3. Trimiteți-ni-l înapoi, ca răspuns la mesajul acesta.
+
+Valoarea din contract: ${d.valoare} lei
+
+Întrebări: ${FUNDRAISING.telefon.afisat}.
+
+${SEMNATURA_TEXT}`,
+    raspundeLa: EMAIL.contact,
+    atasamente: [{ nume: d.numeFisier, continut: d.pdf }],
+  });
+}
+
+/** Către asociație: o firmă și-a luat contractul completat de pe site. */
+export async function anuntaDescarcarea(d: {
+  denumire: string;
+  cui: string;
+  reprezentant: string;
+  email: string;
+  telefon?: string;
+  valoare: string;
+  fel: string;
+}) {
+  const titlu = `Contract descărcat — ${d.denumire}`;
+  const campuri = tabel([
+    ["Firmă", d.denumire],
+    ["CUI", d.cui],
+    ["Persoană", d.reprezentant],
+    ["E-mail", d.email],
+    ["Telefon", d.telefon ?? ""],
+    ["Valoare", d.valoare ? `${d.valoare} lei` : ""],
+    ["Format", d.fel],
+  ]);
+
+  const corp = `
+    <p style="${P}">O firmă și-a luat de pe site contractul completat cu datele ei. Urmează să-l semneze și să-l trimită înapoi — merită un telefon dacă nu vine nimic în câteva zile.</p>
+    ${campuri.html}
+    <p style="${P}">A primit și ea o copie pe e-mail. Firma e în panou, la Firme.</p>
+    ${buton("Deschide panoul", `${ADRESA_SITE}/admin/firme`)}`;
+
+  return trimiteEmail({
+    catre: EMAIL.fundraising,
+    subiect: titlu,
+    html: pagina(titlu, corp),
+    text: `O firmă și-a luat de pe site contractul completat cu datele ei.
+
+${campuri.text}
+
+A primit și ea o copie pe e-mail. Firma e în panou, la Firme.
+
+${ADRESA_SITE}/admin/firme`,
+    raspundeLa: d.email,
+  });
+}
+
 /** Către asociație: a venit un contract de contrasemnat. */
 export async function anuntaContractulLaAsociatie(
   d: ContractSemnat & { cui: string; telefon?: string; ip?: string },
