@@ -51,6 +51,31 @@ const intrare = await cere("/api/admin/intrare", {
 });
 verifica(intrare.status === 303, `intrarea în panou (${intrare.status})`);
 
+// ─── Fiecare pagină din panou are bara panoului ───────────────────────────
+/*
+  Pagina de aniversări își definea propriul „Cadru" — un titlu și atât — care
+  ascundea cadrul comun al panoului. Rezultatul: o pagină albă, cu un titlu în
+  mijloc, fără bară, fără meniu, fără nicio cale înapoi. A stat așa până a
+  văzut-o cineva. De asta se verifică toate, nu doar cele noi.
+*/
+for (const cale of [
+  "/admin",
+  "/admin/donatii",
+  "/admin/donatori",
+  "/admin/firme",
+  "/admin/cereri",
+  "/admin/aniversari",
+  "/admin/scrie",
+  "/admin/poze",
+  "/admin/cauta",
+]) {
+  const html = await (await cere(cale)).text();
+  verifica(
+    html.includes("panou de administrare"),
+    `${cale}: are bara panoului`,
+  );
+}
+
 // ─── Exportul pentru Excel ────────────────────────────────────────────────
 for (const [lista, coloana] of [
   ["donatii", "Referință"],

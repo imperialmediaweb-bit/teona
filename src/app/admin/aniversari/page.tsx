@@ -7,6 +7,7 @@ import { adresaPoza } from "@/lib/poza-urcata";
 import { etichetaOcaziei } from "@/date/aniversari";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import Cadru from "@/componente/admin/Cadru";
 
 export const metadata: Metadata = {
   title: "Aniversări de aprobat",
@@ -48,7 +49,7 @@ async function Continut({
 
   if (!areParolaConfigurata()) {
     return (
-      <Cadru titlu="Aniversări de aprobat">
+      <Cadru titlu="Aniversări de aprobat" activ="/admin/aniversari">
         <p className="text-amplu text-cerneala-moale">
           Zona asta nu e configurată. Setează variabila{" "}
           <code className="rounded bg-hartie-umbra px-1.5 py-0.5">
@@ -62,7 +63,7 @@ async function Continut({
 
   if (!(await esteAutentificat())) {
     return (
-      <Cadru titlu="Aniversări de aprobat">
+      <Cadru titlu="Aniversări de aprobat" activ="/admin/aniversari">
         <form action="/api/admin/intrare" method="post" className="max-w-sm">
           <label
             htmlFor="parola"
@@ -98,7 +99,7 @@ async function Continut({
 
   if (!areBazaDeDate()) {
     return (
-      <Cadru titlu="Aniversări de aprobat">
+      <Cadru titlu="Aniversări de aprobat" activ="/admin/aniversari">
         <p className="text-amplu text-cerneala-moale">
           Baza de date nu e legată la site (lipsește `DATABASE_URL`).
         </p>
@@ -109,7 +110,15 @@ async function Continut({
   const campanii = await campaniiDeVerificat();
 
   return (
-    <Cadru titlu={`Campanii de verificat (${campanii.length})`}>
+    <Cadru
+      titlu="Aniversări de aprobat"
+      descriere={
+        campanii.length === 1
+          ? "O campanie de ziua cuiva așteaptă să fie verificată."
+          : `${campanii.length} campanii de ziua cuiva așteaptă să fie verificate.`
+      }
+      activ="/admin/aniversari"
+    >
       {campanii.length === 0 && (
         <p className="text-amplu text-cerneala-moale">
           Nimic de verificat acum.
@@ -182,20 +191,5 @@ async function Continut({
         ))}
       </div>
     </Cadru>
-  );
-}
-
-function Cadru({
-  titlu,
-  children,
-}: {
-  titlu: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <main className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
-      <h1 className="text-h2 text-cerneala">{titlu}</h1>
-      <div className="mt-8">{children}</div>
-    </main>
   );
 }
