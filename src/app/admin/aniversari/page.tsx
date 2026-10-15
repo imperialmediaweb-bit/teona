@@ -2,8 +2,12 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
-import { campaniiDeVerificat } from "@/lib/campanii";
+import {
+  campaniiDeVerificat,
+  campaniiPublicateCuBani,
+} from "@/lib/campanii";
 import { adresaPoza } from "@/lib/poza-urcata";
+import { scrieSuma } from "@/lib/suma";
 import { etichetaOcaziei } from "@/date/aniversari";
 import { connection } from "next/server";
 import { Suspense } from "react";
@@ -108,6 +112,7 @@ async function Continut({
   }
 
   const campanii = await campaniiDeVerificat();
+  const publicate = await campaniiPublicateCuBani().catch(() => []);
 
   return (
     <Cadru
@@ -123,6 +128,48 @@ async function Continut({
         <p className="text-amplu text-cerneala-moale">
           Nimic de verificat acum.
         </p>
+      )}
+
+      {/*
+        Paginile publicate, cu banii lor.
+
+        Butonul „Donează" de pe pagina cuiva duce la formularul nostru, cu
+        slugul campaniei în adresă, deci fiecare donație știe de pe ce pagină a
+        venit. Fără lista asta, singura întrebare care-l interesează pe omul
+        care și-a făcut pagina — „a strâns ceva?" — n-ar avea răspuns nicăieri.
+      */}
+      {publicate.length > 0 && (
+        <section className="mb-10 rounded-card border border-hartie-umbra bg-hartie p-5">
+          <h2 className="font-titlu text-amplu font-bold text-cerneala">
+            Pagini publicate, și cât au strâns
+          </h2>
+          <ul className="mt-4 grid gap-3">
+            {publicate.map((p) => (
+              <li
+                key={p.slug}
+                className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-hartie-umbra pb-3 last:border-0 last:pb-0"
+              >
+                <span className="text-mic text-cerneala-moale">
+                  <a
+                    href={`/ziua-ta/${p.slug}`}
+                    className="font-titlu font-bold text-cerneala underline-offset-2 hover:underline"
+                  >
+                    {p.titlu}
+                  </a>{" "}
+                  · {p.numePublic}
+                </span>
+                <span className="font-titlu font-bold whitespace-nowrap text-cerneala">
+                  {scrieSuma(p.bani / 100)}
+                  <span className="ml-2 font-normal text-cerneala-slab">
+                    {p.donatii === 1
+                      ? "o donație"
+                      : `${p.donatii} donații`}
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       <div className="grid gap-8">

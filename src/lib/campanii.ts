@@ -131,6 +131,60 @@ export async function campaniiDeVerificat(): Promise<CampanieDeVerificat[]> {
 }
 
 /**
+ * Paginile publicate, cu cât a strâns fiecare.
+ *
+ * De când butonul „Donează" de pe pagina cuiva duce la formularul nostru cu
+ * slugul campaniei în adresă, donațiile poartă slugul. Fără interogarea asta,
+ * banii ar intra în grămadă, iar omul care și-a făcut pagina n-ar putea primi
+ * niciun răspuns la singura întrebare care-l interesează: „a strâns ceva?”.
+ *
+ * Se numără doar donațiile încasate, în lei. Una în euro, prin PayPal, n-are
+ * ce căuta în același total — cursul care contează e al băncii, în ziua
+ * încasării, nu unul ales de noi.
+ */
+export async function campaniiPublicateCuBani(limita = 50): Promise<
+  Array<{
+    slug: string;
+    titlu: string;
+    numePublic: string;
+    bani: number;
+    donatii: number;
+    publicataLa: string;
+  }>
+> {
+  const randuri = await intreaba<{
+    slug: string;
+    titlu: string;
+    nume_public: string;
+    bani: string | null;
+    cate: string;
+    creat_la: Date;
+  }>(
+    `SELECT c.slug, c.titlu, c.nume_public, c.creat_la,
+            (SELECT SUM(d.suma_bani) FROM donatii d
+              WHERE d.campanie_slug = c.slug
+                AND d.moneda = 'RON'
+                AND d.stare = 'platita') AS bani,
+            (SELECT count(*) FROM donatii d
+              WHERE d.campanie_slug = c.slug
+                AND d.stare = 'platita') AS cate
+       FROM campanii_aniversare c
+      WHERE c.stare = 'publicata'
+      ORDER BY c.creat_la DESC
+      LIMIT $1`,
+    [limita],
+  );
+  return randuri.map((r) => ({
+    slug: r.slug,
+    titlu: r.titlu,
+    numePublic: r.nume_public,
+    bani: Number(r.bani ?? 0),
+    donatii: Number(r.cate ?? 0),
+    publicataLa: r.creat_la.toISOString(),
+  }));
+}
+
+/**
  * Publică sau respinge o campanie.
  *
  * Întoarce rândul **doar dacă starea chiar s-a schimbat acum** — condiția
