@@ -311,15 +311,32 @@ export default function FormularContractOnline() {
       <h2 className="mt-9 text-h4 text-cerneala">Semnătura</h2>
 
       {/*
-        Ce e semnătura asta, înaintea casetei, nu după ea.
+        Ce e semnătura asta, înaintea casetei, nu după ea — și scris cu
+        măsură.
+
+        Legea 214/2024 (art. 4) dă semnăturii electronice simple efectele celei
+        olografe doar în anumite cazuri; cel care se potrivește aici e
+        recunoașterea de către partea împotriva căreia e folosită — expresă sau
+        tacită, de pildă prin plata sumei din contract. Textul de dedesubt
+        spune exact atât: nu „e ca semnătura cu pixul”, dar nici „n-are nicio
+        valoare”. Cine vrea certitudine are, imediat sub el, calea cu
+        certificat.
       */}
       <p className="mt-3 max-w-2xl text-mic text-cerneala-moale">
         Semnătura desenată aici e o <strong>semnătură electronică simplă</strong>.
-        Contractul e valabil prin acordul părților, iar{" "}
-        {ASOCIATIA.denumire} îl contrasemnează și vi-l trimite înapoi. Dacă
-        firma dumneavoastră vrea o semnătură electronică calificată — cea cu
-        certificat, folosită la ANAF — descărcați modelul de mai sus, semnați-l
-        cu certificatul firmei și trimiteți-l la {EMAIL.contact}.
+        Legea îi dă aceleași efecte ca semnăturii cu pixul atunci când partea
+        împotriva căreia e folosită o recunoaște — inclusiv tacit, prin plata
+        sumei din contract. {ASOCIATIA.denumire} îl contrasemnează și vi-l
+        trimite înapoi.
+      </p>
+      <p className="mt-3 max-w-2xl text-mic text-cerneala-moale">
+        <strong className="font-titlu font-bold text-cerneala">
+          Pentru sume mari, folosiți semnătura electronică calificată.
+        </strong>{" "}
+        E singura care are, prin lege, puterea semnăturii olografe în orice
+        situație. Descărcați modelul de mai sus, semnați-l cu certificatul
+        firmei (cel cu care intrați în SPV la ANAF) și trimiteți-l la{" "}
+        {EMAIL.contact}.
       </p>
 
       <div className="mt-5">
