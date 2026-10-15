@@ -306,6 +306,13 @@ export default function Directioneaza20() {
                 scris="Modelele asociației"
                 titlu="Documente de descărcat"
               />
+              {/*
+                Contractul se descarcă în Word, nu doar în PDF: o firmă îl
+                deschide, scrie denumirea și suma, îl trimite la semnat. Un PDF
+                se completează numai cu pixul, după ce îl tipărești. Textul e
+                cel al asociației, transcris cuvânt cu cuvânt; se face cu
+                `node scripts/contract-word.mjs`.
+              */}
               <p className="mt-6 text-amplu text-cerneala-moale">
                 Vrei un contract personalizat? Scrie-ne la{" "}
                 <a
@@ -326,8 +333,9 @@ export default function Directioneaza20() {
                 <Aparitie className="h-full">
                   <DocumentDeDescarcat
                     titlu="Contract de sponsorizare"
-                    descriere="Modelul de contract, gata de completat de firma ta."
+                    descriere="Modelul asociației, de completat la calculator: denumirea firmei, datele ei și suma. Restul e scris."
                     format="Word"
+                    fisier="/documente/contract-de-sponsorizare.docx"
                     colt="a"
                   />
                 </Aparitie>
@@ -341,6 +349,19 @@ export default function Directioneaza20() {
                     colt="b"
                   />
                 </Aparitie>
+              </li>
+              <li className="sm:col-span-2">
+                <p className="text-mic text-cerneala-moale">
+                  Contractul e și în{" "}
+                  <a
+                    href="/documente/contract-de-sponsorizare.pdf"
+                    download
+                    className="font-titlu font-bold text-caramiziu-700 underline-offset-4 hover:underline"
+                  >
+                    PDF, de tipărit și completat cu pixul
+                  </a>
+                  . Același text, aceleași clauze.
+                </p>
               </li>
             </ul>
           </div>
