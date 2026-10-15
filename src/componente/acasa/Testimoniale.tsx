@@ -62,7 +62,7 @@ export default function Testimoniale({
           parte din această misiune.
         </p>
 
-        <div className="relative mt-12 min-h-56">
+        <div className="relative mt-10 min-h-52">
           <AnimatePresence mode="wait" initial={false}>
             <motion.figure
               key={activ}
@@ -82,7 +82,16 @@ export default function Testimoniale({
               >
                 <path d="M13 24V13.5C13 6 8.5 1 1 0v5c4 1 6 4 6 8H1v11h12zm18 0V13.5C31 6 26.5 1 19 0v5c4 1 6 4 6 8h-6v11h12z" />
               </svg>
-              <blockquote className="mt-5 font-titlu text-h4 leading-snug text-cerneala sm:text-h3">
+              {/*
+                Citatul e cu un pas mai mic și ținut pe o lățime de citit.
+
+                Era scris cu `text-h4`, iar pe ecran lat cu `text-h3` — adică
+                aproape cât titlul secțiunii de deasupra, pe toată lățimea
+                paginii. Ieșeau rânduri de peste o sută de semne scrise cu 30
+                px: ochiul pierde capătul rândului și nu mai găsește începutul
+                celui următor. Un testimonial nu e titlu; e vorba cuiva.
+              */}
+              <blockquote className="mx-auto mt-5 max-w-2xl font-titlu text-amplu leading-relaxed text-cerneala sm:text-h4 sm:leading-snug">
                 „{curent.citat}”
               </blockquote>
               <figcaption className="mt-6">
