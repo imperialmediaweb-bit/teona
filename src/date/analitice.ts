@@ -11,5 +11,5 @@
  * omul a fost aici.
  */
 export const ANALITICE = (
-  process.env.NEXT_PUBLIC_ANALITICE ?? "G-X81X9TJVJ8"
+  process.env.NEXT_PUBLIC_ANALITICE ?? "G-YEZ8LGLC7W"
 ).trim();
