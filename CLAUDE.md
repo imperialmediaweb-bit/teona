@@ -224,6 +224,40 @@ Textele stau în tabelul `texte`, nu în cod. Probe:
 `BAZA=… PAROLA_ADMIN=… node scripts/qa/scrie-pe-site.mjs` și
 `… node scripts/qa/panou-fundraising.mjs`.
 
+## Asistentul de pe site
+
+Caseta „Întreabă-ne", jos în pagină, răspunde vizitatorilor: cum se donează,
+ce e Casa Teona, cum sponsorizează o firmă, cum se devine voluntar.
+
+- **Știe numai ce scrie în `src/lib/intreaba/stiinta.ts`** — aceleași constante
+  verificate din care se scriu paginile, contractele și e-mailurile. Nu citește
+  site-ul vechi: acolo au rămas pagini de magazin din WordPress și tabere de
+  acum trei ani descrise la prezent. Dacă un IBAN se schimbă, se schimbă
+  peste tot deodată, inclusiv în ce spune asistentul.
+- **N-are acces la baza de date.** Nu știe cine a donat, cât s-a strâns, cine e
+  pe vreo listă. E omul de la recepție care știe bine casa, nu unul cu chei la
+  toate ușile.
+- **Nu promite nimic** în numele asociației: nu confirmă un loc în tabără, nu
+  acceptă cereri, nu stabilește întâlniri. Pentru toate astea trimite la
+  formularul potrivit sau la telefon.
+- **Nu cere date personale și nu salvează nimic.** Conversația trăiește în fila
+  omului. Într-o casetă în care oamenii scriu uneori despre boala copilului, a
+  nu ține nimic e singura purtare cuviincioasă.
+- Capăt public care cheamă un API plătit: 20 de întrebări pe oră pe adresă,
+  întrebarea cel mult 600 de semne (mai lungă e refuzată, nu tăiată),
+  conversația șase schimburi, răspunsul plafonat. Partea care nu se schimbă —
+  regulile și ce știe asociația — se păstrează în cache-ul API-ului, deci a
+  doua întrebare costă a zecea parte din prima.
+- Pe telefon caseta stă jos-stânga: jos-dreapta e butonul plutitor „Donează",
+  iar două butoane rotunde unul peste altul se apasă din greșeală.
+- Modelul se schimbă dintr-o variabilă, `MODEL_ASISTENT`; implicit
+  `claude-opus-5-5`. Codul nou folosește SDK-ul oficial (`@anthropic-ai/sdk`);
+  `src/lib/asistent.ts` și `src/lib/analiza/intreaba.ts` au rămas pe `fetch`
+  scris de mână, cu `claude-sonnet-5-5`.
+- Probă, cu un API de mentiune care citește ce i se trimite:
+  `node scripts/qa/intreaba.mjs` — verifică și că în cerere ajung datele
+  verificate, și că nu ajunge nimic din baza de date.
+
 ## Formularul 230 pe hârtie: site-ul nu ține niciun CNP
 
 Cine preferă pixul descarcă formularul de la `/formular-230`, îl completează,

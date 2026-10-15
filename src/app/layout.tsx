@@ -7,6 +7,7 @@ import BannerCookieuri from "@/componente/BannerCookieuri";
 import BaraDeAnunt from "@/componente/BaraDeAnunt";
 import Analitice from "@/componente/Analitice";
 import ButonDoneazaMobil from "@/componente/ButonDoneazaMobil";
+import AsistentDacaExista from "@/componente/AsistentDacaExista";
 import Newsletter from "@/componente/Newsletter";
 import Subsol from "@/componente/Subsol";
 import { ADRESA_SITE, INDEXABIL, JsonLd, jsonLdAsociatie } from "./seo";
@@ -215,6 +216,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
         <Suspense>
           <ButonDoneazaMobil />
+          <Suspense fallback={null}>
+            <AsistentDacaExista />
+          </Suspense>
         </Suspense>
         <BannerCookieuri />
         <Analitice />
