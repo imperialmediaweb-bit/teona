@@ -95,10 +95,15 @@ export default function CampCui({
         if (!r.ok) {
           setStare({
             fel: "negasita",
+            /*
+              Orice ar răspunde serverul, omul trebuie să afle că poate merge
+              mai departe. Fără „completează de mână", un mesaj de genul
+              „serviciul ANAF nu răspunde" pare un zid.
+            */
             mesaj:
               typeof date?.mesaj === "string"
-                ? date.mesaj
-                : "N-am putut verifica CUI-ul acum.",
+                ? `${date.mesaj} Poți completa datele de mână.`
+                : "N-am putut verifica CUI-ul acum. Completează de mână.",
           });
           return;
         }

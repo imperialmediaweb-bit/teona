@@ -55,6 +55,7 @@ export default function FormularContractOnline() {
   const [stare, setStare] = useState<Stare>({ fel: "gol" });
   const formular = useRef<HTMLFormElement>(null);
   const [descarc, setDescarc] = useState<"pdf" | "word" | null>(null);
+  const [descarcat, setDescarcat] = useState(false);
 
   /**
    * Descarcă contractul completat cu datele din formular.
@@ -113,6 +114,7 @@ export default function FormularContractOnline() {
       legatura.click();
       legatura.remove();
       URL.revokeObjectURL(adresa);
+      setDescarcat(true);
     } catch {
       setStare({
         fel: "eroare",
@@ -429,6 +431,59 @@ export default function FormularContractOnline() {
         Word, dacă mai aveți de completat ceva sau îl semnați cu certificatul.
         PDF, dacă îl tipăriți și îl semnați cu pixul.
       </p>
+
+      {/*
+        Ce are de făcut omul după ce apasă butonul.
+
+        Pașii stau pe pagină de la început, nu apar abia după descărcare: cine
+        citește înainte să descarce vrea să știe în ce se bagă. După
+        descărcare, deasupra lor apare și butonul care deschide e-mailul cu
+        adresa și subiectul deja scrise — altfel omul închide fila și își
+        amintește săptămâna viitoare.
+      */}
+      {descarcat && (
+        <div
+          role="status"
+          className="mt-6 colt-mic-b border-2 border-turcoaz-300 bg-turcoaz-50 p-5"
+        >
+          <p className="font-titlu font-bold text-turcoaz-900">
+            Gata, contractul e la dumneavoastră.
+          </p>
+          <p className="mt-2 text-mic text-turcoaz-900/85">
+            Semnați-l și trimiteți-ni-l înapoi. Butonul de mai jos deschide
+            e-mailul cu adresa și subiectul deja scrise — rămâne doar să
+            atașați documentul semnat.
+          </p>
+          <a
+            href={`mailto:${EMAIL.contact}?subject=${encodeURIComponent(
+              `Contract de sponsorizare semnat${denumire ? ` — ${denumire}` : ""}`,
+            )}&body=${encodeURIComponent(
+              `Bună ziua,\n\nAtașez contractul de sponsorizare semnat${
+                denumire ? ` pentru ${denumire}` : ""
+              }${cui ? `, CUI ${cui}` : ""}.\n\nCu stimă,\n`,
+            )}`}
+            className="mt-4 inline-flex min-h-12 items-center gap-2 rounded-full bg-turcoaz-600 px-6 py-3 font-titlu font-bold text-hartie transition-colors hover:bg-turcoaz-700"
+          >
+            <Pictograma nume="plic" aria-hidden="true" className="size-5" />
+            Trimite-l pe e-mail
+          </a>
+        </div>
+      )}
+
+      <ol className="mt-6 grid gap-3">
+        {[
+          "Deschideți documentul și verificați datele firmei. Orice e greșit se poate schimba direct în el.",
+          "Semnați-l: cu certificatul calificat al firmei, în Adobe Reader sau în aplicația furnizorului, ori tipărit, cu pixul.",
+          `Trimiteți-l la ${EMAIL.contact}. Îl contrasemnăm și vă trimitem înapoi, pe aceeași adresă, exemplarul semnat de amândoi.`,
+        ].map((pas, i) => (
+          <li key={pas} className="flex items-start gap-3">
+            <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-caramiziu-700 font-titlu text-nota font-bold text-hartie">
+              {i + 1}
+            </span>
+            <span className="text-mic text-cerneala-moale">{pas}</span>
+          </li>
+        ))}
+      </ol>
 
       {/* ── Sau semnezi aici, pe loc ─────────────────────────────────── */}
       <details className="mt-8 colt-mic-a border-2 border-hartie-umbra open:bg-hartie-calda">
