@@ -105,7 +105,15 @@ export default function Sustinere() {
                     Orice sumă contează enorm pentru a ne putea continua
                     activitatea.
                   </p>
-                  <div className="relative mt-8">
+                  {/*
+                    Căile de plată, scrise aici: cardul e doar una din ele, iar
+                    cine caută transfer bancar sau PayPal nu are de unde ghici,
+                    de pe prima pagină, că le găsește tot la „Donează”.
+                  */}
+                  <p className="relative mt-5 text-mic text-hartie/80">
+                    Card, transfer bancar sau PayPal.
+                  </p>
+                  <div className="relative mt-5">
                     <Buton
                       href={RUTE.doneaza}
                       varianta="contur"

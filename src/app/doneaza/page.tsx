@@ -261,6 +261,42 @@ export default function Doneaza() {
           <div>
             <h2 className="sr-only">Donează cu cardul</h2>
             <FormularDonatie />
+
+            {/*
+              Cine deschide pagina vede întâi un formular de card. Dacă nu vrea
+              cu cardul, de aici n-avea de unde afla că se poate și altfel:
+              transferul, PayPal-ul și SMS-ul sunt mai jos, după o cotitură de
+              pagină, iar scurtăturile de sus nu le pomenesc pe toate. Rândul
+              ăsta le spune pe nume lângă buton și duce la ele.
+            */}
+            <p className="mt-6 text-mic text-cerneala-moale">
+              Nu vrei cu cardul? Se poate și prin{" "}
+              <a
+                href="#transfer"
+                className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
+              >
+                transfer bancar
+              </a>
+              {arePayPal() && (
+                <>
+                  , cu{" "}
+                  <a
+                    href="#paypal"
+                    className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
+                  >
+                    PayPal (în euro)
+                  </a>
+                </>
+              )}{" "}
+              sau lunar prin{" "}
+              <a
+                href="#sms"
+                className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
+              >
+                SMS
+              </a>
+              .
+            </p>
           </div>
         </div>
       </section>
