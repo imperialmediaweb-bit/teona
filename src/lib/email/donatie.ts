@@ -1,6 +1,7 @@
 import {
   ADRESE,
   ASOCIATIA,
+  CIFRE,
   EMAIL,
   RUTE,
   TELEFON_PRINCIPAL,
@@ -97,18 +98,35 @@ export function construiesteMultumirea(d: Date): Compus {
   }).format(Number.isNaN(ziua.getTime()) ? new Date() : ziua);
 
   const titlu = d.reinnoire
-    ? "Donația ta lunară a ajuns la copii"
+    ? "A mers. Mulțumim din nou."
     : d.prinTransfer
       ? "Am găsit transferul tău. Mulțumim!"
-      : "Mulțumim pentru donație!";
+      : "Mulțumim.";
 
+  /*
+    Deschiderea.
+
+    Un mesaj care începe cu „Donația ta de 150 lei a fost procesată" e un bon
+    de casă. Omul tocmai a dat bani unei asociații de copii cu dizabilități,
+    fără să fie obligat și fără să primească nimic înapoi — merită o
+    propoziție scrisă pentru el, nu una generată.
+
+    Ce nu scrie aici: cât costă o zi de tabără, câți copii ajung dintr-o sumă,
+    la ce anume merg banii lui. Nu știm, iar o cifră inventată ca „să sune
+    bine" costă exact lucrul pe care îl apără mesajul ăsta.
+  */
   const deschidere = d.reinnoire
-    ? `Ți s-a reînnoit donația lunară de ${suma}. Nu trebuie să faci nimic — îți scriem doar ca să știi.`
+    ? `S-a reînnoit donația ta lunară de ${suma}. Nu trebuie să faci nimic — îți scriem doar ca să știi că a mers. Și ca să-ți mulțumim încă o dată: nu ne-am obișnuit.`
     : d.prinTransfer
-      ? `Am găsit transferul tău de ${suma} în extrasul de cont. E al copiilor de acum — mulțumim.`
+      ? `Am găsit transferul tău de ${suma} în extrasul de cont. De acum e al copiilor.`
       : lunar
-        ? `Donația ta de ${suma} pe lună înseamnă mult pentru noi. Prima plată a intrat; următoarea se face automat, în aceeași zi a lunii viitoare.`
-        : `Donația ta de ${suma} înseamnă mult pentru noi.`;
+        ? `Ai ales să dai ${suma} în fiecare lună. Asta e lucrul cel mai greu de obținut și cel mai de folos: lunar înseamnă că putem spune „da" unei familii înainte să avem banii în cont.`
+        : `Ai dat ${suma}. Nu te-a obligat nimeni și nu primești nimic înapoi — de asta contează.`;
+
+  /** Al doilea paragraf: unde ajunge, în cuvinte pe care le putem susține. */
+  const unde_ajunge = d.reinnoire
+    ? ""
+    : `Banii merg la copiii cu nevoi speciale, la cei care au trecut prin cancer și la familiile lor. Până acum am făcut ${CIFRE[0].valoare} de tabere, cu peste ${CIFRE[1].valoare.toLocaleString("ro-RO")} de participanți, iar la Casa Teona vin acum peste ${CIFRE[2].valoare} de copii. De azi ești și tu în socoteala asta.`;
 
   const randuri: Array<[string, string]> = [
     ["Suma", suma],
@@ -128,6 +146,7 @@ export function construiesteMultumirea(d: Date): Compus {
     `${salut(d)},`,
     "",
     deschidere,
+    ...(unde_ajunge ? ["", unde_ajunge] : []),
     "",
     ...randuri.map(([e, v]) => `${e}: ${v}`),
     "",
@@ -154,7 +173,8 @@ export function construiesteMultumirea(d: Date): Compus {
   */
   const corp = `
     <p style="${P}">${curat(salut(d))},</p>
-    <p style="${P}">${curat(deschidere)}</p>
+    <p style="${P}font-size:18px;">${curat(deschidere)}</p>
+    ${unde_ajunge ? `<p style="${P}">${curat(unde_ajunge)}</p>` : ""}
     ${caseta(
       `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${randuri
         .map(
@@ -185,7 +205,15 @@ export function construiesteMultumirea(d: Date): Compus {
       Îți poți vedea oricând toate donațiile în
       <a href="${ADRESA_SITE}/contul-meu" style="color:${CULORI.accent};font-weight:bold;">contul tău</a>.
       Nu-ți trebuie parolă.
-    </p>`;
+    </p>
+    <!--
+      Motto-ul, la sfârșit, nu în antet.
+
+      În antet ar fi un slogan de firmă, lângă siglă. Jos de tot, după ce
+      omul a citit tot, e felul în care se încheie o scrisoare — și e ce
+      spune asociația despre ea însăși de dinainte să existe site-ul.
+    -->
+    <p style="margin:22px 0 0;font-family:Georgia,'Times New Roman',serif;font-size:16px;font-style:italic;text-align:center;color:${CULORI.accent};">${curat(ASOCIATIA.motto)}</p>`;
 
   const html = pagina(titlu, corp, deschidere);
 

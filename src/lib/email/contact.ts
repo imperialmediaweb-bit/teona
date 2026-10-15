@@ -1,7 +1,17 @@
 import { ADRESA_SITE } from "@/app/seo";
-import { EMAIL, RUTE, TELEFON_PRINCIPAL } from "@/date/asociatie";
+import {
+  ADRESE,
+  ASOCIATIA,
+  CIFRE,
+  EMAIL,
+  RUTE,
+  TELEFON_PRINCIPAL,
+} from "@/date/asociatie";
+
+/** Cerneala din plic, pentru un `strong` dintr-o casetă. */
+const CULORI_CERNEALA = "#232323";
 import { curat, tabel, trimiteEmail } from "./trimite";
-import { MIC, P, buton, paginaInterna, pagina } from "./plic";
+import { MIC, P, buton, caseta, paginaInterna, pagina } from "./plic";
 import type { Compus } from "./campanie";
 
 /**
@@ -73,23 +83,38 @@ export function compuneConfirmareaDeContact(
     : "Am primit mesajul tău";
   const prenume = d.nume.trim().split(/\s+/)[0];
 
+  /*
+    Ce scrie, și de ce atât.
+
+    Un „am primit mesajul tău, îți răspundem curând" e o chitanță de primire,
+    nu un răspuns. Omul care scrie unei asociații de copii cu dizabilități
+    vrea să știe trei lucruri: că a citit un om, nu un robot; cât așteaptă;
+    și ce face dacă nu poate aștepta. Astea trei sunt tot mesajul.
+
+    La voluntariat se adaugă ce urmează — vorbim întâi la telefon —, pentru
+    că altfel omul nu știe dacă s-a înscris la ceva sau doar a trimis o
+    scrisoare în gol.
+  */
   const corp = `
     <p style="${P}">${prenume ? `Bună, ${curat(prenume)},` : "Bună,"}</p>
+    <p style="${P}font-size:18px;">${
+      d.voluntariat
+        ? "Ți-am primit cererea de voluntariat. Mulțumim că vrei să fii alături de copii — nu e puțin lucru să-ți dai timpul."
+        : "Ți-am primit mesajul. Îl citește un om din asociație, nu un program."
+    }</p>
     <p style="${P}">${
       d.voluntariat
-        ? "Ți-am primit cererea de voluntariat. O citește cineva din echipă și te sunăm sau îți scriem — de obicei în două-trei zile lucrătoare."
-        : "Ți-am primit mesajul și îți răspundem cât putem de repede, de obicei în două-trei zile lucrătoare."
+        ? `Ce urmează: te sunăm sau îți scriem în două-trei zile lucrătoare și vorbim întâi la telefon, să ne cunoaștem și să vedem ce ți se potrivește. La Casa Teona e nevoie de oameni la activitățile cu copiii, în tabere și la evenimente. Nu-ți trebuie experiență și nu trebuie să poți veni în fiecare zi — peste ${CIFRE[3].valoare} de voluntari au trecut pe aici, fiecare cu timpul lui.`
+        : "Îți răspundem cât putem de repede, de obicei în două-trei zile lucrătoare. Dacă e ceva despre un copil sau o familie, trece înaintea celorlalte."
     }</p>
-    <p style="${P}">Dacă e urgent, nu ne aștepta: sună la <strong>${curat(TELEFON_PRINCIPAL.afisat)}</strong>.</p>
-    ${
-      d.voluntariat
-        ? `<p style="${MIC}">Până atunci: la Casa Teona e nevoie de oameni la activități cu copiii, la tabere și la evenimente. Nu-ți trebuie experiență — îți trebuie răbdare, și pe aia ai arătat-o deja.</p>`
-        : ""
-    }
+    ${caseta(
+      `<p style="${MIC}margin-bottom:0;">Dacă e ceva ce nu poate aștepta, nu ne aștepta pe e-mail: sună la <strong style="color:${CULORI_CERNEALA};">${curat(TELEFON_PRINCIPAL.afisat)}</strong>. Răspundem.</p>`,
+    )}
     ${buton(
-      d.voluntariat ? "Vezi ce facem" : "Vezi proiectele noastre",
+      d.voluntariat ? "Vezi ce facem la Casa Teona" : "Vezi proiectele noastre",
       `${ADRESA_SITE}${d.voluntariat ? RUTE.casaTeona : RUTE.proiecte}`,
-    )}`;
+    )}
+    <p style="margin:18px 0 0;font-family:Georgia,'Times New Roman',serif;font-size:16px;font-style:italic;text-align:center;color:#b82b09;">${curat(ASOCIATIA.motto)}</p>`;
 
   return {
     subiect: titlu,
@@ -104,13 +129,25 @@ export function compuneConfirmareaDeContact(
 
 ${
   d.voluntariat
-    ? "Ți-am primit cererea de voluntariat. O citește cineva din echipă și te sunăm sau îți scriem — de obicei în două-trei zile lucrătoare."
-    : "Ți-am primit mesajul și îți răspundem cât putem de repede, de obicei în două-trei zile lucrătoare."
+    ? "Ți-am primit cererea de voluntariat. Mulțumim că vrei să fii alături de copii — nu e puțin lucru să-ți dai timpul."
+    : "Ți-am primit mesajul. Îl citește un om din asociație, nu un program."
 }
 
-Dacă e urgent, sună la ${TELEFON_PRINCIPAL.afisat}.
+${
+  d.voluntariat
+    ? `Ce urmează: te sunăm sau îți scriem în două-trei zile lucrătoare și vorbim întâi la telefon, să ne cunoaștem și să vedem ce ți se potrivește. La Casa Teona e nevoie de oameni la activitățile cu copiii, în tabere și la evenimente. Nu-ți trebuie experiență și nu trebuie să poți veni în fiecare zi — peste ${CIFRE[3].valoare} de voluntari au trecut pe aici, fiecare cu timpul lui.`
+    : "Îți răspundem cât putem de repede, de obicei în două-trei zile lucrătoare. Dacă e ceva despre un copil sau o familie, trece înaintea celorlalte."
+}
 
-${ADRESA_SITE}${d.voluntariat ? RUTE.casaTeona : RUTE.proiecte}`,
+Dacă e ceva ce nu poate aștepta, nu ne aștepta pe e-mail: sună la ${TELEFON_PRINCIPAL.afisat}. Răspundem.
+
+${ADRESA_SITE}${d.voluntariat ? RUTE.casaTeona : RUTE.proiecte}
+
+${ASOCIATIA.denumireLegala} · CIF ${ASOCIATIA.cif}
+${ADRESE.casaTeona.nume}: ${ADRESE.casaTeona.strada}, ${ADRESE.casaTeona.oras} ${ADRESE.casaTeona.cod}
+${TELEFON_PRINCIPAL.afisat} · ${EMAIL.contact}
+
+${ASOCIATIA.motto}`,
   };
 }
 
