@@ -50,6 +50,38 @@ function numeleDestinatiei(id: string): string {
   return DESTINATII_DONATIE.find((d) => d.id === id)?.eticheta ?? id;
 }
 
+/**
+ * O secțiune a tabloului, cu titlu propriu.
+ *
+ * Până acum cele nouă cartonașe stăteau într-o singură grilă, unul după
+ * altul: graficul lunilor lângă pâlnia firmelor, donatorii noi lângă cererile
+ * nerezolvate. Nimic nu era greșit, dar nimic nu spunea ce ține de ce, iar
+ * ochiul trebuia să citească fiecare titlu ca să-și dea seama unde a ajuns.
+ * Trei titluri mari — banii, donatorii, ce așteaptă — împart pagina în trei
+ * lucruri despre care te poți întreba separat.
+ */
+function Sectiune({
+  titlu,
+  nota,
+  children,
+}: {
+  titlu: string;
+  nota?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="mt-10">
+      <div className="mb-4 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-hartie-umbra pb-2">
+        <h2 className="font-titlu text-amplu font-extrabold text-cerneala">
+          {titlu}
+        </h2>
+        {nota && <p className="text-nota text-cerneala-slab">{nota}</p>}
+      </div>
+      {children}
+    </section>
+  );
+}
+
 export default function PaginaTablou({
   searchParams,
 }: {
@@ -246,241 +278,253 @@ async function Continut({
         />
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <div className="min-w-0 lg:col-span-2">
+      <Sectiune
+        titlu="Banii"
+        nota="Cât a intrat, de unde vine și pe ce se duce."
+      >
+        <div className="grid gap-6">
+          <div className="min-w-0">
+            <Card
+              titlu="Cât a intrat, lună de lună"
+              nota="Ultimele 12 luni, inclusiv cele în care n-a intrat nimic."
+            >
+              <Coloane date={luni} />
+            </Card>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-3">
+            <Card
+              titlu="Venit previzibil"
+              nota={
+                totalFrecvente > 0
+                  ? `${Math.round((lunar / totalFrecvente) * 100)}% din bani vin din donații lunare.`
+                  : undefined
+              }
+            >
+              <Felii date={frecvente} titlu="O dată față de lunar" />
+            </Card>
+
+            <Card
+              titlu="Pe ce cale intră"
+              nota="Inclusiv ce s-a trecut de mână. Numai donațiile în lei."
+            >
+              <Felii
+                date={metode}
+                titlu="Donații pe metode de plată"
+                nume={numeleMetodei}
+              />
+            </Card>
+
+            <Card
+              titlu="Pe ce se duc banii"
+              nota="Destinația aleasă de donator."
+            >
+              <Felii
+                date={destinatii}
+                titlu="Donații pe destinații"
+                nume={numeleDestinatiei}
+              />
+            </Card>
+          </div>
+        </div>
+      </Sectiune>
+
+      <Sectiune
+        titlu="Donatorii"
+        nota="Cine a dat în ultima vreme și dacă vin oameni noi."
+      >
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/*
+            Ultimele donații, cu nume.
+
+            Nu e o statistică, e o listă de oameni cărora li se poate mulțumi
+            azi. Adresa de e-mail nu se arată întreagă: panoul se deschide și
+            într-un birou prin care trec oameni.
+          */}
+          <Card titlu="Ultimele donații" nota="Cele mai recente opt, încasate.">
+            {ultimele.length === 0 ? (
+              <p className="text-mic text-cerneala-moale">
+                Nicio donație încasată încă.
+              </p>
+            ) : (
+              <ul className="grid gap-2.5">
+                {ultimele.map((d, i) => (
+                  <li
+                    key={`${d.cand}-${i}`}
+                    className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-hartie-umbra pb-2 last:border-0 last:pb-0"
+                  >
+                    <span className="font-titlu text-mic font-semibold text-cerneala">
+                      {d.cine}
+                      {d.frecventa === "lunar" && (
+                        <span className="ml-2 rounded-full bg-miere-100 px-2 py-0.5 text-nota font-bold text-miere-900">
+                          lunar
+                        </span>
+                      )}
+                    </span>
+                    <span className="font-titlu text-mic font-bold text-cerneala">
+                      {scrieSuma(d.bani / 100, d.moneda)}
+                    </span>
+                    <span className="basis-full text-nota text-cerneala-slab">
+                      {CAND_SCURT.format(new Date(d.cand))}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+
           <Card
-            titlu="Cât a intrat, lună de lună"
-            nota="Ultimele 12 luni, inclusiv cele în care n-a intrat nimic."
+            titlu="Donatori noi"
+            nota="Oameni la prima lor donație. Arată dacă asociația crește sau se bazează pe aceiași."
           >
-            <Coloane date={luni} />
+            <DonatoriNoi date={luni} />
           </Card>
         </div>
+      </Sectiune>
 
-        {/*
-          Ultimele donații, cu nume.
-
-          Nu e o statistică, e o listă de oameni cărora li se poate mulțumi
-          azi. Adresa de e-mail nu se arată întreagă: panoul se deschide și
-          într-un birou prin care trec oameni.
-        */}
-        <Card
-          titlu="Ultimele donații"
-          nota="Cele mai recente opt, încasate."
-        >
-          {ultimele.length === 0 ? (
-            <p className="text-mic text-cerneala-moale">
-              Nicio donație încasată încă.
-            </p>
-          ) : (
-            <ul className="grid gap-2.5">
-              {ultimele.map((d, i) => (
-                <li
-                  key={`${d.cand}-${i}`}
-                  className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-hartie-umbra pb-2 last:border-0 last:pb-0"
-                >
-                  <span className="font-titlu text-mic font-semibold text-cerneala">
-                    {d.cine}
-                    {d.frecventa === "lunar" && (
-                      <span className="ml-2 rounded-full bg-miere-100 px-2 py-0.5 text-nota font-bold text-miere-900">
-                        lunar
-                      </span>
-                    )}
-                  </span>
-                  <span className="font-titlu text-mic font-bold text-cerneala">
-                    {scrieSuma(d.bani / 100, d.moneda)}
-                  </span>
-                  <span className="basis-full text-nota text-cerneala-slab">
-                    {CAND_SCURT.format(new Date(d.cand))}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-
-        {/*
-          Campaniile scrise din panou, cu cât s-a strâns pe fiecare.
-
-          Legătura se face prin `campanie_slug` de pe donație — câmpul pe care
-          îl pune butonul „Donează pentru campania asta”. O campanie fără
-          țintă apare și ea: faptul că nu s-a anunțat o sumă nu înseamnă că nu
-          vrei să știi cât a intrat.
-        */}
-        <Card
-          titlu="Campanii"
-          nota="Cât s-a strâns pe fiecare campanie publicată."
-        >
-          {campanii.length === 0 ? (
-            <p className="text-mic text-cerneala-moale">
-              Nicio campanie publicată.{" "}
-              <Link
-                href="/admin/scrie?fel=campanie"
-                className="font-semibold text-caramiziu-700 hover:underline"
-              >
-                Scrie una
-              </Link>
-              .
-            </p>
-          ) : (
-            <ul className="grid gap-4">
-              {campanii.map((c) => {
-                const procent =
-                  c.tintaBani && c.tintaBani > 0
-                    ? Math.min(
-                        100,
-                        Math.round((c.bani / c.tintaBani) * 100),
-                      )
-                    : null;
-                return (
-                  <li key={c.slug}>
-                    <div className="flex flex-wrap items-baseline justify-between gap-x-4">
-                      <Link
-                        href={`/campanii/${c.slug}`}
-                        className="font-titlu text-mic font-semibold text-cerneala hover:text-caramiziu-700"
-                      >
-                        {c.titlu}
-                      </Link>
-                      <span className="font-titlu text-mic font-bold text-cerneala">
-                        {scrieSuma(c.bani / 100)}
-                        {c.tintaBani !== null && (
-                          <span className="font-semibold text-cerneala-slab">
-                            {" "}
-                            din {scrieSuma(c.tintaBani / 100)}
-                          </span>
-                        )}
-                      </span>
-                    </div>
-                    {procent !== null && (
-                      <div
-                        className="mt-1.5 h-2 overflow-hidden rounded-full bg-hartie-umbra"
-                        role="img"
-                        aria-label={`${procent}% din țintă`}
-                      >
-                        <div
-                          className="h-full rounded-full bg-caramiziu-600"
-                          style={{ width: `${procent}%` }}
-                        />
-                      </div>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </Card>
-
-        <Card
-          titlu="Donatori noi"
-          nota="Oameni la prima lor donație. Arată dacă asociația crește sau se bazează pe aceiași."
-        >
-          <DonatoriNoi date={luni} />
-        </Card>
-
-        <Card
-          titlu="Pe ce se duc banii"
-          nota="Destinația aleasă de donator."
-        >
-          <Felii
-            date={destinatii}
-            titlu="Donații pe destinații"
-            nume={numeleDestinatiei}
-          />
-        </Card>
-
-        <Card
-          titlu="Pe ce cale intră"
-          nota="Inclusiv ce s-a trecut de mână. Numai donațiile în lei."
-        >
-          <Felii
-            date={metode}
-            titlu="Donații pe metode de plată"
-            nume={numeleMetodei}
-          />
-        </Card>
-
-        <Card
-          titlu="Venit previzibil"
-          nota={
-            totalFrecvente > 0
-              ? `${Math.round((lunar / totalFrecvente) * 100)}% din bani vin din donații lunare.`
-              : undefined
-          }
-        >
-          <Felii date={frecvente} titlu="O dată față de lunar" />
-        </Card>
-
-        <Card
-          titlu="Sponsorizări de la firme"
-          nota="Unde a ajuns fiecare firmă."
-        >
+      <Sectiune
+        titlu="Campanii, firme și cereri"
+        nota="Ce e pornit și ce așteaptă un răspuns de la noi."
+      >
+        <div className="grid gap-6 lg:grid-cols-2">
           {/*
-            Culoarea nu mai vine de aici: stadiile au ordine, iar pâlnia le
-            colorează singură cu o rampă, de la deschis la închis. Înainte
-            fiecare stadiu își purta culoarea lui, aleasă pe gust, iar
-            ordinea nu se vedea deloc.
+            Campaniile scrise din panou, cu cât s-a strâns pe fiecare.
+
+            Legătura se face prin `campanie_slug` de pe donație — câmpul pe care
+            îl pune butonul „Donează pentru campania asta”. O campanie fără
+            țintă apare și ea: faptul că nu s-a anunțat o sumă nu înseamnă că nu
+            vrei să știi cât a intrat.
           */}
-          <Palnie
-            date={STADII_FIRMA.map((s) => ({
-              eticheta: s.eticheta,
-              nr: nrPalnie.get(s.id) ?? 0,
-            }))}
-          />
-          <Link
-            href="/admin/firme"
-            className="mt-4 inline-block font-titlu text-mic font-bold text-caramiziu-700 underline underline-offset-4"
-          >
-            Vezi firmele
-          </Link>
-        </Card>
-
-        <Card
-          titlu="Cereri care așteaptă"
-          nota="Nerezolvate, pe fel."
-        >
-          <ul className="grid gap-2">
-            {FELURI_CERERE.map((f) => (
-              <li
-                key={f.id}
-                className="flex items-baseline justify-between gap-3 border-b border-hartie-umbra pb-2 last:border-0"
-              >
-                <span className="text-mic text-cerneala-moale">
-                  {f.eticheta}
-                </span>
-                <span className="font-titlu text-amplu font-bold text-cerneala">
-                  {nrDeLucru.get(f.id) ?? 0}
-                </span>
-              </li>
-            ))}
-          </ul>
-          <Link
-            href="/admin/cereri"
-            className="mt-4 inline-block font-titlu text-mic font-bold text-caramiziu-700 underline underline-offset-4"
-          >
-            Vezi cererile
-          </Link>
-        </Card>
-
-        {apasari.length > 0 && (
           <Card
-            titlu="Apăsări pe linkurile din afară"
-            nota="Revolut și Galantom nu trec prin site, deci asta e intenția, nu donația. Nu se adună la total."
+            titlu="Campanii"
+            nota="Cât s-a strâns pe fiecare campanie publicată."
           >
+            {campanii.length === 0 ? (
+              <p className="text-mic text-cerneala-moale">
+                Nicio campanie publicată.{" "}
+                <Link
+                  href="/admin/scrie?fel=campanie"
+                  className="font-semibold text-caramiziu-700 hover:underline"
+                >
+                  Scrie una
+                </Link>
+                .
+              </p>
+            ) : (
+              <ul className="grid gap-4">
+                {campanii.map((c) => {
+                  const procent =
+                    c.tintaBani && c.tintaBani > 0
+                      ? Math.min(100, Math.round((c.bani / c.tintaBani) * 100))
+                      : null;
+                  return (
+                    <li key={c.slug}>
+                      <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+                        <Link
+                          href={`/campanii/${c.slug}`}
+                          className="font-titlu text-mic font-semibold text-cerneala hover:text-caramiziu-700"
+                        >
+                          {c.titlu}
+                        </Link>
+                        <span className="font-titlu text-mic font-bold text-cerneala">
+                          {scrieSuma(c.bani / 100)}
+                          {c.tintaBani !== null && (
+                            <span className="font-semibold text-cerneala-slab">
+                              {" "}
+                              din {scrieSuma(c.tintaBani / 100)}
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                      {procent !== null && (
+                        <div
+                          className="mt-1.5 h-2 overflow-hidden rounded-full bg-hartie-umbra"
+                          role="img"
+                          aria-label={`${procent}% din țintă`}
+                        >
+                          <div
+                            className="h-full rounded-full bg-caramiziu-600"
+                            style={{ width: `${procent}%` }}
+                          />
+                        </div>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </Card>
+
+          <Card
+            titlu="Sponsorizări de la firme"
+            nota="Unde a ajuns fiecare firmă."
+          >
+            {/*
+              Culoarea nu mai vine de aici: stadiile au ordine, iar pâlnia le
+              colorează singură cu o rampă, de la deschis la închis. Înainte
+              fiecare stadiu își purta culoarea lui, aleasă pe gust, iar
+              ordinea nu se vedea deloc.
+            */}
+            <Palnie
+              date={STADII_FIRMA.map((s) => ({
+                eticheta: s.eticheta,
+                nr: nrPalnie.get(s.id) ?? 0,
+              }))}
+            />
+            <Link
+              href="/admin/firme"
+              className="mt-4 inline-block font-titlu text-mic font-bold text-caramiziu-700 underline underline-offset-4"
+            >
+              Vezi firmele
+            </Link>
+          </Card>
+
+          <Card titlu="Cereri care așteaptă" nota="Nerezolvate, pe fel.">
             <ul className="grid gap-2">
-              {apasari.map((a) => (
+              {FELURI_CERERE.map((f) => (
                 <li
-                  key={a.ce}
+                  key={f.id}
                   className="flex items-baseline justify-between gap-3 border-b border-hartie-umbra pb-2 last:border-0"
                 >
-                  <span className="text-mic text-cerneala-moale">{a.ce}</span>
+                  <span className="text-mic text-cerneala-moale">
+                    {f.eticheta}
+                  </span>
                   <span className="font-titlu text-amplu font-bold text-cerneala">
-                    {a.nr}
+                    {nrDeLucru.get(f.id) ?? 0}
                   </span>
                 </li>
               ))}
             </ul>
+            <Link
+              href="/admin/cereri"
+              className="mt-4 inline-block font-titlu text-mic font-bold text-caramiziu-700 underline underline-offset-4"
+            >
+              Vezi cererile
+            </Link>
           </Card>
-        )}
-      </div>
+
+          {apasari.length > 0 && (
+            <Card
+              titlu="Apăsări pe linkurile din afară"
+              nota="Revolut și Galantom nu trec prin site, deci asta e intenția, nu donația. Nu se adună la total."
+            >
+              <ul className="grid gap-2">
+                {apasari.map((a) => (
+                  <li
+                    key={a.ce}
+                    className="flex items-baseline justify-between gap-3 border-b border-hartie-umbra pb-2 last:border-0"
+                  >
+                    <span className="text-mic text-cerneala-moale">{a.ce}</span>
+                    <span className="font-titlu text-amplu font-bold text-cerneala">
+                      {a.nr}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
+        </div>
+      </Sectiune>
     </Cadru>
   );
 }

@@ -71,8 +71,15 @@ for (const cale of [
   "/admin/formulare",
 ]) {
   const html = await (await cere(cale)).text();
+  /*
+    Semnul barei e `id="panou-admin"` plus ieșirea din panou, nu o bucată de
+    text. Bara scria cândva „panou de administrare" sub siglă; de când sigla
+    adevărată spune singură unde ești, rândul acela a dispărut, iar proba
+    pica pe toate cele zece pagini deși bara era la locul ei. Un identificator
+    și un buton se schimbă mult mai greu decât o etichetă.
+  */
   verifica(
-    html.includes("panou de administrare"),
+    html.includes('id="panou-admin"') && html.includes("Ieși din panou"),
     `${cale}: are bara panoului`,
   );
 }

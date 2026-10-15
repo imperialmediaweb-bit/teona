@@ -1,5 +1,10 @@
+import { Suspense, cache } from "react";
 import Link from "next/link";
 import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
+import Sigla from "@/componente/Sigla";
+import { esteAutentificat } from "@/lib/admin";
+import { areBazaDeDate } from "@/lib/baza";
+import { deFacutAcum } from "@/lib/statistici";
 
 /**
  * Cadrul comun al panoului.
@@ -70,7 +75,11 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
   {
     titlu: "Site",
     pagini: [
-      { href: "/admin/scrie", eticheta: "Scrie pe site", pictograma: "document" },
+      {
+        href: "/admin/scrie",
+        eticheta: "Scrie pe site",
+        pictograma: "document",
+      },
       { href: "/admin/poze", eticheta: "Poze", pictograma: "arta" },
     ],
   },
@@ -86,15 +95,71 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
  * săracă a ei.
  */
 const AFARA: ReadonlyArray<{ href: string; eticheta: string }> = [
-  { href: "https://dashboard.mailerlite.com/campaigns", eticheta: "MailerLite" },
+  {
+    href: "https://dashboard.mailerlite.com/campaigns",
+    eticheta: "MailerLite",
+  },
   { href: "https://console.cloudinary.com/", eticheta: "Cloudinary" },
 ];
+
+/**
+ * Cât așteaptă pe fiecare pagină, ca să se vadă din meniu.
+ *
+ * Cifrele sunt aceleași care stau în „De făcut acum" pe tabloul de bord, doar
+ * că aici se văd de pe orice pagină a panoului: cine intră să caute un donator
+ * vede în trecere că au venit trei cereri, fără să se întoarcă la tablou.
+ *
+ * `cache` de la React, nu un `Map` global: fiecare intrare de meniu își cere
+ * singură cifra, iar fără dedublare asta ar fi însemnat nouă interogări
+ * identice la fiecare pagină. Cu `cache`, prima o face, celelalte o primesc.
+ *
+ * Interogările se fac **numai** după ce omul a intrat cu parola. Pe ecranul de
+ * intrare, cadrul se randează la fel, dar un om din afară n-are de ce să afle
+ * din meniu câte cereri are asociația pe masă.
+ */
+const semne = cache(async (): Promise<ReadonlyMap<string, number>> => {
+  if (!areBazaDeDate() || !(await esteAutentificat())) return new Map();
+  const lucruri = await deFacutAcum().catch(() => []);
+  const pe = new Map<string, number>();
+  for (const lucru of lucruri) {
+    pe.set(lucru.unde, (pe.get(lucru.unde) ?? 0) + lucru.nr);
+  }
+  return pe;
+});
+
+/** Pastila cu cifra, lângă numele paginii. Lipsește de tot când nu e nimic. */
+async function Semn({ href, aici }: { href: string; aici: boolean }) {
+  const nr = (await semne()).get(href) ?? 0;
+  if (nr === 0) return null;
+  return (
+    /*
+      Înțelesul cifrei stă în `aria-label`, nu într-un `<span className="sr-only">`
+      alăturat.
+
+      `sr-only` ascunde cu `position: absolute`, iar aici n-avea niciun
+      strămoș poziționat: blocul lui de referință ajungea să fie pagina
+      întreagă, deci spanul ieșea din bara care se derulează lateral și
+      lățea documentul cu 120 px pe un ecran de 390. Pagina nu se derula
+      vizibil, dar `scrollWidth` creștea — și proba de lățime a prins-o.
+      Aceeași capcană ca la tabelele ascunse de sub grafice.
+    */
+    <span
+      role="img"
+      aria-label={`${nr} de făcut`}
+      className={`ml-auto grid min-w-5 shrink-0 place-items-center rounded-full px-1.5 py-0.5 font-titlu text-nota font-bold ${
+        aici ? "bg-hartie text-caramiziu-900" : "bg-caramiziu-700 text-hartie"
+      }`}
+    >
+      {nr}
+    </span>
+  );
+}
 
 function Nav({ activ }: { activ?: string }) {
   return (
     <>
       {GRUPURI.map((grup) => (
-        <div key={grup.titlu} className="lg:mt-7 lg:first:mt-0">
+        <div key={grup.titlu} className="lg:mt-5 lg:first:mt-0">
           <p className="hidden px-3 pb-2 font-titlu text-nota font-bold tracking-wide text-hartie/45 uppercase lg:block">
             {grup.titlu}
           </p>
@@ -106,7 +171,7 @@ function Nav({ activ }: { activ?: string }) {
                   <Link
                     href={p.href}
                     aria-current={aici ? "page" : undefined}
-                    className={`flex items-center gap-2.5 rounded-lg px-3 py-2 font-titlu text-mic font-semibold whitespace-nowrap transition-colors ${
+                    className={`flex items-center gap-2.5 rounded-lg px-3 py-1.5 font-titlu text-mic font-semibold whitespace-nowrap transition-colors ${
                       aici
                         ? "bg-caramiziu-600 text-hartie"
                         : "text-hartie/75 hover:bg-hartie/10 hover:text-hartie"
@@ -118,6 +183,14 @@ function Nav({ activ }: { activ?: string }) {
                       className="size-4 shrink-0"
                     />
                     {p.eticheta}
+                    {/*
+                      Cifra vine din baza de date, deci ar ține meniul în loc
+                      până răspunde. Învelită în `Suspense`, bara apare pe
+                      loc și pastilele se așază în ea când sosesc.
+                    */}
+                    <Suspense fallback={null}>
+                      <Semn href={p.href} aici={aici} />
+                    </Suspense>
                   </Link>
                 </li>
               );
@@ -126,6 +199,36 @@ function Nav({ activ }: { activ?: string }) {
         </div>
       ))}
     </>
+  );
+}
+
+/**
+ * Butonul de ieșire — numai când e cineva înăuntru.
+ *
+ * Pe ecranul de intrare n-are ce căuta: n-ai de unde ieși dacă n-ai intrat.
+ * Și mai rău, stă în cod **înaintea** formularului de parolă, fiindcă bara e
+ * în stânga: primul `button[type="submit"]` din pagină devenea el, iar
+ * probele automate — și orice browser care trimite formularul cu Enter de pe
+ * un câmp fără buton propriu — nimereau ieșirea în loc de intrare. Prins de
+ * `scripts/qa/crm.mjs`, care de la o zi la alta nu mai reușea să intre în
+ * panou, deși parola era bună.
+ */
+async function Iesirea() {
+  if (!(await esteAutentificat())) return null;
+  return (
+    <form action="/api/admin/iesire" method="post">
+      <button
+        type="submit"
+        className="flex w-full items-center gap-2.5 rounded-lg px-3 py-1.5 font-titlu text-nota font-semibold whitespace-nowrap text-hartie/65 transition-colors hover:bg-hartie/10 hover:text-hartie"
+      >
+        <Pictograma
+          nume="sageata"
+          aria-hidden="true"
+          className="size-3.5 shrink-0"
+        />
+        Ieși din panou
+      </button>
+    </form>
   );
 }
 
@@ -147,17 +250,24 @@ export default function Cadru({
   return (
     <div id="panou-admin" className="min-h-screen bg-hartie-calda lg:flex">
       {/* Bara laterală. Pe ecran lat stă lipită și nu se derulează cu pagina. */}
-      <div className="bg-cerneala lg:sticky lg:top-0 lg:h-screen lg:w-60 lg:shrink-0 lg:overflow-y-auto">
-        <div className="flex items-center gap-3 px-4 py-4 lg:px-5 lg:py-6">
-          <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-caramiziu-600 text-hartie">
-            <Pictograma nume="infinit" aria-hidden="true" className="size-5" />
-          </span>
-          <span className="font-titlu leading-tight font-extrabold text-hartie">
-            Teona Ariana
-            <span className="block font-semibold text-nota text-hartie/50">
-              panou de administrare
-            </span>
-          </span>
+      <div className="bg-cerneala lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-60 lg:shrink-0 lg:flex-col">
+        {/*
+          Sigla adevărată, nu un pătrat portocaliu.
+
+          Aici stătea o pictogramă oarecare într-un pătrat, cu numele scris
+          lângă: semăna cu panoul oricui. Omul care deschide panoul dimineața
+          vede acum aceeași siglă care e pe site, pe contract și pe adeverințe
+          — e panoul asociației lui, nu un instrument străin. Pe fundal închis,
+          numele ia treapta mai deschisă a culorilor de brand.
+        */}
+        <div className="px-4 py-3 lg:px-5 lg:py-5">
+          <Link
+            href="/admin"
+            className="inline-flex rounded-lg transition-opacity hover:opacity-80"
+          >
+            <Sigla peFundalInchis className="text-[38px]" />
+            <span className="sr-only">Tabloul de bord</span>
+          </Link>
         </div>
 
         {/*
@@ -187,11 +297,11 @@ export default function Cadru({
 
         <nav
           aria-label="Panou"
-          className="overflow-x-auto px-3 pb-4 lg:overflow-visible lg:pb-8"
+          className="overflow-x-auto px-3 pb-4 lg:min-h-0 lg:flex-1 lg:overflow-x-visible lg:overflow-y-auto lg:pb-6"
         >
           <Nav activ={activ} />
 
-          <div className="hidden lg:mt-8 lg:block">
+          <div className="hidden lg:mt-6 lg:block">
             <p className="px-3 pb-2 font-titlu text-nota font-bold tracking-wide text-hartie/45 uppercase">
               În altă parte
             </p>
@@ -202,7 +312,7 @@ export default function Cadru({
                     href={loc.href}
                     target="_blank"
                     rel="noreferrer noopener"
-                    className="flex items-center gap-2.5 rounded-lg px-3 py-2 font-titlu text-mic font-semibold text-hartie/60 transition-colors hover:bg-hartie/10 hover:text-hartie"
+                    className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 font-titlu text-mic font-semibold text-hartie/60 transition-colors hover:bg-hartie/10 hover:text-hartie"
                   >
                     <Pictograma
                       nume="sageata"
@@ -216,6 +326,33 @@ export default function Cadru({
             </ul>
           </div>
         </nav>
+
+        {/*
+          Jos: site-ul și ieșirea.
+
+          Până acum nu exista nicio cale de a ieși din panou. Parola e una
+          singură, pentru toți cei din asociație, și cookie-ul ține
+          douăsprezece ore: pe un laptop împrumutat sau pe calculatorul din
+          birou, „am terminat" trebuia să însemne ceva. Ieșirea merge prin
+          POST, nu printr-un link: un link s-ar deschide din greșeală, iar
+          orice imagine străină cu adresa aceea ar fi dat afară omul din panou.
+        */}
+        <div className="flex items-center justify-between gap-2 border-t border-hartie/10 px-3 py-2 lg:grid lg:gap-0.5 lg:py-2.5">
+          <a
+            href="/"
+            className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 font-titlu text-nota font-semibold whitespace-nowrap text-hartie/65 transition-colors hover:bg-hartie/10 hover:text-hartie"
+          >
+            <Pictograma
+              nume="sageata"
+              aria-hidden="true"
+              className="size-3.5 shrink-0 -rotate-45"
+            />
+            Vezi site-ul
+          </a>
+          <Suspense fallback={null}>
+            <Iesirea />
+          </Suspense>
+        </div>
       </div>
 
       {/*
