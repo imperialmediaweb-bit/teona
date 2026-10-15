@@ -35,6 +35,19 @@ const CU_BANI = new Intl.NumberFormat("ro-RO", {
 /** Simbolul monedei, scris după sumă, cum se scrie în română. */
 const SIMBOL: Record<string, string> = { RON: "lei", EUR: "€", USD: "$" };
 
+/**
+ * Cifrele singure, fără monedă: „2500000" -> „2.500.000".
+ *
+ * Pentru câmpurile în care omul bate o sumă și care scrie deja „(lei)" în
+ * etichetă. Un milion scris fără puncte se numără cu degetul pe ecran, iar
+ * un zero în plus trece neobservat — exact greșeala pe care calculatorul de
+ * sponsorizare n-o poate prinde, pentru că 25.000.000 e o cifră la fel de
+ * validă ca 2.500.000.
+ */
+export function scrieCifre(suma: number): string {
+  return (Number.isInteger(laBan(suma)) ? INTREG : CU_BANI).format(suma);
+}
+
 export function scrieSuma(suma: number, moneda = "RON"): string {
   const rotund = Number.isInteger(laBan(suma));
   const cifre = (rotund ? INTREG : CU_BANI).format(suma);
