@@ -234,7 +234,8 @@ function laCerere(r: RandCerere): Cerere {
     id: r.id,
     fel: r.fel as FelCerere,
     nume: r.nume,
-    email: r.email,
+    // Lipsă la cele adăugate de mână, de pe WhatsApp: acolo e doar un număr.
+    email: r.email ?? "",
     telefon: r.telefon,
     detalii: r.detalii ?? {},
     stadiu: r.stadiu as StadiuCerere,
@@ -245,7 +246,8 @@ function laCerere(r: RandCerere): Cerere {
 export async function salveazaCerere(date: {
   fel: FelCerere;
   nume: string;
-  email: string;
+  /** Lipsește la cele adăugate de mână, de pe WhatsApp: acolo e doar un număr. */
+  email?: string;
   telefon?: string;
   detalii?: Record<string, string>;
 }): Promise<string | null> {
@@ -256,7 +258,7 @@ export async function salveazaCerere(date: {
     [
       date.fel,
       date.nume,
-      date.email,
+      date.email?.trim() || null,
       date.telefon ?? null,
       JSON.stringify(date.detalii ?? {}),
     ],

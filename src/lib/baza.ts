@@ -319,6 +319,16 @@ const ADAOSURI = `
     care a existat, poate fi șters de mână; nimic nu-l mai folosește.
   */
 
+  /*
+    E-mailul unei cereri poate lipsi.
+
+    Cererile venite de pe site au mereu unul — formularul îl cere. Dar cele
+    adăugate de mână din panou vin de pe WhatsApp, unde există doar un număr de
+    telefon. Obligat să scrie ceva acolo, omul ar fi inventat o adresă, iar
+    lista ar fi avut e-mailuri false.
+  */
+  ALTER TABLE cereri ALTER COLUMN email DROP NOT NULL;
+
   /* Cine a scris donația de mână, pentru cele care nu vin de la un procesator. */
   ALTER TABLE donatii ADD COLUMN IF NOT EXISTS adaugat_de text;
   /* Ce a scris omul la adăugarea manuală: „transfer BCR 12 mart", chitanța etc. */

@@ -187,6 +187,101 @@ async function Continut({
           semnată, ANAF nu înregistrează redirecționarea.
         </p>
 
+        {/*
+          Adăugarea de mână.
+
+          Nu toată lumea trece prin formularul de pe site: cineva trimite poza
+          pe WhatsApp și atât. Până acum, singurul loc în care rămânea era
+          conversația aia. Strâns într-un `details` ca să nu stea deschis
+          peste listă — se folosește de câteva ori pe zi, nu tot timpul.
+        */}
+        <details className="mt-5 max-w-3xl colt-a border border-hartie-umbra bg-hartie">
+          <summary className="cursor-pointer px-5 py-4 font-titlu text-mic font-bold text-cerneala">
+            Adaug eu unul — a trimis pe WhatsApp sau a sunat
+          </summary>
+
+          <form
+            action="/api/admin/cereri"
+            method="post"
+            className="grid gap-4 border-t border-hartie-umbra p-5"
+          >
+            <input type="hidden" name="actiune" value="adauga" />
+            <input type="hidden" name="fel" value="redirectionare" />
+            <input type="hidden" name="inapoi" value="/admin/formulare" />
+
+            <label className="grid gap-1.5">
+              <span className="text-mic font-semibold text-cerneala">
+                Numele
+              </span>
+              <input name="nume" required className={camp} />
+            </label>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="grid gap-1.5">
+                <span className="text-mic font-semibold text-cerneala">
+                  Telefon
+                </span>
+                <input name="telefon" inputMode="tel" className={camp} />
+              </label>
+              <label className="grid gap-1.5">
+                <span className="text-mic font-semibold text-cerneala">
+                  E-mail
+                </span>
+                <input name="email" type="email" className={camp} />
+              </label>
+            </div>
+            <p className="-mt-2 text-nota text-cerneala-slab">
+              Măcar unul din cele două. De pe WhatsApp ai un număr, nu o adresă
+              — e în regulă așa.
+            </p>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="grid gap-1.5">
+                <span className="text-mic font-semibold text-cerneala">
+                  Pe câți ani a bifat
+                </span>
+                <select name="ani" defaultValue="" className={camp}>
+                  <option value="">Nu știu</option>
+                  <option value="1">Un an</option>
+                  <option value="2">Doi ani</option>
+                </select>
+              </label>
+              <label className="grid gap-1.5">
+                <span className="text-mic font-semibold text-cerneala">
+                  A venit prin
+                </span>
+                <select name="deUnde" defaultValue="WhatsApp" className={camp}>
+                  <option>WhatsApp</option>
+                  <option>E-mail</option>
+                  <option>Telefon</option>
+                  <option>Hârtie, la Casa Teona</option>
+                </select>
+              </label>
+            </div>
+
+            <label className="grid gap-1.5">
+              <span className="text-mic font-semibold text-cerneala">
+                Observații
+              </span>
+              <input
+                name="observatii"
+                maxLength={300}
+                placeholder="a zis că trimite hârtia săptămâna viitoare"
+                className={camp}
+              />
+            </label>
+
+            <div>
+              <button
+                type="submit"
+                className="colt-mic-a bg-caramiziu-700 px-5 py-2.5 font-titlu text-mic font-bold text-hartie transition-colors hover:bg-caramiziu-800"
+              >
+                Adaugă în listă
+              </button>
+            </div>
+          </form>
+        </details>
+
         {formulare.length === 0 ? (
           <p className="mt-6 text-amplu text-cerneala-moale">
             N-a spus nimeni încă.
@@ -228,6 +323,11 @@ async function Continut({
                           </>
                         )}
                       </p>
+                      {f.detalii.Observații && (
+                        <p className="mt-1 text-mic text-cerneala-moale">
+                          {f.detalii.Observații}
+                        </p>
+                      )}
                     </div>
                     <p className="text-nota text-cerneala-slab">
                       {CAND.format(new Date(f.creatLa))}
@@ -236,6 +336,11 @@ async function Continut({
                       {peDoiAni && (
                         <span className="ml-2 rounded-full bg-turcoaz-100 px-2 py-0.5 font-bold text-turcoaz-900">
                           2 ani
+                        </span>
+                      )}
+                      {f.detalii["A venit prin"] && (
+                        <span className="ml-2 rounded-full bg-hartie-umbra px-2 py-0.5">
+                          {f.detalii["A venit prin"]}
                         </span>
                       )}
                     </p>
