@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import { RUTE } from "@/date/asociatie";
+import Link from "next/link";
 import Buton from "../Buton";
 import Pictograma from "../Pictograma";
 import Camp, { claseControl, claseControlGresit } from "../formular/Camp";
@@ -48,9 +49,19 @@ export default function CalculatorSponsorizare() {
     cifra: boolean;
     impozit: boolean;
   } | null>(null);
+  /*
+    Datele firmei, așa cum le-a dat ANAF. Din ele iese contractul, aici, pe
+    loc: cine și-a calculat suma n-are de ce să mai treacă printr-o pagină în
+    care scrie a doua oară același CUI.
+  */
+  const [firma, setFirma] = useState<Firma | null>(null);
+  const [descarc, setDescarc] = useState<"pdf" | "word" | null>(null);
+  const [eroareDescarcare, setEroareDescarcare] = useState("");
 
   /** Completează cele două câmpuri din ultimul bilanț depus. */
-  function completeaza(firma: Firma) {
+  function completeaza(gasita: Firma) {
+    setFirma(gasita);
+    const firma = gasita;
     const bilant = firma.bilant;
     if (!bilant) {
       setDinBilant(null);
@@ -68,6 +79,56 @@ export default function CalculatorSponsorizare() {
       cifra: bilant.cifraDeAfaceri !== null,
       impozit: bilant.impozitEstimat !== null,
     });
+  }
+
+  /**
+   * Scoate contractul completat cu datele firmei și suma calculată.
+   *
+   * Nu trimite nimic și nu salvează nimic: firma ia documentul, îl semnează
+   * cum vrea și ni-l trimite pe e-mail. Câmpurile pe care nu le avem — cine
+   * semnează, în ce calitate — rămân punctate, de completat.
+   */
+  async function descarcaContractul(fel: "pdf" | "word") {
+    if (!firma || !rezultat) return;
+    setDescarc(fel);
+    setEroareDescarcare("");
+    try {
+      const date = new URLSearchParams({
+        fel,
+        denumire: firma.denumire,
+        cui: String(firma.cui),
+        sediu: firma.adresa ?? "",
+        regCom: firma.nrRegCom ?? "",
+        valoare: scrieCifre(rezultat.maxim),
+      });
+      const raspuns = await fetch("/api/contract/descarca", {
+        method: "POST",
+        body: date,
+      });
+      if (!raspuns.ok) {
+        const corp = (await raspuns.json().catch(() => ({}))) as {
+          mesaj?: string;
+        };
+        setEroareDescarcare(corp.mesaj ?? "Nu am putut scrie contractul.");
+        return;
+      }
+      const antet = raspuns.headers.get("content-disposition") ?? "";
+      const nume =
+        /filename="([^"]+)"/.exec(antet)?.[1] ??
+        (fel === "word" ? "Contract.docx" : "Contract.pdf");
+      const adresa = URL.createObjectURL(await raspuns.blob());
+      const legatura = document.createElement("a");
+      legatura.href = adresa;
+      legatura.download = nume;
+      document.body.append(legatura);
+      legatura.click();
+      legatura.remove();
+      URL.revokeObjectURL(adresa);
+    } catch {
+      setEroareDescarcare("Nu am putut descărca. Verifică-ți conexiunea.");
+    } finally {
+      setDescarc(null);
+    }
   }
 
   const cifra = citesteSuma(cifraText);
@@ -350,26 +411,78 @@ export default function CalculatorSponsorizare() {
         </p>
 
         {/*
+          Contractul se ia de aici, pe loc.
+
           Butonul ducea la un e-mail gol, în care firma trebuia să scrie
-          singură ce vrea. Acum duce acolo unde contractul chiar se face, cu
-          CUI-ul și suma calculată în adresă: pagina le ia de acolo, cere
-          restul datelor de la ANAF și scoate documentul completat.
+          singură ce vrea — după ce tocmai îi calculaserăm suma și îi știam
+          CUI-ul. Acum, dacă firma a venit din CUI, documentul se scoate din
+          panoul ăsta, cu datele ei și cu suma calculată în el. Cine a bătut
+          cifrele de mână n-are denumirea firmei, deci pentru el rămâne
+          legătura spre pagina unde o scrie.
         */}
-        <div className="relative mt-6">
-          <Buton
-            href={`${RUTE.directionare20}/contract${
-              rezultat
-                ? `?cui=${encodeURIComponent(cuiText.trim())}&valoare=${encodeURIComponent(
-                    scrieCifre(rezultat.maxim),
-                  )}`
-                : ""
-            }`}
-            varianta="principal"
-          >
-            Fă-mi contractul de sponsorizare
-            <Pictograma nume="sageata" className="size-4" />
-          </Buton>
-        </div>
+        {firma && rezultat ? (
+          <div className="relative mt-6">
+            <p className="font-titlu text-mic font-bold text-cerneala">
+              Ia contractul, completat cu datele firmei
+            </p>
+            <div className="mt-3 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => descarcaContractul("word")}
+                disabled={descarc !== null}
+                className="inline-flex min-h-12 items-center justify-center rounded-full bg-caramiziu-700 px-6 py-3 font-titlu font-bold text-hartie transition-colors hover:bg-caramiziu-600 disabled:opacity-60"
+              >
+                {descarc === "word" ? "Se pregătește…" : "Descarcă în Word"}
+              </button>
+              <button
+                type="button"
+                onClick={() => descarcaContractul("pdf")}
+                disabled={descarc !== null}
+                className="inline-flex min-h-12 items-center justify-center rounded-full border-2 border-caramiziu-300 bg-hartie px-6 py-3 font-titlu font-bold text-caramiziu-800 transition-colors hover:border-caramiziu-500 disabled:opacity-60"
+              >
+                {descarc === "pdf" ? "Se pregătește…" : "Descarcă în PDF"}
+              </button>
+            </div>
+            <p className="mt-3 text-nota text-cerneala-moale">
+              Cine semnează și în ce calitate rămân de completat în document.
+              Îl semnezi și ni-l trimiți pe e-mail; îl contrasemnăm și ți-l
+              trimitem înapoi.{" "}
+              <Link
+                href={`${RUTE.directionare20}/contract?cui=${encodeURIComponent(
+                  cuiText.trim(),
+                )}&valoare=${encodeURIComponent(scrieCifre(rezultat.maxim))}`}
+                className="font-titlu font-semibold text-caramiziu-700 underline underline-offset-2"
+              >
+                Sau completează tot acum
+              </Link>
+              .
+            </p>
+            {eroareDescarcare && (
+              <p
+                role="alert"
+                className="mt-3 font-titlu text-mic font-semibold text-caramiziu-800"
+              >
+                {eroareDescarcare}
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="relative mt-6">
+            <Buton
+              href={`${RUTE.directionare20}/contract${
+                rezultat && cuiText.trim()
+                  ? `?cui=${encodeURIComponent(cuiText.trim())}&valoare=${encodeURIComponent(
+                      scrieCifre(rezultat.maxim),
+                    )}`
+                  : ""
+              }`}
+              varianta="principal"
+            >
+              Ia contractul de sponsorizare
+              <Pictograma nume="sageata" className="size-4" />
+            </Buton>
+          </div>
+        )}
       </div>
     </div>
   );
