@@ -47,11 +47,19 @@ async function scrieNasterea(page, iso) {
     ["Anul nașterii", an],
     ["Ziua nașterii", String(Number(zi))],
   ]) {
+    /*
+      Două secunde, nu treizeci.
+
+      O valoare care nu e în listă (anul 1, 1900, 30 februarie) e un rezultat
+      așteptat aici, nu o defecțiune: listele merg 110 ani în urmă și dau
+      numai zilele lunii alese. Cu timpul implicit, fiecare astfel de
+      verificare aștepta jumătate de minut degeaba și proba părea blocată.
+    */
     await page
-      .selectOption(`select[aria-label="${eticheta}"]`, valoare)
-      .catch((e) =>
-        log(`  (${eticheta} = ${valoare} a eșuat:`, e.message.split("\n")[0], ")"),
-      );
+      .selectOption(`select[aria-label="${eticheta}"]`, valoare, {
+        timeout: 2000,
+      })
+      .catch(() => log(`  (${eticheta}: ${valoare} nu e în listă)`));
   }
 }
 
