@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { EMAIL } from "@/date/asociatie";
+import { RUTE } from "@/date/asociatie";
 import Buton from "../Buton";
 import Pictograma from "../Pictograma";
 import Camp, { claseControl, claseControlGresit } from "../formular/Camp";
@@ -349,12 +349,24 @@ export default function CalculatorSponsorizare() {
           </span>
         </p>
 
+        {/*
+          Butonul ducea la un e-mail gol, în care firma trebuia să scrie
+          singură ce vrea. Acum duce acolo unde contractul chiar se face, cu
+          CUI-ul și suma calculată în adresă: pagina le ia de acolo, cere
+          restul datelor de la ANAF și scoate documentul completat.
+        */}
         <div className="relative mt-6">
           <Buton
-            href={`mailto:${EMAIL.contact}?subject=${encodeURIComponent("Contract de sponsorizare")}`}
+            href={`${RUTE.directionare20}/contract${
+              rezultat
+                ? `?cui=${encodeURIComponent(cuiText.trim())}&valoare=${encodeURIComponent(
+                    scrieCifre(rezultat.maxim),
+                  )}`
+                : ""
+            }`}
             varianta="principal"
           >
-            Vreau contract de sponsorizare
+            Fă-mi contractul de sponsorizare
             <Pictograma nume="sageata" className="size-4" />
           </Buton>
         </div>

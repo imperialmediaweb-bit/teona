@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { Suspense, useId, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { ASOCIATIA, EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import Pictograma from "../Pictograma";
 import Camp, {
@@ -42,9 +43,38 @@ type Stare =
   | { fel: "reusit"; mesaj: string }
   | { fel: "eroare"; mesaj: string };
 
+/**
+ * `useSearchParams` cere o graniță `Suspense` ca pagina să rămână
+ * pregenerată. O ținem aici, nu în pagină: cine folosește formularul n-are de
+ * ce să știe asta.
+ */
 export default function FormularContractOnline() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          aria-hidden="true"
+          className="colt-a min-h-[40rem] border border-hartie-umbra bg-hartie"
+        />
+      }
+    >
+      <Formular />
+    </Suspense>
+  );
+}
+
+function Formular() {
   const id = useId();
-  const [cui, setCui] = useState("");
+  /*
+    CUI-ul și suma vin din calculatorul de pe pagina pentru firme: butonul lui
+    duce aici cu amândouă în adresă. Firma nu le mai scrie a doua oară, iar
+    căutarea la ANAF pornește singură, din CUI-ul primit.
+  */
+  const parametri = useSearchParams();
+  const [cui, setCui] = useState(() => parametri.get("cui")?.trim() ?? "");
+  const [valoareInitiala] = useState(
+    () => parametri.get("valoare")?.trim() ?? "",
+  );
   const [denumire, setDenumire] = useState("");
   const [sediu, setSediu] = useState("");
   const [regCom, setRegCom] = useState("");
@@ -305,6 +335,7 @@ export default function FormularContractOnline() {
             name="valoare"
             type="text"
             inputMode="decimal"
+            defaultValue={valoareInitiala}
             maxLength={20}
             placeholder="de exemplu 5.000"
             aria-invalid={Boolean(erori.valoare)}
