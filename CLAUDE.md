@@ -154,30 +154,29 @@ Textele stau în tabelul `texte`, nu în cod. Probe:
 `BAZA=… PAROLA_ADMIN=… node scripts/qa/scrie-pe-site.mjs` și
 `… node scripts/qa/panou-fundraising.mjs`.
 
-## Formularul 230 pe hârtie: fișiere în R2, nu în Cloudinary
+## Formularul 230 pe hârtie: site-ul nu ține niciun CNP
 
-Cine preferă pixul descarcă formularul de la `/formular-230`, îl semnează, îi
-face o fotografie și o trimite de pe `/redirectioneaza-3-5`. Asociația le vede
-la `/admin/formulare`, cu nume, e-mail, telefon și stadiu
-(primit → verificat → depus la ANAF).
+Cine preferă pixul descarcă formularul de la `/formular-230`, îl completează,
+trimite **poza pe WhatsApp sau pe e-mail** direct la asociație, hârtia semnată
+prin poștă, și spune pe site că a completat.
 
-- **Fotografia nu ține loc de hârtie.** Originalul semnat tot trebuie să ajungă
-  la asociație — ANAF îl poate cere. Scrie pe pagină, în răspunsul de după
-  trimitere și în panou. Ce aduce poza e timpul: se știe din ziua aceea cine
-  redirecționează și pe cine mai trebuie sunat după plic.
-- **Fișierele stau în Cloudflare R2, privat**, nu în Cloudinary: pe un 230
-  scrie nume, adresă, **CNP** și o semnătură, iar Cloudinary e o rețea publică
-  de livrare a imaginilor. Nu există nicio adresă permanentă — panoul cere o
-  legătură semnată, valabilă zece minute.
-- Cheile se pun în Railway: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`,
-  `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`. Fără ele, formularul spune cinstit că
-  primirea nu e pornită și dă telefonul.
-- Ștergerea din panou scoate **întâi fișierul din R2**, apoi rândul: invers, o
-  cădere ar lăsa în depozit o fotografie cu un CNP pe care nimeni n-ar mai
-  putea s-o găsească.
-- Semnătura AWS v4 e scrisă de mână (`src/lib/r2.ts`), fără SDK. Probă:
-  `node scripts/qa/semnatura-r2.mjs` — o verifică pe cazurile publicate de AWS,
-  pentru că o semnătură greșită nu dă un rezultat parțial, ci niciunul.
+- **Site-ul nu primește poza.** A existat și varianta cu fișier urcat în
+  depozit privat; s-a scos pentru că nu rezolva nimic — oamenii trimit poza pe
+  WhatsApp oricum, iar o a doua copie n-ar fi scos-o pe prima din telefon,
+  doar ar fi adăugat încă un loc în care stă același CNP.
+- **Anunțul intră în CRM**, ca o cerere cu felul `redirectionare` — acolo unde
+  scrie și formularul de pași de pe aceeași pagină. O singură listă, un singur
+  export, o singură căutare. Se vede și la `/admin/cereri`, și la
+  `/admin/formulare`, care adaugă legătura de WhatsApp și eticheta „2 ani".
+- **„Pe câți ani"** se întreabă pentru că formularul are opțiunea de
+  distribuire pe doi ani: cine a bifat-o nu mai trebuie căutat la anul.
+- **R2 rămâne doar pentru fișierul 230 gol**, cel pe care îl descarcă oamenii.
+  N-are nicio dată personală în el. Chei în Railway: `R2_ACCOUNT_ID`,
+  `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, plus `R2_ENDPOINT`
+  dacă depozitul e în jurisdicția UE. Semnătura AWS v4 e scrisă de mână; probă:
+  `node scripts/qa/semnatura-r2.mjs`.
+- Numărul de WhatsApp de pe pagină e cel public al asociației. Un număr
+  personal al cuiva din echipă n-are ce căuta acolo fără acordul lui scris.
 
 ## Adresele inexistente răspund 404, nu 200
 

@@ -2,21 +2,17 @@ import { NextResponse } from "next/server";
 import { limitaDeRata, raspuns } from "@/lib/api";
 import { esteAutentificat } from "@/lib/admin";
 import { areR2, urcaInR2 } from "@/lib/r2";
-import {
-  esteStadiu230,
-  schimbaStarea230,
-  stergeFormular230,
-} from "@/lib/formulare230";
 import { CHEIE_FORMULAR } from "@/app/formular-230/route";
 
 /**
- * Ce se face din panou cu formularele 230: se urcă cel gol, se mută stadiul
- * celor primite, se șterg.
+ * Urcarea fișierului 230 gol, cel pe care îl descarcă oamenii.
  *
- * Ștergerea e singurul loc din tot panoul care scoate definitiv un fișier cu
- * CNP pe el. De aceea șterge întâi din R2 și abia apoi rândul: invers, o
- * cădere ar lăsa în depozit o fotografie pe care nimeni n-ar mai putea s-o
- * găsească.
+ * Atât face ruta asta. Anunțurile „am completat formularul" sunt cereri
+ * obișnuite în CRM și se mută de acolo, cu `/api/admin/cereri` — site-ul nu
+ * primește poza formularului și nu ține niciun CNP.
+ *
+ * Fișierul gol n-are nicio dată personală în el: e formularul tipizat, cu
+ * datele asociației completate.
  */
 export async function POST(cerere: Request) {
   const prea = limitaDeRata(cerere, {
@@ -56,18 +52,7 @@ export async function POST(cerere: Request) {
     return inapoi(cerere, "urcat");
   }
 
-  const id = camp("id");
-  if (!/^[0-9a-f-]{36}$/i.test(id)) return raspuns("Formular necunoscut.", 400);
-
-  if (actiune === "sterge") {
-    const sters = await stergeFormular230(id);
-    return inapoi(cerere, sters ? "sters" : "nesters");
-  }
-
-  const stare = camp("stare");
-  if (!esteStadiu230(stare)) return raspuns("Stadiu necunoscut.", 400);
-  await schimbaStarea230(id, stare, camp("observatii") || undefined);
-  return inapoi(cerere, "mutat");
+  return raspuns("Acțiune necunoscută.", 400);
 }
 
 function inapoi(cerere: Request, ce: string) {

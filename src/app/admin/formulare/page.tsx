@@ -4,11 +4,7 @@ import { connection } from "next/server";
 import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { areR2 } from "@/lib/r2";
-import {
-  STADII_230,
-  formulare230,
-  legaturaFormular,
-} from "@/lib/formulare230";
+import { STADII_CERERE, cereri } from "@/lib/crm";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
 
@@ -20,15 +16,14 @@ export const metadata: Metadata = {
 /**
  * Formularele 230 primite de pe site, și fișierul gol de descărcat.
  *
- * **Fotografia nu ține loc de hârtie.** Scrie pe pagină, nu în comentarii:
- * originalul semnat tot trebuie să ajungă la asociație, iar ANAF îl poate
- * cere. Lista asta e pentru timp — cine a trimis, pe cine mai trebuie sunat
- * după plic — nu pentru dosar.
+ * **Aici nu e niciun CNP.** Site-ul nu primește poza formularului: omul o
+ * trimite pe WhatsApp sau pe e-mail, direct la asociație. Lista asta are doar
+ * cine a completat, cum se ia legătura cu el și pe câți ani a bifat.
  *
- * **Fișierele nu au adresă permanentă.** Fiecare „Vezi formularul" cere o
- * legătură semnată, valabilă zece minute. Pe un 230 scrie CNP-ul omului; o
- * adresă care merge la nesfârșit ar fi ajuns într-un istoric de browser, pe
- * un WhatsApp, într-un e-mail.
+ * Rostul ei e timpul: se știe din ziua aceea cine redirecționează, cine a
+ * bifat pe doi ani — și deci nu mai trebuie căutat la anul — și pe cine mai
+ * trebuie sunat după plic. Hârtia semnată tot trebuie să ajungă la asociație;
+ * fără ea, ANAF nu înregistrează nimic.
  */
 
 const CAND = new Intl.DateTimeFormat("ro-RO", {
@@ -80,8 +75,18 @@ async function Continut({
     );
   }
 
-  const formulare = areBazaDeDate() ? await formulare230() : [];
-  const deVerificat = formulare.filter((f) => f.stare === "primit").length;
+  /*
+    Lista vine din CRM, nu dintr-un tabel al ei.
+
+    `cereri` are deja categoria „Redirecționare 3,5%", iar formularul de pași
+    de pe aceeași pagină scrie tot acolo. Un al doilea tabel ar fi însemnat
+    aceiași oameni în două liste, cu două exporturi și două feluri de a-i
+    marca rezolvați.
+  */
+  const formulare = areBazaDeDate()
+    ? await cereri("redirectionare", undefined, 500)
+    : [];
+  const deVerificat = formulare.filter((f) => f.stadiu === "nou").length;
 
   return (
     <Cadru
@@ -177,20 +182,23 @@ async function Continut({
         </h2>
 
         <p className="mt-3 max-w-3xl text-mic text-cerneala-moale">
-          Fotografia nu ține loc de hârtie: originalul semnat tot trebuie să
-          ajungă la asociație, iar ANAF îl poate cere. Lista e ca să știi din
-          timp cine redirecționează și pe cine mai trebuie sunat după plic.
+          Oamenii trimit poza pe WhatsApp, iar hârtia prin poștă. Aici e doar
+          lista: cine a completat, pe câți ani, și cum îl suni. Fără hârtia
+          semnată, ANAF nu înregistrează redirecționarea.
         </p>
 
         {formulare.length === 0 ? (
           <p className="mt-6 text-amplu text-cerneala-moale">
-            N-a trimis nimeni încă.
+            N-a spus nimeni încă.
           </p>
         ) : (
           <ul className="mt-5 grid gap-3">
             {formulare.map((f) => {
-              const stadiu = STADII_230.find((s) => s.id === f.stare);
-              const legatura = legaturaFormular(f);
+              const stadiu = STADII_CERERE.find((s) => s.id === f.stadiu);
+              const peDoiAni = f.detalii["Pe câți ani"] === "2 ani";
+              const peWhatsApp = f.telefon
+                ? `https://wa.me/${f.telefon.replace(/\D/g, "").replace(/^0/, "40")}`
+                : null;
               return (
                 <li
                   key={f.id}
@@ -224,40 +232,43 @@ async function Continut({
                     <p className="text-nota text-cerneala-slab">
                       {CAND.format(new Date(f.creatLa))}
                       {stadiu && ` · ${stadiu.eticheta}`}
+                      {/* Cine a bifat pe doi ani nu mai trebuie căutat la anul. */}
+                      {peDoiAni && (
+                        <span className="ml-2 rounded-full bg-turcoaz-100 px-2 py-0.5 font-bold text-turcoaz-900">
+                          2 ani
+                        </span>
+                      )}
                     </p>
                   </div>
 
                   <div className="mt-4 flex flex-wrap items-center gap-3">
-                    {legatura ? (
+                    {/* Scrie-i pe WhatsApp, de unde vine oricum poza. */}
+                    {peWhatsApp && (
                       <a
-                        href={legatura}
+                        href={peWhatsApp}
                         target="_blank"
                         rel="noreferrer noopener"
-                        className="colt-mic-a border-2 border-cerneala/15 bg-hartie px-4 py-2 font-titlu text-mic font-bold text-cerneala transition-colors hover:border-caramiziu-500"
+                        className="colt-mic-a border-2 border-cerneala/15 bg-hartie px-4 py-2 font-titlu text-mic font-bold text-cerneala transition-colors hover:border-turcoaz-500"
                       >
-                        Vezi formularul
+                        Scrie-i pe WhatsApp
                       </a>
-                    ) : (
-                      <span className="text-mic text-cerneala-slab">
-                        Fără fișier.
-                      </span>
                     )}
 
                     <form
-                      action="/api/admin/formulare"
+                      action="/api/admin/cereri"
                       method="post"
                       className="flex flex-wrap items-center gap-2"
                     >
                       <input type="hidden" name="id" value={f.id} />
                       <select
-                        name="stare"
-                        defaultValue={f.stare}
+                        name="stadiu"
+                        defaultValue={f.stadiu}
                         className={camp}
-                        aria-label="Stadiul formularului"
+                        aria-label="Stadiul cererii"
                       >
-                        {STADII_230.map((s) => (
-                          <option key={s.id} value={s.id}>
-                            {s.eticheta}
+                        {STADII_CERERE.map((st) => (
+                          <option key={st.id} value={st.id}>
+                            {st.eticheta}
                           </option>
                         ))}
                       </select>
@@ -266,18 +277,6 @@ async function Continut({
                         className="font-titlu text-mic font-semibold text-caramiziu-700 underline underline-offset-2"
                       >
                         Mută
-                      </button>
-                    </form>
-
-                    <form action="/api/admin/formulare" method="post">
-                      <input type="hidden" name="id" value={f.id} />
-                      <input type="hidden" name="actiune" value="sterge" />
-                      <button
-                        type="submit"
-                        className="ml-auto font-titlu text-mic font-semibold text-caramiziu-800 underline underline-offset-2"
-                        title="Șterge rândul și fotografia din depozit"
-                      >
-                        Șterge definitiv
                       </button>
                     </form>
                   </div>

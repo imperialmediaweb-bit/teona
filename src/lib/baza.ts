@@ -304,33 +304,20 @@ const ADAOSURI = `
   ALTER TABLE texte ADD COLUMN IF NOT EXISTS categorie text;
 
   /*
-    Formularele 230 trimise de oameni, cu poza celui semnat.
+    Nu există tabel pentru formularele 230.
 
-    Fișierul stă în R2, privat; aici rămâne doar cheia lui, cine l-a trimis și
-    unde a ajuns. Fotografia nu înlocuiește hârtia — originalul semnat tot
-    trebuie să ajungă la asociație — dar e felul în care se vede din timp cine
-    redirecționează și pe cine mai trebuie sunat.
+    A existat unul, scurt: ținea fotografia formularului completat. S-a scos
+    pentru că nu rezolva nimic — oamenii trimit poza pe WhatsApp oricum, iar o
+    a doua copie pe site n-ar fi scos-o pe prima din telefon, doar ar fi
+    adăugat încă un loc în care stă același CNP.
 
-    Datele astea sunt cele mai sensibile de pe tot site-ul. De aceea stare
-    pleacă de la „primit" și se poate ajunge la „șters": ștergerea scoate și
-    fișierul din R2, nu doar rândul de aici.
+    Anunțul „am completat formularul" e o cerere obișnuită, în tabelul cereri,
+    cu felul „redirectionare" — acolo unde scrie și formularul de pași de pe
+    aceeași pagină. O singură listă, un singur export, o singură căutare.
+
+    Dacă pe baza de date a rămas tabelul gol formulare_230 de la publicarea în
+    care a existat, poate fi șters de mână; nimic nu-l mai folosește.
   */
-  CREATE TABLE IF NOT EXISTS formulare_230 (
-    id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    nume          text NOT NULL,
-    email         text NOT NULL,
-    telefon       text,
-    fisier_cheie  text,
-    fisier_tip    text,
-    octeti        integer,
-    /* primit → verificat → depus */
-    stare         text NOT NULL DEFAULT 'primit',
-    observatii    text,
-    creat_la      timestamptz NOT NULL DEFAULT now(),
-    schimbat_la   timestamptz NOT NULL DEFAULT now()
-  );
-  CREATE INDEX IF NOT EXISTS formulare_230_dupa_stare
-    ON formulare_230 (stare, creat_la DESC);
 
   /* Cine a scris donația de mână, pentru cele care nu vin de la un procesator. */
   ALTER TABLE donatii ADD COLUMN IF NOT EXISTS adaugat_de text;

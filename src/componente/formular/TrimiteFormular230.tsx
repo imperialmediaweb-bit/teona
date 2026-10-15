@@ -5,28 +5,38 @@ import { EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import Pictograma from "../Pictograma";
 import Camp, {
   Bifa,
+  Optiuni,
   claseButonTrimite,
   claseControl,
   claseControlGresit,
 } from "./Camp";
 
 /**
+ * Numărul pe care se primesc pozele.
+ *
+ * E numărul public al asociației, cel de pe toate paginile. Un număr personal
+ * al cuiva din echipă n-are ce căuta aici fără acordul lui scris: odată pus pe
+ * site, nu se mai poate lua înapoi.
+ */
+const WHATSAPP = `https://wa.me/${TELEFON_PRINCIPAL.apel.replace(/\D/g, "")}`;
+
+/**
  * Formularul 230 pe hârtie: descarcă, completează, fotografiază, trimite.
  *
- * **Fotografia nu ține loc de hârtie, și scrie asta de două ori** — o dată
- * înainte de a trimite, o dată după. Originalul semnat tot trebuie să ajungă
- * la asociație; ANAF îl poate cere. Cine crede că a terminat când a apăsat
- * trimite, n-a terminat, iar redirecționarea lui s-ar pierde.
+ * **Site-ul nu primește poza.** Formularul de aici notează doar că ai
+ * completat: numele, cum te sunăm, pe câți ani ai bifat. Poza o trimiți pe
+ * WhatsApp, direct la asociație.
  *
- * **De ce merită totuși.** Asociația vede din ziua aceea cine redirecționează,
- * poate pregăti situația centralizatoare și știe pe cine să sune după plic.
- * Fără asta, află abia când deschide plicurile, în mai.
+ * De ce așa: oamenii trimit poza pe WhatsApp oricum. O a doua copie, urcată pe
+ * site, n-ar scoate-o pe prima din telefon — ar însemna încă un loc în care
+ * stă același CNP. Aici rămân doar date de contact, ca la orice formular.
  *
- * Fișierul pleacă într-un depozit privat, nu pe o rețea publică de imagini: pe
- * un 230 scrie nume, adresă, CNP și o semnătură.
+ * **Nimic din toate astea nu ține loc de hârtie**, și scrie de două ori: o
+ * dată în pași, o dată după trimitere. Originalul semnat tot trebuie să ajungă
+ * la asociație, altfel ANAF nu înregistrează redirecționarea.
  */
 
-type Erori = Partial<Record<"nume" | "email" | "fisier" | "acord", string>>;
+type Erori = Partial<Record<"nume" | "email" | "acord", string>>;
 
 type Stare =
   | { fel: "gol" }
@@ -46,13 +56,10 @@ export default function TrimiteFormular230() {
     const gasite: Erori = {};
     const nume = String(date.get("nume") ?? "").trim();
     const email = String(date.get("email") ?? "").trim();
-    const fisier = date.get("fisier");
 
     if (nume.length < 2) gasite.nume = "Scrie-ți numele.";
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
       gasite.email = "Introdu o adresă de e-mail validă.";
-    if (!(fisier instanceof File) || fisier.size === 0)
-      gasite.fisier = "Alege fotografia sau PDF-ul formularului completat.";
     if (date.get("acord") !== "da")
       gasite.acord = "Bifează acordul pentru a putea trimite.";
 
@@ -101,11 +108,25 @@ export default function TrimiteFormular230() {
           />
           <span>{stare.mesaj}</span>
         </p>
-        <p className="mt-4 text-mic text-turcoaz-900/80">
-          Trimite hârtia la <strong>Casa Teona, Strada Zamca 22, Suceava</strong>,
-          sau adu-o personal. Dacă ai întrebări: {TELEFON_PRINCIPAL.afisat} ·{" "}
-          {EMAIL.contact}
-        </p>
+        <div className="mt-5 grid gap-3">
+          <a
+            href={WHATSAPP}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="inline-flex w-fit items-center gap-2 colt-mic-a bg-turcoaz-700 px-5 py-3 font-titlu font-bold text-hartie transition-colors hover:bg-turcoaz-800"
+          >
+            Trimite poza pe WhatsApp
+          </a>
+          <p className="text-mic text-turcoaz-900/80">
+            Sau pe e-mail, la{" "}
+            <a href={`mailto:${EMAIL.contact}`} className="underline">
+              {EMAIL.contact}
+            </a>
+            . Și trimite hârtia semnată la{" "}
+            <strong>Casa Teona, Strada Zamca 22, Suceava</strong>, ori adu-o
+            personal — fără ea, ANAF nu poate înregistra redirecționarea.
+          </p>
+        </div>
       </div>
     );
   }
@@ -118,8 +139,9 @@ export default function TrimiteFormular230() {
         {[
           "Descarcă formularul — datele asociației sunt deja completate.",
           "Completează-ți datele tale și semnează-l.",
-          "Fă-i o fotografie clară și trimite-ne-o aici.",
+          "Fă-i o fotografie și trimite-ne-o pe WhatsApp, ca să verificăm că e completat bine.",
           "Trimite și hârtia semnată, în original — fără ea, ANAF nu poate înregistra redirecționarea.",
+          "Spune-ne aici că ai completat, ca să știm să te așteptăm.",
         ].map((pas, i) => (
           <li key={pas} className="flex gap-3">
             <span className="grid size-7 shrink-0 place-items-center rounded-full bg-caramiziu-700 font-titlu text-mic font-bold text-hartie">
@@ -144,7 +166,26 @@ export default function TrimiteFormular230() {
         className="mt-8 grid gap-5 border-t border-hartie-umbra pt-7"
       >
         <p className="font-titlu font-bold text-cerneala">
-          Trimite-ne fotografia formularului completat
+          Spune-ne că ai completat
+        </p>
+        <p className="-mt-3 text-mic text-cerneala-moale">
+          Nu-ți cerem CNP-ul și nu încărca formularul aici. Poza ne-o trimiți pe{" "}
+          <a
+            href={WHATSAPP}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="font-semibold text-caramiziu-700 underline underline-offset-2"
+          >
+            WhatsApp
+          </a>{" "}
+          sau pe{" "}
+          <a
+            href={`mailto:${EMAIL.contact}`}
+            className="font-semibold text-caramiziu-700 underline underline-offset-2"
+          >
+            {EMAIL.contact}
+          </a>
+          .
         </p>
 
         {/* Capcana pentru roboți: un om nu vede câmpul ăsta. */}
@@ -198,26 +239,27 @@ export default function TrimiteFormular230() {
           />
         </Camp>
 
-        <Camp
-          id={`${id}-fisier`}
-          eticheta="Fotografia sau PDF-ul formularului"
-          obligatoriu
-          nota="JPG, PNG, WebP sau PDF, până la 8 MB."
-          eroare={erori.fisier}
-        >
-          <input
-            id={`${id}-fisier`}
-            name="fisier"
-            type="file"
-            accept="image/jpeg,image/png,image/webp,application/pdf"
-            className="w-full text-corp text-cerneala-moale"
-          />
-        </Camp>
+        {/*
+          Pe câți ani a bifat.
+
+          Formularul 230 are opțiunea de distribuire pe doi ani. Cine o
+          bifează nu mai trebuie căutat la anul — iar asta schimbă complet
+          lista de sunat în primăvara următoare.
+        */}
+        <Optiuni
+          name="ani"
+          legenda="Pe câți ani ai bifat pe formular"
+          optiuni={[
+            { valoare: "1", eticheta: "Un an", pictograma: "document" },
+            { valoare: "2", eticheta: "Doi ani", pictograma: "infinit" },
+          ]}
+          defaultValue="1"
+        />
 
         <Bifa name="acord" obligatoriu eroare={erori.acord}>
-          Sunt de acord ca Asociația Teona Ariana să păstreze formularul meu
-          completat ca să poată depune redirecționarea. Știu că pe el apare
-          CNP-ul meu și că trebuie să trimit și hârtia semnată, în original.
+          Sunt de acord ca Asociația Teona Ariana să-mi păstreze numele și
+          datele de contact ca să poată urmări redirecționarea. Știu că trebuie
+          să trimit și hârtia semnată, în original.
         </Bifa>
 
         {stare.fel === "eroare" && (
@@ -235,7 +277,7 @@ export default function TrimiteFormular230() {
             disabled={stare.fel === "trimite"}
             className={claseButonTrimite}
           >
-            {stare.fel === "trimite" ? "Se trimite…" : "Trimite formularul"}
+            {stare.fel === "trimite" ? "Se trimite…" : "Am completat formularul"}
           </button>
         </div>
       </form>

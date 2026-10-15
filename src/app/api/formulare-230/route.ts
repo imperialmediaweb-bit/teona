@@ -1,43 +1,35 @@
 import { email as emailValid, esteRobot, limitaDeRata, raspuns, text } from "@/lib/api";
 import { areBazaDeDate } from "@/lib/baza";
-import { areR2, urcaInR2 } from "@/lib/r2";
-import { salveazaFormular230 } from "@/lib/formulare230";
+import { salveazaCerere } from "@/lib/crm";
 import { EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
 
 /**
- * Formularul 230 completat pe hârtie, fotografiat și trimis înapoi.
+ * „Am completat formularul 230” — anunțul, nu formularul.
  *
- * **Fotografia nu ține loc de hârtie.** Originalul semnat tot trebuie să
- * ajungă la asociație — ANAF îl poate cere. Răspunsul spune asta limpede, ca
- * nimeni să nu creadă că a terminat când a apăsat trimite.
+ * **Site-ul nu primește poza și nu ține niciun CNP.** Omul o trimite pe
+ * WhatsApp sau pe e-mail, direct la asociație, iar hârtia semnată o aduce sau
+ * o trimite prin poștă. Aici se adună doar cine a completat, cum se ia
+ * legătura cu el și pe câți ani a bifat.
  *
- * **Fișierul pleacă direct în R2, privat.** Nu trece prin disc, nu rămâne
- * nicăieri pe server, și nu există nicio adresă permanentă către el: panoul
- * cere o legătură semnată, valabilă zece minute, de fiecare dată.
+ * **De ce nu primim și poza, deși am putea.** Am construit și varianta cu
+ * fișier urcat în depozit privat. Dar ea nu înlocuiește WhatsApp-ul, îl
+ * dublează: oamenii trimit poza pe WhatsApp oricum, iar o a doua copie pe
+ * site înseamnă încă un loc în care stă același CNP, nu unul mai puțin. Codul
+ * de urcare a rămas în depozit, oprit, dacă vreodată se schimbă socoteala.
  *
- * Pe un formular 230 scrie nume, adresă, **CNP** și o semnătură. De aceea
- * acordul e separat și explicit, limita de rată e strânsă, iar fișierul se
- * acceptă doar dacă octeții lui chiar arată a fotografie sau a PDF.
+ * Ce rămâne aici sunt date obișnuite de contact — ca la orice formular de pe
+ * site, nu date fiscale.
+ *
+ * **Se scrie în CRM, nu într-un tabel al lui.** Prima versiune avea tabelul ei
+ * de formulare, pe lângă `cereri`, care are deja categoria „Redirecționare
+ * 3,5%" și în care scrie formularul de pași de pe aceeași pagină. Două liste
+ * cu aceiași oameni înseamnă două căutări, două exporturi și două locuri în
+ * care cineva e marcat „rezolvat" doar într-unul.
  */
-
-const MAXIM_OCTETI = 8 * 1024 * 1024;
-
-/** Ce se acceptă, verificat pe octeți, nu pe ce declară browserul. */
-const TIPURI: Array<{ tip: string; extensie: string; semn: number[] }> = [
-  { tip: "application/pdf", extensie: "pdf", semn: [0x25, 0x50, 0x44, 0x46] },
-  { tip: "image/jpeg", extensie: "jpg", semn: [0xff, 0xd8, 0xff] },
-  { tip: "image/png", extensie: "png", semn: [0x89, 0x50, 0x4e, 0x47] },
-  { tip: "image/webp", extensie: "webp", semn: [0x52, 0x49, 0x46, 0x46] },
-];
-
-function recunoaste(octeti: Uint8Array) {
-  return TIPURI.find((t) => t.semn.every((o, i) => octeti[i] === o)) ?? null;
-}
-
 export async function POST(cerere: Request) {
   const prea = limitaDeRata(cerere, {
     cheie: "formular-230",
-    maxim: 5,
+    maxim: 6,
     fereastraMs: 30 * 60 * 1000,
   });
   if (prea) return prea;
@@ -48,7 +40,7 @@ export async function POST(cerere: Request) {
   const camp = (nume: string) => String(formular.get(nume) ?? "").trim();
 
   if (esteRobot(Object.fromEntries(formular.entries()))) {
-    return raspuns("Mulțumim! Am primit formularul.", 200);
+    return raspuns("Mulțumim! Am notat.", 200);
   }
 
   const nume = text(camp("nume"), 120);
@@ -59,65 +51,37 @@ export async function POST(cerere: Request) {
     return raspuns("Introdu o adresă de e-mail validă.", 400);
   }
   if (formular.get("acord") !== "da") {
-    return raspuns("Bifează acordul pentru a putea trimite formularul.", 400);
+    return raspuns("Bifează acordul pentru a putea trimite.", 400);
   }
 
-  const fisier = formular.get("fisier");
-  if (!(fisier instanceof File) || fisier.size === 0) {
-    return raspuns("Alege fotografia sau PDF-ul formularului completat.", 400);
-  }
-  if (fisier.size > MAXIM_OCTETI) {
-    return raspuns(
-      "Fișierul e prea mare. O fotografie de până la 8 MB e mai mult decât destul.",
-      400,
-    );
-  }
+  /*
+    Pe câți ani a bifat. Formularul 230 are opțiunea de distribuire pe doi
+    ani; cine a bifat-o nu mai trebuie căutat la anul. Dacă n-a răspuns,
+    rămâne gol — nu se presupune unul.
+  */
+  const aniScris = camp("ani");
+  const ani = aniScris === "2" ? 2 : aniScris === "1" ? 1 : null;
 
-  const octeti = new Uint8Array(await fisier.arrayBuffer());
-  const fel = recunoaste(octeti);
-  if (!fel) {
+  if (!areBazaDeDate()) {
     return raspuns(
-      "Fișierul nu pare o fotografie sau un PDF. Acceptăm JPG, PNG, WebP și PDF.",
-      400,
-    );
-  }
-
-  if (!areR2() || !areBazaDeDate()) {
-    return raspuns(
-      `Primirea formularelor pe site nu e încă pornită. Trimite-l pe ${EMAIL.contact} sau sună la ${TELEFON_PRINCIPAL.afisat}.`,
+      `Nu putem nota asta acum. Scrie-ne pe ${EMAIL.contact} sau sună la ${TELEFON_PRINCIPAL.afisat}.`,
       503,
     );
   }
 
-  /*
-    Cheia conține ziua și un număr întâmplător, nu numele omului.
-
-    Cine ar vedea vreodată lista de chei n-ar afla din ea cine a trimis ce;
-    legătura dintre fișier și persoană stă în baza de date, la care se ajunge
-    numai cu parola panoului.
-  */
-  const zi = new Date().toISOString().slice(0, 10);
-  const cheie = `formulare-230/${zi}/${crypto.randomUUID()}.${fel.extensie}`;
-
-  const urcat = await urcaInR2(cheie, octeti, fel.tip);
-  if (!urcat) {
-    return raspuns(
-      "N-am putut primi fișierul acum. Mai încearcă peste câteva minute.",
-      502,
-    );
-  }
-
-  await salveazaFormular230({
+  await salveazaCerere({
+    fel: "redirectionare",
     nume,
     email: camp("email"),
-    telefon: camp("telefon") || null,
-    fisierCheie: cheie,
-    fisierTip: fel.tip,
-    octeti: fisier.size,
+    telefon: camp("telefon") || undefined,
+    detalii: {
+      "A completat formularul": "da",
+      ...(ani ? { "Pe câți ani": ani === 2 ? "2 ani" : "1 an" } : {}),
+    },
   });
 
   return raspuns(
-    "Am primit formularul. Trimite-ne și hârtia semnată, în original — fără ea ANAF nu poate înregistra redirecționarea.",
+    "Am notat, mulțumim! Mai rămâne un lucru: trimite-ne poza formularului pe WhatsApp și hârtia semnată prin poștă sau adu-o la Casa Teona. Fără hârtie, ANAF nu poate înregistra redirecționarea.",
     200,
   );
 }

@@ -252,7 +252,7 @@ export async function peMonede(): Promise<
 export async function deFacutAcum(): Promise<
   Array<{ eticheta: string; nr: number; unde: string }>
 > {
-  const [cereri, aniversari, ciorne, firme, formulare] = await Promise.all([
+  const [cereri, aniversari, ciorne, firme] = await Promise.all([
     intreaba<{ nr: string }>(
       `SELECT count(*) AS nr FROM cereri WHERE stadiu = 'nou'`,
     ),
@@ -270,9 +270,6 @@ export async function deFacutAcum(): Promise<
         WHERE stadiu IN ('cerere', 'contract_trimis')
           AND schimbat_la < now() - interval '14 days'`,
     ),
-    intreaba<{ nr: string }>(
-      `SELECT count(*) AS nr FROM formulare_230 WHERE stare = 'primit'`,
-    ),
   ]);
 
   return [
@@ -286,11 +283,6 @@ export async function deFacutAcum(): Promise<
       eticheta: "firme fără răspuns de două săptămâni",
       nr: Number(firme[0]?.nr ?? 0),
       unde: "/admin/firme",
-    },
-    {
-      eticheta: "formulare 230 de verificat",
-      nr: Number(formulare[0]?.nr ?? 0),
-      unde: "/admin/formulare",
     },
     {
       eticheta: "ciorne nepublicate",
