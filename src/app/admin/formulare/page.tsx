@@ -161,6 +161,10 @@ async function Continut({
               R2_SECRET_ACCESS_KEY
             </code>{" "}
             și <code className="rounded bg-hartie-umbra px-1">R2_BUCKET</code>.
+            Dacă depozitul e creat în jurisdicția Uniunii Europene, mai trebuie
+            și{" "}
+            <code className="rounded bg-hartie-umbra px-1">R2_ENDPOINT</code>,
+            cu adresa lui.
           </p>
         )}
       </section>

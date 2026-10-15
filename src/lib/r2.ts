@@ -17,6 +17,12 @@ import { createHash, createHmac } from "node:crypto";
  *
  * **Cheile stau în Railway**, niciodată în depozit:
  *   R2_ACCOUNT_ID · R2_ACCESS_KEY_ID · R2_SECRET_ACCESS_KEY · R2_BUCKET
+ *
+ * **R2_ENDPOINT, când depozitul e într-o jurisdicție.** Un depozit creat în
+ * jurisdicția Uniunii Europene — alegerea potrivită pentru fișiere cu CNP pe
+ * ele — nu răspunde la adresa obișnuită, ci la `<cont>.eu.r2.cloudflarestorage.com`,
+ * și numai la ea. Fără variabila asta, totul ar fi semnat corect și trimis la
+ * adresa greșită, iar răspunsul n-ar spune de ce.
  */
 
 const REGIUNE = "auto";
@@ -28,11 +34,14 @@ function config() {
   const secret = process.env.R2_SECRET_ACCESS_KEY;
   const galeata = process.env.R2_BUCKET;
   if (!cont || !cheie || !secret || !galeata) return null;
+  const adresa = process.env.R2_ENDPOINT?.trim();
   return {
     cheie,
     secret,
     galeata,
-    gazda: `${cont}.r2.cloudflarestorage.com`,
+    gazda: adresa
+      ? adresa.replace(/^https?:\/\//, "").replace(/\/+$/, "")
+      : `${cont}.r2.cloudflarestorage.com`,
   };
 }
 
