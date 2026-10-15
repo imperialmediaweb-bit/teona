@@ -1,7 +1,6 @@
 import {
   ADRESE,
   ASOCIATIA,
-  CIFRE,
   EMAIL,
   RUTE,
   TELEFON_PRINCIPAL,
@@ -11,6 +10,7 @@ import { scrieSuma } from "@/lib/suma";
 import { ADRESA_SITE } from "@/app/seo";
 import { curat, trimiteEmail } from "./trimite";
 import { CULORI, MIC, P, caseta, pagina } from "./plic";
+import { texteleMultumirii } from "./multumire-texte";
 
 /**
  * Mulțumirea pentru o donație.
@@ -101,32 +101,39 @@ export function construiesteMultumirea(d: Date): Compus {
     ? "A mers. Mulțumim din nou."
     : d.prinTransfer
       ? "Am găsit transferul tău. Mulțumim!"
-      : "Mulțumim.";
+      : // Fără prenume în titlu: salutul de dedesubt îl spune deja, iar
+        // „Mulțumim, Maria." urmat de „Bună, Maria," sună a scrisoare tipărită.
+        "Mulțumim.";
 
   /*
-    Deschiderea.
+    Deschiderea, paragraful despre ce facem și citatul de la sfârșit vin din
+    `multumire-texte.ts`, în șapte variante. Un donator lunar primește
+    douăsprezece mesaje pe an; dacă toate sunt aceeași propoziție, de la al
+    treilea încolo nu se mai citesc.
 
-    Un mesaj care începe cu „Donația ta de 150 lei a fost procesată" e un bon
-    de casă. Omul tocmai a dat bani unei asociații de copii cu dizabilități,
-    fără să fie obligat și fără să primească nimic înapoi — merită o
-    propoziție scrisă pentru el, nu una generată.
+    Ce nu scrie nicăieri: cât costă o zi de tabără, câți copii ajung dintr-o
+    sumă. Nu știm.
 
-    Ce nu scrie aici: cât costă o zi de tabără, câți copii ajung dintr-o sumă,
-    la ce anume merg banii lui. Nu știm, iar o cifră inventată ca „să sune
-    bine" costă exact lucrul pe care îl apără mesajul ăsta.
+    **Și nu scrie nici suma, sus.** O mulțumire care începe cu „Ai dat 50 de
+    lei" e tot un bon de casă, doar cu adjective: pune cifra înaintea omului
+    și îl împarte, fără să vrea, în donator mare și donator mic. Suma e în
+    tabelul de dedesubt, unde omul se uită când o caută. Sus stă gestul, care
+    e același la 20 și la 2.000 de lei.
   */
-  const deschidere = d.reinnoire
-    ? `S-a reînnoit donația ta lunară de ${suma}. Nu trebuie să faci nimic — îți scriem doar ca să știi că a mers. Și ca să-ți mulțumim încă o dată: nu ne-am obișnuit.`
-    : d.prinTransfer
-      ? `Am găsit transferul tău de ${suma} în extrasul de cont. De acum e al copiilor.`
-      : lunar
-        ? `Ai ales să dai ${suma} în fiecare lună. Asta e lucrul cel mai greu de obținut și cel mai de folos: lunar înseamnă că putem spune „da" unei familii înainte să avem banii în cont.`
-        : `Ai dat ${suma}. Nu te-a obligat nimeni și nu primești nimic înapoi — de asta contează.`;
+  const { deschidere, ceFacem, citat } = texteleMultumirii(
+    d.reinnoire
+      ? "reinnoire"
+      : d.prinTransfer
+        ? "transfer"
+        : lunar
+          ? "lunara"
+          : "unica",
+    d.email,
+    Number.isNaN(ziua.getTime()) ? new Date() : ziua,
+  );
 
-  /** Al doilea paragraf: unde ajunge, în cuvinte pe care le putem susține. */
-  const unde_ajunge = d.reinnoire
-    ? ""
-    : `Banii merg la copiii cu nevoi speciale, la cei care au trecut prin cancer și la familiile lor. Până acum am făcut ${CIFRE[0].valoare} de tabere, cu peste ${CIFRE[1].valoare.toLocaleString("ro-RO")} de participanți, iar la Casa Teona vin acum peste ${CIFRE[2].valoare} de copii. De azi ești și tu în socoteala asta.`;
+  /** La reînnoire nu se repetă ce facem: omul a citit-o deja, luna trecută. */
+  const unde_ajunge = d.reinnoire ? "" : ceFacem;
 
   const randuri: Array<[string, string]> = [
     ["Suma", suma],
@@ -160,7 +167,8 @@ export function construiesteMultumirea(d: Date): Compus {
     `${ADRESE.casaTeona.strada}, ${ADRESE.casaTeona.oras} ${ADRESE.casaTeona.cod}`,
     `${TELEFON_PRINCIPAL.afisat} · ${EMAIL.contact}`,
     "",
-    ASOCIATIA.motto,
+    `„${citat.text}”`,
+    citat.sursa,
   ].join("\n");
 
   /*
@@ -213,7 +221,13 @@ export function construiesteMultumirea(d: Date): Compus {
       omul a citit tot, e felul în care se încheie o scrisoare — și e ce
       spune asociația despre ea însăși de dinainte să existe site-ul.
     -->
-    <p style="margin:22px 0 0;font-family:Georgia,'Times New Roman',serif;font-size:16px;font-style:italic;text-align:center;color:${CULORI.accent};">${curat(ASOCIATIA.motto)}</p>`;
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0 0;"><tr>
+      <td width="3" bgcolor="${CULORI.accent}" style="background-color:${CULORI.accent};font-size:0;line-height:0;">&nbsp;</td>
+      <td style="padding:2px 0 2px 16px;">
+        <p style="margin:0 0 4px;font-family:Georgia,'Times New Roman',serif;font-size:17px;line-height:1.5;font-style:italic;color:${CULORI.cerneala};">${curat(citat.text)}</p>
+        <p style="margin:0;font-family:Arial,sans-serif;font-size:12px;color:${CULORI.moale};">${curat(citat.sursa)}</p>
+      </td>
+    </tr></table>`;
 
   const html = pagina(titlu, corp, deschidere);
 
