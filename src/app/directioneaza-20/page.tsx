@@ -310,8 +310,12 @@ export default function Directioneaza20() {
                 Contractul se descarcă în Word, nu doar în PDF: o firmă îl
                 deschide, scrie denumirea și suma, îl trimite la semnat. Un PDF
                 se completează numai cu pixul, după ce îl tipărești. Textul e
-                cel al asociației, transcris cuvânt cu cuvânt; se face cu
-                `node scripts/contract-word.mjs`.
+                cel al asociației, transcris cuvânt cu cuvânt.
+
+                Modelul gol se scrie la cerere, din `src/lib/contract-word.ts`,
+                același cod care scrie și contractul completat cu datele unei
+                firme. Două generatoare cu aceeași așezare s-ar fi depărtat
+                unul de altul la prima schimbare.
               */}
               <p className="mt-6 text-amplu text-cerneala-moale">
                 Vrei un contract personalizat? Scrie-ne la{" "}
@@ -335,7 +339,7 @@ export default function Directioneaza20() {
                     titlu="Contract de sponsorizare"
                     descriere="Modelul asociației, de completat la calculator: denumirea firmei, datele ei și suma. Restul e scris."
                     format="Word"
-                    fisier="/documente/contract-de-sponsorizare.docx"
+                    fisier="/api/contract/descarca"
                     colt="a"
                   />
                 </Aparitie>

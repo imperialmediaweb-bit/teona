@@ -65,6 +65,24 @@ const raspunsPagina = await pagina.goto(BAZA + CALE, {
 });
 verifica(raspunsPagina?.ok() === true, `${CALE} răspunde (${raspunsPagina?.status()})`);
 
+/*
+  Întâi scăpăm de bannerul de cookie-uri: stă fixat în josul ecranului și
+  acoperă exact caseta de semnat. (Prins aici: mouse-ul nimerea un buton al
+  bannerului, iar desenul nu apărea niciodată.)
+*/
+await pagina
+  .getByRole("button", { name: /Acceptă toate/i })
+  .click()
+  .catch(() => {});
+await pagina.waitForTimeout(300);
+
+/*
+  Semnatul pe ecran stă într-o secțiune închisă: calea întâi e descărcarea
+  contractului completat. O deschidem, ca un om.
+*/
+await pagina.getByText("Sau semnează acum, pe ecran").click();
+await pagina.waitForTimeout(400);
+
 const panza = pagina.locator("canvas");
 verifica((await panza.count()) === 1, "pagina are o casetă de semnat");
 
@@ -125,7 +143,57 @@ verifica(
   `suma scrisă englezește e refuzată, nu ghicită (${sumaEngleza.stare})`,
 );
 
-// ─── 3. Un contract bun trece de scrierea PDF-ului ────────────────────────
+// ─── 3. Contractul completat, de descărcat ────────────────────────────────
+/*
+  Calea pe care o folosesc firmele serioase: iau documentul cu datele lor și îl
+  semnează cu certificatul calificat. Verificăm că iese un fișier adevărat —
+  un PDF începe cu „%PDF", iar un .docx e o arhivă zip, deci începe cu „PK".
+*/
+async function descarca(fel) {
+  const r = await fetch(`${BAZA}/api/contract/descarca`, {
+    method: "POST",
+    body: new URLSearchParams({ ...bun(), fel }),
+  });
+  if (!r.ok) return { stare: r.status, inceput: "", octeti: 0, nume: "" };
+  const octeti = new Uint8Array(await r.arrayBuffer());
+  return {
+    stare: r.status,
+    inceput: String.fromCharCode(...octeti.slice(0, 4)),
+    octeti: octeti.length,
+    nume: r.headers.get("content-disposition") ?? "",
+  };
+}
+
+const pdf = await descarca("pdf");
+verifica(
+  pdf.stare === 200 && pdf.inceput.startsWith("%PDF") && pdf.octeti > 20000,
+  `PDF-ul completat iese întreg (${pdf.stare}, ${pdf.octeti} octeți)`,
+);
+verifica(
+  /filename="[^"]*\.pdf"/.test(pdf.nume),
+  `PDF-ul are nume de fișier în antet (${pdf.nume})`,
+);
+
+const word = await descarca("word");
+verifica(
+  word.stare === 200 && word.inceput.startsWith("PK") && word.octeti > 8000,
+  `documentul Word completat iese întreg (${word.stare}, ${word.octeti} octeți)`,
+);
+verifica(
+  /filename="[^"]*\.docx"/.test(word.nume),
+  `documentul Word are nume de fișier în antet (${word.nume})`,
+);
+
+const model = await fetch(`${BAZA}/api/contract/descarca`);
+const octetiModel = new Uint8Array(await model.arrayBuffer());
+verifica(
+  model.ok &&
+    String.fromCharCode(...octetiModel.slice(0, 2)) === "PK" &&
+    octetiModel.length > 8000,
+  `modelul gol se scrie la cerere (${model.status}, ${octetiModel.length} octeți)`,
+);
+
+// ─── 4. Un contract bun trece de scrierea PDF-ului ────────────────────────
 const corect = await trimite(bun());
 verifica(
   corect.stare === 200 || corect.stare === 503,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { ASOCIATIA, EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import Pictograma from "../Pictograma";
 import Camp, {
@@ -53,6 +53,75 @@ export default function FormularContractOnline() {
   const [areSemnatura, setAreSemnatura] = useState(false);
   const [erori, setErori] = useState<Erori>({});
   const [stare, setStare] = useState<Stare>({ fel: "gol" });
+  const formular = useRef<HTMLFormElement>(null);
+  const [descarc, setDescarc] = useState<"pdf" | "word" | null>(null);
+
+  /**
+   * Descarcă contractul completat cu datele din formular.
+   *
+   * Nu semnează și nu trimite nimic: firma primește documentul ei, îl
+   * semnează cum vrea — cu certificatul calificat sau tipărit, cu pixul — și
+   * ni-l trimite pe e-mail. Serverul nu păstrează nimic: o descărcare nu e un
+   * angajament.
+   */
+  async function descarca(fel: "pdf" | "word") {
+    const el = formular.current;
+    if (!el) return;
+    const date = new FormData(el);
+    date.set("fel", fel);
+
+    const gasite: Erori = {};
+    if (String(date.get("denumire") ?? "").trim().length < 3)
+      gasite.denumire = "Scrieți denumirea firmei.";
+    if (String(date.get("cui") ?? "").replace(/\D/g, "").length < 2)
+      gasite.cui = "Scrieți CUI-ul firmei.";
+    setErori(gasite);
+    if (Object.keys(gasite).length > 0) return;
+
+    setDescarc(fel);
+    setStare({ fel: "gol" });
+    try {
+      const raspuns = await fetch("/api/contract/descarca", {
+        method: "POST",
+        body: date,
+      });
+      if (!raspuns.ok) {
+        const corp = (await raspuns.json().catch(() => ({}))) as {
+          mesaj?: string;
+        };
+        setStare({
+          fel: "eroare",
+          mesaj: corp.mesaj ?? "Nu am putut scrie contractul.",
+        });
+        return;
+      }
+      /*
+        Numele fișierului vine din antetul răspunsului, nu din browser:
+        altfel descărcarea s-ar numi „descarca" și firma ar avea în Descărcări
+        zece fișiere la fel.
+      */
+      const antet = raspuns.headers.get("content-disposition") ?? "";
+      const nume =
+        /filename="([^"]+)"/.exec(antet)?.[1] ??
+        (fel === "word" ? "Contract.docx" : "Contract.pdf");
+      const bucata = await raspuns.blob();
+      const adresa = URL.createObjectURL(bucata);
+      const legatura = document.createElement("a");
+      legatura.href = adresa;
+      legatura.download = nume;
+      document.body.append(legatura);
+      legatura.click();
+      legatura.remove();
+      URL.revokeObjectURL(adresa);
+    } catch {
+      setStare({
+        fel: "eroare",
+        mesaj: "Nu am putut descărca contractul. Verificați conexiunea.",
+      });
+    } finally {
+      setDescarc(null);
+    }
+  }
 
   /** Ce vine de la ANAF după CUI: denumirea, sediul, nr. de la registru. */
   function dinAnaf(firma: Firma) {
@@ -128,6 +197,7 @@ export default function FormularContractOnline() {
 
   return (
     <form
+      ref={formular}
       onSubmit={trimite}
       noValidate
       className="colt-a border border-hartie-umbra bg-hartie p-6 shadow-[0_24px_50px_-26px_rgba(35,35,35,0.45)] sm:p-8"
@@ -308,69 +378,108 @@ export default function FormularContractOnline() {
         </Camp>
       </div>
 
-      <h2 className="mt-9 text-h4 text-cerneala">Semnătura</h2>
-
       {/*
-        Ce e semnătura asta, înaintea casetei, nu după ea — și scris cu
-        măsură.
+        Calea întâi: documentul completat, de descărcat.
 
-        Legea 214/2024 (art. 4) dă semnăturii electronice simple efectele celei
-        olografe doar în anumite cazuri; cel care se potrivește aici e
-        recunoașterea de către partea împotriva căreia e folosită — expresă sau
-        tacită, de pildă prin plata sumei din contract. Textul de dedesubt
-        spune exact atât: nu „e ca semnătura cu pixul”, dar nici „n-are nicio
-        valoare”. Cine vrea certitudine are, imediat sub el, calea cu
-        certificat.
+        Firma îl semnează cum vrea — cu certificatul calificat, care are prin
+        lege puterea semnăturii olografe, sau tipărit, cu pixul — și ni-l
+        trimite pe e-mail. Nu se salvează nimic la noi: o descărcare nu e un
+        angajament.
+
+        Semnatul pe ecran rămâne dedesubt, închis. Legea 214/2024 (art. 4) dă
+        semnăturii electronice simple efectele celei olografe doar în anumite
+        cazuri — cel care se potrivește aici e recunoașterea de către partea
+        împotriva căreia e folosită, inclusiv tacit, prin plata sumei. E bună
+        pentru sume mici și firme fără certificat; nu e calea pe care o pun
+        prima.
       */}
+      <h2 className="mt-9 text-h4 text-cerneala">Ia contractul completat</h2>
       <p className="mt-3 max-w-2xl text-mic text-cerneala-moale">
-        Semnătura desenată aici e o <strong>semnătură electronică simplă</strong>.
-        Legea îi dă aceleași efecte ca semnăturii cu pixul atunci când partea
-        împotriva căreia e folosită o recunoaște — inclusiv tacit, prin plata
-        sumei din contract. {ASOCIATIA.denumire} îl contrasemnează și vi-l
-        trimite înapoi.
-      </p>
-      <p className="mt-3 max-w-2xl text-mic text-cerneala-moale">
-        <strong className="font-titlu font-bold text-cerneala">
-          Pentru sume mari, folosiți semnătura electronică calificată.
-        </strong>{" "}
-        E singura care are, prin lege, puterea semnăturii olografe în orice
-        situație. Descărcați modelul de mai sus, semnați-l cu certificatul
-        firmei (cel cu care intrați în SPV la ANAF) și trimiteți-l la{" "}
-        {EMAIL.contact}.
+        Îl descărcați cu datele firmei scrise în el, îl semnați — cu
+        certificatul calificat al firmei (cel cu care intrați în SPV la ANAF)
+        sau tipărit, cu pixul — și ni-l trimiteți la{" "}
+        <a
+          href={`mailto:${EMAIL.contact}`}
+          className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
+        >
+          {EMAIL.contact}
+        </a>
+        . Îl contrasemnăm și vă trimitem exemplarul semnat de amândoi.
       </p>
 
-      <div className="mt-5">
-        <SemnaturaPeEcran
-          name="semnatura"
-          eroare={erori.semnatura}
-          onSemnat={setAreSemnatura}
-        />
-      </div>
-
-      <div className="mt-6">
-        <Bifa name="acord" obligatoriu eroare={erori.acord}>
-          Am citit contractul, semnez în numele firmei de mai sus și sunt de
-          acord ca {ASOCIATIA.denumire} să prelucreze datele acestea pentru
-          încheierea lui.
-        </Bifa>
-      </div>
-
-      <div className="mt-7 flex flex-wrap items-center gap-4">
+      <div className="mt-5 flex flex-wrap gap-3">
         <button
-          type="submit"
-          disabled={stare.fel === "trimite"}
+          type="button"
+          onClick={() => descarca("word")}
+          disabled={descarc !== null}
           className={claseButonTrimite}
         >
-          {stare.fel === "trimite"
-            ? "Se semnează…"
-            : "Semnează și trimite contractul"}
+          {descarc === "word" ? "Se pregătește…" : "Descarcă în Word"}
         </button>
-        {!areSemnatura && (
-          <span className="text-mic text-cerneala-slab">
-            Mai întâi semnați în casetă.
-          </span>
-        )}
+        <button
+          type="button"
+          onClick={() => descarca("pdf")}
+          disabled={descarc !== null}
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border-2 border-cerneala/15 bg-hartie px-7 py-3 font-titlu font-semibold text-cerneala transition-colors hover:border-caramiziu-500 hover:text-caramiziu-700 disabled:opacity-60"
+        >
+          {descarc === "pdf" ? "Se pregătește…" : "Descarcă în PDF"}
+        </button>
       </div>
+      <p className="mt-3 text-nota text-cerneala-slab">
+        Word, dacă mai aveți de completat ceva sau îl semnați cu certificatul.
+        PDF, dacă îl tipăriți și îl semnați cu pixul.
+      </p>
+
+      {/* ── Sau semnezi aici, pe loc ─────────────────────────────────── */}
+      <details className="mt-8 colt-mic-a border-2 border-hartie-umbra open:bg-hartie-calda">
+        <summary className="flex min-h-12 cursor-pointer items-center px-5 py-3 font-titlu font-bold text-cerneala">
+          Sau semnează acum, pe ecran
+        </summary>
+
+        <div className="border-t-2 border-hartie-umbra p-5">
+          <p className="max-w-2xl text-mic text-cerneala-moale">
+            Semnătura desenată aici e o{" "}
+            <strong>semnătură electronică simplă</strong>. Legea îi dă aceleași
+            efecte ca semnăturii cu pixul atunci când partea împotriva căreia e
+            folosită o recunoaște — inclusiv tacit, prin plata sumei din
+            contract. Pentru sume mari, folosiți semnătura calificată, de mai
+            sus: e singura care are această putere în orice situație.
+          </p>
+
+          <div className="mt-5">
+            <SemnaturaPeEcran
+              name="semnatura"
+              eroare={erori.semnatura}
+              onSemnat={setAreSemnatura}
+            />
+          </div>
+
+          <div className="mt-6">
+            <Bifa name="acord" obligatoriu eroare={erori.acord}>
+              Am citit contractul, semnez în numele firmei de mai sus și sunt
+              de acord ca {ASOCIATIA.denumire} să prelucreze datele acestea
+              pentru încheierea lui.
+            </Bifa>
+          </div>
+
+          <div className="mt-6 flex flex-wrap items-center gap-4">
+            <button
+              type="submit"
+              disabled={stare.fel === "trimite"}
+              className={claseButonTrimite}
+            >
+              {stare.fel === "trimite"
+                ? "Se semnează…"
+                : "Semnează și trimite contractul"}
+            </button>
+            {!areSemnatura && (
+              <span className="text-mic text-cerneala-slab">
+                Mai întâi semnați în casetă.
+              </span>
+            )}
+          </div>
+        </div>
+      </details>
 
       {stare.fel === "eroare" && (
         <p

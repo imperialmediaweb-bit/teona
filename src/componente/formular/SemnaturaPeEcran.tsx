@@ -62,8 +62,19 @@ export default function SemnaturaPeEcran({
     }
 
     masoara();
-    window.addEventListener("resize", masoara);
-    return () => window.removeEventListener("resize", masoara);
+
+    /*
+      Un `resize` pe fereastră nu e de ajuns.
+
+      Caseta stă într-un `<details>` închis, iar acolo lățimea ei e zero.
+      Când omul îl deschide, fereastra nu se schimbă, deci măsurarea n-ar mai
+      avea loc niciodată: pânza rămâne de 0×0 și desenul nu apare. Prins de
+      proba automată, care deschide secțiunea și desenează — exact ce face un
+      om.
+    */
+    const privitor = new ResizeObserver(masoara);
+    privitor.observe(el);
+    return () => privitor.disconnect();
   }, []);
 
   function punct(ev: React.PointerEvent<HTMLCanvasElement>) {

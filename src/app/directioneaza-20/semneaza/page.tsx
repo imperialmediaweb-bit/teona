@@ -41,7 +41,7 @@ export default function Semneaza() {
       <AntetPagina
         scris="Pentru firme"
         titlu="Semnează contractul de sponsorizare"
-        subtitlu="Scrie CUI-ul, completează suma și semnează pe ecran. Primești contractul pe e-mail în aceeași clipă, iar noi îl contrasemnăm."
+        subtitlu="Scrie CUI-ul și completează suma — îți dăm contractul gata scris, în Word sau PDF. Îl semnezi cum vrei și ni-l trimiți; îl contrasemnăm și ți-l trimitem înapoi."
         accent="turcoaz"
         poza={{
           cale: "/poze/2024/11/459590851_545309534736056_5697611419655887236_n.jpg",
@@ -99,15 +99,14 @@ export default function Semneaza() {
                 />
                 <span>
                   <a
-                    href="/documente/contract-de-sponsorizare.docx"
+                    href="/api/contract/descarca"
                     download
                     className="font-titlu font-bold text-caramiziu-700 underline-offset-4 hover:underline"
                   >
-                    Descarcă modelul în Word
+                    Descarcă modelul gol, în Word
                   </a>{" "}
-                  și semnează-l cu certificatul calificat al firmei (cel de la
-                  ANAF), apoi trimite-l la {EMAIL.contact}. Aceea e singura
-                  semnătură care are, prin lege, puterea celei cu pixul.
+                  — pentru cine preferă să-l completeze singur. Formularul de
+                  mai jos ți-l dă completat cu datele firmei.
                 </span>
               </li>
               <li className="flex items-start gap-2.5">
