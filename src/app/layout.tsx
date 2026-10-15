@@ -202,7 +202,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Antet />
         </Suspense>
 
-        <main id="continut" className="flex-1">
+        {/*
+          Pe telefon, pastila Donează plutește peste colțul din dreapta jos.
+          Fără locul ăsta de dedesubt, ultimul rând al oricărei pagini rămâne
+          sub ea.
+        */}
+        <main id="continut" className="flex-1 pb-16 sm:pb-0">
           {children}
         </main>
 
