@@ -152,6 +152,24 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
   `BAZA=… PAROLA_ADMIN=… DATABASE_URL=… node scripts/qa/analiza.mjs`.
   Fără `ANTHROPIC_API_KEY` pagina rămâne utilă: cifrele se calculează oricum,
   doar interpretarea lipsește.
+- **Vizitele din Google Analytics**, tot la `/admin/analiza`, sus: câți
+  oameni au intrat pe site în ultimele 28 de zile, de unde au venit (sursele
+  sunt traduse: „google / organic" se citește „Căutare Google"), ce pagini au
+  văzut și ce au adus linkurile etichetate — adică exact ce a adus fiecare
+  buletin de e-mail. Nimeni nu intră în Google Analytics; panoul se deschide
+  oricum. **Cifrele de vizite nu sunt donații** și scrie asta pe pagină:
+  Google numără vizite, baza de date numără donații; când nu se potrivesc,
+  baza de date are dreptate. Aceleași cifre intră și în rezumatul trimis
+  modelului, cu aceeași atenționare.
+  Se face cu un cont de serviciu Google (JWT semnat de mână, ca semnătura AWS
+  de la R2 — bibliotecile Google ar fi adus 20 MB pentru o pagină de cod):
+  în Google Cloud un proiect cu `analyticsdata.googleapis.com` pornit, un cont
+  de serviciu cu cheie JSON, contul adăugat ca **Vizualizator** pe
+  proprietatea GA4, iar în Railway `GA_PROPERTY_ID` (numărul, nu „G-…"),
+  `GA_CLIENT_EMAIL` și `GA_PRIVATE_KEY`. Fără ele, pagina spune ce lipsește;
+  dacă Google nu răspunde, restul panoului merge mai departe.
+  Probă, cu un Google de mentiune care verifică semnătura cu cheia publică
+  pereche: `PAROLA_ADMIN=… node scripts/qa/analytics.mjs`.
 - **Export pentru Excel** pe donații, donatori, firme și cereri: `;` ca
   separator, BOM la început și virgulă zecimală — fără ele, Excel-ul românesc
   citește 150 de lei ca 150 de milioane de miliarde.

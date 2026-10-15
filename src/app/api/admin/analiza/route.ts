@@ -9,6 +9,7 @@ import {
   salveazaAnaliza,
 } from "@/lib/analiza/cifre";
 import { areAnaliza, cereAnaliza, rezumat } from "@/lib/analiza/intreaba";
+import { vizite } from "@/lib/ga/raport";
 
 /**
  * Cere o analiză nouă.
@@ -45,9 +46,11 @@ export async function POST(cerere: Request) {
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
   if (!areAnaliza()) return inapoi(cerere, "fara-cheie");
 
-  const [donatori, firme] = await Promise.all([
+  const [donatori, firme, deVizite] = await Promise.all([
     profilulDonatorilor(),
     profilulFirmelor(),
+    // Dacă Google Analytics nu e legat sau nu răspunde, analiza se face fără.
+    vizite().catch(() => null),
   ]);
 
   /*
@@ -61,7 +64,7 @@ export async function POST(cerere: Request) {
     return inapoi(cerere, "putine-date");
   }
 
-  const cifre = rezumat(donatori, firme);
+  const cifre = rezumat(donatori, firme, deVizite);
   const text = await cereAnaliza(cifre);
   if (!text) return inapoi(cerere, "n-a-mers");
 

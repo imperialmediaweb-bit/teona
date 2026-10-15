@@ -12,6 +12,7 @@ import {
   type ProfilFirme,
 } from "@/lib/analiza/cifre";
 import { areAnaliza, rezumat } from "@/lib/analiza/intreaba";
+import { areVizite, vizite } from "@/lib/ga/raport";
 import { cate } from "@/lib/numere-ro";
 import { scrieSuma } from "@/lib/suma";
 import Cadru from "@/componente/admin/Cadru";
@@ -331,6 +332,156 @@ function Firme({ f }: { f: ProfilFirme }) {
   );
 }
 
+/**
+ * Vizitele de pe site, aduse din Google Analytics.
+ *
+ * **De ce aici și nu în Google Analytics.** Pentru că nimeni nu intră în
+ * Google Analytics: are patruzeci de meniuri și cere învățat, iar panoul se
+ * deschide oricum. Aici vin numai cele patru lucruri după care se iau
+ * hotărâri — câți oameni, de unde, pe ce pagini, și ce a adus fiecare
+ * campanie etichetată.
+ *
+ * Cifrele astea **nu sunt donații**. Google numără vizite; donațiile le
+ * numără baza de date, mai sus pe pagină. Scris pe pagină, nu doar aici: cine
+ * le adună din greșeală raportează de două ori aceiași oameni.
+ *
+ * Învelită în `Suspense`: e o cerere la Google, iar restul paginii n-are de ce
+ * s-o aștepte.
+ */
+async function DinAnalytics() {
+  const date = await vizite().catch(() => null);
+
+  if (!date) {
+    return (
+      <div className="colt-a border border-hartie-umbra bg-hartie p-5 sm:p-6">
+        <p className="text-amplu text-cerneala-moale">
+          Google Analytics n-a răspuns. Dacă tocmai s-au pus cheile, mai
+          încearcă peste câteva minute; dacă nu, verifică dacă contul de
+          serviciu e adăugat ca <strong>Vizualizator</strong> pe proprietatea
+          GA4.
+        </p>
+      </div>
+    );
+  }
+
+  const crestere = (acum: number, inainte: number) =>
+    inainte > 0
+      ? `${acum >= inainte ? "+" : ""}${Math.round(((acum - inainte) / inainte) * 100)}% față de perioada dinainte`
+      : "Nu există perioadă dinainte cu care să comparăm";
+
+  return (
+    <>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Cifra
+          eticheta="Oameni pe site"
+          valoare={String(date.utilizatori)}
+          nota={crestere(date.utilizatori, date.inainte.utilizatori)}
+        />
+        <Cifra
+          eticheta="Vizite"
+          valoare={String(date.sesiuni)}
+          nota={crestere(date.sesiuni, date.inainte.sesiuni)}
+        />
+        <Cifra
+          eticheta="Pagini văzute"
+          valoare={String(date.vizualizari)}
+          nota={`Ultimele ${date.zile} de zile`}
+        />
+        <Cifra
+          eticheta="Pagini pe vizită"
+          valoare={
+            date.sesiuni > 0
+              ? (date.vizualizari / date.sesiuni).toFixed(1)
+              : "—"
+          }
+          nota="Cât de mult se umblă prin site"
+        />
+      </div>
+
+      <div className="mt-5 grid gap-5 lg:grid-cols-3">
+        <Fisa
+          titlu="De unde vin"
+          nota="Pe vizite. Aici se vede dacă o postare sau un buletin a adus oameni."
+        >
+          {date.surse.length === 0 ? (
+            <p className="text-mic text-cerneala-moale">Încă nicio vizită.</p>
+          ) : (
+            <Tabel
+              capete={["Cale", "Vizite"]}
+              randuri={date.surse.map((s) => [s.sursa, String(s.sesiuni)])}
+            />
+          )}
+        </Fisa>
+
+        <Fisa titlu="Cele mai văzute pagini" nota="Pe vizualizări.">
+          {date.pagini.length === 0 ? (
+            <p className="text-mic text-cerneala-moale">Încă nimic.</p>
+          ) : (
+            <Tabel
+              capete={["Pagina", "Vizualizări"]}
+              randuri={date.pagini.map((p) => [p.cale, String(p.vizualizari)])}
+            />
+          )}
+        </Fisa>
+
+        <Fisa
+          titlu="Campaniile etichetate"
+          nota="Vizite venite din linkuri cu etichetă — buletinele de e-mail, de exemplu."
+        >
+          {date.campanii.length === 0 ? (
+            <p className="text-mic text-cerneala-moale">
+              Încă n-a venit nimeni printr-un link etichetat. Linkurile din
+              șabloanele de e-mail poartă etichetele, deci apar aici după prima
+              campanie trimisă.
+            </p>
+          ) : (
+            <Tabel
+              capete={["Campanie", "Vizite"]}
+              randuri={date.campanii.map((c) => [c.nume, String(c.sesiuni)])}
+            />
+          )}
+        </Fisa>
+      </div>
+    </>
+  );
+}
+
+/** Cât se așteaptă răspunsul de la Google. */
+function SeIncarca() {
+  return (
+    <div className="colt-a border border-hartie-umbra bg-hartie p-5 text-mic text-cerneala-moale">
+      Se cer cifrele de la Google…
+    </div>
+  );
+}
+
+/** Ce trebuie făcut ca să meargă, când nu e legat nimic. */
+function FaraAnalytics() {
+  return (
+    <div className="colt-a border border-hartie-umbra bg-hartie p-5 sm:p-6">
+      <p className="max-w-3xl text-amplu text-cerneala-moale">
+        Site-ul trimite deja date către Google Analytics, dar panoul nu le poate
+        citi fără o cheie. E nevoie de un cont de serviciu Google, adăugat ca
+        Vizualizator pe proprietatea GA4, iar în Railway de trei variabile:
+      </p>
+      <ul className="mt-3 grid gap-1.5 text-mic text-cerneala-moale">
+        {[
+          ["GA_PROPERTY_ID", "numărul proprietății GA4 (nu „G-…”)"],
+          ["GA_CLIENT_EMAIL", "adresa contului de serviciu, din fișierul JSON"],
+          ["GA_PRIVATE_KEY", "cheia privată din același fișier"],
+        ].map(([cheie, ce]) => (
+          <li key={cheie}>
+            <code className="rounded bg-hartie-umbra px-1.5 py-0.5">
+              {cheie}
+            </code>{" "}
+            — {ce}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export default function PaginaAnaliza({
   searchParams,
 }: {
@@ -373,21 +524,49 @@ async function Continut({
     );
   }
 
+  /*
+    Fără bază de date rămâne partea de vizite.
+
+    Google Analytics n-are nicio legătură cu baza noastră de date: dacă una
+    cade, cealaltă n-are de ce să dispară din panou. Înainte, lipsa bazei
+    golea pagina întreagă, inclusiv cifrele care veneau de la Google.
+  */
   if (!areBazaDeDate()) {
     return (
-      <Cadru titlu="Analiză" activ="/admin/analiza">
-        <p className="max-w-2xl text-amplu text-cerneala-moale">
-          Lipsește{" "}
-          <code className="rounded bg-hartie-umbra px-1.5">DATABASE_URL</code>.
-        </p>
+      <Cadru
+        titlu="Analiză"
+        descriere="Vizitele de pe site. Profilurile cer baza de date."
+        activ="/admin/analiza"
+      >
+        <Sectiune
+          titlu="Vizitele de pe site"
+          nota="Din Google Analytics, ultimele 28 de zile. Sunt vizite, nu donații."
+        >
+          {areVizite() ? (
+            <Suspense fallback={<SeIncarca />}>
+              <DinAnalytics />
+            </Suspense>
+          ) : (
+            <FaraAnalytics />
+          )}
+        </Sectiune>
+
+        <Sectiune titlu="Profilul donatorilor și al firmelor">
+          <p className="max-w-2xl text-amplu text-cerneala-moale">
+            Lipsește{" "}
+            <code className="rounded bg-hartie-umbra px-1.5">DATABASE_URL</code>
+            . Fără baza de date nu există donatori și firme de profilat.
+          </p>
+        </Sectiune>
       </Cadru>
     );
   }
 
-  const [donatori, firme, vechi] = await Promise.all([
+  const [donatori, firme, vechi, deVizite] = await Promise.all([
     profilulDonatorilor(),
     profilulFirmelor(),
     analize(6).catch(() => []),
+    areVizite() ? vizite().catch(() => null) : Promise.resolve(null),
   ]);
   const ultima = vechi[0];
   /*
@@ -398,7 +577,7 @@ async function Continut({
     Când există deja o analiză, se arată cifrele salvate odată cu ea — alea
     au plecat atunci, nu cele de azi.
   */
-  const acum = rezumat(donatori, firme);
+  const acum = rezumat(donatori, firme, deVizite);
 
   return (
     <Cadru
@@ -414,6 +593,19 @@ async function Continut({
           {RATAT[ratat]}
         </p>
       )}
+
+      <Sectiune
+        titlu="Vizitele de pe site"
+        nota="Din Google Analytics, ultimele 28 de zile. Sunt vizite, nu donații."
+      >
+        {areVizite() ? (
+          <Suspense fallback={<SeIncarca />}>
+            <DinAnalytics />
+          </Suspense>
+        ) : (
+          <FaraAnalytics />
+        )}
+      </Sectiune>
 
       <Sectiune
         titlu="Profilul donatorilor"

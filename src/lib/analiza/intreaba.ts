@@ -1,5 +1,6 @@
 import { cate } from "@/lib/numere-ro";
 import { scrieSuma } from "@/lib/suma";
+import type { Vizite } from "@/lib/ga/raport";
 import type { ProfilDonatori, ProfilFirme } from "./cifre";
 
 /**
@@ -77,7 +78,11 @@ const LUNI = [
  * Tot ce trimitem. Dacă vrei să știi ce află modelul despre asociație, citești
  * funcția asta — nu e nimic altundeva.
  */
-export function rezumat(d: ProfilDonatori, f: ProfilFirme): string {
+export function rezumat(
+  d: ProfilDonatori,
+  f: ProfilFirme,
+  v?: Vizite | null,
+): string {
   const randuri: string[] = [];
 
   randuri.push("DONATORI");
@@ -167,6 +172,48 @@ export function rezumat(d: ProfilDonatori, f: ProfilFirme): string {
   randuri.push(
     `- blocate de peste două săptămâni în „cerere" sau „contract trimis": ${f.uitate}`,
   );
+
+  /*
+    Vizitele, dacă Google Analytics e legat.
+
+    Fără ele, analiza se oprea de fiecare dată la aceeași concluzie: „nu se
+    știe de unde vin oamenii". Cu ele, se poate pune întrebarea care contează
+    — câți dintre cei care intră pe site ajung să doneze și de pe ce cale vin.
+
+    Rămâne scris pe document că sunt două surse diferite: Google numără
+    vizite, baza de date numără donații. Un model căruia nu i se spune asta
+    le adună.
+  */
+  if (v) {
+    randuri.push("");
+    randuri.push(
+      `VIZITE PE SITE (Google Analytics, ultimele ${v.zile} de zile)`,
+    );
+    randuri.push(
+      `- ${cate(v.utilizatori, "om a intrat", "oameni au intrat")} pe site, în ${cate(v.sesiuni, "vizită", "vizite")}, cu ${cate(v.vizualizari, "pagină văzută", "pagini văzute")}`,
+    );
+    randuri.push(
+      `- perioada dinainte, la fel de lungă: ${v.inainte.utilizatori} oameni, ${v.inainte.sesiuni} vizite`,
+    );
+    if (v.surse.length > 0) {
+      randuri.push(
+        `- de unde au venit: ${v.surse.map((x) => `${x.sursa}: ${x.sesiuni}`).join("; ")}`,
+      );
+    }
+    if (v.pagini.length > 0) {
+      randuri.push(
+        `- cele mai văzute pagini: ${v.pagini.map((x) => `${x.cale}: ${x.vizualizari}`).join("; ")}`,
+      );
+    }
+    if (v.campanii.length > 0) {
+      randuri.push(
+        `- vizite venite din linkuri etichetate de campanie: ${v.campanii.map((x) => `${x.nume}: ${x.sesiuni}`).join("; ")}`,
+      );
+    }
+    randuri.push(
+      "- atenție: cifrele de vizite vin de la Google și numără vizite, nu donații. Donațiile de mai sus vin din baza de date. Nu le aduna și nu presupune că o vizită și o donație sunt același om.",
+    );
+  }
 
   return randuri.join("\n");
 }
