@@ -132,6 +132,14 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
   și nr. de la registrul comerțului de la ANAF după CUI, clauzele sunt cele
   din contractul asociației, cuvânt cu cuvânt. Iese PDF de două pagini, cu
   diacritice, și mută firma la „contract trimis".
+- **`/admin/rapoarte`** — cifrele unei perioade încheiate, scoase ca PDF:
+  **lunar** (pentru ședință și consiliul director), **anual** (pentru raportul
+  de activitate și finanțatori) și **pe campanie**. Toate numără numai ce s-a
+  încasat — un transfer anunțat, dar negăsit în extras, apare separat, ca lucru
+  de verificat — și arată sumele în euro neconvertite. Raportul lunar conține
+  nume de donatori și scrie pe el că e intern; celelalte două n-au nicio dată
+  personală, dinadins, ca să poată fi atașate la un e-mail fără a doua privire.
+  Probă: `BAZA=… PAROLA_ADMIN=… node scripts/qa/rapoarte.mjs`.
 - **Export pentru Excel** pe donații, donatori, firme și cereri: `;` ca
   separator, BOM la început și virgulă zecimală — fără ele, Excel-ul românesc
   citește 150 de lei ca 150 de milioane de miliarde.

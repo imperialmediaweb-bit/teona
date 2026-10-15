@@ -114,12 +114,7 @@ export class Cursor {
   ): this {
     const font = gros ? this.doc.gros : this.doc.normal;
     const inaltimeRand = marime * 1.45;
-    for (const rand of this.randuri(
-      text,
-      font,
-      marime,
-      this.latime - indent,
-    )) {
+    for (const rand of this.randuri(text, font, marime, this.latime - indent)) {
       this.locPentru(inaltimeRand);
       this.y -= inaltimeRand;
       this.pagina.drawText(rand, {
@@ -183,6 +178,93 @@ export class Cursor {
     return this;
   }
 
+  /**
+   * Un tabel simplu: prima coloană la stânga, restul la dreapta.
+   *
+   * Cifrele se citesc pe coloană, deci se aliniază la dreapta — altfel „1.250"
+   * și „980" încep în același loc și ochiul compară lungimi de cuvinte, nu
+   * mărimi. Lățimea coloanelor de cifre e fixă, a primei e tot ce rămâne: un
+   * nume lung de campanie se taie cu trei puncte în loc să împingă sumele
+   * afară din pagină.
+   */
+  tabel(
+    randuri: ReadonlyArray<readonly string[]>,
+    {
+      capete,
+      marime = 9.5,
+      latimeCifre = 95,
+      spatiuDupa = 10,
+    }: {
+      capete?: readonly string[];
+      marime?: number;
+      latimeCifre?: number;
+      spatiuDupa?: number;
+    } = {},
+  ): this {
+    const coloane = Math.max(
+      capete?.length ?? 0,
+      ...randuri.map((r) => r.length),
+      1,
+    );
+    const inaltimeRand = marime * 2;
+    const latimePrima = this.latime - (coloane - 1) * latimeCifre;
+
+    const scrieRand = (celule: readonly string[], gros: boolean) => {
+      this.locPentru(inaltimeRand);
+      this.y -= inaltimeRand * 0.72;
+      const font = gros ? this.doc.gros : this.doc.normal;
+      for (let i = 0; i < coloane; i++) {
+        const text = celule[i] ?? "";
+        if (!text) continue;
+        if (i === 0) {
+          this.pagina.drawText(this.taie(text, font, marime, latimePrima - 6), {
+            x: MARGINE,
+            y: this.y,
+            size: marime,
+            font,
+            color: gros ? CERNEALA : CERNEALA,
+          });
+        } else {
+          const dreapta = MARGINE + latimePrima + i * latimeCifre - 6;
+          this.pagina.drawText(text, {
+            x: dreapta - font.widthOfTextAtSize(text, marime),
+            y: this.y,
+            size: marime,
+            font,
+            color: CERNEALA,
+          });
+        }
+      }
+      this.y -= inaltimeRand * 0.28;
+    };
+
+    if (capete) {
+      scrieRand(capete, true);
+      this.linie();
+    }
+    for (const rand of randuri) scrieRand(rand, false);
+    this.y -= spatiuDupa;
+    return this;
+  }
+
+  /** Textul, scurtat cu „…" dacă nu încape pe lățimea dată. */
+  private taie(
+    text: string,
+    font: PDFFont,
+    marime: number,
+    latime: number,
+  ): string {
+    if (font.widthOfTextAtSize(text, marime) <= latime) return text;
+    let scurt = text;
+    while (
+      scurt.length > 1 &&
+      font.widthOfTextAtSize(`${scurt}…`, marime) > latime
+    ) {
+      scurt = scurt.slice(0, -1);
+    }
+    return `${scurt}…`;
+  }
+
   /** O imagine PNG — semnătura desenată pe ecran. */
   async imagine(
     png: Uint8Array,
@@ -191,9 +273,19 @@ export class Cursor {
     const imagine = await this.doc.pdf.embedPng(png);
     this.locPentru(inaltime + 6);
     this.y -= inaltime;
-    this.pagina.drawImage(imagine, { x, y: this.y, width: latime, height: inaltime });
+    this.pagina.drawImage(imagine, {
+      x,
+      y: this.y,
+      width: latime,
+      height: inaltime,
+    });
     this.y -= 6;
     return this;
+  }
+
+  /** Documentul din spate — pentru ce nu trece prin cursor, ca o siglă în colț. */
+  get document(): Document {
+    return this.doc;
   }
 
   /** Unde a ajuns cursorul, dacă e nevoie să se deseneze ceva lângă. */
