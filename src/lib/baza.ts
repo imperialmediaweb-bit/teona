@@ -281,6 +281,26 @@ const DEFINITIE = `
     primit_la   timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (procesator, eveniment)
   );
+
+  /*
+    Analizele cerute din panou, păstrate.
+
+    Fiecare costă o cerere plătită către model, deci a doua oară se citește,
+    nu se cere din nou. Se păstrează și cifrele pe care s-a făcut analiza, nu
+    doar textul: peste trei luni, cifrele vor fi altele, iar o recomandare
+    citită fără datele de atunci pare greșită când de fapt era potrivită
+    pentru momentul ei.
+
+    Nu conține date personale: ce se păstrează aici sunt agregatele trimise
+    modelului, aceleasi care se văd pe pagină.
+  */
+  CREATE TABLE IF NOT EXISTS analize (
+    id        uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    text      text NOT NULL,
+    cifre     text NOT NULL,
+    creat_la  timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS analize_dupa_data ON analize (creat_la DESC);
 `;
 
 /*

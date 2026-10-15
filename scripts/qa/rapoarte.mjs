@@ -35,12 +35,27 @@ function verifica(ok, mesaj) {
   if (!ok) rele++;
 }
 
+/*
+  O adresă nouă la fiecare rulare.
+
+  Intrarea în panou e limitată la cinci încercări la cincisprezece minute, pe
+  adresă, iar în dezvoltare toate cererile vin de la aceeași. Fără antetul
+  ăsta, proba merge o dată și la a doua rulare pică cu 429 — care arată ca o
+  defecțiune a panoului, nu ca limita făcându-și treaba. (`198.51.100.0/24` e
+  rezervat pentru documentație.)
+*/
+const DE_LA = `198.51.100.${1 + Math.floor(Math.random() * 250)}`;
+
 let cookie = "";
 async function cere(cale, optiuni = {}) {
   const r = await fetch(BAZA + cale, {
     ...optiuni,
     redirect: "manual",
-    headers: { ...(optiuni.headers ?? {}), ...(cookie ? { cookie } : {}) },
+    headers: {
+      ...(optiuni.headers ?? {}),
+      "x-forwarded-for": DE_LA,
+      ...(cookie ? { cookie } : {}),
+    },
   });
   for (const c of r.headers.getSetCookie?.() ?? []) cookie = c.split(";")[0];
   return r;

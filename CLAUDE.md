@@ -140,6 +140,18 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
   nume de donatori și scrie pe el că e intern; celelalte două n-au nicio dată
   personală, dinadins, ca să poată fi atașate la un e-mail fără a doua privire.
   Probă: `BAZA=… PAROLA_ADMIN=… node scripts/qa/rapoarte.mjs`.
+- **`/admin/analiza`** — profilul donatorilor (câte donații face un om, cât
+  adună, câți se întorc, câți s-au oprit, cât trece până la a doua donație) și
+  profilul firmelor (pâlnia, rata de conversie, cât durează drumul până la bani
+  în cont). Dedesubt, o citire a cifrelor făcută de model, păstrată în tabelul
+  `analize` ca să nu se plătească de două ori aceeași întrebare.
+  **Spre model pleacă numai agregate** — numărători, sume, procente; niciun
+  nume, niciun e-mail, niciun telefon. Textul trimis se vede pe pagină, înainte
+  de apăsarea butonului. Proba verifică asta la nivel de rețea, cu un server
+  care imită API-ul Anthropic (`ANTHROPIC_API` îi dă adresa):
+  `BAZA=… PAROLA_ADMIN=… DATABASE_URL=… node scripts/qa/analiza.mjs`.
+  Fără `ANTHROPIC_API_KEY` pagina rămâne utilă: cifrele se calculează oricum,
+  doar interpretarea lipsește.
 - **Export pentru Excel** pe donații, donatori, firme și cereri: `;` ca
   separator, BOM la început și virgulă zecimală — fără ele, Excel-ul românesc
   citește 150 de lei ca 150 de milioane de miliarde.

@@ -47,6 +47,7 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
     pagini: [
       { href: "/admin", eticheta: "Tablou de bord", pictograma: "panou" },
       { href: "/admin/rapoarte", eticheta: "Rapoarte", pictograma: "grafic" },
+      { href: "/admin/analiza", eticheta: "Analiză", pictograma: "stea" },
     ],
   },
   {
