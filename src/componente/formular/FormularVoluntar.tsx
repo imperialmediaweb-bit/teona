@@ -61,18 +61,28 @@ function varsta(nastere: Date, azi: Date): number {
   return ani;
 }
 
-/** `2006-10-24`, din data unui calculator. */
-function caZi(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
-    d.getDate(),
-  ).padStart(2, "0")}`;
-}
+const LUNILE = [
+  "ianuarie",
+  "februarie",
+  "martie",
+  "aprilie",
+  "mai",
+  "iunie",
+  "iulie",
+  "august",
+  "septembrie",
+  "octombrie",
+  "noiembrie",
+  "decembrie",
+];
 
-const SCRIS_LUNG = new Intl.DateTimeFormat("ro-RO", {
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-});
+/** Câte zile are luna aleasă. Fără an, februarie primește 29 — nu tăiem o zi. */
+function cateZile(luna: string, an: string): number {
+  if (!luna) return 31;
+  if (!an)
+    return luna === "2" ? 29 : [4, 6, 9, 11].includes(Number(luna)) ? 30 : 31;
+  return new Date(Number(an), Number(luna), 0).getDate();
+}
 
 /**
  * Formularul de voluntariat (11.4), în trei pași.
@@ -102,39 +112,42 @@ export default function FormularVoluntar() {
   const titluriPasi = useRef<Array<HTMLHeadingElement | null>>([]);
   const [pas, setPas] = useState(0);
   /*
-    Marginile câmpului de dată și data scrisă în litere.
+    Data nașterii se alege din trei liste, nu dintr-un calendar.
 
-    Calendarul dintr-un `<input type="date">` e al browserului, nu al nostru:
-    el alege și limba, și ordinea (10/24/2026 pe un browser pe engleză). Nu se
-    poate schimba din pagină — dar se pot face două lucruri care contează mai
-    mult decât forma lui.
+    `<input type="date">` părea alegerea firească și a fost greșită. Calendarul
+    e al browserului: își ia limba și ordinea din setările lui (10/24/2026 pe
+    un browser pe engleză), se deschide pe anul curent și, ca să ajungi la
+    1990, derulezi treizeci și ceva de ani unul câte unul. Pentru o zi de
+    naștere — singura dată din formular care e **sigur** în trecut, cu zeci de
+    ani în urmă — e cel mai prost câmp cu putință. `min` și `max` n-au salvat
+    nimic: lista tot de la anul curent pornea.
 
-    Întâi, `min` și `max`: fără ele, calendarul oferea 2027, 2029, 2030 ca ani
-    de naștere și se putea alege o dată din viitor. Acum se oprește la ziua de
-    azi și nu coboară sub 110 ani.
+    Trei liste nu pot fi greșit citite, nu depind de limba browserului și pun
+    anul la a doua apăsare. Anii merg descrescător, cu cei recenți primii.
 
-    Apoi, data scrisă dedesubt în litere — „24 octombrie 2006". Oricare ar fi
-    limba browserului, omul vede limpede ce a ales și prinde singur inversarea
-    zi/lună, fără să trimită formularul și să afle după.
-
-    Amândouă se calculează în `useEffect`: `new Date()` în timpul randării e o
-    valoare care se schimbă de la o secundă la alta, iar Next refuză să
-    pregenereze pagina cu ea.
+    Formularul trimite mai departe tot `nastere`, în forma `2006-10-24`, dintr-un
+    câmp ascuns: ce se întâmplă mai departe — verificarea de 18 ani, salvarea —
+    rămâne neschimbat.
   */
-  const [margini, setMargini] = useState<{ min: string; max: string } | null>(
-    null,
-  );
-  const [nastereaScrisa, setNastereaScrisa] = useState("");
+  const [zi, setZi] = useState("");
+  const [luna, setLuna] = useState("");
+  const [an, setAn] = useState("");
+  /*
+    Anii se fac în `useEffect`: `new Date()` în timpul randării e o valoare
+    care se schimbă de la o secundă la alta, iar Next refuză să pregenereze
+    pagina cu ea.
+  */
+  const [ani, setAni] = useState<number[]>([]);
 
   useEffect(() => {
-    const azi = new Date();
-    setMargini({
-      max: caZi(azi),
-      min: caZi(
-        new Date(azi.getFullYear() - 110, azi.getMonth(), azi.getDate()),
-      ),
-    });
+    const acum = new Date().getFullYear();
+    setAni(Array.from({ length: 111 }, (_, i) => acum - i));
   }, []);
+
+  const nastere =
+    an && luna && zi
+      ? `${an}-${luna.padStart(2, "0")}-${zi.padStart(2, "0")}`
+      : "";
   const [erori, setErori] = useState<Erori>({});
   const [stare, setStare] = useState<Stare>({ fel: "gol" });
 
@@ -447,46 +460,86 @@ export default function FormularVoluntar() {
                 </Camp>
 
                 <Camp
-                  id={`${id}-nastere`}
+                  id={`${id}-nastere-zi`}
                   eticheta="Data nașterii"
                   obligatoriu
                   nota="Folosim data nașterii pentru a verifica vârsta minimă."
                   eroare={erori.nastere}
                 >
-                  <input
-                    id={`${id}-nastere`}
-                    name="nastere"
-                    type="date"
-                    autoComplete="bday"
-                    min={margini?.min}
-                    max={margini?.max}
-                    onChange={(e) => {
-                      const scris = e.currentTarget.value;
-                      const data = scris ? new Date(`${scris}T00:00:00`) : null;
-                      setNastereaScrisa(
-                        data && !Number.isNaN(data.getTime())
-                          ? SCRIS_LUNG.format(data)
-                          : "",
-                      );
-                    }}
-                    aria-invalid={Boolean(erori.nastere)}
-                    aria-describedby={
-                      erori.nastere
-                        ? `${id}-nastere-eroare`
-                        : `${id}-nastere-nota`
-                    }
-                    className={
-                      erori.nastere ? claseControlGresit : claseControl
-                    }
-                  />
-                  {nastereaScrisa && (
-                    <p
-                      aria-live="polite"
-                      className="mt-2 font-titlu text-mic font-semibold text-cerneala"
+                  <input type="hidden" name="nastere" value={nastere} />
+                  {/*
+                    Grilă cu lățimi fixe, nu `flex`.
+
+                    Cu `flex-1` pe lună, lista se strivea la două degete și
+                    „septembrie" nu se mai vedea: alături are două liste cu
+                    lățime proprie, iar spațiul rămas dintr-o coloană de
+                    formular nu-i ajungea. Aici ziua și anul primesc exact cât
+                    le trebuie, luna ia tot restul.
+
+                    Pe telefon se așază una sub alta. Pe 390 px, coloana are
+                    290: după ziua și anul rămâneau 90 pentru lună, adică
+                    „septen". Trei liste pline, una sub alta, se citesc întregi
+                    și se apasă la fel de repede.
+                  */}
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-[5rem_1fr_6.5rem]">
+                    <select
+                      id={`${id}-nastere-zi`}
+                      aria-label="Ziua nașterii"
+                      value={zi}
+                      onChange={(e) => setZi(e.target.value)}
+                      aria-invalid={Boolean(erori.nastere)}
+                      aria-describedby={
+                        erori.nastere
+                          ? `${id}-nastere-eroare`
+                          : `${id}-nastere-nota`
+                      }
+                      className={`${
+                        erori.nastere ? claseControlGresit : claseControl
+                      } min-w-0 px-2`}
                     >
-                      {nastereaScrisa}
-                    </p>
-                  )}
+                      <option value="">Ziua</option>
+                      {Array.from(
+                        { length: cateZile(luna, an) },
+                        (_, i) => i + 1,
+                      ).map((z) => (
+                        <option key={z} value={z}>
+                          {z}
+                        </option>
+                      ))}
+                    </select>
+
+                    <select
+                      aria-label="Luna nașterii"
+                      value={luna}
+                      onChange={(e) => setLuna(e.target.value)}
+                      className={`${
+                        erori.nastere ? claseControlGresit : claseControl
+                      } min-w-0 px-2`}
+                    >
+                      <option value="">Luna</option>
+                      {LUNILE.map((nume, i) => (
+                        <option key={nume} value={i + 1}>
+                          {nume}
+                        </option>
+                      ))}
+                    </select>
+
+                    <select
+                      aria-label="Anul nașterii"
+                      value={an}
+                      onChange={(e) => setAn(e.target.value)}
+                      className={`${
+                        erori.nastere ? claseControlGresit : claseControl
+                      } min-w-0 px-2`}
+                    >
+                      <option value="">Anul</option>
+                      {ani.map((a) => (
+                        <option key={a} value={a}>
+                          {a}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </Camp>
 
                 <Camp id={`${id}-localitate`} eticheta="Localitatea">
