@@ -36,7 +36,7 @@ export default function DocumentDeDescarcat({
       <span
         className={`relative flex h-28 items-end justify-between overflow-hidden px-6 pb-4 ${
           fisier
-            ? "bg-gradient-to-br from-caramiziu-700 to-caramiziu-900 text-hartie"
+            ? "bg-miere-300 text-miere-900"
             : "bg-hartie-umbra text-cerneala-slab"
         }`}
       >
@@ -55,7 +55,7 @@ export default function DocumentDeDescarcat({
         </span>
         <span
           className={`relative flex size-11 items-center justify-center colt-mic-b ${
-            fisier ? "bg-hartie/20" : "bg-hartie/70"
+            fisier ? "bg-miere-900/15" : "bg-hartie/70"
           }`}
         >
           <Pictograma nume="document" className="size-6" />

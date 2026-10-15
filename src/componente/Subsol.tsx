@@ -14,7 +14,7 @@ import DeschideSetariCookieuri from "./DeschideSetariCookieuri";
 import { anulCurent } from "@/lib/an";
 
 const titlu =
-  "font-titlu text-nota font-bold tracking-[0.1em] text-hartie uppercase";
+  "font-titlu text-nota font-bold tracking-[0.1em] text-cerneala uppercase";
 
 /**
  * Linkurile din subsol au 36 px înălțime, dar zona de atins e lată: textul
@@ -24,11 +24,18 @@ const titlu =
  * telefon.
  */
 const linkLegal =
-  "-mx-2 inline-flex min-h-9 items-center px-2 transition-colors duration-200 hover:text-miere-300";
+  "-mx-2 inline-flex min-h-9 items-center px-2 transition-colors duration-200 hover:text-caramiziu-700";
 const link = `${linkLegal} text-mic`;
 
 /**
  * Subsolul (12.3). Identic pe toate paginile.
+ *
+ * **E pe hârtie, nu pe portocaliu închis.** Era `bg-caramiziu-900`, iar
+ * deasupra lui stă pe fiecare pagină îndemnul final, tot portocaliu închis:
+ * împreună făceau ultima treime a oricărei pagini un bloc greu, de la margine
+ * la margine. Clientul a spus că site-ul îi pare închis și avea dreptate —
+ * nu din cauza nuanței, ci a suprafeței. Îndemnul rămâne pata tare; subsolul,
+ * care e o listă de linkuri și adrese, stă liniștit sub el.
  *
  * Tot conținutul cerut, pe patru coloane la lățime mare și pe două pe telefon:
  * sigla și fraza, paginile pe două coloane, contactul, adresele, rețelele,
@@ -44,7 +51,7 @@ export default async function Subsol() {
   );
 
   return (
-    <footer className="doar-site granulatie relative overflow-hidden bg-caramiziu-900 text-hartie/75">
+    <footer className="doar-site granulatie relative overflow-hidden border-t border-hartie-umbra bg-hartie-calda text-cerneala-moale">
       {/* Dunga de brand, de la portocaliu la galben: subsolul începe clar. */}
       <div
         aria-hidden="true"
@@ -52,17 +59,17 @@ export default async function Subsol() {
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-24 -right-24 size-80 rounded-full border-2 border-hartie/8"
+        className="pointer-events-none absolute -top-24 -right-24 size-80 rounded-full border-2 border-caramiziu-100"
       />
 
       <div className="relative mx-auto max-w-7xl px-4 pt-7 pb-7 sm:px-6 lg:px-8 lg:pt-12 lg:pb-7">
         <div className="grid gap-x-6 gap-y-6 sm:grid-cols-2 lg:grid-cols-[1.1fr_1.5fr_0.9fr_1fr] lg:gap-x-8">
           <div className="sm:col-span-2 lg:col-span-1">
-            <Sigla peFundalInchis className="text-[44px]" />
+            <Sigla className="text-[44px]" />
             <p className="mt-3 text-mic leading-relaxed sm:max-w-xs">
               {ASOCIATIA.fraza}
             </p>
-            <p className="scris mt-3 text-amplu text-miere-300">
+            <p className="scris mt-3 text-amplu text-caramiziu-700">
               „{ASOCIATIA.motto}”
             </p>
           </div>
@@ -83,7 +90,7 @@ export default async function Subsol() {
               <li>
                 <Link
                   href={RUTE.doneaza}
-                  className={`${link} font-semibold text-miere-300 hover:text-miere-200`}
+                  className={`${link} font-semibold text-caramiziu-700 hover:text-caramiziu-600`}
                 >
                   Donează
                 </Link>
@@ -121,7 +128,7 @@ export default async function Subsol() {
               <Retele
                 retele={RETELE_ASOCIATIE}
                 context={ASOCIATIA.denumire}
-                className="mt-3 text-hartie/75"
+                className="mt-3 text-cerneala-moale"
               />
             </div>
 
@@ -158,14 +165,14 @@ export default async function Subsol() {
               <h2 className={titlu}>Unde ne găsești</h2>
               <ul className="mt-2 grid gap-3 text-mic leading-snug">
                 <li>
-                  <span className="block font-titlu font-semibold text-hartie">
+                  <span className="block font-titlu font-semibold text-cerneala">
                     {ADRESE.casaTeona.nume}
                   </span>
                   {ADRESE.casaTeona.strada}, {ADRESE.casaTeona.oras}{" "}
                   {ADRESE.casaTeona.cod}
                 </li>
                 <li>
-                  <span className="block font-titlu font-semibold text-hartie">
+                  <span className="block font-titlu font-semibold text-cerneala">
                     {ADRESE.sediuSocial.nume}
                   </span>
                   {ADRESE.sediuSocial.strada}, {ADRESE.sediuSocial.oras}
@@ -175,10 +182,10 @@ export default async function Subsol() {
           </div>
         </div>
 
-        <div className="mt-6 flex flex-col gap-1 border-t border-hartie/15 pt-4 text-nota lg:mt-9 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
-          <p className="text-hartie/60">
+        <div className="mt-6 flex flex-col gap-1 border-t border-hartie-umbra pt-4 text-nota lg:mt-9 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
+          <p className="text-cerneala-slab">
             © {anul}{" "}
-            <span className="font-semibold text-hartie/85">
+            <span className="font-semibold text-cerneala">
               {ASOCIATIA.denumire}
             </span>
             {" · "}CIF {ASOCIATIA.cif} · Toate drepturile rezervate.

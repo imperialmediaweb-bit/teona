@@ -326,14 +326,18 @@ function Formular({
         />
       </p>
 
-      <div className="granulatie relative overflow-hidden bg-gradient-to-br from-caramiziu-700 to-caramiziu-900 px-6 py-5 text-hartie sm:px-8">
+      {/*
+        Banda de titlu, pe tentă deschisă. Butonul de dedesubt rămâne portocaliu
+        plin — el e lucrul de apăsat, nu titlul.
+      */}
+      <div className="granulatie relative overflow-hidden border-b border-caramiziu-100 bg-caramiziu-50 px-6 py-5 text-caramiziu-900 sm:px-8">
         <Decor
           semn="inima"
           strokeWidth={0.9}
-          className="absolute -right-6 -bottom-10 size-32 text-hartie/20"
+          className="absolute -right-6 -bottom-10 size-32 text-caramiziu-200"
         />
         <p className="relative flex items-center gap-3 font-titlu text-amplu font-bold">
-          <span className="flex size-10 items-center justify-center colt-mic-b bg-hartie/20">
+          <span className="flex size-10 items-center justify-center colt-mic-b bg-caramiziu-700 text-hartie">
             <Pictograma nume="inima" className="size-5" />
           </span>
           Donează cu cardul

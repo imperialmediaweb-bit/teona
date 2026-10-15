@@ -132,19 +132,25 @@ export default function FormularRedirectionare() {
       noValidate
       className="relative overflow-hidden colt-b border border-hartie-umbra bg-hartie shadow-[0_26px_52px_-26px_rgba(42,159,163,0.45)]"
     >
-      <div className="granulatie relative overflow-hidden bg-gradient-to-br from-turcoaz-600 to-turcoaz-800 px-6 py-5 text-hartie sm:px-8">
+      {/*
+        Banda de titlu a formularului stă pe o tentă deschisă, nu pe portocaliu
+        închis. Pe fiecare pagină erau două-trei astfel de benzi tari, plus
+        îndemnul final și subsolul; culoarea nu mai spunea „aici e important”,
+        pentru că era peste tot. Pastila pictogramei rămâne plină: ea e accentul.
+      */}
+      <div className="granulatie relative overflow-hidden border-b border-turcoaz-100 bg-turcoaz-50 px-6 py-5 text-turcoaz-900 sm:px-8">
         <Decor
           semn="unda"
           strokeWidth={0.9}
-          className="absolute -right-6 -bottom-8 size-28 text-hartie/20"
+          className="absolute -right-6 -bottom-8 size-28 text-turcoaz-200"
         />
         <p className="relative flex items-center gap-3 font-titlu text-amplu font-bold">
-          <span className="flex size-10 items-center justify-center colt-mic-a bg-hartie/20">
+          <span className="flex size-10 items-center justify-center colt-mic-a bg-turcoaz-600 text-hartie">
             <Pictograma nume="plic" className="size-5" />
           </span>
           Trimite-mi pașii pe e-mail
         </p>
-        <p className="relative mt-2 text-mic opacity-90">
+        <p className="relative mt-2 text-mic text-cerneala-moale">
           Ca să-i ai la îndemână când te așezi cu actele în față.
         </p>
       </div>

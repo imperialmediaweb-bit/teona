@@ -166,19 +166,25 @@ export default function FormularSponsorizare() {
       noValidate
       className="relative overflow-hidden colt-a border border-hartie-umbra bg-hartie shadow-[0_26px_52px_-26px_rgba(247,79,34,0.45)]"
     >
-      <div className="granulatie relative overflow-hidden bg-gradient-to-br from-caramiziu-700 to-caramiziu-900 px-6 py-5 text-hartie sm:px-8">
+      {/*
+        Banda de titlu a formularului stă pe o tentă deschisă, nu pe portocaliu
+        închis. Pe fiecare pagină erau două-trei astfel de benzi tari, plus
+        îndemnul final și subsolul; culoarea nu mai spunea „aici e important”,
+        pentru că era peste tot. Pastila pictogramei rămâne plină: ea e accentul.
+      */}
+      <div className="granulatie relative overflow-hidden border-b border-caramiziu-100 bg-caramiziu-50 px-6 py-5 text-caramiziu-900 sm:px-8">
         <Decor
           semn="unda"
           strokeWidth={0.9}
-          className="absolute -right-6 -bottom-8 size-28 text-hartie/20"
+          className="absolute -right-6 -bottom-8 size-28 text-caramiziu-200"
         />
         <p className="relative flex items-center gap-3 font-titlu text-amplu font-bold">
-          <span className="flex size-10 items-center justify-center colt-mic-b bg-hartie/20">
+          <span className="flex size-10 items-center justify-center colt-mic-b bg-caramiziu-700 text-hartie">
             <Pictograma nume="cladire" className="size-5" />
           </span>
           Vreau să sponsorizez
         </p>
-        <p className="relative mt-2 text-mic opacity-90">
+        <p className="relative mt-2 text-mic text-cerneala-moale">
           Completați atât — vă trimitem pașii pe e-mail și vă pregătim
           contractul.
         </p>
