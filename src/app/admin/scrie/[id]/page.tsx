@@ -7,6 +7,8 @@ import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { esteFel, felul, textDupaId, type Text } from "@/lib/texte";
 import { adresaPoza, areCloudinary } from "@/lib/poza-urcata";
+import { areCheiCloudinary, toateDosarele } from "@/lib/cloudinary-listare";
+import { CATEGORII } from "@/date/proiecte-tipuri";
 
 import { areAsistent } from "@/lib/asistent";
 import Cadru from "@/componente/admin/Cadru";
@@ -97,9 +99,20 @@ async function Continut({
   const fel = text?.fel ?? (esteFel(felCerut) ? felCerut : "noutate");
   const acesta = felul(fel);
 
+  /*
+    Folderele din Cloudinary, pentru alegerea galeriei unui proiect.
+
+    Se citesc doar când se scrie un proiect: la o noutate ar fi două cereri
+    la Cloudinary degeaba, la fiecare deschidere a editorului.
+  */
+  const dosare =
+    fel === "proiect" && areCheiCloudinary()
+      ? await toateDosarele().catch(() => [])
+      : [];
+
   return (
     <Cadru
-      titlu={nou ? `${acesta.eticheta} nouă` : text!.titlu}
+      titlu={nou ? acesta.butonNou : text!.titlu}
       descriere={
         nou
           ? "Scrie, salvează ca ciornă, iar când e gata apasă „Publică”."
@@ -191,6 +204,107 @@ async function Continut({
             className={`${camp} resize-y font-mono text-mic`}
           />
         </label>
+
+        {fel === "proiect" && (
+          <fieldset className="grid gap-5 colt-a border border-hartie-umbra bg-hartie p-5">
+            <legend className="px-2 font-titlu text-mic font-bold text-cerneala">
+              Când a fost și unde-i sunt pozele
+            </legend>
+
+            <div className="grid gap-5 sm:grid-cols-2">
+              <label className="grid gap-1.5">
+                <span className="text-mic font-semibold text-cerneala">
+                  Prima zi
+                </span>
+                <span className="text-mic text-cerneala-moale">
+                  După ea se așază proiectul în listă.
+                </span>
+                <input
+                  type="date"
+                  name="dataInceput"
+                  defaultValue={text?.dataInceput ?? ""}
+                  className={camp}
+                />
+              </label>
+
+              <label className="grid gap-1.5">
+                <span className="text-mic font-semibold text-cerneala">
+                  Cum se citește data
+                </span>
+                <span className="text-mic text-cerneala-moale">
+                  Asta se vede pe pagină. O tabără ține cinci zile, nu una.
+                </span>
+                <input
+                  name="dataCitita"
+                  placeholder="9 – 13 iunie 2025"
+                  defaultValue={text?.dataCitita ?? ""}
+                  className={camp}
+                />
+              </label>
+            </div>
+
+            <label className="grid gap-1.5">
+              <span className="text-mic font-semibold text-cerneala">
+                La ce categorie apare
+              </span>
+              <select
+                name="categorie"
+                defaultValue={text?.categorie ?? ""}
+                className={camp}
+              >
+                <option value="">După an, automat</option>
+                {CATEGORII.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.eticheta}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            {/*
+              Galeria: se alege folderul, nu se urcă pozele a doua oară.
+
+              Asociația le urcă oricum în Cloudinary, pe foldere, de pe
+              telefon. O listă de ales e un clic; o sută de fotografii urcate
+              din nou e o după-amiază.
+            */}
+            <label className="grid gap-1.5">
+              <span className="text-mic font-semibold text-cerneala">
+                Folderul cu pozele, din Cloudinary
+              </span>
+              {dosare.length > 0 ? (
+                <>
+                  <span className="text-mic text-cerneala-moale">
+                    Toate pozele din folderul ales apar în galeria paginii,
+                    cele mai noi primele. Dacă lași gol, pozele se caută după
+                    dată, din numele folderului.
+                  </span>
+                  <select
+                    name="dosarCloud"
+                    defaultValue={text?.dosarCloud ?? ""}
+                    className={camp}
+                  >
+                    <option value="">
+                      Fără folder ales — caută după dată
+                    </option>
+                    {dosare.map((d) => (
+                      <option key={d.cale} value={d.cale}>
+                        {d.cale}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              ) : (
+                <input
+                  name="dosarCloud"
+                  placeholder="2025/TABĂRĂ AUTISM 8-12 SEPTEMBRIE 2025"
+                  defaultValue={text?.dosarCloud ?? ""}
+                  className={camp}
+                />
+              )}
+            </label>
+          </fieldset>
+        )}
 
         {fel === "campanie" && (
           <label className="grid gap-1.5">

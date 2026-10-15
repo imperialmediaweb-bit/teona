@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { cacheLife } from "next/cache";
 import { RUTE } from "@/date/asociatie";
-import { pozeleProiectului, proiecteAfisate } from "@/date/proiecte";
+import { pozeleProiectului, proiecteleToate } from "@/date/proiecte";
 import { listaCuPozeDinCloud } from "@/date/proiecte-cloud";
 import { areBazaDeDate } from "@/lib/baza";
 import { FELURI, textePublicate } from "@/lib/texte";
@@ -56,7 +56,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     Despre noi sunt alese în componente, iar o listă scrisă de mână aici ar
     promite pe o pagină poze care nu sunt pe ea.
   */
-  const proiecte = (await listaCuPozeDinCloud(proiecteAfisate())).map(
+  const proiecte = (await listaCuPozeDinCloud(await proiecteleToate())).map(
     (proiect) => {
       const poze = pozeleProiectului(proiect);
       return {

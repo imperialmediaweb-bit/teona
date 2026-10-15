@@ -117,12 +117,40 @@ export async function POST(cerere: Request) {
     }
   }
 
+  /*
+    Datele unui proiect: când a fost și unde-i sunt pozele.
+
+    `data_inceput` e cheia de ordonare și ce intră în `<time>`; `data_citita`
+    e ce vede omul („9 – 13 iunie 2025”), scris de cine adaugă tabăra,
+    pentru că o tabără ține cinci zile, nu una, iar o dată singură ar minți.
+    Categoria se deduce din an dacă nu e aleasă alta: altfel tabăra nouă nu
+    s-ar vedea sub niciun filtru de pe pagina Proiecte.
+  */
+  const dataInceput = camp("dataInceput") || null;
+  if (dataInceput && !/^\d{4}-\d{2}-\d{2}$/.test(dataInceput)) {
+    return raspuns("Data de început trebuie să fie o zi din calendar.", 400);
+  }
+
+  const categorie =
+    camp("categorie") ||
+    (dataInceput
+      ? Number(dataInceput.slice(0, 4)) >= 2026
+        ? "2026"
+        : dataInceput.slice(0, 4) === "2025"
+          ? "2025"
+          : "2021-2024"
+      : null);
+
   const date = {
     titlu,
     rezumat: camp("rezumat"),
     continut,
     poza,
     tintaBani,
+    dataInceput: fel === "proiect" ? dataInceput : null,
+    dataCitita: fel === "proiect" ? camp("dataCitita") || null : null,
+    dosarCloud: fel === "proiect" ? camp("dosarCloud") || null : null,
+    categorie: fel === "proiect" ? categorie : null,
     publicat: actiune === "publica",
   };
 

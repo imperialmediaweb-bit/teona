@@ -25,13 +25,22 @@ export const FELURI = [
     id: "noutate",
     eticheta: "Noutate",
     plural: "Noutăți",
+    butonNou: "Scrie o noutate",
     cale: "/noutati",
   },
   {
     id: "campanie",
     eticheta: "Campanie",
     plural: "Campanii",
+    butonNou: "Scrie o campanie",
     cale: "/campanii",
+  },
+  {
+    id: "proiect",
+    eticheta: "Proiect",
+    plural: "Tabere și proiecte",
+    butonNou: "Adaugă o tabără",
+    cale: "/proiecte",
   },
 ] as const;
 
@@ -55,6 +64,19 @@ export type Text = {
   poza: { id: string; latime: number; inaltime: number; alt: string } | null;
   /** Numai la campanii, în bani (lei × 100). */
   tintaBani: number | null;
+  /** Numai la proiecte: ziua de început, pentru ordonare și pentru `<time>`. */
+  dataInceput: string | null;
+  /** Numai la proiecte: „9 – 13 iunie 2025”, așa cum se citește. */
+  dataCitita: string | null;
+  /**
+   * Numai la proiecte: folderul de poze din Cloudinary, față de rădăcină.
+   *
+   * Asociația urcă oricum pozele acolo, pe foldere. Mai bine alege folderul
+   * dintr-o listă decât să urce a doua oară o sută de fotografii.
+   */
+  dosarCloud: string | null;
+  /** Numai la proiecte: `2026`, `2025`, `2021-2024`, `campanii`, `umanitare`. */
+  categorie: string | null;
   publicat: boolean;
   publicatLa: string | null;
   schimbatLa: string;
@@ -72,6 +94,10 @@ type Rand = {
   poza_inaltime: number | null;
   poza_alt: string | null;
   tinta_bani: string | number | null;
+  data_inceput: Date | string | null;
+  data_citita: string | null;
+  dosar_cloud: string | null;
+  categorie: string | null;
   stare: string;
   publicat_la: Date | null;
   schimbat_la: Date;
@@ -97,6 +123,13 @@ function dinRand(r: Rand): Text {
           }
         : null,
     tintaBani: r.tinta_bani === null ? null : Number(r.tinta_bani),
+    dataInceput:
+      r.data_inceput instanceof Date
+        ? r.data_inceput.toISOString().slice(0, 10)
+        : (r.data_inceput ?? null),
+    dataCitita: r.data_citita,
+    dosarCloud: r.dosar_cloud,
+    categorie: r.categorie,
     publicat: r.stare === "publicat",
     publicatLa: r.publicat_la ? r.publicat_la.toISOString() : null,
     schimbatLa: r.schimbat_la.toISOString(),
@@ -104,7 +137,8 @@ function dinRand(r: Rand): Text {
 }
 
 const COLOANE = `id, fel, slug, titlu, rezumat, continut, poza_id, poza_latime,
-  poza_inaltime, poza_alt, tinta_bani, stare, publicat_la, schimbat_la`;
+  poza_inaltime, poza_alt, tinta_bani, data_inceput, data_citita, dosar_cloud,
+  categorie, stare, publicat_la, schimbat_la`;
 
 /**
  * Textele publicate, cele mai noi primele.
@@ -185,6 +219,11 @@ export type DateText = {
   continut: string;
   poza: { id: string; latime: number; inaltime: number; alt: string } | null;
   tintaBani: number | null;
+  /** Numai la proiecte. */
+  dataInceput: string | null;
+  dataCitita: string | null;
+  dosarCloud: string | null;
+  categorie: string | null;
   publicat: boolean;
 };
 
@@ -194,8 +233,9 @@ export async function creeazaText(date: DateText): Promise<string> {
   const randuri = await intreaba<{ id: string }>(
     `INSERT INTO texte
        (fel, slug, titlu, rezumat, continut, poza_id, poza_latime,
-        poza_inaltime, poza_alt, tinta_bani, stare, publicat_la)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+        poza_inaltime, poza_alt, tinta_bani, data_inceput, data_citita,
+        dosar_cloud, categorie, stare, publicat_la)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
      RETURNING id`,
     [
       date.fel,
@@ -208,6 +248,10 @@ export async function creeazaText(date: DateText): Promise<string> {
       date.poza?.inaltime ?? null,
       date.poza?.alt ?? null,
       date.tintaBani,
+      date.dataInceput,
+      date.dataCitita,
+      date.dosarCloud,
+      date.categorie,
       date.publicat ? "publicat" : "ciorna",
       date.publicat ? new Date() : null,
     ],
@@ -236,6 +280,10 @@ export async function schimbaText(
        poza_inaltime = COALESCE($7, poza_inaltime),
        poza_alt = COALESCE($8, poza_alt),
        tinta_bani = $9,
+       data_inceput = $11,
+       data_citita = $12,
+       dosar_cloud = $13,
+       categorie = $14,
        stare = $10,
        publicat_la = CASE
          WHEN $10 = 'publicat' AND publicat_la IS NULL THEN now()
@@ -255,6 +303,10 @@ export async function schimbaText(
       date.poza?.alt ?? null,
       date.tintaBani,
       date.publicat ? "publicat" : "ciorna",
+      date.dataInceput,
+      date.dataCitita,
+      date.dosarCloud,
+      date.categorie,
     ],
   );
 }

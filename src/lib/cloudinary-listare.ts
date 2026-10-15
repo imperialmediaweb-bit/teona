@@ -195,3 +195,33 @@ export function miniatura(id: string, latime = 400): string {
   const cont = process.env.CLOUDINARY_CLOUD_NAME ?? "";
   return `https://res.cloudinary.com/${cont}/image/upload/c_fill,w_${latime},q_auto,f_auto/${id}`;
 }
+
+/**
+ * Toate folderele, pe câteva niveluri, ca listă plată.
+ *
+ * Pentru alegerea folderului de poze al unui proiect, din panou: asociația
+ * vede „Teona / 2025 / TABĂRĂ AUTISM 8-12 SEPTEMBRIE 2025” și o alege, în loc
+ * să urce a doua oară o sută de fotografii pe care le-a urcat deja.
+ *
+ * Două niveluri sub rădăcină ajung: anii, și taberele din ei. Mai adânc sunt
+ * subfolderele unei tabere („ZIUA 1”), care n-au ce căuta într-o listă de
+ * ales — pozele lor vin oricum odată cu folderul părinte.
+ */
+export async function toateDosarele(
+  radacina = process.env.CLOUDINARY_FOLDER || "Teona",
+  adancime = 2,
+): Promise<Dosar[]> {
+  const copii = await dosare(radacina);
+  if (adancime <= 1 || copii.length === 0) return copii;
+
+  const nepoti = await Promise.all(
+    copii.map((d) => dosare(d.cale).catch(() => [])),
+  );
+
+  const toate: Dosar[] = [];
+  copii.forEach((d, i) => {
+    toate.push(d);
+    for (const nepot of nepoti[i]) toate.push(nepot);
+  });
+  return toate;
+}

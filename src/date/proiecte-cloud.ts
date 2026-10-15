@@ -169,7 +169,17 @@ export async function pozeCloudProiect(
   // Calea e față de rădăcină, nu față de an: campaniile stau direct sub
   // `Teona`, nu într-un folder de an.
   if (dosarScris) {
-    const cale = `${RADACINA}/${dosarScris}`;
+    /*
+      Calea poate veni cu rădăcina în față sau fără.
+
+      Scrisă de mână în cod, e față de rădăcină („2026/TABĂRĂ ONCOLOGIE
+      2026"). Aleasă dintr-o listă în panou, vine întreagă, cum o dă
+      Cloudinary („Teona/2026/TABĂRĂ ONCOLOGIE 2026"). Lipită a doua oară,
+      ar ieși „Teona/Teona/..." și n-ar găsi nimic.
+    */
+    const cale = dosarScris.startsWith(`${RADACINA}/`)
+      ? dosarScris
+      : `${RADACINA}/${dosarScris}`;
     const poze = await pozeCuSubdosare(cale);
     if (poze.length === 0) {
       console.warn(`[poze] folderul scris ${cale} n-a dat nimic`);

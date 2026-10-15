@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import { connection } from "next/server";
 import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
 import { RUTE } from "@/date/asociatie";
-import { proiecteAfisate } from "@/date/proiecte";
+import { proiecteleToate } from "@/date/proiecte";
 import { listaCuPozeDinCloud } from "@/date/proiecte-cloud";
 import Decor from "@/componente/Decor";
 import IndemnFinal from "@/componente/IndemnFinal";
@@ -15,11 +17,7 @@ export const metadata: Metadata = metadate({
   cale: "/proiecte",
 });
 
-export default async function Proiecte() {
-  // Taberele noi n-au poze pe disc: fotografiile lor stau în Cloudinary, în
-  // folderul cu aceeași dată. Fără asta, cardul lor din listă ar fi gol.
-  const proiecte = await listaCuPozeDinCloud(proiecteAfisate());
-
+export default function Proiecte() {
   return (
     <>
       <JsonLd date={jsonLdFir([{ nume: "Proiecte", cale: RUTE.proiecte }])} />
@@ -55,7 +53,17 @@ export default async function Proiecte() {
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="sr-only">Proiectele noastre, pe categorii</h2>
-          <ListaProiecte proiecte={proiecte} />
+          {/*
+            Lista se citește la cerere, nu la construire.
+
+            De când asociația poate adăuga tabere din panou, o listă generată
+            o dată, la publicare, e o listă veche: tabăra adăugată marți n-ar
+            fi apărut până la următoarea publicare de cod. Verificat — exact
+            asta se întâmpla.
+          */}
+          <Suspense fallback={<Asteapta />}>
+            <Lista />
+          </Suspense>
         </div>
       </section>
 
@@ -67,4 +75,22 @@ export default async function Proiecte() {
       />
     </>
   );
+}
+
+/** Locul listei cât se citește: ține înălțimea, ca pagina să nu sară. */
+function Asteapta() {
+  return (
+    <div
+      aria-hidden="true"
+      className="min-h-[60vh] animate-pulse colt-a bg-hartie-calda"
+    />
+  );
+}
+
+async function Lista() {
+  await connection();
+  // Taberele noi n-au poze pe disc: fotografiile lor stau în Cloudinary, în
+  // folderul cu aceeași dată. Fără asta, cardul lor din listă ar fi gol.
+  const proiecte = await listaCuPozeDinCloud(await proiecteleToate());
+  return <ListaProiecte proiecte={proiecte} />;
 }

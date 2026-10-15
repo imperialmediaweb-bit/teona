@@ -291,6 +291,18 @@ const DEFINITIE = `
   poată fi rulate de oricâte ori.
 */
 const ADAOSURI = `
+  /*
+    Proiectele scrise din panou: tabere, ateliere, orice are o dată și poze.
+
+    Stau în acelasi tabel ca noutățile și campaniile, cu „fel" pe „proiect".
+    Au în plus ce are un proiect și n-are un text: datele taberei și folderul
+    de poze din Cloudinary.
+  */
+  ALTER TABLE texte ADD COLUMN IF NOT EXISTS data_inceput date;
+  ALTER TABLE texte ADD COLUMN IF NOT EXISTS data_citita text;
+  ALTER TABLE texte ADD COLUMN IF NOT EXISTS dosar_cloud text;
+  ALTER TABLE texte ADD COLUMN IF NOT EXISTS categorie text;
+
   /* Cine a scris donația de mână, pentru cele care nu vin de la un procesator. */
   ALTER TABLE donatii ADD COLUMN IF NOT EXISTS adaugat_de text;
   /* Ce a scris omul la adăugarea manuală: „transfer BCR 12 mart", chitanța etc. */

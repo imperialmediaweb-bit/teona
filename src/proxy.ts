@@ -99,10 +99,18 @@ export default async function proxy(cerere: NextRequest) {
     // O adresă cu procente stricate (`%zz`) nu e un slug valid oricum.
   }
 
+  /*
+    Proiectele vin din două locuri: din depozit (exportul WordPress și cele
+    scrise în cod) și din panou. Lista din cod se știe la pornire; pentru
+    restul se întreabă baza de date, ca o tabără adăugată acum cinci minute să
+    nu dea 404.
+  */
   if (sectiune === "proiecte") {
-    return SLUGURI.has(slug)
-      ? NextResponse.next()
-      : await paginaDe404(cerere, "proiect");
+    if (SLUGURI.has(slug)) return NextResponse.next();
+    const exista = await estePublicat("proiect", slug);
+    return exista === false
+      ? await paginaDe404(cerere, "proiect")
+      : NextResponse.next();
   }
 
   const fel = sectiune === "noutati" ? "noutate" : "campanie";

@@ -99,7 +99,7 @@ async function Continut({
           href={`/admin/scrie/nou?fel=${fel}`}
           className="colt-mic-a bg-caramiziu-700 px-5 py-2.5 font-titlu text-mic font-bold text-hartie transition-colors hover:bg-caramiziu-800"
         >
-          Scrie {acesta.eticheta.toLowerCase()} nouă
+          {acesta.butonNou}
         </Link>
       }
     >

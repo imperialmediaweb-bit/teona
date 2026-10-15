@@ -3,7 +3,11 @@ import { join } from "node:path";
 import { pozaLocala, proiecte as proiecteBrute } from "@/lib/continut";
 import { curataTitlu, faSlug } from "@/lib/slug-proiecte.mjs";
 import { PROIECTE_SCRISE } from "./proiecte-scrise";
+import { CATEGORII as CATEGORIILE } from "./proiecte-tipuri";
 import type { IdCategorie, ProiectAfisat } from "./proiecte-tipuri";
+import { areBazaDeDate } from "@/lib/baza";
+import { textePublicate } from "@/lib/texte";
+import { PREFIX_CLOUD } from "@/lib/cloud";
 
 export { CATEGORII } from "./proiecte-tipuri";
 export type { IdCategorie, ProiectAfisat } from "./proiecte-tipuri";
@@ -129,6 +133,59 @@ export function proiecteAfisate(): ProiectAfisat[] {
 
 export function proiectDupaSlug(slug: string): ProiectAfisat | undefined {
   return proiecteAfisate().find((p) => p.slug === slug);
+}
+
+/**
+ * Proiectele scrise din panou, aduse în forma celorlalte.
+ *
+ * O tabără adăugată de asociație arată pe site exact ca una scrisă în cod:
+ * aceeași pagină, aceeași galerie, același loc în listă. Diferența e numai de
+ * unde vine, iar asta nu trebuie să se vadă nicăieri.
+ */
+async function dinPanou(): Promise<ProiectAfisat[]> {
+  if (!areBazaDeDate()) return [];
+
+  const texte = await textePublicate("proiect", 300).catch(() => []);
+  return texte.map((t) => ({
+    slug: t.slug,
+    titlu: t.titlu,
+    // Fără dată de început, data publicării ține locul doar la ordonare.
+    data: t.dataInceput ?? (t.publicatLa ?? "").slice(0, 10),
+    dataCitita: t.dataCitita,
+    categorie: (CATEGORIILE.find((c) => c.id === t.categorie)?.id ??
+      "2026") as IdCategorie,
+    coperta: t.poza ? `${PREFIX_CLOUD}${t.poza.id}` : null,
+    poze: [],
+    dosarCloud: t.dosarCloud ?? undefined,
+    descriere: t.continut
+      .split(/\n{2,}/)
+      .map((p) => p.trim())
+      .filter(Boolean),
+  }));
+}
+
+/**
+ * Toate proiectele: cele din cod, cele din export și cele scrise din panou.
+ *
+ * Asincronă pentru că ultimele vin din baza de date. `proiecteAfisate()`
+ * rămâne sincronă și e folosită acolo unde nu se poate aștepta — la
+ * generarea paginilor dinainte, de pildă — iar asta se folosește peste tot
+ * unde lista trebuie să fie completă.
+ */
+export async function proiecteleToate(): Promise<ProiectAfisat[]> {
+  const panou = await dinPanou();
+  // Un slug scris din panou îl bate pe cel din cod: dacă asociația rescrie o
+  // tabără, versiunea ei e cea bună.
+  const ale = new Set(panou.map((p) => p.slug));
+  return [...panou, ...proiecteAfisate().filter((p) => !ale.has(p.slug))].sort(
+    (a, b) => b.data.localeCompare(a.data),
+  );
+}
+
+export async function proiectDupaSlugPeste(
+  slug: string,
+): Promise<ProiectAfisat | undefined> {
+  return (await proiecteleToate()).find((p) => p.slug === slug);
 }
 
 /**

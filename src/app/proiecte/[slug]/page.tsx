@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { RUTE } from "@/date/asociatie";
 import {
   pozeleProiectului,
-  proiectDupaSlug,
+  proiectDupaSlugPeste,
   proiecteAfisate,
 } from "@/date/proiecte";
 import { cuPozeDinCloud } from "@/date/proiecte-cloud";
@@ -31,7 +31,7 @@ export async function generateMetadata({
   params,
 }: PageProps<"/proiecte/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const gasit = proiectDupaSlug(slug);
+  const gasit = await proiectDupaSlugPeste(slug);
   /*
     Un slug inexistent se oprește aici, nu în corpul paginii.
 
@@ -88,7 +88,7 @@ export default async function PaginaProiect({
   params,
 }: PageProps<"/proiecte/[slug]">) {
   const { slug } = await params;
-  const gasit = proiectDupaSlug(slug);
+  const gasit = await proiectDupaSlugPeste(slug);
   if (!gasit) notFound();
 
   // Taberele scrise de asociație n-au poze în cod: și le iau din folderul
