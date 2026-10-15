@@ -64,6 +64,18 @@ const SIGLA = `${ADRESA_SITE}/poze/2024/11/cropped-Screenshot11removebgpreview-2
  * iar un e-mail se deschide des pe telefon, pe date mobile: poza e singurul
  * lucru din mesaj care poate cântări cât tot restul la un loc.
  */
+/** Pozele fixe ale cardurilor de jos, micșorate pentru e-mail. */
+const POZE = {
+  campanii: {
+    adresa: `${ADRESA_SITE}/poze/email/campanii.jpg`,
+    alt: "Copii în echipament de cățărare, la o tabără Teona Ariana",
+  },
+  tabere: {
+    adresa: `${ADRESA_SITE}/poze/email/tabere.jpg`,
+    alt: "O fată zâmbind pe iarbă, la o tabără RESPIRO",
+  },
+} as const;
+
 const POZA_IMPLICITA = {
   adresa: `${ADRESA_SITE}/poze/email/tabara-respiro.jpg`,
   alt: "Copiii, părinții și voluntarii Asociației Teona Ariana, la o tabără RESPIRO",
@@ -102,6 +114,8 @@ export const CUPRINS: Record<FelSablon, readonly string[]> = {
     "Donez acum — butonul mare, spre formularul de donație",
     "20 / 50 / 100 lei — suma ajunge aleasă în formular",
     "Donez lunar — caseta care explică de ce ajută cel mai mult",
+    "Card cu poză spre campaniile deschise",
+    "Card cu poză spre taberele RESPIRO",
     "Redirecționez 3,5% din impozitul pe venit",
     "SMS cu SUSTIN la 8835, cu felul în care se oprește",
     "Campanie de ziua ta",
@@ -119,6 +133,7 @@ export const CUPRINS: Record<FelSablon, readonly string[]> = {
     "Modelul de contract, în Word",
     "Declarația 177",
     "Ce primește firma: sigla pe site, raportul, materialele",
+    "Carduri cu poze spre tabere și spre campaniile deschise",
     "Hai să vorbim — telefonul și e-mailul managerului de fundraising",
     "Rețelele asociației și subsolul legal, cu dezabonare",
   ],
@@ -187,6 +202,11 @@ function titluMic(text: string) {
   return `<p style="margin:0 0 14px;font-family:${FONT};font-size:13px;font-weight:bold;letter-spacing:0.08em;text-transform:uppercase;color:${MOALE};">${curat(text)}</p>`;
 }
 
+/** O cutie cu chenar, pentru o listă care trebuie să se citească ca un bloc. */
+function cutie(continut: string) {
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;border:1px solid ${UMBRA};border-radius:14px;"><tr><td style="padding:20px 20px 8px;">${continut}</td></tr></table>`;
+}
+
 function caseta(continut: string, fundal = HARTIE_CALDA) {
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 22px;background-color:${fundal};border-radius:14px;"><tr><td style="padding:22px 24px;">${continut}</td></tr></table>`;
 }
@@ -206,6 +226,33 @@ function rand(
           : ""
       }</p>
     </td></tr></table>`;
+}
+
+/**
+ * Un card cu fotografie: poză lată, titlu, o frază, buton.
+ *
+ * Poza stă deasupra, nu lângă text. Alăturate, pe un telefon de 360 px
+ * rămâne fiecăreia câte un deget de lățime și nu se mai înțelege nici poza,
+ * nici fraza. Una peste alta arată la fel de bine la 600 px și la 320.
+ */
+function cardFoto(d: {
+  poza: string;
+  alt: string;
+  titlu: string;
+  text: string;
+  eticheta: string;
+  adresa: string;
+}): string {
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 16px;background-color:${HARTIE_CALDA};border-radius:14px;overflow:hidden;">
+    <tr><td style="font-size:0;line-height:0;">
+      <img src="${curat(d.poza)}" alt="${curat(d.alt)}" width="536" style="display:block;width:100%;max-width:536px;height:auto;border:0;" />
+    </td></tr>
+    <tr><td style="padding:18px 20px 20px;">
+      <p style="margin:0 0 4px;font-family:${FONT};font-size:18px;font-weight:bold;color:${CERNEALA};">${curat(d.titlu)}</p>
+      <p style="margin:0 0 14px;font-family:${FONT};font-size:15px;line-height:1.6;color:${MOALE};">${curat(d.text)}</p>
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" bgcolor="#ffffff" style="border:2px solid ${PORTOCALIU};border-radius:999px;"><a href="${curat(d.adresa)}" style="display:inline-block;padding:10px 22px;font-family:${FONT};font-size:15px;font-weight:bold;color:${PORTOCALIU};text-decoration:none;border-radius:999px;">${curat(d.eticheta)}</a></td></tr></table>
+    </td></tr>
+  </table>`;
 }
 
 /** Pașii, ca tabel: `<ol>` iese strâmb în Outlook. */
@@ -427,9 +474,29 @@ function corpPersoane(c: ContinutCampanie): string {
       )}
     </td></tr>
 
+    <tr><td style="padding:22px 32px 0;">
+      ${titluMic("unde se duc banii")}
+      ${cardFoto({
+        poza: POZE.campanii.adresa,
+        alt: POZE.campanii.alt,
+        titlu: "Campaniile deschise acum",
+        text: "Fiecare campanie spune limpede pentru ce se strâng banii și cât s-a strâns până acum.",
+        eticheta: "Vezi campaniile",
+        adresa: link(RUTE.campanii, "persoane", campanie),
+      })}
+      ${cardFoto({
+        poza: POZE.tabere.adresa,
+        alt: POZE.tabere.alt,
+        titlu: "Taberele RESPIRO",
+        text: "O săptămână în care copiii se joacă, iar părinții răsuflă. Toate taberele de până acum, cu poze.",
+        eticheta: "Vezi taberele",
+        adresa: link(RUTE.proiecte, "persoane", campanie),
+      })}
+    </td></tr>
+
     <tr><td style="padding:6px 32px 0;">
       ${titluMic("alte feluri de a ajuta, fără să scoți un leu în plus")}
-      ${rand(
+      ${cutie(`${rand(
         "Redirecționează 3,5% din impozitul pe venit",
         "Nu te costă nimic: sunt bani pe care oricum îi plătești statului. Completezi formularul 230 în câteva minute.",
         {
@@ -461,7 +528,7 @@ function corpPersoane(c: ContinutCampanie): string {
         "Donează prin Galantom",
         "Platforma de donații recurente, dacă îți e mai la îndemână.",
         { eticheta: "Deschide Galantom", adresa: LINKURI_EXTERNE.galantom },
-      )}
+      )}`)}
     </td></tr>
 
     <tr><td style="padding:10px 32px 0;">
@@ -516,7 +583,7 @@ function corpFirme(c: ContinutCampanie): string {
 
     <tr><td style="padding:14px 32px 0;">
       ${titluMic("ce primește firma")}
-      ${rand(
+      ${cutie(`${rand(
         "Numele și sigla pe site",
         "La Sponsori și parteneri, cu link către site-ul firmei.",
         {
@@ -535,7 +602,27 @@ function corpFirme(c: ContinutCampanie): string {
       ${rand(
         "Materiale pentru comunicarea voastră",
         "Fotografii și text despre proiectul pe care îl susțineți, de folosit pe canalele firmei.",
-      )}
+      )}`)}
+    </td></tr>
+
+    <tr><td style="padding:20px 32px 0;">
+      ${titluMic("ce susține firma")}
+      ${cardFoto({
+        poza: POZE.tabere.adresa,
+        alt: POZE.tabere.alt,
+        titlu: "Taberele RESPIRO",
+        text: "O săptămână în care copiii cu nevoi speciale se joacă, iar părinții răsuflă. 33 de tabere până acum.",
+        eticheta: "Vezi taberele",
+        adresa: link(RUTE.proiecte, "firme", campanie),
+      })}
+      ${cardFoto({
+        poza: POZE.campanii.adresa,
+        alt: POZE.campanii.alt,
+        titlu: "Campaniile deschise acum",
+        text: "Dacă firma vrea să susțină un lucru anume, de aici se alege.",
+        eticheta: "Vezi campaniile",
+        adresa: link(RUTE.campanii, "firme", campanie),
+      })}
     </td></tr>
 
     <tr><td style="padding:12px 32px 0;">
@@ -587,6 +674,8 @@ export function textSimpluCampanie(
       `Modelul de contract: ${ADRESA_SITE}/api/contract/descarca`,
       `Ce primesc sponsorii: ${link(RUTE.sponsori, fel, campanie)}`,
       `Raportul de activitate: ${link(RUTE.raport2025, fel, campanie)}`,
+      `Taberele RESPIRO: ${link(RUTE.proiecte, fel, campanie)}`,
+      `Campaniile deschise: ${link(RUTE.campanii, fel, campanie)}`,
       "",
       `20% din impozitul pe profit sau 0,75% din cifra de afaceri — suma mai mică dintre ele.`,
       `${om.nume}, ${om.rol} · ${om.telefon.afisat} · ${om.email}`,
@@ -602,6 +691,8 @@ export function textSimpluCampanie(
       `Donez lunar: ${catre({ frecventa: "lunar" })}`,
       `Redirecționez 3,5%: ${link(RUTE.redirectionare35, fel, campanie)}`,
       `SMS: ${SMS.text} la ${SMS.numar} (${SMS.sumaLunara} pe lună, oprire cu ${SMS.textOprire})`,
+      `Campaniile deschise: ${link(RUTE.campanii, fel, campanie)}`,
+      `Taberele RESPIRO: ${link(RUTE.proiecte, fel, campanie)}`,
       `Campanie de ziua ta: ${link(RUTE.ziuaTa, fel, campanie)}`,
       `Voluntariat: ${link(RUTE.voluntar, fel, campanie)}`,
       "",
