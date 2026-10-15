@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { EMAIL, RETELE_ASOCIATIE, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import Decor from "../Decor";
 import Pictograma from "../Pictograma";
@@ -61,6 +61,19 @@ function varsta(nastere: Date, azi: Date): number {
   return ani;
 }
 
+/** `2006-10-24`, din data unui calculator. */
+function caZi(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+    d.getDate(),
+  ).padStart(2, "0")}`;
+}
+
+const SCRIS_LUNG = new Intl.DateTimeFormat("ro-RO", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+
 /**
  * Formularul de voluntariat (11.4), în trei pași.
  *
@@ -88,6 +101,40 @@ export default function FormularVoluntar() {
   const formular = useRef<HTMLFormElement>(null);
   const titluriPasi = useRef<Array<HTMLHeadingElement | null>>([]);
   const [pas, setPas] = useState(0);
+  /*
+    Marginile câmpului de dată și data scrisă în litere.
+
+    Calendarul dintr-un `<input type="date">` e al browserului, nu al nostru:
+    el alege și limba, și ordinea (10/24/2026 pe un browser pe engleză). Nu se
+    poate schimba din pagină — dar se pot face două lucruri care contează mai
+    mult decât forma lui.
+
+    Întâi, `min` și `max`: fără ele, calendarul oferea 2027, 2029, 2030 ca ani
+    de naștere și se putea alege o dată din viitor. Acum se oprește la ziua de
+    azi și nu coboară sub 110 ani.
+
+    Apoi, data scrisă dedesubt în litere — „24 octombrie 2006". Oricare ar fi
+    limba browserului, omul vede limpede ce a ales și prinde singur inversarea
+    zi/lună, fără să trimită formularul și să afle după.
+
+    Amândouă se calculează în `useEffect`: `new Date()` în timpul randării e o
+    valoare care se schimbă de la o secundă la alta, iar Next refuză să
+    pregenereze pagina cu ea.
+  */
+  const [margini, setMargini] = useState<{ min: string; max: string } | null>(
+    null,
+  );
+  const [nastereaScrisa, setNastereaScrisa] = useState("");
+
+  useEffect(() => {
+    const azi = new Date();
+    setMargini({
+      max: caZi(azi),
+      min: caZi(
+        new Date(azi.getFullYear() - 110, azi.getMonth(), azi.getDate()),
+      ),
+    });
+  }, []);
   const [erori, setErori] = useState<Erori>({});
   const [stare, setStare] = useState<Stare>({ fel: "gol" });
 
@@ -411,6 +458,17 @@ export default function FormularVoluntar() {
                     name="nastere"
                     type="date"
                     autoComplete="bday"
+                    min={margini?.min}
+                    max={margini?.max}
+                    onChange={(e) => {
+                      const scris = e.currentTarget.value;
+                      const data = scris ? new Date(`${scris}T00:00:00`) : null;
+                      setNastereaScrisa(
+                        data && !Number.isNaN(data.getTime())
+                          ? SCRIS_LUNG.format(data)
+                          : "",
+                      );
+                    }}
                     aria-invalid={Boolean(erori.nastere)}
                     aria-describedby={
                       erori.nastere
@@ -421,6 +479,14 @@ export default function FormularVoluntar() {
                       erori.nastere ? claseControlGresit : claseControl
                     }
                   />
+                  {nastereaScrisa && (
+                    <p
+                      aria-live="polite"
+                      className="mt-2 font-titlu text-mic font-semibold text-cerneala"
+                    >
+                      {nastereaScrisa}
+                    </p>
+                  )}
                 </Camp>
 
                 <Camp id={`${id}-localitate`} eticheta="Localitatea">
