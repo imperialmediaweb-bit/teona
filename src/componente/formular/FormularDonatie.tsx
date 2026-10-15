@@ -77,6 +77,39 @@ function useCampaniaDinAdresa(): string | null {
 }
 
 /**
+ * Suma și felul plății, dacă vin din adresă.
+ *
+ * Butoanele dintr-un e-mail de campanie („Donez 50 de lei”, „Donez lunar”)
+ * duc la `/doneaza?suma=50` sau `?frecventa=lunar`. Fără asta, omul care a
+ * apăsat „50 de lei” în inbox ajungea pe un formular gol și trebuia s-o aleagă
+ * încă o dată — pasul în plus la care se pierd cei mai mulți.
+ *
+ * Valoarea din adresă n-are nicio autoritate: e doar o preselecție pe care
+ * donatorul o vede și o poate schimba. De aceea se acceptă numai un număr
+ * întreg, pozitiv și rezonabil — restul se ignoră în tăcere, nu se arată o
+ * eroare pentru ceva ce donatorul n-a scris el.
+ */
+function useSumaDinAdresa(): { suma: number | null; alta: string } {
+  const scris = useSearchParams().get("suma");
+  const numar = Number(scris);
+  if (!scris || !Number.isFinite(numar) || numar <= 0 || numar > 1_000_000) {
+    return { suma: null, alta: "" };
+  }
+  const rotunda = Math.round(numar);
+  return SUME.includes(rotunda as (typeof SUME)[number])
+    ? { suma: rotunda, alta: "" }
+    : { suma: null, alta: String(rotunda) };
+}
+
+/** `?frecventa=lunar` sau `?frecventa=o-data`. Orice altceva lasă implicitul. */
+function useFrecventaDinAdresa(implicita: boolean): boolean {
+  const scris = useSearchParams().get("frecventa");
+  if (scris === "lunar") return true;
+  if (scris === "o-data" || scris === "odata") return false;
+  return implicita;
+}
+
+/**
  * `useSearchParams` cere o graniță `Suspense` ca pagina să poată rămâne
  * pregenerată. O ținem aici, nu în pagină: așa componenta se poate pune
  * oriunde, fără ca cel care o folosește să trebuiască să știe asta.
@@ -116,10 +149,11 @@ function Formular({
 }) {
   const destinatia = useDestinatiaDinAdresa(destinatieInitiala);
   const campania = useCampaniaDinAdresa();
+  const dinAdresa = useSumaDinAdresa();
   const id = useId();
-  const [suma, setSuma] = useState<number | null>(null);
-  const [altaSuma, setAltaSuma] = useState("");
-  const [lunar, setLunar] = useState(true);
+  const [suma, setSuma] = useState<number | null>(dinAdresa.suma);
+  const [altaSuma, setAltaSuma] = useState(dinAdresa.alta);
+  const [lunar, setLunar] = useState(useFrecventaDinAdresa(true));
   const [erori, setErori] = useState<Erori>({});
   const [seTrimite, setSeTrimite] = useState(false);
   /*
@@ -239,10 +273,9 @@ function Formular({
         </div>
         <div className="grid gap-5 p-7 sm:p-9">
           <p className="text-cerneala-moale">
-            Procesatorul e pregătit, dar contul asociației e încă în
-            verificare la bancă. Nu îți cerem datele cardului până nu
-            funcționează totul. Poți dona chiar acum, pe una dintre căile
-            care merg:
+            Procesatorul e pregătit, dar contul asociației e încă în verificare
+            la bancă. Nu îți cerem datele cardului până nu funcționează totul.
+            Poți dona chiar acum, pe una dintre căile care merg:
           </p>
 
           <ul className="grid gap-3">

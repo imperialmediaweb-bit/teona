@@ -37,6 +37,15 @@ export async function creeazaCiorna(date: {
   numeExpeditor: string;
   grupuri: string[];
   continut: ContinutEmail;
+  /**
+   * HTML gata făcut, dacă vine din altă parte.
+   *
+   * Șabloanele de campanie (`campanie-sabloane.ts`) își construiesc singure
+   * mesajul, cu butoanele lor: unul pentru persoane, altul pentru firme.
+   * Când sunt date, `continut` rămâne doar ce se vede în numele ciornei.
+   */
+  html?: string;
+  textSimplu?: string;
 }): Promise<Raspuns> {
   const cheie = process.env.MAILERLITE_API_KEY;
   if (!cheie) return { ok: false, mesaj: "Cheia MailerLite lipsește." };
@@ -57,8 +66,8 @@ export async function creeazaCiorna(date: {
           subject: date.subiect.slice(0, 255),
           from_name: date.numeExpeditor.slice(0, 255),
           from: date.expeditor,
-          content: construieste(date.continut),
-          plain_text: textSimplu(date.continut),
+          content: date.html ?? construieste(date.continut),
+          plain_text: date.textSimplu ?? textSimplu(date.continut),
         },
       ],
     }),

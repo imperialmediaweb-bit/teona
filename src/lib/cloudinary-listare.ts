@@ -34,7 +34,8 @@ import "server-only";
  * prin care cheile asociației ar putea fi trimise în altă parte.
  */
 const BAZA =
-  (process.env.NODE_ENV !== "production" && process.env.CLOUDINARY_API?.trim()) ||
+  (process.env.NODE_ENV !== "production" &&
+    process.env.CLOUDINARY_API?.trim()) ||
   "https://api.cloudinary.com/v1_1";
 
 export type PozaCloud = {
@@ -54,8 +55,8 @@ export type Dosar = { nume: string; cale: string };
 export function areCheiCloudinary(): boolean {
   return Boolean(
     process.env.CLOUDINARY_CLOUD_NAME &&
-      process.env.CLOUDINARY_API_KEY &&
-      process.env.CLOUDINARY_API_SECRET,
+    process.env.CLOUDINARY_API_KEY &&
+    process.env.CLOUDINARY_API_SECRET,
   );
 }
 
@@ -66,8 +67,7 @@ function acreditari() {
   if (!cont || !cheie || !secret) return null;
   return {
     cont,
-    antet:
-      "Basic " + Buffer.from(`${cheie}:${secret}`).toString("base64"),
+    antet: "Basic " + Buffer.from(`${cheie}:${secret}`).toString("base64"),
   };
 }
 
@@ -224,4 +224,18 @@ export async function toateDosarele(
     for (const nepot of nepoti[i]) toate.push(nepot);
   });
   return toate;
+}
+
+/**
+ * Adresa unei poze pentru un e-mail.
+ *
+ * Două deosebiri față de `miniatura`: lățimea e cea a șablonului la ecrane
+ * dense (536 px × 2), iar formatul e fixat la JPEG. `f_auto` alege formatul
+ * după antetul `Accept` al clientului — pe care clienții de e-mail și
+ * serverele de proxy ale Gmailului nu-l trimit cum trebuie, așa că o poză
+ * WebP ajunge uneori ca pătrat gol. JPEG se vede peste tot.
+ */
+export function pozaPentruEmail(id: string, latime = 1072): string {
+  const cont = process.env.CLOUDINARY_CLOUD_NAME ?? "";
+  return `https://res.cloudinary.com/${cont}/image/upload/c_limit,w_${latime},q_auto,f_jpg/${id}`;
 }

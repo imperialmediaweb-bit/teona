@@ -178,9 +178,25 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
   „PayPal (în euro)" dacă are chei, „Transfer bancar". Înainte pagina începea
   direct cu formularul de card, iar celelalte stăteau după o cotitură de
   pagină — cine nu voia cu cardul nu afla de acolo că se poate și altfel.
-- **Buletinele și campaniile de e-mail se fac în MailerLite**, nu în panou.
-  Pagina care lăsa o ciornă acolo a fost scoasă: trecea pe lângă tot ce face
-  un instrument de e-mail. În bara din stânga e un link către el.
+- **Buletinele și campaniile de e-mail se trimit din MailerLite**, nu din
+  panou. Pagina care încerca să fie un instrument de e-mail a fost scoasă:
+  trecea pe lângă tot ce face unul adevărat — șabloane, segmente, probe,
+  statistici de deschidere. În bara din stânga e un link către el.
+- **`/admin/sabloane`** nu reface acel instrument: ține cele **două șabloane
+  de campanie**, unul pentru persoane fizice și unul pentru firme. Ce nu se
+  face bine în editorul MailerLite sunt tocmai butoanele — un e-mail către
+  oameni are nevoie de zece-douăsprezece căi de a ajuta (card, 20/50/100 lei,
+  lunar, 3,5%, SMS, transfer cu toate conturile, ziua ta, voluntariat,
+  Galantom, distribuire), iar unul către firme de altele patru (calculatorul,
+  contractul, Declarația 177, omul de la fundraising). Construite de mână la
+  fiecare campanie, ies de fiecare dată altfel și lipsește câte unul.
+  Aici se scriu **titlul, textul și poza**; restul e scris o dată, în
+  `src/lib/email/campanie-sabloane.ts`, și verificat o dată.
+  Patru butoane: vezi cum arată, descarcă HTML-ul (pentru editorul de cod din
+  MailerLite), trimite-ți o probă, fă ciorna în MailerLite. **Nu trimite nimic
+  către listă** — asta rămâne un gest omenesc, făcut acolo.
+  Linkurile poartă etichete UTM, deci Google Analytics arată singur ce a adus
+  buletinul. Probă: `BAZA=… PAROLA_ADMIN=… node scripts/qa/sabloane-email.mjs`.
 
 Publicul: **`/noutati`** și **`/campanii`**, cu paginile lor. Nu sunt în meniul
 principal — caietul îl fixează la nouă intrări (12.1), iar a zecea rupe antetul

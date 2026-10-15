@@ -364,9 +364,7 @@ export default function Directioneaza20() {
                   href={`${RUTE.directionare20}/contract`}
                   className="flex items-center justify-between gap-4 colt-mic-a border-2 border-caramiziu-200 bg-caramiziu-50 px-5 py-4 font-titlu font-bold text-caramiziu-900 transition-colors hover:border-caramiziu-400"
                 >
-                  <span>
-                    Sau ia contractul completat cu datele firmei tale
-                  </span>
+                  <span>Sau ia contractul completat cu datele firmei tale</span>
                   <Pictograma
                     nume="sageata"
                     aria-hidden="true"
@@ -390,9 +388,19 @@ export default function Directioneaza20() {
         </div>
       </section>
 
-      {/* 8.4 — calculatorul fiscal. */}
+      {/*
+        8.4 — calculatorul fiscal.
+
+        Secțiunea are nume, ca să se poată trimite cineva direct la ea: linkul
+        „Calculează cât poate da firma” din e-mailul pentru firme duce la
+        `/directioneaza-20#calculator`, nu în capul unei pagini lungi din care
+        omul trebuie să caute singur.
+      */}
       <Val culoare="text-tenta-turcoaz" className={VAL_PESTE} />
-      <section className="granulatie relative overflow-hidden bg-tenta-turcoaz pt-6 pb-24 lg:pt-10 lg:pb-28">
+      <section
+        id="calculator"
+        className="granulatie relative scroll-mt-24 overflow-hidden bg-tenta-turcoaz pt-6 pb-24 lg:pt-10 lg:pb-28"
+      >
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <TitluSectiune
             scris="Înainte de contract"
