@@ -5,6 +5,7 @@ import { ASOCIATIA } from "@/date/asociatie";
 import Antet from "@/componente/Antet";
 import BannerCookieuri from "@/componente/BannerCookieuri";
 import BaraDeAnunt from "@/componente/BaraDeAnunt";
+import Analitice from "@/componente/Analitice";
 import ButonDoneazaMobil from "@/componente/ButonDoneazaMobil";
 import Newsletter from "@/componente/Newsletter";
 import Subsol from "@/componente/Subsol";
@@ -202,12 +203,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Antet />
         </Suspense>
 
-        {/*
-          Pe telefon, pastila Donează plutește peste colțul din dreapta jos.
-          Fără locul ăsta de dedesubt, ultimul rând al oricărei pagini rămâne
-          sub ea.
-        */}
-        <main id="continut" className="flex-1 pb-16 sm:pb-0">
+        <main id="continut" className="flex-1">
           {children}
         </main>
 
@@ -221,6 +217,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <ButonDoneazaMobil />
         </Suspense>
         <BannerCookieuri />
+        <Analitice />
       </body>
     </html>
   );

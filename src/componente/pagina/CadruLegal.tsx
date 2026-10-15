@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { pagini } from "@/lib/continut";
 import Val, { VAL_PESTE } from "../Val";
 import TextLegal from "./TextLegal";
@@ -18,10 +19,19 @@ import TextLegal from "./TextLegal";
 export default function CadruLegal({
   titlu,
   slugVechi,
+  children,
 }: {
   titlu: string;
   /** Slugul paginii în exportul WordPress. */
   slugVechi: string;
+  /**
+   * Ce se adaugă sub textul preluat, despărțit de el.
+   *
+   * Textul vechi nu se atinge, dar site-ul nou poate face lucruri pe care
+   * documentul vechi n-avea de unde să le știe. Atunci se scrie dedesubt, la
+   * vedere, nu se strecoară în mijlocul unui document juridic.
+   */
+  children?: ReactNode;
 }) {
   const pagina = pagini().find((p) => p.slug === slugVechi);
 
@@ -47,6 +57,7 @@ export default function CadruLegal({
       <section className="bg-hartie pt-4 pb-24 lg:pt-8 lg:pb-32">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <TextLegal text={pagina.textHtml} />
+          {children}
         </div>
       </section>
     </>

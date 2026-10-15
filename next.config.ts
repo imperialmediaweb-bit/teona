@@ -64,17 +64,29 @@ const cloudinary = (process.env.CLOUDINARY_CLOUD_NAME ?? "").trim();
 const dezvoltare = process.env.NODE_ENV === "development";
 const FORMULAR230 = "https://formular230.ro";
 
+/*
+  Google Analytics, pornit doar cu acord (vezi `src/componente/Analitice.tsx`).
+
+  Domeniile stau în politică tot timpul, nu doar când cineva a bifat: politica
+  pleacă într-un antet, la fiecare cerere, iar antetul nu poate ști ce a bifat
+  vizitatorul. Permisiunea nu încarcă nimic singură — scriptul intră în pagină
+  doar după acord.
+*/
+const GOOGLE_SCRIPT = "https://www.googletagmanager.com";
+const GOOGLE_DATE =
+  "https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com";
+
 const politicaDeContinut = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${dezvoltare ? " 'unsafe-eval'" : ""} ${FORMULAR230}`,
+  `script-src 'self' 'unsafe-inline'${dezvoltare ? " 'unsafe-eval'" : ""} ${FORMULAR230} ${GOOGLE_SCRIPT}`,
   `style-src 'self' 'unsafe-inline' ${FORMULAR230}`,
   // `data:` pentru fundalurile SVG din CSS și pentru pozele neclare de
   // încărcare ale lui `next/image`; `blob:` pentru previzualizări locale.
-  `img-src 'self' data: blob:${cloudinary ? " https://res.cloudinary.com" : ""}`,
+  `img-src 'self' data: blob:${cloudinary ? " https://res.cloudinary.com" : ""} ${GOOGLE_DATE}`,
   // Fonturile vin de pe domeniul nostru, prin `next/font`. Dacă aici ar
   // trebui vreodată adăugat Google Fonts, înseamnă că s-a stricat ceva.
   "font-src 'self'",
-  `connect-src 'self'${dezvoltare ? " ws: wss:" : ""}`,
+  `connect-src 'self'${dezvoltare ? " ws: wss:" : ""} ${GOOGLE_DATE}`,
   `frame-src ${FORMULAR230}`,
   "frame-ancestors 'none'",
   "object-src 'none'",
