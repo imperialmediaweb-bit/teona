@@ -38,6 +38,22 @@ export type DateContract = {
   /** Valoarea scrisă de om, în lei: „5.000” sau „5000,50”. */
   valoare: string;
   dataSemnarii: string;
+  /**
+   * Semnătura desenată pe ecran, ca PNG.
+   *
+   * Lipsește când contractul se scoate din panou ca să fie semnat cu pixul;
+   * există când firma l-a semnat online, pe site.
+   */
+  semnatura?: Uint8Array;
+  /**
+   * Urma semnăturii electronice: când și de unde a fost aplicată.
+   *
+   * Scrie în document, sub semnătură, nu doar în baza noastră de date. O
+   * semnătură desenată are putere de probă doar împreună cu împrejurările în
+   * care a fost dată; dacă acelea stau numai la noi, firma le poate contesta
+   * fără să aibă ce contrazice.
+   */
+  urmaSemnaturii?: string;
 };
 
 /** Valoarea câmpului, sau punctele de completat cu pixul. */
@@ -223,12 +239,18 @@ export async function contractDeSponsorizare(
     `rezerva` întâi: blocul fie încape întreg pe pagina asta, fie trece tot pe
     următoarea. Despicat între pagini, un contract pare trimis greșit.
   */
-  c.rezerva(90);
+  c.rezerva(date.semnatura ? 160 : 90);
   const sus = c.pozitia();
 
   c.scrie("SPONSOR", { gros: true, marime: 10, culoare: PORTOCALIU, spatiuDupa: 14 });
+  if (date.semnatura) {
+    await c.imagine(date.semnatura, { latime: 150, inaltime: 52 });
+  }
   c.scrie(sau(date.reprezentant, 40), { spatiuDupa: 2 });
   c.scrie("Reprezentant legal", { marime: 9, culoare: MOALE, spatiuDupa: 0 });
+  if (date.urmaSemnaturii) {
+    c.scrie(date.urmaSemnaturii, { marime: 7, culoare: MOALE, spatiuDupa: 0 });
+  }
   const dupaSponsor = c.pozitia();
 
   const DREAPTA = 250;

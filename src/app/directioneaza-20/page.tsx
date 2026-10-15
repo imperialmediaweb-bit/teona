@@ -351,7 +351,25 @@ export default function Directioneaza20() {
                 </Aparitie>
               </li>
               <li className="sm:col-span-2">
-                <p className="text-mic text-cerneala-moale">
+                {/*
+                  Drumul scurt, înaintea celor de descărcat: completezi,
+                  semnezi, gata. Cine vrea hârtie sau semnătură calificată are
+                  modelele chiar deasupra.
+                */}
+                <Link
+                  href={`${RUTE.directionare20}/semneaza`}
+                  className="flex items-center justify-between gap-4 colt-mic-a border-2 border-caramiziu-200 bg-caramiziu-50 px-5 py-4 font-titlu font-bold text-caramiziu-900 transition-colors hover:border-caramiziu-400"
+                >
+                  <span>
+                    Sau completează și semnează contractul online, pe loc
+                  </span>
+                  <Pictograma
+                    nume="sageata"
+                    aria-hidden="true"
+                    className="size-5 shrink-0"
+                  />
+                </Link>
+                <p className="mt-3 text-mic text-cerneala-moale">
                   Contractul e și în{" "}
                   <a
                     href="/documente/contract-de-sponsorizare.pdf"

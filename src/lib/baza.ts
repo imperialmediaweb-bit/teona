@@ -169,6 +169,48 @@ const DEFINITIE = `
     ON firme (stadiu, schimbat_la DESC);
 
   /*
+    Contractele de sponsorizare semnate online.
+
+    Firma completează contractul pe site, îl semneaza cu degetul sau cu
+    mouse-ul, iar aici ajunge PDF-ul ieșit, așa cum l-a văzut și semnat.
+
+    Se păstrează documentul întreg, ca octeți, nu datele din care l-am face
+    din nou. Un contract nu e un rând de tabel: dacă mâine se schimbă un text
+    din clauze sau o adresă a asociației, un document regenerat ar arăta
+    altfel decât cel semnat, iar cel semnat e singurul care contează.
+
+    Coloana amprenta e suma de control a fișierului (SHA-256). Spune, mai
+    târziu, că PDF-ul din mâna firmei e exact cel pe care l-am scris noi
+    atunci.
+
+    Coloanele ip și agent sunt împrejurările semnăturii. O semnătură desenată pe
+    ecran nu are, singură, puterea uneia olografe; ce o susține e dovada
+    despre cine, când și de unde a dat-o.
+  */
+  CREATE TABLE IF NOT EXISTS contracte (
+    id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    firma_id      uuid,
+    denumire      text NOT NULL,
+    cui           text NOT NULL,
+    sediu         text,
+    reg_com       text,
+    reprezentant  text NOT NULL,
+    calitate      text,
+    telefon       text,
+    email         text NOT NULL,
+    valoare       text NOT NULL,
+    pdf           bytea NOT NULL,
+    amprenta      text NOT NULL,
+    ip            text,
+    agent         text,
+    /* semnat_de_sponsor → contrasemnat, sau anulat. */
+    stare         text NOT NULL DEFAULT 'semnat_de_sponsor',
+    creat_la      timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS contracte_dupa_stare
+    ON contracte (stare, creat_la DESC);
+
+  /*
     Restul cererilor care vin de pe site: pașii pentru 3,5%, voluntariat,
     mesajele din formularul de contact.
 

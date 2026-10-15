@@ -39,6 +39,15 @@ export async function trimiteEmail(mesaj: {
   text: string;
   /** Adresa omului, ca asociația să poată răspunde direct din inbox. */
   raspundeLa?: string;
+  /**
+   * Fișiere atașate.
+   *
+   * Pentru contractul semnat online: firma trebuie să primească pe loc, în
+   * inbox, exact documentul pe care l-a semnat. Un link către site n-ar fi
+   * același lucru — linkul se poate schimba, atașamentul rămâne în e-mailul
+   * ei și e dovada că l-a primit atunci.
+   */
+  atasamente?: Array<{ nume: string; continut: Uint8Array }>;
 }): Promise<boolean> {
   const cheie = process.env.RESEND_API_KEY;
   if (!cheie) return false;
@@ -57,6 +66,14 @@ export async function trimiteEmail(mesaj: {
         html: mesaj.html,
         text: mesaj.text,
         ...(mesaj.raspundeLa ? { reply_to: mesaj.raspundeLa } : {}),
+        ...(mesaj.atasamente?.length
+          ? {
+              attachments: mesaj.atasamente.map((a) => ({
+                filename: a.nume,
+                content: Buffer.from(a.continut).toString("base64"),
+              })),
+            }
+          : {}),
       }),
     });
     return raspuns.ok;

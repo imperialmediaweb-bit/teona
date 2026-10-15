@@ -252,7 +252,8 @@ export async function peMonede(): Promise<
 export async function deFacutAcum(): Promise<
   Array<{ eticheta: string; nr: number; unde: string }>
 > {
-  const [cereri, aniversari, ciorne, firme, transferuri] = await Promise.all([
+  const [cereri, aniversari, ciorne, firme, transferuri, contracte] =
+    await Promise.all([
     intreaba<{ nr: string }>(
       `SELECT count(*) AS nr FROM cereri WHERE stadiu = 'nou'`,
     ),
@@ -275,6 +276,10 @@ export async function deFacutAcum(): Promise<
     intreaba<{ nr: string }>(
       `SELECT count(*) AS nr FROM donatii WHERE stare = 'anuntata'`,
     ),
+    // Contractele semnate online de firme, în așteptarea contrasemnăturii.
+    intreaba<{ nr: string }>(
+      `SELECT count(*) AS nr FROM contracte WHERE stare = 'semnat_de_sponsor'`,
+    ),
   ]);
 
   return [
@@ -283,6 +288,11 @@ export async function deFacutAcum(): Promise<
       eticheta: "transferuri de căutat în extras",
       nr: Number(transferuri[0]?.nr ?? 0),
       unde: "/admin/donatii",
+    },
+    {
+      eticheta: "contracte de contrasemnat",
+      nr: Number(contracte[0]?.nr ?? 0),
+      unde: "/admin/contracte",
     },
     {
       eticheta: "aniversări de aprobat",
