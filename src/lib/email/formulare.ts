@@ -1,5 +1,6 @@
 import { ADRESA_SITE } from "@/app/seo";
 import {
+  ADRESE,
   ASOCIATIA,
   CONTACT_FIRME,
   CONTURI,
@@ -8,7 +9,7 @@ import {
   TELEFON_PRINCIPAL,
 } from "@/date/asociatie";
 import { curat, tabel, trimiteEmail } from "./trimite";
-import { MIC, P, buton, caseta, pagina, pasi } from "./plic";
+import { MIC, P, buton, caseta, paginaInterna, pagina, pasi } from "./plic";
 import type { Compus } from "./campanie";
 
 /**
@@ -39,6 +40,15 @@ export type CerereSponsorizare = {
   cale: string;
   suma?: string;
   mesaj?: string;
+};
+
+/** Ce anunță un om pe `/formular-230`, după ce l-a completat pe hârtie. */
+export type Formular230 = {
+  nume: string;
+  email: string;
+  telefon?: string;
+  /** Pe câți ani a bifat distribuirea, dacă a spus. */
+  ani?: 1 | 2 | null;
 };
 
 /** Ce completează un om pe `/redirectioneaza-3-5`. */
@@ -92,7 +102,11 @@ export function compuneSponsorizare(d: CerereSponsorizare): Compus {
 
   return {
     subiect: titlu,
-    html: pagina(titlu, corp),
+    html: pagina(
+      titlu,
+      corp,
+      "Patru pași, datele noastre pentru contabilitate și un om pe care îl puteți suna.",
+    ),
     text: `Bună, ${d.persoana},
 
 Am primit cererea trimisă în numele ${d.firma}. Ați ales calea: ${d.cale}.
@@ -139,7 +153,11 @@ export function compuneAnuntSponsorizare(d: CerereSponsorizare): Compus {
 
   return {
     subiect: `${titlu} — ${d.firma}`,
-    html: pagina(titlu, corp),
+    html: paginaInterna(
+      titlu,
+      corp,
+      `${d.firma} · ${d.cale}${d.suma ? ` · ${d.suma}` : ""}`,
+    ),
     text: `${titlu}\n\n${campuri.text}`,
   };
 }
@@ -192,7 +210,11 @@ export function compuneRedirectionare(d: CerereRedirectionare): Compus {
 
   return {
     subiect: titlu,
-    html: pagina(titlu, corp),
+    html: pagina(
+      titlu,
+      corp,
+      "Nu te costă nimic, iar termenul e 25 mai. Trei pași.",
+    ),
     text: `Bună, ${d.nume},
 
 Nu te costă nimic: impozitul pe venit îl plătești oricum, iar prin Formularul 230 alegi doar unde ajunge 3,5% din el.
@@ -233,7 +255,7 @@ export function compuneAnuntRedirectionare(d: CerereRedirectionare): Compus {
 
   return {
     subiect: `${titlu} — ${d.nume}`,
-    html: pagina(titlu, corp),
+    html: paginaInterna(titlu, corp, `${d.nume} · ${d.preferinta}`),
     text: `${titlu}\n\n${campuri.text}`,
   };
 }
@@ -256,4 +278,115 @@ export async function trimiteRedirectionare(
     ...compuneAnuntRedirectionare(d),
   });
   return { catreOm: true };
+}
+
+// ─── Formularul 230 completat pe hârtie ───────────────────────────────────
+
+const WHATSAPP = `https://wa.me/${TELEFON_PRINCIPAL.apel.replace(/\D/g, "")}`;
+
+/**
+ * Către om: am notat, dar hârtia încă n-a ajuns.
+ *
+ * Mesajul ăsta e singura urmă scrisă a unui gest care, altfel, se pierde: omul
+ * a completat formularul acasă, a bifat pe site că l-a completat, și de acolo
+ * mai are două lucruri de făcut — poza și hârtia. Nicio bază de date nu i le
+ * amintește, iar termenul e 25 mai.
+ *
+ * **Nu confirmă că am primit formularul**, pentru că nu l-am primit: site-ul
+ * nu primește poza și nu ține niciun CNP. Confirmă doar că știm să-l așteptăm.
+ */
+export function compuneFormular230(d: Formular230): Compus {
+  const titlu = "Am notat formularul tău 230";
+  const corp = `
+    <p style="${P}">Bună, ${curat(d.nume.split(" ")[0])},</p>
+    <p style="${P}">Ne-ai spus pe site că ai completat Formularul 230. Mulțumim — îți mai rămân două lucruri, și ambele contează:</p>
+    ${pasi([
+      `<strong>Poza formularului</strong>, pe WhatsApp la <strong>${curat(TELEFON_PRINCIPAL.afisat)}</strong> sau pe e-mail la <strong>${curat(EMAIL.redirectionare)}</strong>. O verificăm și-ți spunem dacă e completat bine, cât mai e timp de corectat.`,
+      `<strong>Hârtia semnată, în original</strong>, prin poștă la Casa Teona, ${curat(ADRESE.casaTeona.strada)}, ${curat(ADRESE.casaTeona.oras)} ${curat(ADRESE.casaTeona.cod)} — sau adusă personal. Fără ea, ANAF nu poate înregistra redirecționarea.`,
+    ])}
+    ${buton("Trimite poza pe WhatsApp", WHATSAPP)}
+    <p style="${P}"><strong>Termenul este 25 mai</strong>, pentru veniturile din anul anterior. Depunem formularul noi, în numele tău, și îți scriem când e depus.</p>
+    ${
+      d.ani === 2
+        ? `<p style="${MIC}">Ai bifat distribuirea pe <strong>doi ani</strong>, deci la anul nu mai trebuie să completezi nimic.</p>`
+        : `<p style="${MIC}">Formularul are și opțiunea de distribuire pe doi ani. Dacă o bifezi, la anul nu mai ai nimic de completat — dacă n-ai bifat-o, te căutăm noi.</p>`
+    }
+    <p style="${MIC}margin-bottom:0;">Nu ți-am cerut CNP-ul pe site și nu-l ținem nicăieri. Ai întrebări? Răspunde la mesajul ăsta sau sună la ${curat(TELEFON_PRINCIPAL.afisat)}.</p>`;
+
+  return {
+    subiect: titlu,
+    html: pagina(
+      titlu,
+      corp,
+      "Îți mai rămân poza pe WhatsApp și hârtia semnată prin poștă.",
+    ),
+    text: `Bună, ${d.nume},
+
+Ne-ai spus pe site că ai completat Formularul 230. Mulțumim — îți mai rămân două lucruri:
+
+1. Poza formularului, pe WhatsApp la ${TELEFON_PRINCIPAL.afisat} sau pe e-mail la ${EMAIL.redirectionare}. O verificăm și-ți spunem dacă e completat bine.
+2. Hârtia semnată, în original, prin poștă la Casa Teona, ${ADRESE.casaTeona.strada}, ${ADRESE.casaTeona.oras} ${ADRESE.casaTeona.cod} — sau adusă personal. Fără ea, ANAF nu poate înregistra redirecționarea.
+
+Termenul este 25 mai, pentru veniturile din anul anterior. Depunem formularul noi, în numele tău.
+${
+  d.ani === 2
+    ? "\nAi bifat distribuirea pe doi ani, deci la anul nu mai trebuie să completezi nimic.\n"
+    : "\nFormularul are și opțiunea de distribuire pe doi ani. Dacă o bifezi, la anul nu mai ai nimic de completat.\n"
+}
+Nu ți-am cerut CNP-ul pe site și nu-l ținem nicăieri. Ai întrebări? Răspunde la mesajul ăsta sau sună la ${TELEFON_PRINCIPAL.afisat}.
+
+${SEMNATURA_TEXT}`,
+  };
+}
+
+/** Către asociație: pe cine așteptăm cu hârtia. */
+export function compuneAnuntFormular230(d: Formular230): Compus {
+  const titlu = "A completat Formularul 230 pe hârtie";
+  const campuri = tabel([
+    ["Nume", d.nume],
+    ["E-mail", d.email],
+    ["Telefon", d.telefon ?? ""],
+    ["Pe câți ani", d.ani ? (d.ani === 2 ? "2 ani" : "1 an") : ""],
+  ]);
+
+  const corp = `
+    <p style="${P}">A bifat pe site că a completat formularul. <strong>Hârtia și poza n-au ajuns prin site</strong> — site-ul nu primește fișiere și nu ține niciun CNP. Caută-le pe WhatsApp și în ${curat(EMAIL.redirectionare)}.</p>
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 16px;">${campuri.html}</table>
+    <p style="${MIC}">I-am scris deja ce-i mai rămâne de făcut: poza pe WhatsApp și hârtia semnată prin poștă.</p>
+    ${buton("Deschide formularele 230", `${ADRESA_SITE}/admin/formulare`)}`;
+
+  return {
+    subiect: `${titlu} — ${d.nume}`,
+    html: paginaInterna(
+      titlu,
+      corp,
+      `${d.nume}${d.ani === 2 ? " · 2 ani" : ""} — de așteptat cu hârtia.`,
+    ),
+    text: `${titlu}
+
+${campuri.text}
+
+Hârtia și poza n-au ajuns prin site. Caută-le pe WhatsApp și în ${EMAIL.redirectionare}.
+
+${ADRESA_SITE}/admin/formulare`,
+  };
+}
+
+/**
+ * Amândouă. Întâi omul: el a făcut gestul și el are termen.
+ *
+ * Niciuna nu oprește nimic dacă nu pleacă — anunțul e deja în CRM, iar
+ * numărul lui stă în „De făcut acum".
+ */
+export async function trimiteFormular230(d: Formular230): Promise<void> {
+  await trimiteEmail({
+    catre: d.email,
+    raspundeLa: EMAIL.redirectionare,
+    ...compuneFormular230(d),
+  });
+  await trimiteEmail({
+    catre: EMAIL.redirectionare,
+    raspundeLa: d.email,
+    ...compuneAnuntFormular230(d),
+  });
 }

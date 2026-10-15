@@ -1,7 +1,7 @@
 import { ASOCIATIA, EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import { ADRESA_SITE } from "@/app/seo";
 import { curat, trimiteEmail } from "./trimite";
-import { MIC, P, buton, pagina } from "./plic";
+import { MIC, P, buton, paginaInterna, pagina } from "./plic";
 
 /**
  * E-mailurile modulului „Donează-ți ziua de naștere".
@@ -44,7 +44,11 @@ export function compuneTrimisa(d: Trimisa): Compus {
 
   return {
     subiect: titlu,
-    html: pagina(titlu, corp),
+    html: pagina(
+      titlu,
+      corp,
+      "O citim și o publicăm, de obicei în aceeași zi lucrătoare.",
+    ),
     text: `Bună, ${d.numePublic},\n\nȚi-am primit campania „${d.titlu}". O citim și o publicăm, de obicei în aceeași zi lucrătoare.\n\nPână atunci îți vezi pagina aici (e doar a ta, păstreaz-o):\n${privat}\n\n${ASOCIATIA.denumire}`,
   };
 }
@@ -71,7 +75,11 @@ export function compuneAnunt(d: Anunt): Compus {
 
   return {
     subiect: `${titlu}: ${d.titlu}`,
-    html: pagina(titlu, corp),
+    html: paginaInterna(
+      titlu,
+      corp,
+      `${d.numePublic} — nu apare pe site până n-o citește cineva.`,
+    ),
     text: `${d.numePublic} (${d.email}) a trimis campania „${d.titlu}".\n\nNu apare pe site până n-o citește cineva:\n${unde}`,
   };
 }
@@ -94,9 +102,7 @@ export function compuneHotarare(d: Hotarare): Compus {
   const adresa = `${ADRESA_SITE}/ziua-ta/${d.slug}`;
   const prenume = curat(d.numePublic.split(" ")[0]);
 
-  const titlu = d.publicata
-    ? "Campania ta e publicată"
-    : "Despre campania ta";
+  const titlu = d.publicata ? "Campania ta e publicată" : "Despre campania ta";
 
   const corp = d.publicata
     ? `
@@ -113,7 +119,13 @@ export function compuneHotarare(d: Hotarare): Compus {
 
   return {
     subiect: titlu,
-    html: pagina(titlu, corp),
+    html: pagina(
+      titlu,
+      corp,
+      d.publicata
+        ? "De acum o poți trimite prietenilor."
+        : "Îți scriem ce n-a mers și cum o putem rezolva.",
+    ),
     text: d.publicata
       ? `Bună, ${d.numePublic},\n\nCampania „${d.titlu}" e publicată:\n${adresa}\n\nMulțumim că te-ai gândit la copii de ziua ta.\n\n${ASOCIATIA.denumire}`
       : `Bună, ${d.numePublic},\n\nNu am putut publica campania „${d.titlu}" așa cum a fost trimisă.${d.motiv ? `\n\n${d.motiv}` : ""}\n\nO poți trimite din nou, schimbată, sau scrie-ne și o rezolvăm împreună. Sună la ${TELEFON_PRINCIPAL.afisat}.\n\n${ASOCIATIA.denumire}`,

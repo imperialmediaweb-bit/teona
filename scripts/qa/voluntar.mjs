@@ -22,6 +22,39 @@ async function stare(eticheta) {
   log(`\n[${eticheta}] pas="${pas.replace(/\s+/g, " ")}" titlu="${titlu}" erori=${JSON.stringify(mesaje)} alert=${JSON.stringify(alert)} focus=${activ}`);
 }
 
+
+/*
+  Data nașterii nu mai e un `input[type="date"]`, ci trei liste.
+
+  Calendarul nativ se deschidea pe anul curent și se defila doar înainte: ca
+  să ajungă la 1990, un om de 36 de ani trebuia să deruleze 36 de ani. Trei
+  liste — ziua, luna, anul — se aleg din două apăsări, iar anii încep de la
+  cel curent și merg în jos. Proba trebuie să le aleagă la fel, pe
+  `aria-label`: listele n-au `name`, câmpul trimis e `input[name="nastere"]`,
+  ascuns, compus din ele.
+*/
+async function scrieNasterea(page, iso) {
+  if (!iso) return;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!m) {
+    log("  (dată pe care listele n-o pot reprezenta:", iso, ")");
+    return;
+  }
+  const [, an, luna, zi] = m;
+  // Luna întâi: ea hotărăște câte zile are lista zilelor.
+  for (const [eticheta, valoare] of [
+    ["Luna nașterii", String(Number(luna))],
+    ["Anul nașterii", an],
+    ["Ziua nașterii", String(Number(zi))],
+  ]) {
+    await page
+      .selectOption(`select[aria-label="${eticheta}"]`, valoare)
+      .catch((e) =>
+        log(`  (${eticheta} = ${valoare} a eșuat:`, e.message.split("\n")[0], ")"),
+      );
+  }
+}
+
 const azi = new Date();
 const iso = (d) => d.toISOString().slice(0, 10);
 const cu18 = new Date(azi.getFullYear() - 18, azi.getMonth(), azi.getDate());
@@ -47,7 +80,7 @@ await stare("Enter la pasul 1, câmpuri goale");
 await deschide();
 await page.fill('input[name="nume"]', "Ion Popescu");
 await page.fill('input[name="email"]', "ion@example.com");
-await page.fill('input[name="nastere"]', "1990-05-05");
+await scrieNasterea(page, "1990-05-05");
 await page.press('input[name="nume"]', "Enter");
 await page.waitForTimeout(400);
 await stare("Enter la pasul 1 cu date valide (unde ajung?)");
@@ -57,7 +90,7 @@ for (const [d, nume] of [[iso(cu18), "exact 18 ani azi"], [iso(ieri18), "18 ani 
   await deschide();
   await page.fill('input[name="nume"]', "Ion Popescu");
   await page.fill('input[name="email"]', "ion@example.com");
-  if (d) await page.fill('input[name="nastere"]', d).catch((e) => log("  (fill a eșuat:", e.message.split("\n")[0], ")"));
+  await scrieNasterea(page, d);
   await page.click('button:has-text("Continuă")');
   await page.waitForTimeout(300);
   await stare(`naștere = ${d || "(gol)"} — ${nume}`);
@@ -68,7 +101,7 @@ await deschide();
 await page.fill('input[name="nume"]', "Ion Popescu");
 await page.fill('input[name="email"]', "ion@example.com");
 await page.fill('input[name="telefon"]', "0700000000");
-await page.fill('input[name="nastere"]', "1990-05-05");
+await scrieNasterea(page, "1990-05-05");
 await page.fill('input[name="localitate"]', "Suceava");
 await page.click('button:has-text("Continuă")');
 await page.waitForTimeout(200);
@@ -82,11 +115,11 @@ await page.waitForTimeout(200);
 await page.click('button:has-text("Înapoi")');
 await page.waitForTimeout(200);
 log("\nDupă două Înapoi: nume=", await page.inputValue('input[name="nume"]'), " telefon=", await page.inputValue('input[name="telefon"]'), " localitate=", await page.inputValue('input[name="localitate"]'));
-await page.fill('input[name="nastere"]', iso(maine18)); // devin minor
+await scrieNasterea(page, iso(maine18)); // devin minor
 await page.click('button:has-text("Continuă")');
 await page.waitForTimeout(200);
 await stare("schimb data la minor și Continuă");
-await page.fill('input[name="nastere"]', "1990-05-05");
+await scrieNasterea(page, "1990-05-05");
 await page.click('button:has-text("Continuă")');
 await page.waitForTimeout(200);
 log("Pas 2 păstrat: Zilnic=", await page.isChecked('input[name="disponibilitate"][value="Zilnic"]'), " limbi=", await page.inputValue('input[name="limbi"]'));
@@ -116,7 +149,7 @@ log("Text zona formular:", text.replace(/\s+/g, " ").slice(0, 400));
 await deschide();
 await page.fill('input[name="nume"]', "Ion Popescu");
 await page.fill('input[name="email"]', "ion@example.com");
-await page.fill('input[name="nastere"]', "1990-05-05");
+await scrieNasterea(page, "1990-05-05");
 await page.click('button:has-text("Continuă")');
 await page.click('button:has-text("Continuă")');
 await page.waitForTimeout(200);

@@ -1,6 +1,13 @@
-import { email as emailValid, esteRobot, limitaDeRata, raspuns, text } from "@/lib/api";
+import {
+  email as emailValid,
+  esteRobot,
+  limitaDeRata,
+  raspuns,
+  text,
+} from "@/lib/api";
 import { areBazaDeDate } from "@/lib/baza";
 import { salveazaCerere } from "@/lib/crm";
+import { trimiteFormular230 } from "@/lib/email/formulare";
 import { EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
 
 /**
@@ -80,8 +87,23 @@ export async function POST(cerere: Request) {
     },
   });
 
+  /*
+    Confirmarea, după ce anunțul e în CRM.
+
+    Omul a completat formularul acasă și i-au mai rămas două lucruri de făcut
+    — poza și hârtia —, pe care nimeni nu i le mai amintește, iar termenul e
+    25 mai. Mesajul le scrie negru pe alb, cu numărul de WhatsApp și adresa
+    Casei Teona, ca să le aibă când se așază cu plicul în față.
+  */
+  await trimiteFormular230({
+    nume,
+    email: camp("email"),
+    telefon: camp("telefon") || undefined,
+    ani,
+  });
+
   return raspuns(
-    "Am notat, mulțumim! Mai rămâne un lucru: trimite-ne poza formularului pe WhatsApp și hârtia semnată prin poștă sau adu-o la Casa Teona. Fără hârtie, ANAF nu poate înregistra redirecționarea.",
+    "Am notat, mulțumim! Ți-am trimis pe e-mail și ce-ți mai rămâne de făcut: poza formularului pe WhatsApp și hârtia semnată prin poștă sau adusă la Casa Teona. Fără hârtie, ANAF nu poate înregistra redirecționarea.",
     200,
   );
 }

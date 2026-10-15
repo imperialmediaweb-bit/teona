@@ -40,7 +40,6 @@ import {
  */
 
 const PORTOCALIU = "#b82b09";
-const PORTOCALIU_INCHIS = "#93250e";
 const TURCOAZ = "#1e454a";
 const CERNEALA = "#232323";
 const MOALE = "#616161";
@@ -268,15 +267,6 @@ function pasi(lista: string[]) {
 }
 
 /* ── Partea de jos, aceeași la amândouă ──────────────────────────────── */
-
-function retele(fel: FelSablon, campanie: string | null | undefined) {
-  void fel;
-  void campanie;
-  return RETELE_ASOCIATIE.map(
-    (r) =>
-      `<a href="${r.url}" style="font-family:${FONT};font-size:14px;font-weight:bold;color:${PORTOCALIU};text-decoration:none;padding:0 10px;">${r.nume}</a>`,
-  ).join("");
-}
 
 function subsol(continut: ContinutCampanie) {
   // MailerLite cere un link de dezabonare în orice HTML propriu. `{$unsubscribe}`

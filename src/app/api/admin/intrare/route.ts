@@ -24,6 +24,7 @@ const PAGINI = new Set([
   "/admin/rapoarte",
   "/admin/analiza",
   "/admin/sabloane",
+  "/admin/emailuri",
 ]);
 
 function unde(formular: FormData | null): string {

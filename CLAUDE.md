@@ -180,6 +180,14 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
   pragul e în `src/lib/plati/donatori.ts`).
 - **Formularele 230** primite de pe site, cu fișierul lor, sunt la
   `/admin/formulare`.
+- **`/admin/emailuri` — toate mesajele pe care le trimite site-ul**, compuse cu
+  date de probă („Maria Popescu", „Firma de probă SRL"), separate în ce primesc
+  oamenii și ce primiți voi. Se deschid, se citesc, nu se trimite nimic de
+  acolo. Până la ea, singurul fel de a vedea ce primește un donator era să
+  donezi — iar un telefon vechi sau o frază neterminată ar fi stat acolo ani.
+  Jos, pagina scrie și **ce nu pleacă de la sine, dinadins**: buletinele (alea
+  sunt din MailerLite), mulțumirea când transferul nu se găsește, confirmarea
+  că Formularul 230 a ajuns la ANAF.
 - **Transferul bancar: donatorul bifează, asociația confirmă.** Transferul nu
   trece prin site, deci site-ul nu poate ști că s-a făcut: banii apar în
   extrasul de cont, pe care îl citește un om. Pe `/doneaza`, în cardul cu
@@ -190,6 +198,10 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
   ar putea umfla raportul anual dintr-un browser. În panou, la `/admin/donatii`,
   apare sus, cu „Am găsit-o în extras" (devine donație, cu data scrisă de
   donator) și „N-am găsit-o". Numărul lor stă și în „De făcut acum".
+  La anunț pleacă două mesaje — confirmarea către donator („îl căutăm în
+  extras", nu o chitanță) și anunțul către asociație; mulțumirea adevărată
+  pleacă abia la „Am găsit-o în extras", cu data scrisă de donator, nu cu
+  ziua apăsării. La „N-am găsit-o" nu pleacă nimic, dinadins.
   Probă: `BAZA=http://localhost:3000 node scripts/qa/transfer-anuntat.mjs`
   (nu cere bază de date și nici parolă).
 - **Căile de plată se văd toate din capul formularului de card**: „Card",
@@ -223,6 +235,32 @@ la orice lățime peste 1300 px — ci în subsol.
 Textele stau în tabelul `texte`, nu în cod. Probe:
 `BAZA=… PAROLA_ADMIN=… node scripts/qa/scrie-pe-site.mjs` și
 `… node scripts/qa/panou-fundraising.mjs`.
+
+## Mesajele automate: un singur plic
+
+Toate e-mailurile tranzacționale — mulțumiri, confirmări, pașii fiscali,
+contractul, intrarea în cont, anunțurile către asociație — trec prin
+`pagina()` din `src/lib/email/plic.ts`: bandă portocalie cu siglă sus,
+corpul, rețelele, apoi datele asociației (denumire legală, CIF, Casa Teona,
+amândouă telefoanele, e-mailul). Se schimbă o dată pentru toate: un telefon
+nou nu se mai uită într-un fișier.
+
+- **Nicio dezabonare.** De la o chitanță nu te dezabonezi, iar un link de
+  dezabonare pe un mesaj tranzacțional îi învață pe oameni să se dezaboneze
+  de la confirmări. Campaniile din MailerLite au alt plic
+  (`campanie-sabloane.ts`), cu dezabonare, cum cere legea și MailerLite.
+- **`paginaInterna()`** e același plic pentru mesajele către asociație.
+  Diferă un singur rând, cel de jos: „Primești mesajul ăsta pentru că ai
+  scris sau ai donat pe…" e adevărat despre un donator și fals despre adresa
+  de contact. Un rând care minte într-un mesaj automat e felul în care nimeni
+  nu mai citește rândurile mărunte.
+- **Rândul de previzualizare** (al treilea argument) e ce arată Gmail în listă
+  după subiect. Fără el, clientul ia primele cuvinte din mesaj — adică
+  antetul, adică numele asociației, care scrie deja la expeditor.
+- Regulile de randare: tabele pentru așezare, stiluri în linie, 600 px,
+  butoanele din celule cu `bgcolor` (Outlook randează cu motorul Word și
+  ignoră fundalul unui `<a>`; Gmail taie `<style>` din `<head>`).
+- Toate se văd la **`/admin/emailuri`**, compuse cu date de probă.
 
 ## Asistentul de pe site
 
@@ -274,6 +312,10 @@ prin poștă, și spune pe site că a completat.
   `/admin/formulare`, care adaugă legătura de WhatsApp și eticheta „2 ani".
 - **„Pe câți ani"** se întreabă pentru că formularul are opțiunea de
   distribuire pe doi ani: cine a bifat-o nu mai trebuie căutat la anul.
+- **După anunț pleacă un e-mail** cu ce i-a mai rămas de făcut — poza pe
+  WhatsApp și hârtia semnată prin poștă, cu adresa Casei Teona —, pentru că
+  nimeni nu i le mai amintește și termenul e 25 mai. Nu confirmă că am primit
+  formularul: nu l-am primit. Că a ajuns la ANAF scrie un om, nu site-ul.
 - **R2 rămâne doar pentru fișierul 230 gol**, cel pe care îl descarcă oamenii.
   N-are nicio dată personală în el. Chei în Railway: `R2_ACCOUNT_ID`,
   `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, plus `R2_ENDPOINT`

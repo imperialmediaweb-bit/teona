@@ -1,5 +1,15 @@
-import { ASOCIATIA, EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
+import { ADRESA_SITE } from "@/app/seo";
+import {
+  ADRESE,
+  ASOCIATIA,
+  EMAIL,
+  RETELE_ASOCIATIE,
+  TELEFOANE,
+} from "@/date/asociatie";
 import { curat } from "./trimite";
+
+/** Sigla, ca fișier servit de site: într-un e-mail, adresele trebuie întregi. */
+const SIGLA = `${ADRESA_SITE}/poze/2024/11/cropped-Screenshot11removebgpreview-2512x512-1.png`;
 
 /**
  * Plicul e-mailurilor tranzacționale: confirmări, mulțumiri, formulare.
@@ -69,26 +79,110 @@ export function pasi(randuri: string[]): string {
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 6px;">${celule}</table>`;
 }
 
-/** Antetul cu denumirea asociației, corpul, și datele de contact jos. */
-export function pagina(titlu: string, corp: string): string {
+/**
+ * Plicul: antet cu siglă, corpul, și datele de contact jos.
+ *
+ * **De ce arată ca pe site.** Un e-mail de confirmare care începe cu o linie
+ * de text și se termină cu două rânduri mărunte seamănă cu o notificare de
+ * bancă. Omul tocmai a donat sau tocmai a cerut ceva de la asociație: are
+ * dreptul să recunoască asociația din prima privire. Sigla și banda portocalie
+ * sunt aceleași ca în șabloanele de campanie.
+ *
+ * **De ce datele de contact întregi jos.** Telefoanele, adresa de e-mail,
+ * Casa Teona și rețelele. Un mesaj de la o asociație e și locul de unde omul
+ * află cum să dea de ea — mai ales dacă ceva n-a mers cum trebuia. Înainte
+ * erau un telefon și o adresă, pe un rând.
+ *
+ * **Ce rămâne altfel decât la campanii:** nicio dezabonare. De la o chitanță
+ * nu te dezaboneszi, iar un link de dezabonare pe un e-mail tranzacțional îi
+ * învață pe oameni să se dezaboneze de la confirmări.
+ *
+ * `previzualizare` e rândul pe care îl arată Gmail și Apple Mail în listă,
+ * după subiect. Nelăsat, clientul ia primele cuvinte din mesaj — și acolo
+ * începe antetul, deci în listă ar apărea „Asociația Teona Ariana Suceava”,
+ * adică exact ce scrie și la expeditor. Rândul stă ascuns în pagină: nu se
+ * vede la deschiderea mesajului, doar în listă.
+ */
+export function pagina(
+  titlu: string,
+  corp: string,
+  previzualizare?: string,
+): string {
+  return invelis(titlu, corp, previzualizare, false);
+}
+
+/**
+ * Același plic, pentru mesajele care pleacă în casa asociației.
+ *
+ * Se deosebesc printr-un singur rând, cel de jos de tot. „Primești mesajul
+ * ăsta pentru că ai scris sau ai donat pe teona-ariana.ro" e adevărat despre
+ * un donator și fals despre adresa de contact a asociației, care primește
+ * anunțurile fiindcă e adresa asociației. Un rând care minte într-un mesaj
+ * automat e felul în care nimeni nu mai citește rândurile mărunte.
+ */
+export function paginaInterna(
+  titlu: string,
+  corp: string,
+  previzualizare?: string,
+): string {
+  return invelis(titlu, corp, previzualizare, true);
+}
+
+function invelis(
+  titlu: string,
+  corp: string,
+  previzualizare: string | undefined,
+  interna: boolean,
+): string {
+  const retele = RETELE_ASOCIATIE.map(
+    (r) =>
+      `<a href="${r.url}" style="font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:${CULORI.accent};text-decoration:none;padding:0 8px;">${r.nume}</a>`,
+  ).join("");
+
   return `<!doctype html>
-<html lang="ro"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><title>${curat(titlu)}</title></head>
+<html lang="ro"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><meta name="color-scheme" content="light" /><title>${curat(titlu)}</title></head>
 <body style="margin:0;padding:0;background-color:${CULORI.fundal};">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${CULORI.fundal};">
-    <tr><td align="center" style="padding:24px 12px;">
+  ${previzualizare ? `<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:${CULORI.fundal};">${curat(previzualizare)}</div>` : ""}
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${CULORI.fundal}" style="background-color:${CULORI.fundal};">
+    <tr><td align="center" style="padding:24px 12px 32px;">
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background-color:${CULORI.card};border-radius:16px;overflow:hidden;">
-        <tr><td style="height:6px;background-color:${CULORI.accent};font-size:0;line-height:0;">&nbsp;</td></tr>
-        <tr><td align="center" style="padding:28px 32px 0;">
-          <p style="margin:0;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;color:${CULORI.accent};">${curat(ASOCIATIA.denumire)}</p>
-          <h1 style="margin:12px 0 0;font-family:Arial,sans-serif;font-size:25px;line-height:1.3;color:${CULORI.cerneala};">${curat(titlu)}</h1>
+
+        <tr><td align="center" bgcolor="${CULORI.accent}" style="background-color:${CULORI.accent};padding:22px 32px 18px;">
+          <img src="${SIGLA}" alt="" width="44" height="44" style="display:block;border:0;margin:0 auto 8px;" />
+          <p style="margin:0;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:#ffffff;">${curat(ASOCIATIA.denumire)}</p>
         </td></tr>
-        <tr><td style="padding:22px 32px 30px;">${corp}</td></tr>
-        <tr><td style="padding:0 32px 28px;">
+
+        <tr><td style="padding:28px 32px 0;">
+          <h1 style="margin:0;font-family:Arial,sans-serif;font-size:25px;line-height:1.3;color:${CULORI.cerneala};">${curat(titlu)}</h1>
+        </td></tr>
+
+        <tr><td style="padding:22px 32px 26px;">${corp}</td></tr>
+
+        <tr><td style="padding:0 32px 22px;">
+          <div style="height:1px;background-color:#efe7e1;font-size:0;line-height:0;">&nbsp;</div>
+        </td></tr>
+
+        <tr><td align="center" style="padding:0 32px 18px;">${retele}</td></tr>
+
+        <tr><td style="padding:0 32px 30px;">
+          <p style="margin:0 0 6px;font-family:Arial,sans-serif;font-size:13px;line-height:1.6;color:${CULORI.moale};">
+            <strong style="color:${CULORI.cerneala};">${curat(ASOCIATIA.denumireLegala)}</strong> · CIF ${curat(ASOCIATIA.cif)}
+          </p>
+          <p style="margin:0 0 6px;font-family:Arial,sans-serif;font-size:13px;line-height:1.6;color:${CULORI.moale};">
+            ${curat(ADRESE.casaTeona.nume)}: ${curat(ADRESE.casaTeona.strada)}, ${curat(ADRESE.casaTeona.oras)} ${curat(ADRESE.casaTeona.cod)}
+          </p>
           <p style="margin:0;font-family:Arial,sans-serif;font-size:13px;line-height:1.6;color:${CULORI.moale};">
-            ${curat(ASOCIATIA.denumireLegala)} · CIF ${curat(ASOCIATIA.cif)}<br />
-            ${curat(TELEFON_PRINCIPAL.afisat)} · ${curat(EMAIL.contact)}
+            ${TELEFOANE.map((t) => `<a href="tel:${t.apel}" style="color:${CULORI.moale};text-decoration:none;">${curat(t.afisat)}</a>`).join(" · ")} · <a href="mailto:${EMAIL.contact}" style="color:${CULORI.moale};">${curat(EMAIL.contact)}</a>
+          </p>
+          <p style="margin:12px 0 0;font-family:Arial,sans-serif;font-size:12px;line-height:1.6;color:${CULORI.moale};">
+            ${
+              interna
+                ? `Mesaj automat de pe ${curat(ADRESA_SITE.replace(/^https?:\/\//, ""))}. Nu e trimis de un om și nu-i poate răspunde nimeni — răspunsul pleacă la cel care a completat formularul.`
+                : `Primești mesajul ăsta pentru că ai scris sau ai donat pe ${curat(ADRESA_SITE.replace(/^https?:\/\//, ""))}.`
+            }
           </p>
         </td></tr>
+
       </table>
     </td></tr>
   </table>

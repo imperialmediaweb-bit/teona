@@ -7,8 +7,11 @@ import {
   text,
   textOptional,
 } from "@/lib/api";
-import { EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
-import { areEmail, curat, tabel, trimiteEmail } from "@/lib/email/trimite";
+import { areEmail } from "@/lib/email/trimite";
+import {
+  trimiteConfirmareaDeContact,
+  trimiteMesajulDeContact,
+} from "@/lib/email/contact";
 import { areBazaDeDate } from "@/lib/baza";
 import { salveazaCerere } from "@/lib/crm";
 
@@ -186,8 +189,7 @@ export async function POST(cerere: Request) {
     );
   }
 
-
-  const campuri = tabel([
+  const campuri: Array<[string, string]> = [
     ["Nume", numeleOmului],
     ["E-mail", adresaOmului],
     ["Telefon", String(corp.telefon ?? "")],
@@ -205,19 +207,16 @@ export async function POST(cerere: Request) {
     ["Cum a aflat", String(corp.aflat ?? "")],
     ["Motivul", String(corp.motiv ?? "")],
     ["Mesaj", String(corp.mesaj ?? "")],
-  ]);
+  ];
 
-  const titlu = voluntariat
-    ? "Cerere nouă de voluntariat"
-    : "Mesaj nou de pe site";
+  const mesaj = {
+    nume: numeleOmului,
+    email: adresaOmului,
+    voluntariat,
+    campuri,
+  };
 
-  const catreAsociatie = await trimiteEmail({
-    catre: EMAIL.contact,
-    subiect: `${titlu}${numeleOmului ? ` — ${numeleOmului}` : ""}`,
-    raspundeLa: adresaOmului,
-    text: `${titlu}\n\n${campuri.text}`,
-    html: `<h2 style="font-family:Arial,sans-serif;color:#232323;">${curat(titlu)}</h2><table cellpadding="0" cellspacing="0">${campuri.html}</table>`,
-  });
+  const catreAsociatie = await trimiteMesajulDeContact(mesaj);
 
   if (!catreAsociatie) {
     // Mesajul n-a ajuns la asociație. Omul trebuie să afle, nu să plece
@@ -230,15 +229,7 @@ export async function POST(cerere: Request) {
 
   // Confirmarea către om. Dacă ea nu pleacă, nu e grav: mesajul lui a ajuns
   // deja unde trebuie, iar asociația îl va contacta.
-  await trimiteEmail({
-    catre: adresaOmului,
-    subiect: voluntariat
-      ? "Am primit cererea ta de voluntariat"
-      : "Am primit mesajul tău",
-    raspundeLa: EMAIL.contact,
-    text: `${numeleOmului ? `Bună, ${numeleOmului}` : "Bună"},\n\nȚi-am primit ${voluntariat ? "cererea de voluntariat" : "mesajul"} și îți răspundem cât putem de repede.\n\nDacă e urgent, sună-ne la ${TELEFON_PRINCIPAL.afisat}.\n\nAsociația Teona Ariana Suceava`,
-    html: `<p style="font-family:Arial,sans-serif;font-size:16px;color:#232323;">${curat(numeleOmului ? `Bună, ${numeleOmului}` : "Bună")},</p><p style="font-family:Arial,sans-serif;font-size:16px;color:#232323;">Ți-am primit ${voluntariat ? "cererea de voluntariat" : "mesajul"} și îți răspundem cât putem de repede.</p><p style="font-family:Arial,sans-serif;font-size:16px;color:#232323;">Dacă e urgent, sună-ne la <strong>${curat(TELEFON_PRINCIPAL.afisat)}</strong>.</p><p style="font-family:Arial,sans-serif;font-size:15px;color:#616161;">Asociația Teona Ariana Suceava</p>`,
-  });
+  await trimiteConfirmareaDeContact(mesaj);
 
   return raspuns(
     voluntariat

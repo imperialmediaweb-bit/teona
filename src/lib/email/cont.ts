@@ -30,7 +30,11 @@ export function compuneIntrare(d: {
 
   return {
     subiect: titlu,
-    html: pagina(titlu, corp),
+    html: pagina(
+      titlu,
+      corp,
+      "Linkul merge o singură dată și expiră în 20 de minute.",
+    ),
     text: `${d.numeMic ? `Bună, ${d.numeMic}` : "Bună"},
 
 Deschide linkul ca să-ți vezi donațiile. Nu-ți trebuie parolă:

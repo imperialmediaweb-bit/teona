@@ -87,6 +87,11 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
         eticheta: "Șabloane de e-mail",
         pictograma: "plic",
       },
+      {
+        href: "/admin/emailuri",
+        eticheta: "Mesajele trimise",
+        pictograma: "plic",
+      },
       { href: "/admin/poze", eticheta: "Poze", pictograma: "arta" },
     ],
   },
@@ -345,7 +350,7 @@ export default function Cadru({
           orice imagine străină cu adresa aceea ar fi dat afară omul din panou.
         */}
         <div className="flex items-center justify-between gap-2 border-t border-hartie/10 px-3 py-2 lg:grid lg:gap-0.5 lg:py-2.5">
-          <a
+          <Link
             href="/"
             className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 font-titlu text-nota font-semibold whitespace-nowrap text-hartie/65 transition-colors hover:bg-hartie/10 hover:text-hartie"
           >
@@ -355,7 +360,7 @@ export default function Cadru({
               className="size-3.5 shrink-0 -rotate-45"
             />
             Vezi site-ul
-          </a>
+          </Link>
           <Suspense fallback={null}>
             <Iesirea />
           </Suspense>

@@ -7,6 +7,7 @@ import {
 } from "@/lib/api";
 import { areBazaDeDate } from "@/lib/baza";
 import { anuntaTransfer } from "@/lib/plati/donatori";
+import { anuntaTransferulPeEmail } from "@/lib/email/transfer";
 import { citesteSuma } from "@/lib/suma";
 import { esteDestinatie, inBani, sumaAcceptata } from "@/date/plati";
 import { EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
@@ -119,10 +120,11 @@ export async function POST(cerere: Request) {
     transferuri de căutat în extras. Două transferuri chiar diferite
     (altă zi, altă sumă) au referințe diferite și intră amândouă.
   */
-  const referinta = `${data} · ${suma} lei · ${adresa || camp("telefon") || nume}`.slice(
-    0,
-    120,
-  );
+  const referinta =
+    `${data} · ${suma} lei · ${adresa || camp("telefon") || nume}`.slice(
+      0,
+      120,
+    );
 
   const rezultat = await anuntaTransfer({
     referinta,
@@ -135,6 +137,24 @@ export async function POST(cerere: Request) {
     observatii: text(camp("observatii"), 1_000) ?? undefined,
   });
 
+  /*
+    Mesajele pleacă după ce anunțul e în bază, nu înainte: un e-mail trimis
+    pentru un rând care n-a intrat ar trimite asociația să caute în extras un
+    transfer care nu e nicăieri. Dacă trimiterea cade, anunțul rămâne —
+    numărul lui stă oricum în „De făcut acum".
+  */
+  if (rezultat.ok) {
+    await anuntaTransferulPeEmail({
+      nume,
+      email: emailValid(adresa) ?? undefined,
+      telefon: text(camp("telefon"), 40) ?? undefined,
+      sumaBani: inBani(suma),
+      destinatie,
+      data: cand.toISOString(),
+      observatii: text(camp("observatii"), 1_000) ?? undefined,
+    });
+  }
+
   if (!rezultat.ok) {
     return raspuns(
       rezultat.motiv === "duplicat"
@@ -145,8 +165,10 @@ export async function POST(cerere: Request) {
   }
 
   return raspuns(
-    "Mulțumim! Am notat transferul și îl căutăm în extrasul de cont. Dacă ai nevoie de o confirmare scrisă, scrie-ne la " +
-      `${EMAIL.contact}.`,
+    adresa
+      ? "Mulțumim! Am notat transferul și îl căutăm în extrasul de cont. Ți-am trimis pe e-mail ce ne-ai scris, iar când găsim transferul îți scriem din nou."
+      : "Mulțumim! Am notat transferul și îl căutăm în extrasul de cont. Dacă ai nevoie de o confirmare scrisă, scrie-ne la " +
+          `${EMAIL.contact}.`,
     200,
   );
 }

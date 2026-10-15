@@ -66,8 +66,7 @@ const CONDITII: Record<Filtru, string> = {
     tăcut patru luni s-a oprit, și de obicei dintr-un motiv care se poate
     afla cu un telefon.
   */
-  opriti:
-    "COUNT(*) > 1 AND MAX(d.platita_la) < now() - interval '4 months'",
+  opriti: "COUNT(*) > 1 AND MAX(d.platita_la) < now() - interval '4 months'",
   /*
     Donatori mari: peste 1.000 de lei adunat.
 
@@ -79,7 +78,7 @@ const CONDITII: Record<Filtru, string> = {
   "fara-acord": "NOT bool_or(d.acord_buletin)",
   // Au bifat acordul, dar n-au ajuns încă în MailerLite — de obicei pentru că
   // cheia a venit după ce au donat ei.
-  "neduși": "bool_or(d.acord_buletin) AND NOT bool_or(d.dus_la_buletin)",
+  neduși: "bool_or(d.acord_buletin) AND NOT bool_or(d.dus_la_buletin)",
 };
 
 export async function donatori(
@@ -257,7 +256,8 @@ export function numeleMetodei(procesator: string): string {
   if (manuala) return manuala.eticheta;
   if (procesator === "stripe") return "Card (Stripe)";
   if (procesator === "paypal") return "PayPal";
-  if (procesator === TRANSFER_ANUNTAT) return "Transfer bancar (anunțat pe site)";
+  if (procesator === TRANSFER_ANUNTAT)
+    return "Transfer bancar (anunțat pe site)";
   return procesator;
 }
 
@@ -305,9 +305,7 @@ export async function adaugaDonatieManuala(date: {
         date.adaugatDe ?? null,
       ],
     );
-    return randuri.length > 0
-      ? { ok: true }
-      : { ok: false, motiv: "duplicat" };
+    return randuri.length > 0 ? { ok: true } : { ok: false, motiv: "duplicat" };
   } catch {
     return { ok: false, motiv: "eroare" };
   }
@@ -434,22 +432,47 @@ export async function cateTransferuriAnuntate(): Promise<number> {
  * Cere starea `anuntata` în `WHERE`, deci a doua apăsare pe buton nu mai
  * schimbă nimic: dacă doi oameni deschid panoul deodată, al doilea află că
  * n-a mai avut ce să confirme.
+ *
+ * Întoarce datele rândului, nu doar „s-a schimbat": din ele se scrie
+ * mulțumirea către donator. `RETURNING` pe același `UPDATE`, nu un `SELECT`
+ * după, ca mulțumirea să plece o singură dată — exact pentru apăsarea care a
+ * schimbat starea, nu pentru a doua.
  */
 export async function hotarasteTransfer(
   id: string,
   confirmat: boolean,
-): Promise<boolean> {
-  const randuri = await intreaba<{ id: string }>(
+): Promise<{
+  email: string | null;
+  nume: string | null;
+  sumaBani: number;
+  destinatie: string;
+  cand: string;
+} | null> {
+  const randuri = await intreaba<{
+    email: string | null;
+    nume: string | null;
+    suma_bani: string;
+    destinatie: string;
+    platita_la: Date | null;
+  }>(
     `UPDATE donatii
         SET stare = $2,
             platita_la = CASE WHEN $2 = 'platita'
                               THEN COALESCE(platita_la, now())
                               ELSE platita_la END
       WHERE id = $1 AND stare = 'anuntata'
-      RETURNING id`,
+      RETURNING email, nume, suma_bani, destinatie, platita_la`,
     [id, confirmat ? "platita" : "respinsa"],
   );
-  return randuri.length > 0;
+  const r = randuri[0];
+  if (!r) return null;
+  return {
+    email: r.email,
+    nume: r.nume,
+    sumaBani: Number(r.suma_bani),
+    destinatie: r.destinatie,
+    cand: r.platita_la?.toISOString() ?? new Date().toISOString(),
+  };
 }
 
 export type Donatie = {
@@ -505,8 +528,7 @@ export async function donatii(limita = 100): Promise<Donatie[]> {
     frecventa: r.frecventa,
     destinatie: r.destinatie,
     email: r.email,
-    nume:
-      [r.prenume, r.nume].filter(Boolean).join(" ").trim() || null,
+    nume: [r.prenume, r.nume].filter(Boolean).join(" ").trim() || null,
     platitaLa: r.platita_la?.toISOString() ?? "",
     observatii: r.observatii,
   }));
@@ -653,8 +675,8 @@ export async function schimbaAcordul(
   email: string,
   acord: boolean,
 ): Promise<void> {
-  await intreaba(
-    "UPDATE donatii SET acord_buletin = $2 WHERE email = $1",
-    [email, acord],
-  );
+  await intreaba("UPDATE donatii SET acord_buletin = $2 WHERE email = $1", [
+    email,
+    acord,
+  ]);
 }
