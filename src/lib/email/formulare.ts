@@ -10,6 +10,7 @@ import {
 } from "@/date/asociatie";
 import { curat, tabel, trimiteEmail } from "./trimite";
 import { MIC, P, buton, caseta, paginaInterna, pagina, pasi } from "./plic";
+import { alege } from "./variante";
 import type { Compus } from "./campanie";
 
 /**
@@ -295,11 +296,21 @@ const WHATSAPP = `https://wa.me/${TELEFON_PRINCIPAL.apel.replace(/\D/g, "")}`;
  * **Nu confirmă că am primit formularul**, pentru că nu l-am primit: site-ul
  * nu primește poza și nu ține niciun CNP. Confirmă doar că știm să-l așteptăm.
  */
+/* Cinci variante, alese ca la mulțumiri (`variante.ts`). */
+const DESCHIDERI_230 = [
+  "Ne-ai spus pe site că ai completat Formularul 230. Mulțumim — îți mai rămân două lucruri, și ambele contează:",
+  "Am notat că ai completat Formularul 230. Mulțumim că te-ai gândit la copiii de aici. Mai sunt două lucruri de făcut:",
+  "Mulțumim că ai completat Formularul 230. Partea grea a trecut; au mai rămas două lucruri, amândouă scurte:",
+  "Ți-am notat anunțul. 3,5% din impozitul pe care oricum îl plătești ajunge la copii — dacă mai faci două lucruri:",
+  "Am primit anunțul tău. Formularul e completat, dar încă n-a ajuns la noi: mai sunt doi pași, ăștia:",
+] as const;
+
 export function compuneFormular230(d: Formular230): Compus {
   const titlu = "Am notat formularul tău 230";
+  const deschidere = alege(DESCHIDERI_230, d.email, new Date());
   const corp = `
     <p style="${P}">Bună, ${curat(d.nume.split(" ")[0])},</p>
-    <p style="${P}">Ne-ai spus pe site că ai completat Formularul 230. Mulțumim — îți mai rămân două lucruri, și ambele contează:</p>
+    <p style="${P}font-size:18px;">${curat(deschidere)}</p>
     ${pasi([
       `<strong>Poza formularului</strong>, pe WhatsApp la <strong>${curat(TELEFON_PRINCIPAL.afisat)}</strong> sau pe e-mail la <strong>${curat(EMAIL.redirectionare)}</strong>. O verificăm și-ți spunem dacă e completat bine, cât mai e timp de corectat.`,
       `<strong>Hârtia semnată, în original</strong>, prin poștă la Casa Teona, ${curat(ADRESE.casaTeona.strada)}, ${curat(ADRESE.casaTeona.oras)} ${curat(ADRESE.casaTeona.cod)} — sau adusă personal. Fără ea, ANAF nu poate înregistra redirecționarea.`,
@@ -322,7 +333,7 @@ export function compuneFormular230(d: Formular230): Compus {
     ),
     text: `Bună, ${d.nume},
 
-Ne-ai spus pe site că ai completat Formularul 230. Mulțumim — îți mai rămân două lucruri:
+${deschidere}
 
 1. Poza formularului, pe WhatsApp la ${TELEFON_PRINCIPAL.afisat} sau pe e-mail la ${EMAIL.redirectionare}. O verificăm și-ți spunem dacă e completat bine.
 2. Hârtia semnată, în original, prin poștă la Casa Teona, ${ADRESE.casaTeona.strada}, ${ADRESE.casaTeona.oras} ${ADRESE.casaTeona.cod} — sau adusă personal. Fără ea, ANAF nu poate înregistra redirecționarea.

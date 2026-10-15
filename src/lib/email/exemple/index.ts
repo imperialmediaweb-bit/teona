@@ -101,6 +101,7 @@ export function exemple(): Exemplu[] {
       catre: "om",
       compus: compuneConfirmareaDeContact({
         nume: "Maria Popescu",
+        email: "maria@exemplu.ro",
         voluntariat: false,
       }),
     },
@@ -111,6 +112,7 @@ export function exemple(): Exemplu[] {
       catre: "om",
       compus: compuneConfirmareaDeContact({
         nume: "Maria Popescu",
+        email: "maria@exemplu.ro",
         voluntariat: true,
       }),
     },
