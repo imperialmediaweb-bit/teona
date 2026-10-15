@@ -48,12 +48,20 @@ function Rand({
   id: string;
 }) {
   return (
-    <li className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-hartie-umbra py-3 last:border-0">
+    /*
+      Titlul sus, butoanele dedesubt, întotdeauna.
+
+      Pe un rând cu `justify-between`, cele cu titlu scurt își trăgeau
+      butoanele lângă text, iar cele cu titlu lung le lăsau pe rândul
+      următor. Două coloane de lățimi diferite scoteau așezarea la zaruri:
+      lista arăta ca și cum fiecare rând ar fi fost pus de altcineva.
+    */
+    <li className="border-b border-hartie-umbra py-3 last:border-0">
       <div className="min-w-0">
         <p className="font-titlu text-mic font-bold text-cerneala">{titlu}</p>
         <p className="mt-0.5 text-nota text-cerneala-moale">{cand}</p>
       </div>
-      <div className="flex shrink-0 gap-2">
+      <div className="mt-2.5 flex flex-wrap gap-2">
         <a
           href={`/api/admin/email?ce=${id}`}
           target="_blank"
