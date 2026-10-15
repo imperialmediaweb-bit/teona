@@ -182,10 +182,29 @@ export async function proiecteleToate(): Promise<ProiectAfisat[]> {
   );
 }
 
+/**
+ * Un proiect, căutat întâi în cod și abia apoi în baza de date.
+ *
+ * **Ordinea nu e o optimizare, e ce face construirea posibilă.** Paginile
+ * proiectelor din cod se pregătesc dinainte, la publicare. Dacă s-ar întreba
+ * baza de date pentru fiecare, Next oprește construirea: „uncached or runtime
+ * data during prerendering" — exact eroarea care a picat trei publicări la
+ * rând. Căutarea sincronă răspunde pentru toate cele din cod fără să atingă
+ * baza de date, deci pregenerarea merge mai departe; se întreabă numai pentru
+ * un slug care nu e în cod, adică pentru o tabără adăugată din panou, iar
+ * pagina aia se randează oricum la cerere.
+ *
+ * Local eroarea nu se vedea: construiam fără `DATABASE_URL`, iar atunci
+ * `areBazaDeDate()` e fals și nu se întreabă nimic. Pe Railway variabila
+ * există și la construire. De aceea proba de construire o pune și ea.
+ */
 export async function proiectDupaSlugPeste(
   slug: string,
 ): Promise<ProiectAfisat | undefined> {
-  return (await proiecteleToate()).find((p) => p.slug === slug);
+  const dinCod = proiectDupaSlug(slug);
+  if (dinCod) return dinCod;
+  if (!areBazaDeDate()) return undefined;
+  return (await dinPanou()).find((p) => p.slug === slug);
 }
 
 /**
