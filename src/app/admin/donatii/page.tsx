@@ -7,6 +7,7 @@ import {
   METODE_MANUALE,
   donatii,
   numeleMetodei,
+  transferuriAnuntate,
 } from "@/lib/plati/donatori";
 import { DESTINATII_DONATIE } from "@/date/asociatie";
 import { scrieSuma } from "@/lib/suma";
@@ -19,7 +20,12 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-type Cautare = { gata?: string; eroare?: string; gresit?: string };
+type Cautare = {
+  gata?: string;
+  respins?: string;
+  eroare?: string;
+  gresit?: string;
+};
 
 const CAND = new Intl.DateTimeFormat("ro-RO", {
   day: "numeric",
@@ -45,7 +51,7 @@ async function Continut({
   searchParams: Promise<Cautare>;
 }) {
   await connection();
-  const { gata, eroare, gresit } = await searchParams;
+  const { gata, respins, eroare, gresit } = await searchParams;
 
   if (!areParolaConfigurata()) {
     return (
@@ -79,6 +85,7 @@ async function Continut({
   }
 
   const lista = await donatii(100);
+  const anuntate = await transferuriAnuntate();
   const camp =
     "w-full rounded-moale border border-hartie-umbra bg-hartie px-3 py-2 text-mic";
   const azi = new Date().toISOString().slice(0, 10);
@@ -98,6 +105,16 @@ async function Continut({
           Apare în listă și în tabloul de bord.
         </p>
       )}
+      {respins && (
+        <p
+          role="status"
+          className="mb-6 rounded-card border border-hartie-umbra bg-hartie-calda p-4 text-mic text-cerneala-moale"
+        >
+          <strong className="font-titlu font-bold">Transferul e scos.</strong>{" "}
+          Nu intră în totaluri. Dacă banii apar mai târziu în extras, trece
+          donația de mână.
+        </p>
+      )}
       {eroare && (
         <p
           role="alert"
@@ -105,6 +122,82 @@ async function Continut({
         >
           {eroare}
         </p>
+      )}
+
+      {/*
+        Transferurile anunțate de donatori, primul lucru de pe pagină.
+
+        Sunt singura listă de aici care cere o faptă: cineva se uită în extras
+        și apasă. Până atunci nu se numără nicăieri — nici în totaluri, nici
+        în tabelul de mai jos — pentru că anunțul vine dintr-un formular
+        public, iar un total în care intră ce scrie oricine nu e un total.
+      */}
+      {anuntate.length > 0 && (
+        <section className="mb-8 rounded-card border-2 border-turcoaz-300 bg-turcoaz-50 p-5">
+          <h2 className="font-titlu text-amplu font-bold text-turcoaz-900">
+            Transferuri anunțate de donatori ({anuntate.length})
+          </h2>
+          <p className="mt-1 max-w-2xl text-mic text-turcoaz-900/80">
+            Oamenii ăștia spun că au făcut transferul. Caută suma în extrasul
+            de cont: dacă e acolo, apasă „Am găsit-o în extras” și donația
+            intră în totaluri, cu data de mai jos. Dacă nu, scoate-o.
+          </p>
+
+          <ul className="mt-5 grid gap-4">
+            {anuntate.map((t) => (
+              <li
+                key={t.id}
+                className="rounded-card border border-turcoaz-200 bg-hartie p-4"
+              >
+                <p className="font-titlu text-amplu font-bold text-cerneala">
+                  {scrieSuma(t.sumaBani / 100)}
+                  <span className="ml-2 font-normal text-cerneala-moale">
+                    {t.nume}
+                  </span>
+                </p>
+                <p className="mt-1 text-mic text-cerneala-moale">
+                  Transfer făcut pe {CAND.format(new Date(t.cand))} · pentru{" "}
+                  {DESTINATII_DONATIE.find((x) => x.id === t.destinatie)
+                    ?.eticheta ?? t.destinatie}{" "}
+                  · anunțat pe {CAND.format(new Date(t.anuntatLa))}
+                </p>
+                {(t.email || t.telefon) && (
+                  <p className="mt-1 text-mic break-all text-cerneala-moale">
+                    {[t.email, t.telefon].filter(Boolean).join(" · ")}
+                  </p>
+                )}
+                {t.observatii && (
+                  <p className="mt-1 text-mic text-cerneala-moale">
+                    La detaliile plății: {t.observatii}
+                  </p>
+                )}
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <form action="/api/admin/donatii/confirma" method="post">
+                    <input type="hidden" name="id" value={t.id} />
+                    <input type="hidden" name="hotarare" value="confirma" />
+                    <button
+                      type="submit"
+                      className="rounded-full bg-turcoaz-600 px-5 py-2.5 font-titlu font-bold text-hartie"
+                    >
+                      Am găsit-o în extras
+                    </button>
+                  </form>
+                  <form action="/api/admin/donatii/confirma" method="post">
+                    <input type="hidden" name="id" value={t.id} />
+                    <input type="hidden" name="hotarare" value="respinge" />
+                    <button
+                      type="submit"
+                      className="rounded-full border border-hartie-umbra px-5 py-2.5 font-titlu font-bold text-cerneala"
+                    >
+                      N-am găsit-o
+                    </button>
+                  </form>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       <details className="rounded-card border border-hartie-umbra bg-hartie p-5">

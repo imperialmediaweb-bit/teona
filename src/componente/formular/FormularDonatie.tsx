@@ -68,6 +68,12 @@ function useDestinatiaDinAdresa(implicita: string): string {
  */
 export default function FormularDonatie(proprietati: {
   destinatieInitiala?: string;
+  /**
+   * Dacă PayPal e configurat. Vine de pe pagină, nu se citește aici:
+   * `arePayPal()` se uită în variabilele de mediu, iar fișierul ăsta rulează
+   * în browser, unde ele nu există.
+   */
+  arePayPal?: boolean;
 }) {
   return (
     <Suspense fallback={<ScheletFormular />}>
@@ -88,8 +94,10 @@ function ScheletFormular() {
 
 function Formular({
   destinatieInitiala = "oriunde",
+  arePayPal = false,
 }: {
   destinatieInitiala?: string;
+  arePayPal?: boolean;
 }) {
   const destinatia = useDestinatiaDinAdresa(destinatieInitiala);
   const id = useId();
@@ -333,6 +341,46 @@ function Formular({
       </div>
 
       <div className="grid gap-6 p-6 sm:p-8">
+        {/*
+          Alegerea căii de plată, înaintea sumei.
+
+          Pagina începea direct cu formularul de card, iar transferul și
+          PayPal-ul stăteau mai jos, după o cotitură de pagină: cine nu voia
+          cu cardul nu afla de aici că se poate și altfel. Cardul rămâne
+          deschis — e calea cea mai folosită — celelalte două duc la blocurile
+          lor. PayPal apare numai dacă are chei, ca blocul lui.
+        */}
+        <nav aria-label="Cum vrei să plătești">
+          <ul className="flex flex-wrap gap-2">
+            <li>
+              <span
+                aria-current="true"
+                className="flex min-h-11 items-center colt-mic-a border-2 border-caramiziu-500 bg-caramiziu-50 px-4 py-2 font-titlu text-mic font-bold text-caramiziu-800"
+              >
+                Card
+              </span>
+            </li>
+            {arePayPal && (
+              <li>
+                <a
+                  href="#paypal"
+                  className="flex min-h-11 items-center colt-mic-b border-2 border-hartie-umbra bg-hartie px-4 py-2 font-titlu text-mic font-bold text-cerneala transition-colors duration-200 hover:border-turcoaz-400 hover:text-turcoaz-800"
+                >
+                  PayPal (în euro)
+                </a>
+              </li>
+            )}
+            <li>
+              <a
+                href="#transfer"
+                className="flex min-h-11 items-center colt-mic-a border-2 border-hartie-umbra bg-hartie px-4 py-2 font-titlu text-mic font-bold text-cerneala transition-colors duration-200 hover:border-turcoaz-400 hover:text-turcoaz-800"
+              >
+                Transfer bancar
+              </a>
+            </li>
+          </ul>
+        </nav>
+
         {/* Suma */}
         <fieldset>
           <legend className="mb-3 font-titlu text-mic font-bold text-cerneala">

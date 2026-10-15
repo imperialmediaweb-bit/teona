@@ -142,6 +142,22 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
   pragul e în `src/lib/plati/donatori.ts`).
 - **Formularele 230** primite de pe site, cu fișierul lor, sunt la
   `/admin/formulare`.
+- **Transferul bancar: donatorul bifează, asociația confirmă.** Transferul nu
+  trece prin site, deci site-ul nu poate ști că s-a făcut: banii apar în
+  extrasul de cont, pe care îl citește un om. Pe `/doneaza`, în cardul cu
+  IBAN-uri, donatorul poate anunța că a făcut transferul (nume de pe transfer,
+  sumă, zi, pentru ce). Anunțul intră în tabelul `donatii` cu starea
+  `anuntata` și **nu se numără nicăieri** — toate interogările cer
+  `stare = 'platita'` — pentru că vine dintr-un formular public: altfel oricine
+  ar putea umfla raportul anual dintr-un browser. În panou, la `/admin/donatii`,
+  apare sus, cu „Am găsit-o în extras" (devine donație, cu data scrisă de
+  donator) și „N-am găsit-o". Numărul lor stă și în „De făcut acum".
+  Probă: `BAZA=http://localhost:3000 node scripts/qa/transfer-anuntat.mjs`
+  (nu cere bază de date și nici parolă).
+- **Căile de plată se văd toate din capul formularului de card**: „Card",
+  „PayPal (în euro)" dacă are chei, „Transfer bancar". Înainte pagina începea
+  direct cu formularul de card, iar celelalte stăteau după o cotitură de
+  pagină — cine nu voia cu cardul nu afla de acolo că se poate și altfel.
 - **Buletinele și campaniile de e-mail se fac în MailerLite**, nu în panou.
   Pagina care lăsa o ciornă acolo a fost scoasă: trecea pe lângă tot ce face
   un instrument de e-mail. În bara din stânga e un link către el.

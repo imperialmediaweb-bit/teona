@@ -12,7 +12,9 @@ import { intreaba } from "@/lib/baza";
  * mic, legat prin e-mail.
  *
  * Totul aici sunt date personale și financiare. Nimic din fișierul ăsta nu e
- * chemat din pagini publice.
+ * chemat din pagini publice, cu o singură excepție: `anuntaTransfer`, prin
+ * care donatorul își anunță singur transferul bancar. Aceea doar scrie — nu
+ * citește nimic înapoi către cel care a trimis formularul.
  */
 
 export type Donator = {
@@ -255,6 +257,7 @@ export function numeleMetodei(procesator: string): string {
   if (manuala) return manuala.eticheta;
   if (procesator === "stripe") return "Card (Stripe)";
   if (procesator === "paypal") return "PayPal";
+  if (procesator === TRANSFER_ANUNTAT) return "Transfer bancar (anunțat pe site)";
   return procesator;
 }
 
@@ -308,6 +311,145 @@ export async function adaugaDonatieManuala(date: {
   } catch {
     return { ok: false, motiv: "eroare" };
   }
+}
+
+/*
+  Transferul bancar anunțat de donator.
+
+  Site-ul nu vede contul din bancă: nu există API, iar extrasul se citește de
+  om. Până acum, un transfer era invizibil până când cineva îl bătea de mână
+  din extras — iar donatorul n-avea nicio urmă că a dat, deci nici mulțumire,
+  nici loc în evidență.
+
+  Acum, cine face transferul poate bifa pe site că l-a făcut. Anunțul intră în
+  același tabel `donatii`, dar cu starea `anuntata`:
+
+  - **nu intră în niciun total** și nu apare în listele de donații. Toate
+    interogările cer `stare = 'platita'`, iar aici asta ar fi o minciună:
+    nimeni n-a văzut încă banii. Altfel, oricine ar putea umfla raportul
+    anual dintr-un formular public;
+  - apare în panou, la „Transferuri anunțate", unde se potrivește cu extrasul
+    și se confirmă sau se respinge. Confirmarea îi schimbă starea în
+    `platita` și de atunci se numără la fel ca orice donație.
+
+  Data scrisă de donator intră în `platita_la` de la început: starea o ține
+  deoparte din calcule, deci nu strică nimic, iar la confirmare nu mai e
+  nevoie să ghicească nimeni când a fost transferul.
+*/
+export const TRANSFER_ANUNTAT = "transfer-anuntat";
+
+export async function anuntaTransfer(date: {
+  referinta: string;
+  sumaBani: number;
+  destinatie: string;
+  data: string;
+  email?: string;
+  nume?: string;
+  telefon?: string;
+  observatii?: string;
+}): Promise<{ ok: true } | { ok: false; motiv: "duplicat" | "eroare" }> {
+  try {
+    const randuri = await intreaba<{ id: string }>(
+      `INSERT INTO donatii
+         (procesator, referinta, suma_bani, moneda, frecventa, destinatie,
+          email, prenume, nume, telefon, stare, platita_la,
+          observatii, adaugat_de)
+       VALUES ($1,$2,$3,'RON','o-data',$4,$5,NULL,$6,$7,'anuntata',$8,$9,'donator')
+       ON CONFLICT (procesator, referinta) DO NOTHING
+       RETURNING id`,
+      [
+        TRANSFER_ANUNTAT,
+        date.referinta,
+        date.sumaBani,
+        date.destinatie,
+        date.email ?? null,
+        date.nume ?? null,
+        date.telefon ?? null,
+        date.data,
+        date.observatii ?? null,
+      ],
+    );
+    return randuri.length > 0 ? { ok: true } : { ok: false, motiv: "duplicat" };
+  } catch {
+    return { ok: false, motiv: "eroare" };
+  }
+}
+
+export type TransferAnuntat = {
+  id: string;
+  sumaBani: number;
+  destinatie: string;
+  email: string | null;
+  nume: string | null;
+  telefon: string | null;
+  observatii: string | null;
+  cand: string;
+  anuntatLa: string;
+};
+
+/** Transferurile anunțate de donatori și încă necontrolate în extras. */
+export async function transferuriAnuntate(): Promise<TransferAnuntat[]> {
+  const randuri = await intreaba<{
+    id: string;
+    suma_bani: string;
+    destinatie: string;
+    email: string | null;
+    nume: string | null;
+    telefon: string | null;
+    observatii: string | null;
+    platita_la: Date | null;
+    creat_la: Date;
+  }>(
+    `SELECT id, suma_bani, destinatie, email, nume, telefon, observatii,
+            platita_la, creat_la
+       FROM donatii
+      WHERE stare = 'anuntata'
+      ORDER BY creat_la DESC
+      LIMIT 200`,
+  );
+  return randuri.map((r) => ({
+    id: r.id,
+    sumaBani: Number(r.suma_bani),
+    destinatie: r.destinatie,
+    email: r.email,
+    nume: r.nume,
+    telefon: r.telefon,
+    observatii: r.observatii,
+    cand: r.platita_la?.toISOString() ?? r.creat_la.toISOString(),
+    anuntatLa: r.creat_la.toISOString(),
+  }));
+}
+
+/** Câte transferuri anunțate așteaptă controlul în extras. */
+export async function cateTransferuriAnuntate(): Promise<number> {
+  const randuri = await intreaba<{ cate: string }>(
+    "SELECT count(*) AS cate FROM donatii WHERE stare = 'anuntata'",
+  );
+  return Number(randuri[0]?.cate ?? 0);
+}
+
+/**
+ * Confirmă sau respinge un transfer anunțat.
+ *
+ * Cere starea `anuntata` în `WHERE`, deci a doua apăsare pe buton nu mai
+ * schimbă nimic: dacă doi oameni deschid panoul deodată, al doilea află că
+ * n-a mai avut ce să confirme.
+ */
+export async function hotarasteTransfer(
+  id: string,
+  confirmat: boolean,
+): Promise<boolean> {
+  const randuri = await intreaba<{ id: string }>(
+    `UPDATE donatii
+        SET stare = $2,
+            platita_la = CASE WHEN $2 = 'platita'
+                              THEN COALESCE(platita_la, now())
+                              ELSE platita_la END
+      WHERE id = $1 AND stare = 'anuntata'
+      RETURNING id`,
+    [id, confirmat ? "platita" : "respinsa"],
+  );
+  return randuri.length > 0;
 }
 
 export type Donatie = {

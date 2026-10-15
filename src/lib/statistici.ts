@@ -252,7 +252,7 @@ export async function peMonede(): Promise<
 export async function deFacutAcum(): Promise<
   Array<{ eticheta: string; nr: number; unde: string }>
 > {
-  const [cereri, aniversari, ciorne, firme] = await Promise.all([
+  const [cereri, aniversari, ciorne, firme, transferuri] = await Promise.all([
     intreaba<{ nr: string }>(
       `SELECT count(*) AS nr FROM cereri WHERE stadiu = 'nou'`,
     ),
@@ -270,10 +270,20 @@ export async function deFacutAcum(): Promise<
         WHERE stadiu IN ('cerere', 'contract_trimis')
           AND schimbat_la < now() - interval '14 days'`,
     ),
+    // Transferurile anunțate de donatori: cineva trebuie să se uite în
+    // extras. Până atunci banii lor nu sunt în niciun total.
+    intreaba<{ nr: string }>(
+      `SELECT count(*) AS nr FROM donatii WHERE stare = 'anuntata'`,
+    ),
   ]);
 
   return [
     { eticheta: "cereri noi", nr: Number(cereri[0]?.nr ?? 0), unde: "/admin/cereri" },
+    {
+      eticheta: "transferuri de căutat în extras",
+      nr: Number(transferuri[0]?.nr ?? 0),
+      unde: "/admin/donatii",
+    },
     {
       eticheta: "aniversări de aprobat",
       nr: Number(aniversari[0]?.nr ?? 0),

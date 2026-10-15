@@ -20,6 +20,7 @@ import DeCopiat from "@/componente/pagina/DeCopiat";
 import DocumentDeDescarcat from "@/componente/pagina/DocumentDeDescarcat";
 import Intrebari, { type Intrebare } from "@/componente/pagina/Intrebari";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
+import AnuntTransfer from "@/componente/formular/AnuntTransfer";
 import FormularDonatie from "@/componente/formular/FormularDonatie";
 import { arePayPal } from "@/lib/plati/paypal";
 
@@ -260,43 +261,7 @@ export default function Doneaza() {
           {/* 2.2 — donația cu cardul, primul bloc de pe pagină. */}
           <div>
             <h2 className="sr-only">Donează cu cardul</h2>
-            <FormularDonatie />
-
-            {/*
-              Cine deschide pagina vede întâi un formular de card. Dacă nu vrea
-              cu cardul, de aici n-avea de unde afla că se poate și altfel:
-              transferul, PayPal-ul și SMS-ul sunt mai jos, după o cotitură de
-              pagină, iar scurtăturile de sus nu le pomenesc pe toate. Rândul
-              ăsta le spune pe nume lângă buton și duce la ele.
-            */}
-            <p className="mt-6 text-mic text-cerneala-moale">
-              Nu vrei cu cardul? Se poate și prin{" "}
-              <a
-                href="#transfer"
-                className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
-              >
-                transfer bancar
-              </a>
-              {arePayPal() && (
-                <>
-                  , cu{" "}
-                  <a
-                    href="#paypal"
-                    className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
-                  >
-                    PayPal (în euro)
-                  </a>
-                </>
-              )}{" "}
-              sau lunar prin{" "}
-              <a
-                href="#sms"
-                className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
-              >
-                SMS
-              </a>
-              .
-            </p>
+            <FormularDonatie arePayPal={arePayPal()} />
           </div>
         </div>
       </section>
@@ -436,6 +401,13 @@ export default function Doneaza() {
                 <p className="relative mt-5 text-mic text-turcoaz-900/80">
                   Titular: {ASOCIATIA.denumireLegala} · CIF: {ASOCIATIA.cif}
                 </p>
+
+                {/*
+                  Transferul nu trece prin site, deci site-ul nu poate ști că
+                  s-a făcut. Bifa de aici îi spune asociației ce sumă să caute
+                  în extras și pe cine să treacă în evidență.
+                */}
+                <AnuntTransfer />
               </section>
             </Aparitie>
 
