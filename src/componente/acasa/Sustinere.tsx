@@ -110,7 +110,12 @@ export default function Sustinere() {
                     cine caută transfer bancar sau PayPal nu are de unde ghici,
                     de pe prima pagină, că le găsește tot la „Donează”.
                   */}
-                  <p className="relative mt-5 text-mic text-hartie/80">
+                  {/*
+                    `text-hartie/80` dădea 4,46:1 pe portocaliul cardului —
+                    sub pragul de 4,5:1 din WCAG AA, prins de
+                    `scripts/qa/contrast.mjs`. La /90 trece.
+                  */}
+                  <p className="relative mt-5 text-mic text-hartie/90">
                     Card, transfer bancar sau PayPal.
                   </p>
                   <div className="relative mt-5">

@@ -276,14 +276,14 @@ export default function CalculatorSponsorizare() {
       {/* Rezultatul, pe câmp de culoare: e lucrul pentru care a venit firma. */}
       <div
         aria-live="polite"
-        className="granulatie relative flex flex-col overflow-hidden colt-b bg-gradient-to-b from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 p-6 text-hartie shadow-[0_36px_70px_-28px_rgba(247,79,34,0.85)] sm:p-8"
+        className="granulatie relative flex flex-col overflow-hidden colt-b border-2 border-caramiziu-200 bg-caramiziu-50 p-6 text-cerneala shadow-[0_28px_56px_-30px_rgba(247,79,34,0.45)] sm:p-8"
       >
         <span
           aria-hidden="true"
-          className="absolute -right-16 -bottom-20 size-56 rounded-full border-2 border-hartie/20"
+          className="absolute -right-16 -bottom-20 size-56 rounded-full border-2 border-caramiziu-200"
         />
 
-        <p className="relative font-titlu text-nota font-bold tracking-wider uppercase opacity-85">
+        <p className="relative font-titlu text-nota font-bold tracking-wider text-caramiziu-700 uppercase">
           Suma maximă pe care o poți direcționa
         </p>
 
@@ -296,10 +296,10 @@ export default function CalculatorSponsorizare() {
           la început: cifra, cele două bare, mențiunea. Fără date scrie „—" și
           barele stau goale, deci nimic nu sare pe ecran când apare rezultatul.
         */}
-        <p className="relative mt-3 font-titlu text-[2.4rem] leading-none font-extrabold tracking-tight break-words sm:text-[3rem]">
+        <p className="relative mt-3 font-titlu text-[2.4rem] leading-none font-extrabold tracking-tight text-caramiziu-800 break-words sm:text-[3rem]">
           {rezultat ? scrieSuma(rezultat.maxim) : "—"}
         </p>
-        <p className="relative mt-2 text-mic text-hartie/85">
+        <p className="relative mt-2 text-mic text-cerneala-moale">
           {rezultat
             ? "Cea mai mică dintre cele două praguri de mai jos."
             : "Scrie cifra de afaceri și impozitul pe profit, în stânga."}
@@ -309,10 +309,10 @@ export default function CalculatorSponsorizare() {
           {praguri.map((prag) => (
             <li key={prag.eticheta}>
               <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <span className="text-mic font-semibold text-hartie/90">
+                <span className="text-mic font-semibold text-cerneala-moale">
                   {prag.eticheta}
                 </span>
-                <span className="font-titlu text-corp font-bold text-hartie">
+                <span className="font-titlu text-corp font-bold text-cerneala">
                   {prag.suma === null ? "—" : scrieSuma(prag.suma)}
                 </span>
               </div>
@@ -320,17 +320,17 @@ export default function CalculatorSponsorizare() {
                   cititorul de ecran o sare și citește suma. */}
               <div
                 aria-hidden="true"
-                className="mt-2 h-2 w-full overflow-hidden rounded-full bg-hartie/15"
+                className="mt-2 h-2 w-full overflow-hidden rounded-full bg-caramiziu-100"
               >
                 <div
                   className={`h-full rounded-full transition-[width] duration-500 ease-cald ${
-                    prag.limita ? "bg-hartie" : "bg-hartie/55"
+                    prag.limita ? "bg-caramiziu-600" : "bg-caramiziu-300"
                   }`}
                   style={{ width: `${prag.parte}%` }}
                 />
               </div>
               {prag.limita && (
-                <p className="mt-2 text-nota font-semibold text-hartie">
+                <p className="mt-2 text-nota font-semibold text-caramiziu-700">
                   Pragul ăsta limitează suma.
                 </p>
               )}
@@ -339,10 +339,10 @@ export default function CalculatorSponsorizare() {
         </ul>
 
         {/* Mențiunea obligatorie din caiet, sub rezultat, nu în subsolul paginii. */}
-        <p className="relative mt-auto flex items-start gap-2.5 pt-8 text-mic text-hartie/90">
+        <p className="relative mt-auto flex items-start gap-2.5 pt-8 text-mic text-cerneala-moale">
           <Pictograma nume="document" className="mt-0.5 size-5 shrink-0" />
           <span>
-            <strong className="font-titlu font-bold text-hartie">
+            <strong className="font-titlu font-bold text-cerneala">
               Calculul este orientativ.
             </strong>{" "}
             Suma finală se stabilește împreună cu contabilitatea firmei.
@@ -352,8 +352,7 @@ export default function CalculatorSponsorizare() {
         <div className="relative mt-6">
           <Buton
             href={`mailto:${EMAIL.contact}?subject=${encodeURIComponent("Contract de sponsorizare")}`}
-            varianta="contur"
-            className="border-hartie bg-hartie text-caramiziu-700 hover:border-hartie hover:text-caramiziu-700"
+            varianta="principal"
           >
             Vreau contract de sponsorizare
             <Pictograma nume="sageata" className="size-4" />
