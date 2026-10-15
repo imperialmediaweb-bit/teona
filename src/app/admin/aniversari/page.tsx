@@ -156,11 +156,6 @@ async function Continut({
               {c.mesaj}
             </p>
 
-            {c.linkGalantom && (
-              <p className="mt-4 break-all text-mic text-cerneala-moale">
-                Donațiile merg la: {c.linkGalantom}
-              </p>
-            )}
 
             <div className="mt-6 flex flex-wrap gap-3 border-t border-hartie-umbra pt-5">
               <form action="/api/admin/aniversari" method="post">

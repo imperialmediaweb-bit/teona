@@ -30,7 +30,6 @@ import { LIMITE, esteOcazie } from "@/date/aniversari";
 /** Cel mult atât: poza are plafonul ei, restul câmpurilor sunt text scurt. */
 const LIMITA_CERERE = POZA_MAXIM + 64 * 1024;
 
-const GALANTOM = /^https:\/\/([a-z0-9-]+\.)*galantom\.ro\//i;
 
 export async function POST(cerere: Request) {
   const prea = limitaDeRata(cerere, {
@@ -105,13 +104,6 @@ export async function POST(cerere: Request) {
     dataEvenimentului = dataBruta;
   }
 
-  const linkBrut = camp("link_galantom").trim();
-  if (linkBrut) {
-    if (linkBrut.length > LIMITE.link || !GALANTOM.test(linkBrut)) {
-      return raspuns("Linkul trebuie să fie o adresă de pe galantom.ro.", 400);
-    }
-  }
-
   // ─── Poza ───────────────────────────────────────────────────────────────
   let pozaId: string | null = null;
   let pozaLatime: number | null = null;
@@ -155,7 +147,6 @@ export async function POST(cerere: Request) {
       pozaId,
       pozaLatime,
       pozaInaltime,
-      linkGalantom: linkBrut || null,
     });
 
     // E-mailurile pleacă după ce campania e salvată, și nu pot anula salvarea:

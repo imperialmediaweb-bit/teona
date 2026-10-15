@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { ASOCIATIA, LINKURI_EXTERNE, RUTE } from "@/date/asociatie";
+import { ASOCIATIA, RUTE } from "@/date/asociatie";
 import { etichetaOcaziei } from "@/date/aniversari";
 import { campaniePublicata, campanieCuJeton } from "@/lib/campanii";
 import { adresaPentruDistribuire, adresaPoza } from "@/lib/poza-urcata";
@@ -62,6 +62,12 @@ export async function generateMetadata(
     campanie.mesaj.replace(/\s+/g, " ").slice(0, 200) +
     (campanie.mesaj.length > 200 ? "…" : "");
 
+  /*
+    Fără poză, Facebook arăta un dreptunghi gol: nicio imagine declarată
+    înseamnă că își alege el ceva din pagină, sau nimic. Când omul n-a pus
+    poză, punem poza de deschidere a site-ului — tot e mai bine decât un link
+    sec, iar o pagină de ziua cuiva se distribuie, asta e tot rostul ei.
+  */
   const imagine = campanie.pozaId
     ? {
         url: adresaPentruDistribuire(campanie.pozaId),
@@ -69,7 +75,12 @@ export async function generateMetadata(
         height: 630,
         alt: `${campanie.numePublic} — ${campanie.titlu}`,
       }
-    : undefined;
+    : {
+        url: `${ADRESA_SITE}/opengraph-image.jpg`,
+        width: 1200,
+        height: 630,
+        alt: ASOCIATIA.denumire,
+      };
 
   return {
     title: { absolute: `${campanie.titlu} · ${ASOCIATIA.denumire}` },
@@ -82,13 +93,13 @@ export async function generateMetadata(
       siteName: ASOCIATIA.denumire,
       locale: "ro_RO",
       type: "website",
-      ...(imagine ? { images: [imagine] } : {}),
+      images: [imagine],
     },
     twitter: {
-      card: imagine ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       title: campanie.titlu,
       description: descriere,
-      ...(imagine ? { images: [imagine.url] } : {}),
+      images: [imagine.url],
     },
   };
 }
@@ -129,7 +140,15 @@ async function Continut(proprietati: Proprietati) {
   if (!gasita) notFound();
   const { campanie, previzualizare } = gasita;
 
-  const unde = campanie.linkGalantom ?? LINKURI_EXTERNE.galantom;
+  /*
+    Donația se face pe site-ul asociației, nu pe altă platformă.
+
+    Butonul duce la formularul obișnuit de donație, cu slugul campaniei în
+    adresă. Donația care iese de acolo poartă slugul, deci în panou se vede
+    cât a strâns fiecare pagină — iar omul care și-a făcut pagina poate
+    întreba oricând și primi un răspuns.
+  */
+  const unde = `${RUTE.doneaza}?campanie=${encodeURIComponent(campanie.slug)}`;
   const adresaPaginii = `${ADRESA_SITE}/ziua-ta/${campanie.slug}`;
 
   return (
@@ -204,11 +223,11 @@ async function Continut(proprietati: Proprietati) {
                 Donează pentru campania lui {campanie.numePublic.split(" ")[0]}
               </Buton>
               <p className="mt-3 text-mic text-cerneala-moale">
-                Donația se face prin Galantom, platforma folosită de{" "}
+                Donația se face pe site-ul{" "}
                 <Link href={RUTE.acasa} className="subliniat font-semibold">
                   {ASOCIATIA.denumire}
                 </Link>
-                .
+                , cu cardul, și se trece pe campania asta.
               </p>
             </div>
           </div>

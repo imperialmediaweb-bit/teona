@@ -16,7 +16,6 @@ type Rand = {
   poza_id: string | null;
   poza_latime: number | null;
   poza_inaltime: number | null;
-  link_galantom: string | null;
   stare: string;
   creat_la: Date;
 };
@@ -34,7 +33,6 @@ function laCampanie(r: Rand): Campanie {
     pozaId: r.poza_id,
     pozaLatime: r.poza_latime,
     pozaInaltime: r.poza_inaltime,
-    linkGalantom: r.link_galantom,
     stare: r.stare as Stare,
     creatLa: r.creat_la.toISOString(),
   };
@@ -71,7 +69,6 @@ export async function creeazaCampanie(date: {
   pozaId: string | null;
   pozaLatime: number | null;
   pozaInaltime: number | null;
-  linkGalantom: string | null;
 }): Promise<{ slug: string; jeton: string }> {
   const slug = await slugLiber(date.titlu);
   // Jetonul îi dă omului o adresă pe care își vede propria campanie cât timp
@@ -81,8 +78,8 @@ export async function creeazaCampanie(date: {
   await intreaba(
     `INSERT INTO campanii_aniversare
        (slug, ocazie, titlu, mesaj, nume_public, email, data_evenimentului,
-        poza_id, poza_latime, poza_inaltime, link_galantom, jeton)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+        poza_id, poza_latime, poza_inaltime, jeton)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
     [
       slug,
       date.ocazie,
@@ -94,7 +91,6 @@ export async function creeazaCampanie(date: {
       date.pozaId,
       date.pozaLatime,
       date.pozaInaltime,
-      date.linkGalantom,
       jeton,
     ],
   );

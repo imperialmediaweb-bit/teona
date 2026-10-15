@@ -62,7 +62,6 @@ export type Campanie = {
   pozaId: string | null;
   pozaLatime: number | null;
   pozaInaltime: number | null;
-  linkGalantom: string | null;
   stare: Stare;
   creatLa: string;
 };

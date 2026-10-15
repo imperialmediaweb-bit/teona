@@ -62,6 +62,21 @@ function useDestinatiaDinAdresa(implicita: string): string {
 }
 
 /**
+ * Campania de ziua cuiva din care s-a venit, dacă s-a venit de acolo.
+ *
+ * Paginile de la `/ziua-ta/<slug>` trimit aici cu slugul în adresă. Donația
+ * pleacă spre procesator cu slugul în ea, deci în panou se vede cât a strâns
+ * fiecare pagină. Fără asta, banii ar intra în grămadă, iar omul care și-a
+ * făcut pagina n-ar putea afla niciodată dacă a strâns ceva.
+ *
+ * Slugul nu se verifică aici: e doar o etichetă dusă mai departe, iar ruta
+ * care primește donația o taie la 120 de semne.
+ */
+function useCampaniaDinAdresa(): string | null {
+  return useSearchParams().get("campanie");
+}
+
+/**
  * `useSearchParams` cere o graniță `Suspense` ca pagina să poată rămâne
  * pregenerată. O ținem aici, nu în pagină: așa componenta se poate pune
  * oriunde, fără ca cel care o folosește să trebuiască să știe asta.
@@ -100,6 +115,7 @@ function Formular({
   arePayPal?: boolean;
 }) {
   const destinatia = useDestinatiaDinAdresa(destinatieInitiala);
+  const campania = useCampaniaDinAdresa();
   const id = useId();
   const [suma, setSuma] = useState<number | null>(null);
   const [altaSuma, setAltaSuma] = useState("");
@@ -167,6 +183,7 @@ function Formular({
           telefon: date.get("telefon"),
           buletin: date.get("buletin") === "da" ? "da" : "nu",
           acord: "da",
+          ...(campania ? { campanie: campania } : {}),
           site_web: date.get("site_web") ?? "",
         }),
       });

@@ -35,7 +35,6 @@ type Erori = Partial<
     | "nume"
     | "email"
     | "poza"
-    | "link"
     | "acord"
     | "general",
     string
@@ -69,9 +68,6 @@ export default function FormularAniversare() {
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(sir("email")))
       gasite.email = "Introdu o adresă de e-mail validă.";
 
-    const link = sir("link_galantom");
-    if (link && !/^https:\/\/([a-z0-9-]+\.)*galantom\.ro\//i.test(link))
-      gasite.link = "Linkul trebuie să fie o adresă de pe galantom.ro.";
 
     const poza = date.get("poza");
     if (poza instanceof File && poza.size > POZA_MAXIM)
@@ -314,25 +310,6 @@ export default function FormularAniversare() {
           />
         </Camp>
       </div>
-
-      <Camp
-        id="an-link"
-        eticheta="Linkul paginii tale de pe Galantom"
-        nota="Opțional, dar recomandat. Dacă ți-ai făcut o pagină pe Galantom, pune linkul aici: butonul „Donează” va duce acolo, iar donațiile se adună pe numele tău. Fără el, butonul duce la proiectul asociației."
-        eroare={erori.link}
-        className="mt-5"
-      >
-        <input
-          id="an-link"
-          name="link_galantom"
-          type="url"
-          inputMode="url"
-          placeholder="https://dar.galantom.ro/..."
-          maxLength={LIMITE.link}
-          aria-invalid={erori.link ? "true" : undefined}
-          className={clasa(erori.link)}
-        />
-      </Camp>
 
       <div className="mt-7 border-t border-hartie-umbra pt-6">
         <label className="flex cursor-pointer items-start gap-3">
