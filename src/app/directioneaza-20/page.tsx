@@ -361,11 +361,11 @@ export default function Directioneaza20() {
                   modelele chiar deasupra.
                 */}
                 <Link
-                  href={`${RUTE.directionare20}/semneaza`}
+                  href={`${RUTE.directionare20}/contract`}
                   className="flex items-center justify-between gap-4 colt-mic-a border-2 border-caramiziu-200 bg-caramiziu-50 px-5 py-4 font-titlu font-bold text-caramiziu-900 transition-colors hover:border-caramiziu-400"
                 >
                   <span>
-                    Sau completează și semnează contractul online, pe loc
+                    Sau ia contractul completat cu datele firmei tale
                   </span>
                   <Pictograma
                     nume="sageata"

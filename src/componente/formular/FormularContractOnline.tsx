@@ -4,13 +4,11 @@ import { useId, useRef, useState } from "react";
 import { ASOCIATIA, EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import Pictograma from "../Pictograma";
 import Camp, {
-  Bifa,
   claseButonTrimite,
   claseControl,
   claseControlGresit,
 } from "./Camp";
 import CampCui, { type Firma } from "./CampCui";
-import SemnaturaPeEcran from "./SemnaturaPeEcran";
 
 /**
  * Contractul de sponsorizare, completat și semnat pe site.
@@ -50,7 +48,6 @@ export default function FormularContractOnline() {
   const [denumire, setDenumire] = useState("");
   const [sediu, setSediu] = useState("");
   const [regCom, setRegCom] = useState("");
-  const [areSemnatura, setAreSemnatura] = useState(false);
   const [erori, setErori] = useState<Erori>({});
   const [stare, setStare] = useState<Stare>({ fel: "gol" });
   const formular = useRef<HTMLFormElement>(null);
@@ -132,75 +129,11 @@ export default function FormularContractOnline() {
     if (firma.nrRegCom) setRegCom(firma.nrRegCom);
   }
 
-  async function trimite(ev: React.FormEvent<HTMLFormElement>) {
-    ev.preventDefault();
-    const date = new FormData(ev.currentTarget);
-
-    const gasite: Erori = {};
-    const ia = (nume: string) => String(date.get(nume) ?? "").trim();
-
-    if (ia("denumire").length < 3) gasite.denumire = "Scrieți denumirea firmei.";
-    if (ia("cui").replace(/\D/g, "").length < 2)
-      gasite.cui = "Scrieți CUI-ul firmei.";
-    if (ia("reprezentant").length < 3)
-      gasite.reprezentant = "Scrieți numele celui care semnează.";
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(ia("email")))
-      gasite.email = "Introduceți o adresă de e-mail validă.";
-    if (ia("valoare") === "") gasite.valoare = "Scrieți valoarea contractului.";
-    if (!ia("semnatura")) gasite.semnatura = "Semnați în casetă.";
-    if (date.get("acord") !== "da")
-      gasite.acord = "Bifați, altfel contractul nu poate pleca.";
-
-    setErori(gasite);
-    if (Object.keys(gasite).length > 0) return;
-
-    setStare({ fel: "trimite" });
-    try {
-      const raspuns = await fetch("/api/contract", { method: "POST", body: date });
-      const corp = (await raspuns.json().catch(() => ({}))) as {
-        mesaj?: string;
-      };
-      if (!raspuns.ok) {
-        setStare({
-          fel: "eroare",
-          mesaj: corp.mesaj ?? "Nu am putut trimite contractul.",
-        });
-        return;
-      }
-      setStare({ fel: "reusit", mesaj: corp.mesaj ?? "Contractul e semnat." });
-    } catch {
-      setStare({
-        fel: "eroare",
-        mesaj: "Nu am putut trimite contractul. Verificați conexiunea.",
-      });
-    }
-  }
-
-  if (stare.fel === "reusit") {
-    return (
-      <div
-        role="status"
-        className="colt-a border-2 border-turcoaz-300 bg-turcoaz-50 p-7 sm:p-9"
-      >
-        <span className="colt-mic-b flex size-14 items-center justify-center bg-turcoaz-600 text-hartie">
-          <Pictograma nume="document" className="size-7" />
-        </span>
-        <h2 className="mt-5 text-h3 text-turcoaz-900">Gata, e semnat</h2>
-        <p className="mt-3 max-w-2xl text-amplu text-turcoaz-900/85">
-          {stare.mesaj}
-        </p>
-        <p className="mt-4 text-mic text-turcoaz-900/80">
-          Dacă nu ajunge nimic în câteva minute, uitați-vă și în „Spam”, apoi
-          sunați-ne la {TELEFON_PRINCIPAL.afisat}.
-        </p>
-      </div>
-    );
-  }
-
   return (
     <form
       ref={formular}
-      onSubmit={trimite}
+      /* Nimic nu se trimite de aici: formularul doar scrie documentul. */
+      onSubmit={(ev) => ev.preventDefault()}
       noValidate
       className="colt-a border border-hartie-umbra bg-hartie p-6 shadow-[0_24px_50px_-26px_rgba(35,35,35,0.45)] sm:p-8"
     >
@@ -484,57 +417,6 @@ export default function FormularContractOnline() {
           </li>
         ))}
       </ol>
-
-      {/* ── Sau semnezi aici, pe loc ─────────────────────────────────── */}
-      <details className="mt-8 colt-mic-a border-2 border-hartie-umbra open:bg-hartie-calda">
-        <summary className="flex min-h-12 cursor-pointer items-center px-5 py-3 font-titlu font-bold text-cerneala">
-          Sau semnează acum, pe ecran
-        </summary>
-
-        <div className="border-t-2 border-hartie-umbra p-5">
-          <p className="max-w-2xl text-mic text-cerneala-moale">
-            Semnătura desenată aici e o{" "}
-            <strong>semnătură electronică simplă</strong>. Legea îi dă aceleași
-            efecte ca semnăturii cu pixul atunci când partea împotriva căreia e
-            folosită o recunoaște — inclusiv tacit, prin plata sumei din
-            contract. Pentru sume mari, folosiți semnătura calificată, de mai
-            sus: e singura care are această putere în orice situație.
-          </p>
-
-          <div className="mt-5">
-            <SemnaturaPeEcran
-              name="semnatura"
-              eroare={erori.semnatura}
-              onSemnat={setAreSemnatura}
-            />
-          </div>
-
-          <div className="mt-6">
-            <Bifa name="acord" obligatoriu eroare={erori.acord}>
-              Am citit contractul, semnez în numele firmei de mai sus și sunt
-              de acord ca {ASOCIATIA.denumire} să prelucreze datele acestea
-              pentru încheierea lui.
-            </Bifa>
-          </div>
-
-          <div className="mt-6 flex flex-wrap items-center gap-4">
-            <button
-              type="submit"
-              disabled={stare.fel === "trimite"}
-              className={claseButonTrimite}
-            >
-              {stare.fel === "trimite"
-                ? "Se semnează…"
-                : "Semnează și trimite contractul"}
-            </button>
-            {!areSemnatura && (
-              <span className="text-mic text-cerneala-slab">
-                Mai întâi semnați în casetă.
-              </span>
-            )}
-          </div>
-        </div>
-      </details>
 
       {stare.fel === "eroare" && (
         <p

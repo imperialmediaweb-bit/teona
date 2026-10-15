@@ -8,10 +8,10 @@ import Pictograma from "@/componente/Pictograma";
 import FormularContractOnline from "@/componente/formular/FormularContractOnline";
 
 export const metadata: Metadata = metadate({
-  titlu: "Semnează contractul de sponsorizare online",
+  titlu: "Contractul de sponsorizare, completat cu datele firmei tale",
   descriere:
-    "Completează contractul de sponsorizare cu datele firmei tale, semnează pe ecran și primești pe loc documentul pe e-mail. Asociația Teona Ariana Suceava.",
-  cale: "/directioneaza-20/semneaza",
+    "Scrie CUI-ul firmei și primești contractul de sponsorizare completat, în Word sau PDF, gata de semnat. Asociația Teona Ariana Suceava.",
+  cale: "/directioneaza-20/contract",
 });
 
 /**
@@ -32,15 +32,15 @@ export default function Semneaza() {
         date={jsonLdFir([
           { nume: "Direcționează 20%", cale: RUTE.directionare20 },
           {
-            nume: "Semnează contractul",
-            cale: `${RUTE.directionare20}/semneaza`,
+            nume: "Contractul de sponsorizare",
+            cale: `${RUTE.directionare20}/contract`,
           },
         ])}
       />
 
       <AntetPagina
         scris="Pentru firme"
-        titlu="Semnează contractul de sponsorizare"
+        titlu="Ia contractul de sponsorizare, completat"
         subtitlu="Scrie CUI-ul și completează suma — îți dăm contractul gata scris, în Word sau PDF. Îl semnezi cum vrei și ni-l trimiți; îl contrasemnăm și ți-l trimitem înapoi."
         accent="turcoaz"
         poza={{
@@ -78,7 +78,7 @@ export default function Semneaza() {
             rel="noreferrer"
             className="flex items-center justify-between gap-4 colt-mic-b border-2 border-turcoaz-300 bg-turcoaz-50 px-5 py-4 font-titlu font-bold text-turcoaz-900 transition-colors hover:border-turcoaz-500"
           >
-            <span>Citește contractul înainte să semnezi (se deschide în filă nouă)</span>
+            <span>Citește contractul întreg (se deschide în filă nouă)</span>
             <Pictograma
               nume="document"
               aria-hidden="true"

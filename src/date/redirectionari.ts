@@ -24,6 +24,13 @@ export const REDIRECTIONARI: ReadonlyArray<{ de_la: string; la: string }> = [
   { de_la: "/35-2", la: "/redirectioneaza-3-5" },
   { de_la: "/contact-us", la: "/contact" },
   /*
+    Pagina de contract a stat o zi la „/semneaza", cât am crezut că firma o să
+    semneze pe ecran. Clientul a hotărât altfel: contractul se descarcă, se
+    semnează în afara site-ului și se trimite pe e-mail. Adresa veche a fost
+    publică, deci duce la cea nouă.
+  */
+  { de_la: "/directioneaza-20/semneaza", la: "/directioneaza-20/contract" },
+  /*
     `/campanii` nu mai e o redirecționare: e o pagină adevărată.
 
     Pe site-ul vechi, adresa asta ducea la o pagină care nu mai exista, iar
