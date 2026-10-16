@@ -45,15 +45,23 @@ export const REDIRECTIONARI: ReadonlyArray<{ de_la: string; la: string }> = [
   { de_la: "/cookies", la: "/politica-de-cookieuri" },
   { de_la: "/gdpr", la: "/politica-de-confidentialitate" },
 
-  // Raportul 2025 — două adrese, aceeași pagină.
+  /*
+    Raportul de activitate 2025, scos de pe site la cererea asociației.
+
+    Adresele rămân, toate trei: două de pe WordPress și cea de pe site-ul
+    nou, care a fost publicată și poate fi deja dată mai departe sau
+    indexată. Duc la „Despre noi" — o adresă care dispare fără urmă îi lasă
+    pe oameni într-un 404 și pierde și ce aduce Google pe ea.
+  */
   {
     de_la: "/raport-anual-de-activitate-2025-asociatia-teona-ariana-suceava",
-    la: "/raport-de-activitate-2025",
+    la: "/despre-noi",
   },
   {
     de_la: "/raport-anual-de-activitate-2025-asociatia-teona-ariana-suceava-2",
-    la: "/raport-de-activitate-2025",
+    la: "/despre-noi",
   },
+  { de_la: "/raport-de-activitate-2025", la: "/despre-noi" },
 
   // Magazinul și formularele vechi de donație.
   { de_la: "/shop", la: "/doneaza" },

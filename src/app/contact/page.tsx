@@ -333,15 +333,21 @@ export default function Contact() {
               />
             </div>
 
+            {/*
+              Trimitea la secțiunea „Transparență" de pe Despre noi, care
+              exista ca să ducă la raportul de activitate. Raportul a fost
+              scos de pe site la cererea asociației, secțiunea odată cu el;
+              rândul ăsta ar fi rămas un link către o ancoră care nu mai e.
+            */}
             <p className="mt-7 text-cerneala-moale">
-              Cum folosim fiecare donație găsești la{" "}
+              Despre ce facem și cum ajung donațiile la copii scriem pe{" "}
               <Link
-                href={`${RUTE.despre}#transparenta`}
+                href={RUTE.despre}
                 className="font-titlu font-bold text-caramiziu-700 underline-offset-4 hover:underline"
               >
-                secțiunea Transparență
-              </Link>{" "}
-              de pe pagina Despre noi.
+                pagina Despre noi
+              </Link>
+              .
             </p>
           </div>
 

@@ -169,7 +169,6 @@ export const RUTE = {
   confidentialitate: "/politica-de-confidentialitate",
   termeni: "/termeni-si-conditii",
   cookieuri: "/politica-de-cookieuri",
-  raport2025: "/raport-de-activitate-2025",
   ziuaTa: "/doneaza-ti-ziua",
   multumim: "/multumim",
 } as const;

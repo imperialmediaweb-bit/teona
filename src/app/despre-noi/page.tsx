@@ -704,44 +704,6 @@ export default function DespreNoi() {
         </div>
       </section>
 
-      {/* 3.8 — Transparență */}
-      <Val culoare="text-hartie" className={VAL_PESTE} />
-      <section className="bg-hartie pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div
-            id="transparenta"
-            className="grid scroll-mt-32 overflow-hidden colt-a border border-hartie-umbra bg-hartie shadow-[0_30px_60px_-28px_rgba(247,79,34,0.5)] lg:grid-cols-[2fr_3fr]"
-          >
-            {/* Anul raportului, scris cât cardul: e lucrul de reținut. */}
-            <div className="granulatie relative flex min-h-[12rem] flex-col justify-between overflow-hidden bg-gradient-to-br from-caramiziu-700 to-caramiziu-900 p-7 text-hartie">
-              <span
-                aria-hidden="true"
-                className="absolute -right-10 -bottom-14 size-44 rounded-full border-2 border-hartie/20"
-              />
-              <span className="colt-mic-b relative flex size-12 items-center justify-center bg-hartie/20">
-                <Pictograma nume="document" className="size-6" />
-              </span>
-              <p
-                aria-hidden="true"
-                className="relative mt-6 font-titlu text-[4rem] leading-none font-extrabold tracking-tight"
-              >
-                2025
-              </p>
-            </div>
-            <div className="p-7 sm:p-9">
-              <h2 className="text-h3 text-cerneala">Transparență</h2>
-              <p className="mt-3 text-amplu text-cerneala-moale">
-                Spunem deschis ce facem și cum folosim fiecare donație.
-              </p>
-              <Buton href={RUTE.raport2025} className="mt-7">
-                Raport de activitate 2025
-                <Pictograma nume="sageata" className="size-4" />
-              </Buton>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* 3.9 */}
       <IndemnFinal peste />
     </>

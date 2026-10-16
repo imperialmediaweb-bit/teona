@@ -111,7 +111,7 @@ export function stiinta(): string {
     `- Proiecte și tabere: ${RUTE.proiecte} · Campanii: ${RUTE.campanii} · Noutăți: ${RUTE.noutati}`,
     `- Donează: ${RUTE.doneaza} · 3,5%: ${RUTE.redirectionare35} · Firme: ${RUTE.directionare20}`,
     `- Voluntariat: ${RUTE.voluntar} · Sponsori: ${RUTE.sponsori} · Contact: ${RUTE.contact}`,
-    `- Raport de activitate: ${RUTE.raport2025} · În presă: ${RUTE.media}`,
+    `- În presă: ${RUTE.media}`,
     "",
     "## Tabere și proiecte (titlu, dată, adresă)",
     ...taberele,

@@ -106,11 +106,6 @@ const PAGINI: ReadonlyArray<{ titlu: string; cale: string; ce: string }> = [
     ce: "Articolele din presa locală despre asociație și datele de contact pentru jurnaliști.",
   },
   {
-    titlu: "Raport de activitate 2025",
-    cale: RUTE.raport2025,
-    ce: "Ce s-a făcut în 2025, cu cifre și cu felul în care au fost folosiți banii.",
-  },
-  {
     titlu: "Contact",
     cale: RUTE.contact,
     ce: "Telefoane, e-mail, adrese, formular de contact și rețelele sociale.",

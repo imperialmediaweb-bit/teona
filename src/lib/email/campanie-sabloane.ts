@@ -582,14 +582,6 @@ function corpFirme(c: ContinutCampanie): string {
         },
       )}
       ${rand(
-        "Un raport despre ce s-a făcut cu banii",
-        "Cifrele anului, pe destinații, cu tabere și copii. Nu o scrisoare de mulțumire.",
-        {
-          eticheta: "Vezi raportul",
-          adresa: link(RUTE.raport2025, "firme", campanie),
-        },
-      )}
-      ${rand(
         "Materiale pentru comunicarea voastră",
         "Fotografii și text despre proiectul pe care îl susțineți, de folosit pe canalele firmei.",
       )}`)}
@@ -663,7 +655,6 @@ export function textSimpluCampanie(
       `Calculează suma firmei: ${link(RUTE.directionare20, fel, campanie)}#calculator`,
       `Modelul de contract: ${ADRESA_SITE}/api/contract/descarca`,
       `Ce primesc sponsorii: ${link(RUTE.sponsori, fel, campanie)}`,
-      `Raportul de activitate: ${link(RUTE.raport2025, fel, campanie)}`,
       `Taberele RESPIRO: ${link(RUTE.proiecte, fel, campanie)}`,
       `Campaniile deschise: ${link(RUTE.campanii, fel, campanie)}`,
       "",
