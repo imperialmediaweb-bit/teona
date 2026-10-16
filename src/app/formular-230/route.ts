@@ -1,5 +1,5 @@
 import { legaturaSemnata, areR2 } from "@/lib/r2";
-import { EMAIL } from "@/date/asociatie";
+import { ASOCIATIA, EMAIL, RUTE, TELEFON_PRINCIPAL } from "@/date/asociatie";
 
 /**
  * Formularul 230 gol, pe care îl descarcă oamenii.
@@ -41,9 +41,54 @@ export async function GET() {
   }
 }
 
+/**
+ * Când fișierul nu e acolo.
+ *
+ * **O pagină, nu o propoziție pe fond alb.** Adresa asta e capătul unui buton
+ * mare, „Descarcă formularul", apăsat de un om care vrea să doneze 3,5% din
+ * impozit. Un text gol, cu Times New Roman, arată ca un site stricat — iar
+ * omul care crede că site-ul e stricat nu mai încearcă pe altă cale, nici
+ * acum, nici la anul.
+ *
+ * Codul rămâne 404: fișierul chiar nu e acolo, iar Google n-are ce indexa.
+ * Dar omul primește numărul de telefon și adresa de e-mail, pe o pagină care
+ * seamănă cu restul site-ului.
+ */
 function lipseste() {
-  return new Response(
-    `Formularul nu e încă încărcat pe site. Scrie-ne la ${EMAIL.contact} și ți-l trimitem.`,
-    { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } },
+  const html = `<!doctype html>
+<html lang="ro"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Formularul 230 · ${curat(ASOCIATIA.denumire)}</title>
+<meta name="robots" content="noindex" />
+<style>
+  :root{color-scheme:light}
+  body{margin:0;background:#f9f5f2;color:#232323;font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;line-height:1.6}
+  main{max-width:34rem;margin:0 auto;padding:4rem 1.25rem}
+  h1{font-size:1.6rem;line-height:1.25;margin:0 0 1rem}
+  p{margin:0 0 1rem;color:#4a4a4a}
+  a{color:#b82b09;font-weight:700}
+  .card{background:#fff;border:1px solid #efe7e1;border-radius:14px;padding:1.5rem}
+  .inapoi{display:inline-block;margin-top:1.5rem;color:#616161;font-size:.9rem}
+</style></head>
+<body><main><div class="card">
+  <h1>Formularul nu e încă încărcat pe site</h1>
+  <p>Îl punem aici imediat ce îl primim. Până atunci ți-l trimitem noi, pe loc:</p>
+  <p>
+    Sună la <a href="tel:${TELEFON_PRINCIPAL.apel}">${curat(TELEFON_PRINCIPAL.afisat)}</a><br />
+    sau scrie la <a href="mailto:${EMAIL.contact}">${curat(EMAIL.contact)}</a>
+  </p>
+  <p>Poți completa formularul și <a href="${RUTE.redirectionare35}">direct pe site</a>, fără imprimantă și fără drum.</p>
+  <a class="inapoi" href="${RUTE.redirectionare35}">← Înapoi la pagina de redirecționare</a>
+</div></main></body></html>`;
+  return new Response(html, {
+    status: 404,
+    headers: { "content-type": "text/html; charset=utf-8" },
+  });
+}
+
+/** Scapă textul pus în HTML. Puțin, dar dintr-un singur loc. */
+function curat(text: string): string {
+  return text.replace(
+    /[&<>"]/g,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!,
   );
 }

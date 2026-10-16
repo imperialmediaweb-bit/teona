@@ -1,3 +1,9 @@
+import {
+  ADRESE,
+  ASOCIATIA,
+  JURIDIC,
+  TELEFON_PRINCIPAL,
+} from "@/date/asociatie";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
@@ -54,28 +60,37 @@ const BEJ = "FEF1E8";
 const LINIE = "E2E2E2";
 
 /* ── Datele verificate ale asociației ──────────────────────────────────── */
-const ASOCIATIA = {
-  denumire: "ASOCIAȚIA TEONA ARIANA SUCEAVA",
-  antet:
-    "str. Nicolae Milescu nr. 7, Suceava  ·  0754 510 167  ·  ata.suceava@gmail.com",
+/*
+  Toate dintr-un singur loc, `src/date/asociatie.ts`.
+
+  Erau scrise aici de mână: denumirea, sediul, CIF-ul, numărul de registru,
+  telefonul și cele trei IBAN-uri. Generatorul de PDF (`contract.ts`) le lua
+  deja din constante, deci cele două contracte aveau aceleași date scrise în
+  două locuri — iar un IBAN schimbat într-unul ar fi lăsat firmele care
+  descarcă varianta Word să vireze în contul vechi. E documentul pe care îl
+  semnează o firmă; aici nu e loc pentru două adevăruri.
+*/
+const ANTET = {
+  denumire: ASOCIATIA.denumireLegala,
+  antet: `${ADRESE.sediuSocial.strada.replace(/^Strada /, "str. ")}, ${ADRESE.sediuSocial.oras}  ·  ${TELEFON_PRINCIPAL.afisat}  ·  ${JURIDIC.email}`,
   randuri: [
-    ["Sediul", "str. Nicolae Milescu nr. 7, Suceava, jud. Suceava", ""],
-    ["CIF", "43533953", ""],
-    ["Registrul special", "nr. 1/14.01.2021 (registrul persoanelor juridice)", ""],
-    ["Telefon / e-mail", "0754 510 167  ·  ata.suceava@gmail.com", ""],
     [
-      "Cont LEI",
-      "RO57 BACX 0000 0021 0940 3001",
-      " – UniCredit Bank, Suc. Curtea Domnească Suceava",
+      "Sediul",
+      `${ADRESE.sediuSocial.strada.replace(/^Strada /, "str. ")}, ${ADRESE.sediuSocial.oras}, jud. ${ADRESE.sediuSocial.oras}`,
+      "",
     ],
+    ["CIF", ASOCIATIA.cif, ""],
+    ["Registrul special", JURIDIC.registru, ""],
     [
-      "Cont EURO",
-      "RO30 BACX 0000 0021 0940 3002",
-      " – UniCredit Bank, Suc. Curtea Domnească Suceava",
+      "Telefon / e-mail",
+      `${TELEFON_PRINCIPAL.afisat}  ·  ${JURIDIC.email}`,
+      "",
     ],
-    ["Cont LEI", "RO16 RNCB 0234 1852 3366 0001", " – BCR Suceava"],
-    ["Reprezentant legal", "Corneliu Cristea Costiuc, Președinte", ""],
-  ] as const,
+    ...JURIDIC.conturi.map(
+      (c) => [`Cont ${c.moneda}`, c.iban, ` – ${c.banca}`] as const,
+    ),
+    ["Reprezentant legal", `${JURIDIC.reprezentant}, ${JURIDIC.calitate}`, ""],
+  ] as ReadonlyArray<readonly [string, string, string]>,
 };
 
 const CORP = 21; // 10,5 pt, în jumătăți de punct
@@ -132,9 +147,7 @@ function rand(parti: Parte[]): Paragraph {
       }),
     );
     if (parte.valoare) {
-      copii.push(
-        new TextRun({ text: parte.valoare, size: CORP, bold: true }),
-      );
+      copii.push(new TextRun({ text: parte.valoare, size: CORP, bold: true }));
     }
     copii.push(
       new TextRun({
@@ -241,7 +254,7 @@ function casetaBeneficiarului(): Table {
                 spacing: { before: 100, after: 80 },
                 children: [
                   new TextRun({
-                    text: ASOCIATIA.denumire,
+                    text: ANTET.denumire,
                     bold: true,
                     size: CORP,
                     color: NEGRU,
@@ -253,8 +266,8 @@ function casetaBeneficiarului(): Table {
           ),
         ],
       }),
-      ...ASOCIATIA.randuri.map(
-        ([eticheta, valoare, coada]) =>
+      ...ANTET.randuri.map(
+        ([eticheta, valoare, coada]: readonly [string, string, string]) =>
           new TableRow({
             children: [
               celula(2200, [
@@ -465,7 +478,7 @@ function antet(): Header {
                     alignment: AlignmentType.RIGHT,
                     children: [
                       new TextRun({
-                        text: ASOCIATIA.antet,
+                        text: ANTET.antet,
                         size: 15,
                         color: MOALE,
                       }),
@@ -562,7 +575,9 @@ export async function contractWord(
     sections: [
       {
         properties: {
-          page: { margin: { top: 1500, bottom: 1130, left: 1130, right: 1130 } },
+          page: {
+            margin: { top: 1500, bottom: 1130, left: 1130, right: 1130 },
+          },
         },
         headers: { default: antet() },
         footers: { default: subsol() },
@@ -676,7 +691,10 @@ export async function contractWord(
                 : []),
               new TextRun({
                 text: ".".repeat(
-                  Math.max(10, 96 - Math.round(2 * (date.valoare?.length ?? 0))),
+                  Math.max(
+                    10,
+                    96 - Math.round(2 * (date.valoare?.length ?? 0)),
+                  ),
                 ),
                 size: CORP,
                 color: MOALE,
