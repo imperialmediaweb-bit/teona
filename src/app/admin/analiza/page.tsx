@@ -696,6 +696,32 @@ async function Continut({
         </p>
       )}
 
+      {/*
+        Scurtătură la consultant, sus.
+
+        Pagina are trei mii de pixeli: profilurile, campaniile, analiza
+        scrisă. Consultantul stă la capăt, fiindcă **cifrele rămân înaintea
+        interpretării** — cine citește o concluzie trebuie să poată verifica
+        pe aceeași pagină din ce a ieșit. Dar cine vine aici cu o întrebare
+        nu vine să citească tabele, și n-are de ce să deruleze pe lângă toate
+        ca s-o pună. Un rând sus, care sare acolo: ordinea nu se schimbă,
+        drumul da.
+      */}
+      {areAnaliza() && (
+        <a
+          href="#consultant"
+          className="mb-6 flex flex-wrap items-center gap-x-3 gap-y-1 colt-a border border-caramiziu-200 bg-caramiziu-50 px-5 py-4 transition-colors hover:border-caramiziu-400"
+        >
+          <span className="font-titlu text-mic font-bold text-caramiziu-900">
+            Ai o întrebare? Întreabă consultantul ↓
+          </span>
+          <span className="text-nota text-caramiziu-900/75">
+            Vede aceleași cifre, știe ce unelte are site-ul. Nu are nume și nici
+            adrese.
+          </span>
+        </a>
+      )}
+
       <Sectiune
         titlu="Vizitele de pe site"
         nota="Din Google Analytics, ultimele 28 de zile. Sunt vizite, nu donații."
@@ -837,7 +863,7 @@ async function Continut({
           Vede exact aceleași cifre, agregate: le trimite serverul, nu caseta.
         */}
         {areAnaliza() ? (
-          <div className="mt-6">
+          <div className="mt-6 scroll-mt-6" id="consultant">
             <Sfatuitor />
           </div>
         ) : (
