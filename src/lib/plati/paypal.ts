@@ -42,7 +42,12 @@ async function iaJeton(): Promise<string> {
     },
     body: "grant_type=client_credentials",
   });
-  if (!raspuns.ok) throw new Error(`PayPal: jeton refuzat (${raspuns.status})`);
+  if (!raspuns.ok) {
+    const spus = await raspuns.text().catch(() => "");
+    throw new Error(
+      `PayPal: jeton refuzat (${raspuns.status}) ${spus.slice(0, 200)}`,
+    );
+  }
 
   const date = (await raspuns.json()) as {
     access_token: string;
@@ -110,7 +115,18 @@ export async function deschideComanda(
   });
 
   if (!raspuns.ok) {
-    throw new Error(`PayPal: comandă refuzată (${raspuns.status})`);
+    /*
+      Și ce-a spus PayPal, nu doar codul.
+
+      Un 422 de la ei poate însemna zece lucruri — contul nu poate primi
+      euro, moneda nu e pornită, suma e prost scrisă —, iar fără motivul lor
+      se caută pe ghicite. Corpul erorii conține coduri și un `debug_id`,
+      niciodată chei; se taie oricum, ca să nu umple jurnalul.
+    */
+    const spus = await raspuns.text().catch(() => "");
+    throw new Error(
+      `PayPal: comandă refuzată (${raspuns.status}) ${spus.slice(0, 400)}`,
+    );
   }
 
   const date = (await raspuns.json()) as {
