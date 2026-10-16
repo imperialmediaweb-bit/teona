@@ -11,6 +11,7 @@ import {
 } from "@/lib/plati/donatori";
 import { DESTINATII_DONATIE } from "@/date/asociatie";
 import { scrieSuma } from "@/lib/suma";
+import { platiEsuate } from "@/lib/plati/esuate";
 import Cadru from "@/componente/admin/Cadru";
 import Descarca from "@/componente/admin/Descarca";
 import Intrare from "@/componente/admin/Intrare";
@@ -82,6 +83,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
 
   const lista = await donatii(100);
   const anuntate = await transferuriAnuntate();
+  const esuate = await platiEsuate().catch(() => []);
   const camp =
     "w-full rounded-moale border border-hartie-umbra bg-hartie px-3 py-2 text-mic";
   const azi = new Date().toISOString().slice(0, 10);
@@ -128,6 +130,62 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
         în tabelul de mai jos — pentru că anunțul vine dintr-un formular
         public, iar un total în care intră ce scrie oricine nu e un total.
       */}
+      {/*
+        Donațiile lunare care n-au trecut — oamenii de sunat.
+
+        Stau deasupra transferurilor dinadins: un transfer anunțat așteaptă o
+        verificare și nu se pierde dacă se face mâine. Un card căzut se pierde
+        de tot — Stripe mai încearcă de câteva ori, apoi oprește abonamentul,
+        iar donatorul nici nu știe.
+      */}
+      {esuate.length > 0 && (
+        <section className="mb-8 rounded-card border-2 border-caramiziu-300 bg-caramiziu-50 p-5">
+          <h2 className="font-titlu text-amplu font-bold text-caramiziu-900">
+            Donații lunare care n-au trecut ({esuate.length})
+          </h2>
+          <p className="mt-1 max-w-2xl text-mic text-caramiziu-900/80">
+            Oamenii ăștia vor să doneze și nu pot — de obicei fiindcă le-a
+            expirat cardul. Fiecare a primit un mesaj cu linkul de schimbat
+            cardul; jumătate nu-l deschid. Un telefon în săptămâna asta
+            recuperează donația. Rândul dispare singur când plata trece.
+          </p>
+
+          <ul className="mt-5 grid gap-3">
+            {esuate.map((e) => (
+              <li
+                key={e.id}
+                className="rounded-moale border border-caramiziu-200 bg-hartie p-4"
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                  <p className="font-titlu font-bold text-cerneala">
+                    {[e.prenume, e.email].filter(Boolean).join(" · ") ||
+                      "fără nume"}
+                  </p>
+                  <p className="font-titlu font-bold whitespace-nowrap text-caramiziu-800">
+                    {scrieSuma(e.sumaBani / 100, e.moneda)} pe lună
+                  </p>
+                </div>
+                <p className="mt-1 text-nota text-cerneala-moale">
+                  {CAND.format(new Date(e.creatLa))}
+                  {e.incercari > 1 && ` · ${e.incercari} încercări`}
+                  {e.motiv && ` · ${e.motiv}`}
+                </p>
+                {e.email && (
+                  <p className="mt-2 text-mic">
+                    <a
+                      href={`mailto:${e.email}`}
+                      className="font-titlu font-semibold text-caramiziu-700 underline underline-offset-2"
+                    >
+                      Scrie-i
+                    </a>
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {anuntate.length > 0 && (
         <section className="mb-8 rounded-card border-2 border-turcoaz-300 bg-turcoaz-50 p-5">
           <h2 className="font-titlu text-amplu font-bold text-turcoaz-900">

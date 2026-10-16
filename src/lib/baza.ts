@@ -400,6 +400,36 @@ const ADAOSURI = `
     ON contacte_presa (activ, publicatie);
 
   /*
+    Plățile lunare care n-au trecut.
+
+    Un card expiră, o bancă îl reemite, plata cade. Stripe mai încearcă de
+    câteva ori și apoi oprește abonamentul; donatorul crede că donează în
+    continuare, iar asociația află peste luni, din raport. Rândurile astea
+    sunt lista de telefoane de dat săptămâna asta.
+
+    Cheia e factura, nu abonamentul: Stripe trimite același eveniment la
+    fiecare reîncercare, iar donatorul n-are de ce să primească patru
+    mesaje despre același card.
+  */
+  CREATE TABLE IF NOT EXISTS plati_esuate (
+    id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    factura     text UNIQUE NOT NULL,
+    abonament   text,
+    client      text,
+    email       text,
+    prenume     text,
+    suma_bani   bigint NOT NULL,
+    moneda      text NOT NULL DEFAULT 'RON',
+    destinatie  text,
+    motiv       text,
+    incercari   integer NOT NULL DEFAULT 1,
+    rezolvat    boolean NOT NULL DEFAULT false,
+    creat_la    timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS plati_esuate_nerezolvate
+    ON plati_esuate (rezolvat, creat_la DESC);
+
+  /*
     Ziua în care se vrea publicat un text care e încă ciornă.
 
     Nu publică nimic singură — publicarea rămâne o apăsare de om. E doar

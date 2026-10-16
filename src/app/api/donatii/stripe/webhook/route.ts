@@ -12,6 +12,14 @@ import { citesteEveniment } from "@/lib/plati/stripe";
 import { laBuletin } from "@/lib/buletin";
 import { trimiteMultumirea } from "@/lib/email/donatie";
 import { trimiteVesteaReinnoirii } from "@/lib/email/reinnoire";
+import {
+  anuntaPlataEsuata,
+  trimitePlataEsuata,
+} from "@/lib/email/plata-esuata";
+import {
+  rezolvaPlatileEsuate,
+  scriePlataEsuata,
+} from "@/lib/plati/esuate";
 
 /**
  * Confirmarea plăților, de la Stripe.
@@ -119,7 +127,77 @@ async function prelucreaza(eveniment: Stripe.Event) {
         factura.id ?? `factura-${eveniment.id}`,
         factura.amount_paid,
       );
+      /*
+        Plata a trecut, deci eșecurile abonamentului se închid.
+
+        Fie omul și-a schimbat cardul, fie a trecut o reîncercare a lui
+        Stripe. Oricum, nu mai e nimeni de sunat — iar o listă de telefoane
+        în care jumătate din rânduri sunt rezolvate nu se mai deschide.
+      */
+      const abonamentPlatit = idAbonamentului(factura);
+      if (abonamentPlatit) {
+        await rezolvaPlatileEsuate(abonamentPlatit).catch(() => undefined);
+      }
       await dupaIncasare(randReinnoire, true);
+      return;
+    }
+
+    /*
+      Plata lunară n-a trecut.
+
+      Cea mai tăcută pierdere de bani dintr-un ONG cu donații recurente: un
+      card expiră, plata cade, Stripe mai încearcă de câteva ori și apoi
+      oprește abonamentul. Donatorul crede că donează în continuare;
+      asociația află peste luni, din raport, că „a scăzut ce vine lunar".
+
+      Nu se scrie nimic în evidența donațiilor: banii ăștia n-au intrat.
+      Rândul din `plati_esuate` e o listă de telefoane, nu o donație.
+    */
+    case "invoice.payment_failed": {
+      const factura = eveniment.data.object as Stripe.Invoice;
+      const date = metadateleAbonamentului(factura);
+      const abonament = idAbonamentului(factura);
+      const client =
+        typeof factura.customer === "string"
+          ? factura.customer
+          : (factura.customer?.id ?? null);
+      const rand = factura.lines?.data?.[0];
+      const suma = factura.amount_due ?? rand?.amount ?? 0;
+      const moneda = (factura.currency ?? "ron").toUpperCase();
+
+      const intaiaOara = await scriePlataEsuata({
+        factura: factura.id ?? `factura-${eveniment.id}`,
+        abonament,
+        client,
+        email: factura.customer_email ?? null,
+        prenume: date.prenume || null,
+        sumaBani: suma,
+        moneda,
+        destinatie: date.destinatie || null,
+        motiv: motivul(factura),
+      });
+
+      /*
+        Mesajul pleacă o singură dată pe factură, la prima cădere. Stripe
+        reîncearcă de câteva ori; patru mesaje despre același card nu se
+        citesc, al treilea se marchează ca spam — și pierdem și donatorul,
+        și adresa.
+      */
+      if (intaiaOara) {
+        const pentru = {
+          email: factura.customer_email ?? "",
+          prenume: date.prenume || null,
+          sumaBani: suma,
+          moneda,
+          destinatie: date.destinatie || "oriunde",
+          client,
+          motiv: motivul(factura),
+        };
+        if (pentru.email) {
+          await trimitePlataEsuata(pentru).catch(() => undefined);
+        }
+        await anuntaPlataEsuata(pentru).catch(() => undefined);
+      }
       return;
     }
 
@@ -167,6 +245,30 @@ async function prelucreaza(eveniment: Stripe.Event) {
       // le retrimită.
       return;
   }
+}
+
+/**
+ * Ce a spus banca, dacă a spus ceva de înțeles.
+ *
+ * Stripe pune motivul în `last_finalization_error` sau pe plata atașată, în
+ * câmpuri care s-au mutat între versiuni de API. Îl căutăm unde e, și dacă
+ * nu-l găsim nu inventăm nimic: mesajul merge și fără el.
+ */
+function motivul(factura: Stripe.Invoice): string | null {
+  const f = factura as unknown as {
+    last_finalization_error?: { message?: string };
+    charge?: { failure_message?: string } | string;
+    payment_intent?: { last_payment_error?: { message?: string } } | string;
+  };
+  const dinFinalizare = f.last_finalization_error?.message;
+  const dinPlata =
+    typeof f.charge === "object" ? f.charge?.failure_message : undefined;
+  const dinIntentie =
+    typeof f.payment_intent === "object"
+      ? f.payment_intent?.last_payment_error?.message
+      : undefined;
+  const gasit = dinFinalizare ?? dinPlata ?? dinIntentie;
+  return gasit ? gasit.slice(0, 300) : null;
 }
 
 /**

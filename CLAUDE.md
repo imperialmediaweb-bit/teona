@@ -358,6 +358,26 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
   identificatorul abonamentului și ziua expirării (35 de zile), deci nu se
   poate schimba abonamentul din ea și nu ține o viață.
   Probă: `BAZA=… PAROLA_ADMIN=… SECRET_SESIUNE=… node scripts/qa/oprire-lunara.mjs`.
+- **Plata lunară care nu trece se recuperează, nu se pierde tăcut.** Un card
+  expiră, o bancă îl reemite, plata cade; Stripe mai încearcă de câteva ori și
+  apoi oprește abonamentul. Donatorul nu știe — pentru el donația pare că
+  merge — iar asociația află peste luni, din raport, că „a scăzut ce vine
+  lunar". Pe `invoice.payment_failed`: rândul intră în `plati_esuate` (cheia e
+  **factura**, nu abonamentul, deci reîncercările se numără, nu se dublează),
+  donatorul primește **un singur mesaj pe factură** cu un link de schimbat
+  cardul, iar asociația primește anunțul — jumătate dintre oameni nu deschid
+  e-mailul, și pentru ei rămâne doar telefonul. Rândurile se văd la
+  `/admin/donatii`, sus, și numărul lor în „De făcut acum". Când plata trece
+  (`invoice.paid`), rândurile abonamentului se închid singure.
+  **Mesajul nu ceartă pe nimeni:** omul nu datorează nimic, face o donație, iar
+  dacă nu mai vrea să continue n-are nimic de făcut. Unul fugărit nu se mai
+  întoarce.
+  Linkul duce la `/actualizeaza-cardul`, care cere **atunci** o sesiune de
+  portal Stripe — cele puse în e-mail expiră în câteva minute. Semnătura
+  acoperă clientul și ziua expirării (35 de zile, `src/lib/card-nou.ts`); dacă
+  portalul nu e pornit în contul asociației, omul primește o pagină cu telefon,
+  nu o eroare. Probă:
+  `PAROLA_ADMIN=… DATABASE_URL=… node scripts/qa/plata-esuata.mjs`
 - **Căile de plată se văd toate din capul formularului de card**: „Card",
   „PayPal (în euro)" dacă are chei, „Transfer bancar". Înainte pagina începea
   direct cu formularul de card, iar celelalte stăteau după o cotitură de

@@ -252,7 +252,8 @@ export async function peMonede(): Promise<
 export async function deFacutAcum(): Promise<
   Array<{ eticheta: string; nr: number; unde: string }>
 > {
-  const [cereri, aniversari, ciorne, firme, transferuri] = await Promise.all([
+  const [cereri, aniversari, ciorne, firme, transferuri, esuate] =
+    await Promise.all([
     intreaba<{ nr: string }>(
       `SELECT count(*) AS nr FROM cereri WHERE stadiu = 'nou'`,
     ),
@@ -275,9 +276,22 @@ export async function deFacutAcum(): Promise<
     intreaba<{ nr: string }>(
       `SELECT count(*) AS nr FROM donatii WHERE stare = 'anuntata'`,
     ),
+    /*
+      Donațiile lunare care n-au trecut. Sunt primele pe listă dintr-un
+      motiv: fiecare rând e un om care *vrea* să doneze și nu poate, iar
+      după câteva reîncercări Stripe oprește abonamentul de tot.
+    */
+    intreaba<{ nr: string }>(
+      `SELECT count(*) AS nr FROM plati_esuate WHERE rezolvat = false`,
+    ),
   ]);
 
   return [
+    {
+      eticheta: "donații lunare care n-au trecut",
+      nr: Number(esuate[0]?.nr ?? 0),
+      unde: "/admin/donatii",
+    },
     { eticheta: "cereri noi", nr: Number(cereri[0]?.nr ?? 0), unde: "/admin/cereri" },
     {
       eticheta: "transferuri de căutat în extras",

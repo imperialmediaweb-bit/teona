@@ -13,6 +13,10 @@ import { compuneContractulNesemnat } from "../contract";
 import { compuneAnuntTransfer, compuneTransferAnuntat } from "../transfer";
 import { compuneVesteaReinnoirii } from "../reinnoire";
 import {
+  compuneAnuntPlataEsuata,
+  compunePlataEsuata,
+} from "../plata-esuata";
+import {
   compuneConfirmareaDeContact,
   compuneMesajulDeContact,
 } from "../contact";
@@ -93,6 +97,35 @@ export function exemple(): Exemplu[] {
         destinatie: "tabere",
         cand: ZI_DE_PROBA,
         abonament: "sub_deproba123",
+      }),
+    },
+    {
+      id: "plata-esuata",
+      titlu: "Plata lunară n-a trecut",
+      cand: "La prima cădere a unei plăți lunare — de obicei card expirat. O singură dată pe factură, oricâte reîncercări ar face Stripe.",
+      catre: "om",
+      compus: compunePlataEsuata({
+        email: "maria@exemplu.ro",
+        prenume: "Maria",
+        sumaBani: 15000,
+        moneda: "RON",
+        destinatie: "tabere",
+        client: "cus_deproba123",
+      }),
+    },
+    {
+      id: "anunt-plata-esuata",
+      titlu: "Anunț: o donație lunară n-a trecut",
+      cand: "Odată cu mesajul de mai sus. Jumătate dintre oameni nu-l deschid — rămâne telefonul.",
+      catre: "asociatie",
+      compus: compuneAnuntPlataEsuata({
+        email: "maria@exemplu.ro",
+        prenume: "Maria",
+        sumaBani: 15000,
+        moneda: "RON",
+        destinatie: "tabere",
+        client: "cus_deproba123",
+        motiv: "Your card has expired.",
       }),
     },
     {

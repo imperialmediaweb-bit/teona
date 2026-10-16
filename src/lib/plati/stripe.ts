@@ -230,3 +230,32 @@ export async function opresteAbonamentulDupaId(id: string): Promise<boolean> {
   await ia().subscriptions.cancel(id);
   return true;
 }
+
+/**
+ * Adresa portalului de facturare, pentru un client.
+ *
+ * Acolo își schimbă cardul, își vede facturile și poate opri donația. E al
+ * lui Stripe, deci nu trece prin noi niciun număr de card — site-ul nu vede
+ * și nu păstrează nimic din ce se scrie acolo.
+ *
+ * Sesiunea ține câteva minute, deci se cere la apăsare, nu la trimiterea
+ * e-mailului. Dacă portalul nu e configurat în contul asociației, Stripe
+ * refuză: atunci întoarcem `null`, iar pagina îi dă omului un telefon în loc
+ * de o eroare.
+ */
+export async function adresaPortalului(
+  client: string,
+  inapoiLa: string,
+): Promise<string | null> {
+  if (!areStripe()) return null;
+  try {
+    const sesiune = await ia().billingPortal.sessions.create({
+      customer: client,
+      return_url: inapoiLa,
+      locale: "ro",
+    });
+    return sesiune.url ?? null;
+  } catch {
+    return null;
+  }
+}
