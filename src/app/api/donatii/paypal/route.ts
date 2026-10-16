@@ -7,6 +7,7 @@ import {
   esteDestinatie,
   euroAcceptat,
 } from "@/date/plati";
+import { esteCanal } from "@/lib/atribuire";
 import { ADRESA_SITE } from "@/app/seo";
 
 /**
@@ -56,13 +57,27 @@ export async function POST(cerere: Request) {
     const comanda = await deschideComanda({
       euro,
       destinatie,
+      canal: esteCanal(corp.canal) ? corp.canal : null,
       adresaSite: ADRESA_SITE,
     });
     return NextResponse.json(
       { adresa: comanda.adresa },
       { status: 200, headers: { "Cache-Control": "no-store" } },
     );
-  } catch {
+  } catch (eroare) {
+    /*
+      Motivul, în jurnalul serverului.
+
+      Donatorul vede un mesaj omenesc, dar cineva trebuie să poată afla de ce
+      n-a mers — altfel „PayPal nu merge" rămâne o vorbă, iar cauza (chei de
+      probă într-un cont de producție, cont fără euro, jeton refuzat) se caută
+      pe ghicite. Mesajele aruncate de `paypal.ts` conțin numai codul de
+      răspuns, niciodată cheile.
+    */
+    console.error(
+      "PayPal:",
+      eroare instanceof Error ? eroare.message : "eroare necunoscută",
+    );
     return raspuns(
       "Nu am putut porni plata prin PayPal. Încearcă din nou peste câteva minute.",
       502,

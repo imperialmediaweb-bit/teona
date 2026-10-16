@@ -58,6 +58,8 @@ async function iaJeton(): Promise<string> {
 export type CerereEuro = {
   euro: number;
   destinatie: string;
+  /** Canalul din care a venit donatorul (`src/lib/atribuire.ts`). */
+  canal?: string | null;
   adresaSite: string;
 };
 
@@ -84,7 +86,17 @@ export async function deschideComanda(
           description: (
             DESTINATII[cerere.destinatie] ?? DESTINATII.oriunde
           ).slice(0, 127),
-          custom_id: cerere.destinatie,
+          /*
+            Destinația și canalul, într-un singur câmp.
+
+            PayPal ne întoarce la confirmare numai ce i-am dat noi aici; alt
+            loc pentru date de-ale noastre nu există. De aceea stau amândouă
+            în `custom_id`, despărțite de o bară — webhookul le desparte
+            înapoi. Fără asta, orice donație prin PayPal ar rămâne fără canal.
+          */
+          custom_id: [cerere.destinatie, cerere.canal ?? ""]
+            .join("|")
+            .slice(0, 127),
         },
       ],
       application_context: {

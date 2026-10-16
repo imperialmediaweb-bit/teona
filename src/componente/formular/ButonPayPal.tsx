@@ -7,6 +7,7 @@ import {
   SUME_PROPUSE_EURO,
   euroAcceptat,
 } from "@/date/plati";
+import { atribuireaCurenta } from "@/lib/atribuire-browser";
 import { citesteSuma, scrieSuma } from "@/lib/suma";
 import Pictograma from "../Pictograma";
 
@@ -82,11 +83,17 @@ export default function ButonPayPal({
     }
 
     setStare({ fel: "trimite" });
+    const deUnde = atribuireaCurenta();
     try {
       const raspuns = await fetch("/api/donatii/paypal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ euro: suma, destinatie }),
+        body: JSON.stringify({
+          euro: suma,
+          destinatie,
+          // De unde a venit omul — vezi `src/lib/atribuire-browser.ts`.
+          ...(deUnde ? { canal: deUnde.canal } : {}),
+        }),
       });
       const corp = (await raspuns.json().catch(() => ({}))) as {
         adresa?: string;

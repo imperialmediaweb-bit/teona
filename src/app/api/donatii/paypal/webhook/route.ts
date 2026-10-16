@@ -52,6 +52,8 @@ export async function POST(cerere: Request) {
     const resursa = eveniment.resource ?? {};
     const referinta = resursa.id ?? eveniment.id;
     const bani = Math.round(Number(resursa.amount?.value ?? 0) * 100);
+    // „destinatie|canal", cum l-am trimis noi la deschiderea comenzii.
+    const [destinatie, canal] = (resursa.custom_id ?? "").split("|");
 
     await scrieInitiata({
       procesator: "paypal",
@@ -59,7 +61,7 @@ export async function POST(cerere: Request) {
       sumaBani: bani,
       moneda: resursa.amount?.currency_code ?? "EUR",
       frecventa: "o-data",
-      destinatie: resursa.custom_id ?? "oriunde",
+      destinatie: destinatie || "oriunde",
       email: resursa.payer?.email_address ?? null,
       prenume: null,
       nume: null,
@@ -67,6 +69,7 @@ export async function POST(cerere: Request) {
       // PayPal nu ne poate transmite o bifă pe care omul n-a văzut-o pe
       // site-ul nostru. Fără acord explicit, nimeni nu ajunge pe listă.
       acordBuletin: false,
+      canal: canal || null,
     });
     const rand = await marcheazaPlatita("paypal", referinta, bani);
 
