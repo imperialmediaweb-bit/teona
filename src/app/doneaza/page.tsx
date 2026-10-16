@@ -259,7 +259,8 @@ export default function Doneaza() {
           </div>
 
           {/* 2.2 — donația cu cardul, primul bloc de pe pagină. */}
-          <div>
+          {/* `id` ca să se poată trimite aici de pe celelalte căi de plată. */}
+          <div id="card">
             <h2 className="sr-only">Donează cu cardul</h2>
             <FormularDonatie arePayPal={arePayPal()} />
           </div>

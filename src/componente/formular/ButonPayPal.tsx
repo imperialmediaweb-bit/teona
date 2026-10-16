@@ -173,13 +173,35 @@ export default function ButonPayPal({
         className="colt-mic-b min-h-12 w-full border-2 border-hartie/30 bg-transparent px-4 py-3 text-corp text-hartie transition-colors duration-200 outline-none placeholder:text-hartie/40 focus:border-hartie sm:max-w-xs"
       />
 
+      {/*
+        Când PayPal nu merge, omul rămâne cu celelalte căi în față.
+
+        Un om care a apăsat „Donează cu PayPal" și a primit o eroare nu mai
+        caută singur altă cale: închide pagina. Mesajul spune ce s-a
+        întâmplat și arată pe loc cele două căi care merg — cardul, care e
+        chiar deasupra, și transferul, cu toate conturile.
+      */}
       {stare.fel === "eroare" && (
-        <p
+        <div
           role="alert"
           className="colt-mic-a mt-4 border-2 border-hartie/40 bg-hartie/10 px-4 py-3 text-mic text-hartie"
         >
-          {stare.mesaj}
-        </p>
+          <p>{stare.mesaj}</p>
+          <p className="mt-2 text-hartie/90">
+            Poți dona și{" "}
+            <a href="#card" className="font-bold underline underline-offset-2">
+              cu cardul
+            </a>{" "}
+            sau prin{" "}
+            <a
+              href="#transfer"
+              className="font-bold underline underline-offset-2"
+            >
+              transfer bancar
+            </a>
+            .
+          </p>
+        </div>
       )}
 
       <button
