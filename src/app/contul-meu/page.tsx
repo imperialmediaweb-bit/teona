@@ -7,6 +7,7 @@ import { areConturi } from "@/lib/cont";
 import { donatorulConectat } from "@/lib/sesiune";
 import { contulMeu } from "@/lib/plati/donatori";
 import { areEmail } from "@/lib/email/trimite";
+import { abonamenteleLui } from "@/lib/plati/stripe";
 import { EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import CereLink from "@/componente/cont/CereLink";
 import PanouDonator from "@/componente/cont/PanouDonator";
@@ -67,17 +68,21 @@ function Schelet() {
   return <Cap titlu="Contul meu" />;
 }
 
-async function Continut({
-  searchParams,
-}: {
-  searchParams: Promise<Cautare>;
-}) {
+async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   await connection();
   const { expirat, gata, eroare } = await searchParams;
 
   const pornit = areBazaDeDate() && areConturi() && areEmail();
   const email = pornit ? await donatorulConectat() : null;
   const cont = email ? await contulMeu(email) : null;
+  /*
+    Abonamentele vin de la Stripe, iar Stripe poate să nu răspundă. Dacă nu
+    răspunde, panoul se deschide oricum, fără lista lor: restul paginii —
+    istoricul, totalurile, ștergerea datelor — nu are nicio treabă cu el.
+  */
+  const abonamente = cont
+    ? await abonamenteleLui(cont.email).catch(() => [])
+    : [];
 
   return (
     <>
@@ -120,6 +125,40 @@ async function Continut({
               Gata, nu mai primești buletinul informativ.
             </p>
           )}
+          {gata === "oprita" && (
+            <p
+              role="status"
+              className="mb-8 colt-mic-a border-2 border-turcoaz-200 bg-turcoaz-50 px-5 py-4 text-mic text-turcoaz-900"
+            >
+              <strong className="font-titlu font-bold">
+                Am oprit donația lunară.
+              </strong>{" "}
+              Nu se mai ia nimic de pe card. Mulțumim pentru lunile în care
+              ne-ai fost alături.
+            </p>
+          )}
+          {eroare === "abonament" && (
+            <p
+              role="alert"
+              className="mb-8 colt-mic-a border-2 border-caramiziu-200 bg-caramiziu-50 px-5 py-4 text-mic text-caramiziu-900"
+            >
+              N-am putut opri donația lunară de aici. Scrie-ne la{" "}
+              <a
+                href={`mailto:${EMAIL.contact}`}
+                className="font-semibold break-all underline underline-offset-2"
+              >
+                {EMAIL.contact}
+              </a>{" "}
+              sau sună la{" "}
+              <a
+                href={`tel:${TELEFON_PRINCIPAL.apel}`}
+                className="font-semibold underline underline-offset-2"
+              >
+                {TELEFON_PRINCIPAL.afisat}
+              </a>{" "}
+              și o oprim noi, pe loc.
+            </p>
+          )}
           {eroare === "confirmare" && (
             <p
               role="alert"
@@ -152,7 +191,7 @@ async function Continut({
               </p>
             </div>
           ) : cont ? (
-            <PanouDonator cont={cont} />
+            <PanouDonator cont={cont} abonamente={abonamente} />
           ) : email ? (
             /*
               Sesiune validă, dar nicio donație pe adresa asta. Se întâmplă

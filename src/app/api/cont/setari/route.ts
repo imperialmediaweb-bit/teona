@@ -3,6 +3,7 @@ import { limitaDeRata, raspuns } from "@/lib/api";
 import { donatorulConectat } from "@/lib/sesiune";
 import { schimbaAcordul, uitaDonatorul } from "@/lib/plati/donatori";
 import { daJosDinBuletin, laBuletin } from "@/lib/buletin";
+import { opresteAbonamentul } from "@/lib/plati/stripe";
 import { inchideSesiunea } from "@/lib/sesiune";
 
 /**
@@ -43,10 +44,44 @@ export async function POST(cerere: Request) {
     );
   }
 
+  if (ce === "opreste-lunara") {
+    /*
+      Oprirea donației lunare, de aici, nu printr-un e-mail către asociație.
+
+      Până acum panoul scria „scrie-ne sau sună și o oprim". Era adevărat, dar
+      punea între om și banii lui un drum pe care trebuia să-l facă el, la
+      ora la care răspunde cineva. Un om care vrea să nu mai dea bani și nu
+      găsește butonul nu scrie: sună la bancă și blochează plata, iar
+      asociația află din Stripe, ca dispută.
+
+      `opresteAbonamentul` verifică întâi că abonamentul e chiar al lui:
+      identificatorul vine din formular, deci poate fi schimbat în browser.
+    */
+    const id = String(formular.get("abonament") ?? "");
+    if (!/^sub_[A-Za-z0-9]+$/.test(id)) {
+      return NextResponse.redirect(
+        new URL("/contul-meu?eroare=abonament", cerere.url),
+        { status: 303 },
+      );
+    }
+    const oprit = await opresteAbonamentul(email, id).catch(() => false);
+    return NextResponse.redirect(
+      new URL(
+        `/contul-meu?${oprit ? "gata=oprita" : "eroare=abonament"}`,
+        cerere.url,
+      ),
+      { status: 303 },
+    );
+  }
+
   if (ce === "stergere") {
     // Confirmarea e scrisă de mână, nu bifată: ștergerea nu se poate anula,
     // iar o bifă se apasă din greșeală.
-    if (String(formular.get("confirmare") ?? "").trim().toUpperCase() !== "ȘTERGE") {
+    if (
+      String(formular.get("confirmare") ?? "")
+        .trim()
+        .toUpperCase() !== "ȘTERGE"
+    ) {
       return NextResponse.redirect(
         new URL("/contul-meu?eroare=confirmare", cerere.url),
         { status: 303 },

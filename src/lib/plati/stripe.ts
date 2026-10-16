@@ -57,8 +57,7 @@ export async function deschideSesiune(
   const stripe = ia();
   const bani = inBani(cerere.lei);
   const lunar = cerere.frecventa === "lunar";
-  const numeProdus =
-    DESTINATII[cerere.destinatie] ?? DESTINATII.oriunde;
+  const numeProdus = DESTINATII[cerere.destinatie] ?? DESTINATII.oriunde;
 
   const sesiune = await stripe.checkout.sessions.create({
     mode: lunar ? "subscription" : "payment",
@@ -108,8 +107,97 @@ function metadate(cerere: CerereDonatie): Record<string, string> {
 }
 
 /** Verifică semnătura webhookului. Fără secret, nu acceptăm nimic. */
-export function citesteEveniment(corp: string, semnatura: string): Stripe.Event {
+export function citesteEveniment(
+  corp: string,
+  semnatura: string,
+): Stripe.Event {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) throw new Error("STRIPE_WEBHOOK_SECRET lipsește");
   return ia().webhooks.constructEvent(corp, semnatura, secret);
+}
+
+/**
+ * Donațiile lunare active ale unui om, luate direct de la Stripe.
+ *
+ * **De ce de la Stripe și nu din baza noastră.** Baza știe ce s-a plătit, nu
+ * ce e încă pornit: un abonament oprit acum trei luni lasă în urmă aceleași
+ * rânduri ca unul care se ia și mâine. Adevărul despre ce se mai ia de pe
+ * card e la procesator, iar un panou care spune „ai o donație lunară" despre
+ * una oprită e mai rău decât niciun panou.
+ *
+ * Căutarea se face pe adresa de e-mail a clientului. Adresa vine din
+ * sesiunea semnată a donatorului, nu dintr-un formular, deci nu se poate
+ * cere lista altcuiva.
+ */
+export type AbonamentDonator = {
+  id: string;
+  sumaBani: number;
+  moneda: string;
+  destinatie: string;
+  /** Ziua următoarei plăți, ISO, sau `null` dacă Stripe n-o dă. */
+  urmatoareaLa: string | null;
+};
+
+export async function abonamenteleLui(
+  email: string,
+): Promise<AbonamentDonator[]> {
+  if (!areStripe()) return [];
+  const stripe = ia();
+
+  const clienti = await stripe.customers.list({ email, limit: 10 });
+  const gasite: AbonamentDonator[] = [];
+
+  for (const client of clienti.data) {
+    const abonamente = await stripe.subscriptions.list({
+      customer: client.id,
+      status: "active",
+      limit: 20,
+    });
+    for (const a of abonamente.data) {
+      const rand = a.items.data[0];
+      if (!rand) continue;
+      /*
+        `current_period_end` stă pe rândul abonamentului, nu pe abonament:
+        din 2025 Stripe l-a mutat acolo, fiindcă un abonament poate avea
+        rânduri cu perioade diferite. Citim ambele locuri, ca să mergem și cu
+        versiuni mai vechi ale API-ului.
+      */
+      const sfarsit =
+        rand.current_period_end ??
+        (a as unknown as { current_period_end?: number }).current_period_end ??
+        null;
+      gasite.push({
+        id: a.id,
+        sumaBani: rand.price.unit_amount ?? 0,
+        moneda: (rand.price.currency ?? "ron").toUpperCase(),
+        destinatie: a.metadata?.destinatie ?? "oriunde",
+        urmatoareaLa: sfarsit ? new Date(sfarsit * 1000).toISOString() : null,
+      });
+    }
+  }
+  return gasite;
+}
+
+/**
+ * Oprește o donație lunară.
+ *
+ * **Verifică întâi că e a lui.** Identificatorul vine dintr-un formular, deci
+ * poate fi schimbat în browser; fără verificarea asta, cine are un cont ar
+ * putea opri donația altcuiva scriind alt `sub_…`. Se compară cu lista lui,
+ * cerută din nou de la Stripe pe adresa din sesiune.
+ *
+ * Se oprește pe loc, nu la sfârșitul lunii plătite. Nu e un abonament la
+ * ceva de care omul se mai folosește până atunci: a cerut să nu mai dea bani,
+ * deci de la apăsarea butonului nu se mai ia nimic. Luna deja plătită rămâne
+ * donată — asta scrie și pe buton.
+ */
+export async function opresteAbonamentul(
+  email: string,
+  id: string,
+): Promise<boolean> {
+  if (!areStripe()) return false;
+  const aleLui = await abonamenteleLui(email);
+  if (!aleLui.some((a) => a.id === id)) return false;
+  await ia().subscriptions.cancel(id);
+  return true;
 }

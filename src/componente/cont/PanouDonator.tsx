@@ -8,6 +8,7 @@ import {
   TELEFON_PRINCIPAL,
 } from "@/date/asociatie";
 import { numeleMetodei, type ContulMeu } from "@/lib/plati/donatori";
+import type { AbonamentDonator } from "@/lib/plati/stripe";
 import { scrieSuma } from "@/lib/suma";
 import Buton from "../Buton";
 import Decor from "../Decor";
@@ -68,8 +69,7 @@ const DESTINATII: Record<string, { cum: string; inseamna?: string }> = {
   },
   oriunde: {
     cum: "acolo unde e cea mai mare nevoie",
-    inseamna:
-      "Asociația hotărăște în fiecare lună unde e cel mai urgent.",
+    inseamna: "Asociația hotărăște în fiecare lună unde e cel mai urgent.",
   },
 };
 
@@ -80,7 +80,13 @@ function luniScris(n: number): string {
   return `de ${n} de luni`;
 }
 
-export default function PanouDonator({ cont }: { cont: ContulMeu }) {
+export default function PanouDonator({
+  cont,
+  abonamente,
+}: {
+  cont: ContulMeu;
+  abonamente: AbonamentDonator[];
+}) {
   const prenume = cont.nume?.split(" ")[0] ?? null;
   const deCand = cont.primaLa ? LUNA_AN.format(new Date(cont.primaLa)) : null;
 
@@ -245,30 +251,108 @@ export default function PanouDonator({ cont }: { cont: ContulMeu }) {
         </p>
       </section>
 
-      {cont.areLunara && (
-        <section className="mt-8 colt-b border-2 border-turcoaz-200 bg-turcoaz-50 p-6">
-          <h3 className="font-titlu text-amplu font-bold text-turcoaz-900">
-            Ai o donație lunară
+      {/*
+        Donațiile lunare active, cu buton de oprire.
+
+        Lista vine de la Stripe, nu din baza noastră: baza știe ce s-a plătit,
+        nu ce e încă pornit. Un abonament oprit acum trei luni lasă în urmă
+        aceleași rânduri ca unul care se ia și mâine, iar un panou care spune
+        „ai o donație lunară" despre una oprită e mai rău decât niciun panou.
+
+        Butonul oprește pe loc, de aici. Până acum scria „scrie-ne sau sună și
+        o oprim": adevărat, dar punea între om și banii lui un drum pe care
+        trebuia să-l facă el, la ora la care răspunde cineva. Un om care vrea
+        să nu mai dea bani și nu găsește butonul nu scrie — sună la bancă și
+        blochează plata, iar asociația află din Stripe, ca dispută.
+      */}
+      {abonamente.length > 0 ? (
+        <section className="mt-8 colt-b border-2 border-turcoaz-200 bg-turcoaz-50 p-6 sm:p-7">
+          <h3 className="font-titlu text-h4 font-bold text-turcoaz-900">
+            {abonamente.length === 1
+              ? "Donația ta lunară"
+              : "Donațiile tale lunare"}
           </h3>
-          <p className="mt-2 text-mic text-turcoaz-900/85">
-            Se reînnoiește singură în fiecare lună. Dacă vrei s-o oprești sau
-            să-i schimbi suma, scrie-ne la{" "}
-            <a
-              href={`mailto:${EMAIL.contact}`}
-              className="font-semibold break-all underline underline-offset-2"
-            >
-              {EMAIL.contact}
-            </a>{" "}
-            sau sună la{" "}
-            <a
-              href={`tel:${TELEFON_PRINCIPAL.apel}`}
-              className="font-semibold underline underline-offset-2"
-            >
-              {TELEFON_PRINCIPAL.afisat}
-            </a>
-            . O oprim fără să te întrebăm de ce.
+          <p className="mt-1 text-mic text-turcoaz-900/70">
+            Se reînnoiesc singure. Le poți opri de aici, fără să ne întrebi și
+            fără să-ți cerem un motiv.
+          </p>
+
+          <ul className="mt-5 grid gap-3">
+            {abonamente.map((a) => (
+              <li
+                key={a.id}
+                className="colt-mic-a flex flex-wrap items-center justify-between gap-x-5 gap-y-3 border border-turcoaz-200 bg-hartie px-5 py-4"
+              >
+                <div className="min-w-0">
+                  <p className="font-titlu text-amplu font-bold text-cerneala">
+                    {scrieSuma(a.sumaBani / 100, a.moneda)}
+                    <span className="font-normal text-cerneala-moale">
+                      {" "}
+                      pe lună,{" "}
+                      {DESTINATII[a.destinatie]?.cum ?? "pentru asociație"}
+                    </span>
+                  </p>
+                  <p className="mt-0.5 text-mic text-cerneala-moale">
+                    {a.urmatoareaLa
+                      ? `Următoarea plată: ${ZI.format(new Date(a.urmatoareaLa))}.`
+                      : "Se ia lunar, în aceeași zi."}
+                  </p>
+                </div>
+                <form
+                  action="/api/cont/setari"
+                  method="post"
+                  className="shrink-0"
+                >
+                  <input type="hidden" name="ce" value="opreste-lunara" />
+                  <input type="hidden" name="abonament" value={a.id} />
+                  <button
+                    type="submit"
+                    className="min-h-11 rounded-full border-2 border-cerneala px-5 py-2 font-titlu text-mic font-bold text-cerneala transition-colors hover:bg-cerneala hover:text-hartie"
+                  >
+                    Oprește donația lunară
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+
+          <p className="mt-4 text-nota text-turcoaz-900/70">
+            Oprirea e pe loc: de la apăsarea butonului nu se mai ia nimic de pe
+            card. Luna deja plătită rămâne donată.
           </p>
         </section>
+      ) : (
+        /*
+          Are donații lunare în istoric, dar niciuna activă la Stripe: ori au
+          fost oprite, ori au venit de pe WordPress-ul vechi, pe care nu-l
+          vedem de aici. A doua situație trebuie spusă, altfel omul crede că
+          le-a oprit cineva.
+        */
+        cont.areLunara && (
+          <section className="mt-8 colt-b border border-hartie-umbra bg-hartie-calda p-6 sm:p-7">
+            <h3 className="font-titlu text-amplu font-bold text-cerneala">
+              Ai avut o donație lunară
+            </h3>
+            <p className="mt-2 max-w-2xl text-mic text-cerneala-moale">
+              Acum nu mai e niciuna activă pe care s-o putem vedea de aici. Dacă
+              ești sigur că încă ți se ia lunar o sumă, scrie-ne la{" "}
+              <a
+                href={`mailto:${EMAIL.contact}`}
+                className="font-semibold break-all underline underline-offset-2"
+              >
+                {EMAIL.contact}
+              </a>{" "}
+              sau sună la{" "}
+              <a
+                href={`tel:${TELEFON_PRINCIPAL.apel}`}
+                className="font-semibold underline underline-offset-2"
+              >
+                {TELEFON_PRINCIPAL.afisat}
+              </a>{" "}
+              și o oprim noi.
+            </p>
+          </section>
+        )
       )}
 
       {/* Setări: acordul de buletin și ștergerea. Drepturile lui, la îndemână. */}
