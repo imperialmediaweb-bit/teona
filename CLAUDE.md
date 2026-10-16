@@ -168,6 +168,15 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
   întrebare costă a zecea parte din prima. Conversația nu se salvează.
   Model din `MODEL_ANALIZA`, implicit `claude-opus-5-5`, prin SDK-ul oficial.
   Aceeași probă verifică ambele căi spre model: `scripts/qa/analiza.mjs`.
+- **Ce a adus fiecare campanie**, tot la `/admin/analiza`: cât s-a strâns, din
+  câte donații, de la câți oameni, cât din țintă și câte vizite au venit din
+  linkul ei. **Banii vin din baza noastră, vizitele de la Google** — două
+  surse diferite, puse una lângă alta, nu adunate: o campanie cu multe vizite
+  și nicio donație e altceva decât una pe care n-a văzut-o nimeni, iar fără
+  amândouă cifrele nu se poate spune care dintre ele e. Donațiile fără
+  eticheta unei campanii se scriu separat, cu mențiunea că asta nu înseamnă
+  că n-au venit dintr-una — doar că n-am putut-o lega. Aceleași cifre intră
+  și în ce vede consultantul.
 - **Vizitele din Google Analytics**, tot la `/admin/analiza`, sus: câți
   oameni au intrat pe site în ultimele 28 de zile, de unde au venit (sursele
   sunt traduse: „google / organic" se citește „Căutare Google"), ce pagini au

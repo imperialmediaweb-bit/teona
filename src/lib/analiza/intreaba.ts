@@ -1,7 +1,7 @@
 import { cate } from "@/lib/numere-ro";
 import { scrieSuma } from "@/lib/suma";
 import type { Vizite } from "@/lib/ga/raport";
-import type { ProfilDonatori, ProfilFirme } from "./cifre";
+import type { Campanie, ProfilDonatori, ProfilFirme } from "./cifre";
 
 /**
  * Analiza cifrelor, cerută unui model de limbaj.
@@ -82,6 +82,11 @@ export function rezumat(
   d: ProfilDonatori,
   f: ProfilFirme,
   v?: Vizite | null,
+  c?: {
+    lista: Campanie[];
+    faraEticheta: number;
+    baniFaraEticheta: number;
+  } | null,
 ): string {
   const randuri: string[] = [];
 
@@ -184,6 +189,57 @@ export function rezumat(
     vizite, baza de date numără donații. Un model căruia nu i se spune asta
     le adună.
   */
+  /*
+    Campaniile, cu banii lângă vizite.
+
+    Aici se vede ce a mers și ce n-a mers — singura întrebare al cărei
+    răspuns schimbă ce face omul luna viitoare. Vizitele vin de la Google, pe
+    eticheta UTM; donațiile din baza noastră, pe eticheta din link. Două
+    surse diferite, puse una lângă alta: o campanie cu multe vizite și nicio
+    donație e altceva decât una pe care n-a văzut-o nimeni, iar fără ambele
+    cifre nu se poate spune care dintre ele e.
+  */
+  if (c && c.lista.length > 0) {
+    randuri.push("");
+    randuri.push("CAMPANII");
+    const peNume = new Map(
+      (v?.campanii ?? []).map((x) => [x.nume.toLowerCase(), x.sesiuni]),
+    );
+    for (const x of c.lista.slice(0, 15)) {
+      const sesiuni =
+        peNume.get(x.slug.toLowerCase()) ??
+        peNume.get(x.titlu.toLowerCase()) ??
+        null;
+      const bucati = [
+        `${cate(x.donatii, "donație", "donații")}`,
+        lei(x.bani),
+        `${cate(x.donatori, "donator", "donatori")}`,
+      ];
+      if (x.tintaBani) {
+        bucati.push(
+          `ținta era ${lei(x.tintaBani)} (strâns ${procent(x.bani, x.tintaBani)})`,
+        );
+      }
+      if (sesiuni !== null) {
+        bucati.push(
+          `${cate(sesiuni, "vizită venită din linkul campaniei", "vizite venite din linkul campaniei")}`,
+        );
+        if (sesiuni > 0) {
+          bucati.push(`din care au donat ${procent(x.donatii, sesiuni)}`);
+        }
+      }
+      randuri.push(`- „${x.titlu}": ${bucati.join(", ")}`);
+    }
+    randuri.push(
+      `- ${cate(c.faraEticheta, "donație a venit", "donații au venit")} fără eticheta vreunei campanii (${lei(c.baniFaraEticheta)}). Asta nu înseamnă că n-au venit dintr-o campanie — doar că n-am putut-o lega de una.`,
+    );
+    if ((v?.campanii ?? []).length === 0) {
+      randuri.push(
+        "- nu avem vizitele pe campanii de la Google: ori nu e legat Analytics, ori linkurile n-au purtat etichete UTM. Fără ele nu se poate spune dacă o campanie n-a adus bani fiindcă n-a văzut-o nimeni sau fiindcă n-a convins.",
+      );
+    }
+  }
+
   if (v) {
     randuri.push("");
     randuri.push(

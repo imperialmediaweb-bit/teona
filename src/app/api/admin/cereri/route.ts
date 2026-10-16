@@ -84,7 +84,10 @@ export async function POST(cerere: Request) {
 
   const fel = String(formular.get("fel") ?? "");
   return NextResponse.redirect(
-    new URL(`/admin/cereri${/^\w+$/.test(fel) ? `?fel=${fel}` : ""}`, cerere.url),
+    new URL(
+      `/admin/cereri${/^\w+$/.test(fel) ? `?fel=${fel}` : ""}`,
+      cerere.url,
+    ),
     { status: 303 },
   );
 }

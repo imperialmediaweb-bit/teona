@@ -106,7 +106,8 @@ export async function POST(cerere: Request) {
       return raspuns("Fișierul nu pare o fotografie (JPG, PNG sau WebP).", 400);
     }
     const urcata = await urcaPoza(octeti, fisier.type, "noutati");
-    if (!urcata) return raspuns("Nu am putut urca poza. Încearcă din nou.", 502);
+    if (!urcata)
+      return raspuns("Nu am putut urca poza. Încearcă din nou.", 502);
     poza = { ...urcata, alt };
   } else if (camp("poza_alt")) {
     // Fără fișier nou, dar cu descriere schimbată: se păstrează poza și i se
@@ -156,11 +157,21 @@ export async function POST(cerere: Request) {
 
   if (/^[0-9a-f-]{36}$/i.test(id)) {
     await schimbaText(id, date);
-    return inapoi(cerere, fel, actiune === "publica" ? "publicat" : "salvat", id);
+    return inapoi(
+      cerere,
+      fel,
+      actiune === "publica" ? "publicat" : "salvat",
+      id,
+    );
   }
 
   const nou = await creeazaText({ ...date, fel });
-  return inapoi(cerere, fel, actiune === "publica" ? "publicat" : "salvat", nou);
+  return inapoi(
+    cerere,
+    fel,
+    actiune === "publica" ? "publicat" : "salvat",
+    nou,
+  );
 }
 
 function inapoi(

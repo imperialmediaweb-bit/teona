@@ -6,14 +6,17 @@ import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import {
   analize,
+  campanii,
   profilulDonatorilor,
   profilulFirmelor,
   type ProfilDonatori,
   type ProfilFirme,
 } from "@/lib/analiza/cifre";
 import { areAnaliza, rezumat } from "@/lib/analiza/intreaba";
+import type { Campanie as CampanieCifre } from "@/lib/analiza/cifre";
 import Sfatuitor from "@/componente/admin/Sfatuitor";
 import { areVizite, vizite } from "@/lib/ga/raport";
+import type { Vizite } from "@/lib/ga/raport";
 import { cate } from "@/lib/numere-ro";
 import { scrieSuma } from "@/lib/suma";
 import Cadru from "@/componente/admin/Cadru";
@@ -256,6 +259,103 @@ function Donatori({ d }: { d: ProfilDonatori }) {
         </Fisa>
       </div>
     </>
+  );
+}
+
+/**
+ * Ce a adus fiecare campanie.
+ *
+ * **Vizitele și donațiile nu se adună.** Google numără vizite, baza numără
+ * donații, și nu sunt neapărat aceiași oameni. Dar puse una lângă alta arată
+ * unde s-a oprit lumea: o campanie cu multe vizite și nicio donație e
+ * altceva decât una pe care n-a văzut-o nimeni, iar fără amândouă cifrele nu
+ * se poate spune care dintre ele e.
+ *
+ * **Donațiile fără etichetă nu sunt zero la restul.** O donație fără
+ * `campanie_slug` nu înseamnă că n-a venit dintr-o campanie, ci că n-am
+ * putut-o lega de una — de aceea apare scris, sub tabel, nu ascuns.
+ */
+function Campanii({
+  c,
+  v,
+}: {
+  c: { lista: CampanieCifre[]; faraEticheta: number; baniFaraEticheta: number };
+  v: Vizite | null;
+}) {
+  const peNume = new Map(
+    (v?.campanii ?? []).map((x) => [x.nume.toLowerCase(), x.sesiuni]),
+  );
+  return (
+    <>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-3xl text-left text-mic">
+          <thead>
+            <tr className="border-b border-hartie-umbra">
+              <CapTabel>Campania</CapTabel>
+              <CapTabel>Strâns</CapTabel>
+              <CapTabel>Donații</CapTabel>
+              <CapTabel>Donatori</CapTabel>
+              <CapTabel>Din țintă</CapTabel>
+              <CapTabel>Vizite din link</CapTabel>
+            </tr>
+          </thead>
+          <tbody>
+            {c.lista.slice(0, 15).map((x) => {
+              const sesiuni =
+                peNume.get(x.slug.toLowerCase()) ??
+                peNume.get(x.titlu.toLowerCase()) ??
+                null;
+              return (
+                <tr
+                  key={x.slug}
+                  className="border-b border-hartie-umbra/60 last:border-0"
+                >
+                  <td className="py-3 pr-4 font-titlu font-bold text-cerneala">
+                    {x.titlu}
+                  </td>
+                  <td className="py-3 pr-4 whitespace-nowrap text-cerneala">
+                    {scrieSuma(x.bani / 100)}
+                  </td>
+                  <td className="py-3 pr-4 text-cerneala-moale">{x.donatii}</td>
+                  <td className="py-3 pr-4 text-cerneala-moale">
+                    {x.donatori}
+                  </td>
+                  <td className="py-3 pr-4 whitespace-nowrap text-cerneala-moale">
+                    {x.tintaBani
+                      ? `${Math.round((x.bani / x.tintaBani) * 100)}% din ${scrieSuma(x.tintaBani / 100)}`
+                      : "—"}
+                  </td>
+                  <td className="py-3 whitespace-nowrap text-cerneala-moale">
+                    {sesiuni === null ? "—" : sesiuni}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-4 max-w-3xl text-nota text-cerneala-slab">
+        {c.faraEticheta > 0 && (
+          <>
+            <strong className="text-cerneala-moale">
+              {c.faraEticheta} donații ({scrieSuma(c.baniFaraEticheta / 100)})
+            </strong>{" "}
+            n-au eticheta vreunei campanii. Nu înseamnă că n-au venit dintr-una
+            — înseamnă că n-am putut-o lega.{" "}
+          </>
+        )}
+        {peNume.size === 0 &&
+          "Coloana cu vizite e goală: ori Analytics nu e legat, ori linkurile n-au purtat etichete UTM. Fără ele nu se poate spune dacă o campanie n-a adus bani fiindcă n-a văzut-o nimeni sau fiindcă n-a convins."}
+      </p>
+    </>
+  );
+}
+
+function CapTabel({ children }: { children: React.ReactNode }) {
+  return (
+    <th className="py-2 pr-4 font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
+      {children}
+    </th>
   );
 }
 
@@ -563,11 +663,12 @@ async function Continut({
     );
   }
 
-  const [donatori, firme, vechi, deVizite] = await Promise.all([
+  const [donatori, firme, vechi, deVizite, deCampanii] = await Promise.all([
     profilulDonatorilor(),
     profilulFirmelor(),
     analize(6).catch(() => []),
     areVizite() ? vizite().catch(() => null) : Promise.resolve(null),
+    campanii().catch(() => null),
   ]);
   const ultima = vechi[0];
   /*
@@ -578,7 +679,7 @@ async function Continut({
     Când există deja o analiză, se arată cifrele salvate odată cu ea — alea
     au plecat atunci, nu cele de azi.
   */
-  const acum = rezumat(donatori, firme, deVizite);
+  const acum = rezumat(donatori, firme, deVizite, deCampanii);
 
   return (
     <Cadru
@@ -621,6 +722,15 @@ async function Continut({
       >
         <Firme f={firme} />
       </Sectiune>
+
+      {deCampanii && deCampanii.lista.length > 0 && (
+        <Sectiune
+          titlu="Ce a adus fiecare campanie"
+          nota="Banii din baza noastră, vizitele de la Google. Două surse diferite, puse alături."
+        >
+          <Campanii c={deCampanii} v={deVizite} />
+        </Sectiune>
+      )}
 
       <Sectiune
         titlu="Ce se vede în cifre"

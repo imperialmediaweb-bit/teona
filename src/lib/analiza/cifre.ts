@@ -290,6 +290,123 @@ export async function profilulDonatorilor(): Promise<ProfilDonatori> {
   };
 }
 
+/**
+ * Ce a adus fiecare campanie.
+ *
+ * **De ce separat de restul cifrelor.** Profilul donatorilor spune cum stă
+ * baza în ansamblu. Asta spune altceva: care dintre lucrurile pe care le-a
+ * făcut asociația anul ăsta au adus bani și care n-au adus. E singura
+ * întrebare la care răspunsul schimbă ce face omul luna viitoare.
+ *
+ * **Donațiile poartă eticheta campaniei** (`campanie_slug`), pusă de linkul
+ * pe care a venit omul. O donație fără etichetă nu înseamnă că n-a venit
+ * dintr-o campanie — înseamnă doar că n-am putut-o lega. Se scrie și câte
+ * sunt așa, ca nimeni să nu creadă că restul e zero.
+ *
+ * **Vizitele vin de la Google**, pe eticheta UTM, și se potrivesc pe slug.
+ * Două surse diferite: Google numără vizite, baza numără donații. Nu se
+ * adună și nu se presupune că o vizită și o donație sunt același om — dar
+ * puse una lângă alta arată unde s-a oprit lumea: o campanie cu multe vizite
+ * și nicio donație e altceva decât una pe care n-a văzut-o nimeni.
+ */
+export type Campanie = {
+  slug: string;
+  titlu: string;
+  /** Cât s-a propus, dacă s-a scris o țintă. */
+  tintaBani: number | null;
+  publicatLa: string | null;
+  donatii: number;
+  bani: number;
+  donatori: number;
+  /** Prima și ultima donație cu eticheta ei. */
+  primaLa: string | null;
+  ultimaLa: string | null;
+};
+
+export async function campanii(): Promise<{
+  lista: Campanie[];
+  faraEticheta: number;
+  baniFaraEticheta: number;
+}> {
+  const [scrise, pe, fara] = await Promise.all([
+    intreaba<{
+      slug: string;
+      titlu: string;
+      tinta_bani: string | null;
+      publicat_la: Date | null;
+    }>(
+      `SELECT slug, titlu, tinta_bani, publicat_la
+         FROM texte
+        WHERE fel = 'campanie' AND stare = 'publicat'
+        ORDER BY publicat_la DESC NULLS LAST
+        LIMIT 40`,
+    ),
+    intreaba<{
+      campanie_slug: string;
+      nr: string;
+      bani: string;
+      donatori: string;
+      prima: Date | null;
+      ultima: Date | null;
+    }>(
+      `SELECT campanie_slug,
+              count(*)                        AS nr,
+              coalesce(sum(suma_bani), 0)     AS bani,
+              count(DISTINCT lower(email))    AS donatori,
+              min(platita_la)                 AS prima,
+              max(platita_la)                 AS ultima
+         FROM donatii
+        WHERE ${INCASATE} AND campanie_slug IS NOT NULL
+        GROUP BY campanie_slug`,
+    ),
+    intreaba<{ nr: string; bani: string }>(
+      `SELECT count(*) AS nr, coalesce(sum(suma_bani), 0) AS bani
+         FROM donatii
+        WHERE ${INCASATE} AND campanie_slug IS NULL`,
+    ),
+  ]);
+
+  const dupaSlug = new Map(pe.map((r) => [r.campanie_slug, r]));
+  /*
+    Și campaniile care n-au mai fost scrise pe site.
+
+    O etichetă poate veni dintr-un buletin de e-mail trimis din MailerLite,
+    fără pagină pe site. Dacă am lista numai campaniile din tabel, banii aia
+    ar dispărea din socoteală fără ca nimeni să observe.
+  */
+  for (const r of pe) {
+    if (scrise.some((x) => x.slug === r.campanie_slug)) continue;
+    scrise.push({
+      slug: r.campanie_slug,
+      titlu: r.campanie_slug,
+      tinta_bani: null,
+      publicat_la: null,
+    });
+  }
+
+  const lista = scrise.map((c) => {
+    const r = dupaSlug.get(c.slug);
+    return {
+      slug: c.slug,
+      titlu: c.titlu,
+      tintaBani: c.tinta_bani === null ? null : Number(c.tinta_bani),
+      publicatLa: c.publicat_la?.toISOString() ?? null,
+      donatii: Number(r?.nr ?? 0),
+      bani: Number(r?.bani ?? 0),
+      donatori: Number(r?.donatori ?? 0),
+      primaLa: r?.prima?.toISOString() ?? null,
+      ultimaLa: r?.ultima?.toISOString() ?? null,
+    };
+  });
+  lista.sort((a, b) => b.bani - a.bani || b.donatii - a.donatii);
+
+  return {
+    lista,
+    faraEticheta: Number(fara[0]?.nr ?? 0),
+    baniFaraEticheta: Number(fara[0]?.bani ?? 0),
+  };
+}
+
 export type ProfilFirme = {
   firme: number;
   peStadii: Array<{ stadiu: string; nr: number }>;

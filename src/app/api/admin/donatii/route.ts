@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import { email as citesteEmail, limitaDeRata, raspuns, text } from "@/lib/api";
 import { esteAutentificat } from "@/lib/admin";
-import {
-  adaugaDonatieManuala,
-  esteMetodaManuala,
-} from "@/lib/plati/donatori";
+import { adaugaDonatieManuala, esteMetodaManuala } from "@/lib/plati/donatori";
 import { citesteSuma } from "@/lib/suma";
 import { esteDestinatie, inBani } from "@/date/plati";
 

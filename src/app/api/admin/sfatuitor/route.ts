@@ -1,7 +1,11 @@
 import { limitaDeRata, raspuns, text as curataText } from "@/lib/api";
 import { esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
-import { profilulDonatorilor, profilulFirmelor } from "@/lib/analiza/cifre";
+import {
+  campanii,
+  profilulDonatorilor,
+  profilulFirmelor,
+} from "@/lib/analiza/cifre";
 import { rezumat } from "@/lib/analiza/intreaba";
 import {
   SEMNE_INTREBARE,
@@ -78,12 +82,13 @@ export async function POST(cerere: Request) {
     );
   }
 
-  const [donatori, firme, deVizite] = await Promise.all([
+  const [donatori, firme, deVizite, deCampanii] = await Promise.all([
     profilulDonatorilor(),
     profilulFirmelor(),
     vizite().catch(() => null),
+    campanii().catch(() => null),
   ]);
-  const cifre = rezumat(donatori, firme, deVizite);
+  const cifre = rezumat(donatori, firme, deVizite, deCampanii);
 
   const flux = new ReadableStream<Uint8Array>({
     async start(coada) {

@@ -4,6 +4,7 @@ import { limitaDeRata, raspuns } from "@/lib/api";
 import { esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import {
+  campanii,
   profilulDonatorilor,
   profilulFirmelor,
   salveazaAnaliza,
@@ -46,11 +47,12 @@ export async function POST(cerere: Request) {
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
   if (!areAnaliza()) return inapoi(cerere, "fara-cheie");
 
-  const [donatori, firme, deVizite] = await Promise.all([
+  const [donatori, firme, deVizite, deCampanii] = await Promise.all([
     profilulDonatorilor(),
     profilulFirmelor(),
     // Dacă Google Analytics nu e legat sau nu răspunde, analiza se face fără.
     vizite().catch(() => null),
+    campanii().catch(() => null),
   ]);
 
   /*
@@ -64,7 +66,7 @@ export async function POST(cerere: Request) {
     return inapoi(cerere, "putine-date");
   }
 
-  const cifre = rezumat(donatori, firme, deVizite);
+  const cifre = rezumat(donatori, firme, deVizite, deCampanii);
   const text = await cereAnaliza(cifre);
   if (!text) return inapoi(cerere, "n-a-mers");
 
