@@ -83,6 +83,8 @@ export type Text = {
   /** Identificatorul postării de pe pagina de Facebook, dacă a plecat. */
   facebookId: string | null;
   facebookLa: string | null;
+  /** Ziua în care se vrea publicat, dacă s-a pus una. */
+  planificatLa: string | null;
 };
 
 type Rand = {
@@ -106,6 +108,7 @@ type Rand = {
   schimbat_la: Date;
   facebook_id: string | null;
   facebook_la: Date | null;
+  planificat_la: Date | string | null;
 };
 
 function dinRand(r: Rand): Text {
@@ -140,12 +143,17 @@ function dinRand(r: Rand): Text {
     schimbatLa: r.schimbat_la.toISOString(),
     facebookId: r.facebook_id,
     facebookLa: r.facebook_la ? r.facebook_la.toISOString() : null,
+    planificatLa:
+      r.planificat_la instanceof Date
+        ? r.planificat_la.toISOString().slice(0, 10)
+        : (r.planificat_la ?? null),
   };
 }
 
 const COLOANE = `id, fel, slug, titlu, rezumat, continut, poza_id, poza_latime,
   poza_inaltime, poza_alt, tinta_bani, data_inceput, data_citita, dosar_cloud,
-  categorie, stare, publicat_la, schimbat_la, facebook_id, facebook_la`;
+  categorie, stare, publicat_la, schimbat_la, facebook_id, facebook_la,
+  planificat_la`;
 
 /**
  * Textele publicate, cele mai noi primele.
@@ -365,4 +373,18 @@ export async function marcheazaFacebook(
     [id, postare],
   );
   return randuri.length > 0;
+}
+
+
+/**
+ * Pune (sau scoate) ziua în care se vrea publicat un text.
+ *
+ * Nu publică nimic: publicarea rămâne o apăsare de om, fiindcă un text bun
+ * azi poate fi nepotrivit în ziua în care s-a plănuit.
+ */
+export async function planificaText(
+  id: string,
+  zi: string | null,
+): Promise<void> {
+  await intreaba("UPDATE texte SET planificat_la = $2 WHERE id = $1", [id, zi]);
 }

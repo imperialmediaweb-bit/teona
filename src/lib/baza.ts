@@ -374,6 +374,40 @@ const ADAOSURI = `
     pagină arată ca o greșeală a asociației, iar cine a văzut-o prima dată
     nu mai citește a doua.
   */
+  /*
+    Redacțiile cărora li se trimit comunicatele.
+
+    Stau în baza de date, nu în cod, fiindcă lista bună nu e cea a adreselor
+    generale de redacție, ci a ziariștilor cu care asociația chiar vorbește —
+    iar aia se schimbă și o știe omul, nu programatorul. Sămânța
+    (src/date/presa-suceava.ts) se pune o singură dată, la prima deschidere
+    a paginii, și numai dacă tabelul e gol.
+  */
+  CREATE TABLE IF NOT EXISTS contacte_presa (
+    id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    publicatie  text NOT NULL,
+    fel         text NOT NULL DEFAULT 'online',
+    email       text,
+    telefon     text,
+    persoana    text,
+    site        text,
+    notite      text,
+    activ       boolean NOT NULL DEFAULT true,
+    creat_la    timestamptz NOT NULL DEFAULT now(),
+    schimbat_la timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS presa_dupa_publicatie
+    ON contacte_presa (activ, publicatie);
+
+  /*
+    Ziua în care se vrea publicat un text care e încă ciornă.
+
+    Nu publică nimic singură — publicarea rămâne o apăsare de om. E doar
+    locul în care ciorna apare în calendar, ca să se vadă că săptămâna
+    viitoare n-are nimeni nimic de spus pe pagină.
+  */
+  ALTER TABLE texte ADD COLUMN IF NOT EXISTS planificat_la date;
+
   ALTER TABLE texte ADD COLUMN IF NOT EXISTS facebook_id text;
   ALTER TABLE texte ADD COLUMN IF NOT EXISTS facebook_la timestamptz;
 

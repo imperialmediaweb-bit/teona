@@ -141,6 +141,38 @@ tipar obișnuit, SVG pentru bannere. Codul se face aici, nu pe un site
 gratuit, fiindcă alea duc la o adresă intermediară a lor: dacă se închide,
 afișele tipărite rămân cu un cod mort.
 
+### Lista de presă
+
+`/admin/presa` ține cui se trimite un comunicat: redacțiile din Suceava, cu
+e-mail, telefon, numele ziaristului și notițe („a scris despre tabăra din
+iunie"). Sămânța (`src/date/presa-suceava.ts`) are **numai adrese citite de
+pe paginile de contact ale publicațiilor**, verificate pe 16 octombrie 2026;
+acolo unde site-ul n-a răspuns (Cloudflare) rândul rămâne fără adresă,
+dinadins — se vede ce lipsește. Se pune o singură dată, la prima deschidere,
+și numai dacă tabelul e gol: altfel un contact șters ar învia singur.
+
+Comunicatul **nu pleacă din panou**: adresele se copiază și se pun la Bcc în
+Gmail-ul asociației. Un mesaj trimis de serverul nostru către opt redacții
+deodată ajunge în spam exact la cei pe care vrei să-i prinzi. Pagina ține și
+forma unui comunicat pe care o redacție îl publică (titlu, primul paragraf
+care spune tot, citat cu nume, contact) și amintește de acordul părinților
+pentru pozele cu copii.
+
+### Calendarul de publicare
+
+`/admin/calendar` arată luna: ce s-a publicat, ce e plănuit (o ciornă cu zi
+pusă, `texte.planificat_la`) și momentele care se repetă an de an — 25 mai,
+2 aprilie, 1 iunie, 3 decembrie, taberele, începutul școlii, sărbătorile.
+Alea sunt scrise o dată, în `src/date/calendar-fundraising.ts`.
+
+**Nimic nu se publică singur.** Ziua pusă pe o ciornă e o intenție, nu un
+ceas: un text bun azi poate fi nepotrivit în ziua în care l-ai plănuit.
+Termenul Declarației 177 **nu** e trecut ca zi fixă — apare ca lucru de
+confirmat cu contabilitatea firmei. O dată greșită într-un calendar e mai
+rea decât una lipsă: după ea se face muncă.
+
+Probă: `BAZA=… PAROLA_ADMIN=… node scripts/qa/presa-calendar.mjs`
+
 ### Pagina de Facebook
 
 `/admin/facebook` arată cifrele paginii (urmăritori, câți au văzut-o, câți
