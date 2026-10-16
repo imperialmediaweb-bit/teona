@@ -204,6 +204,31 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
   ziua apăsării. La „N-am găsit-o" nu pleacă nimic, dinadins.
   Probă: `BAZA=http://localhost:3000 node scripts/qa/transfer-anuntat.mjs`
   (nu cere bază de date și nici parolă).
+- **Donația lunară se oprește de către donator, din două locuri.** În contul
+  lui (`/contul-meu`), lista abonamentelor active vine **de la Stripe**, nu
+  din baza noastră: baza știe ce s-a plătit, nu ce e încă pornit, iar un
+  panou care spune „ai o donație lunară" despre una oprită acum trei luni e
+  mai rău decât niciun panou. Căutarea se face pe adresa de e-mail a
+  clientului Stripe, deci prinde și abonamentele făcute prin GiveWP pe
+  WordPress, dacă e același cont Stripe (acolo lipsește eticheta destinației,
+  deci scrie „pentru asociație").
+  Al doilea loc e **vestea de dinaintea reînnoirii**: cu câteva zile înainte
+  de fiecare plată lunară pleacă un mesaj — cine rămâne n-are nimic de făcut,
+  cine vrea să oprească are butonul chiar în mesaj. Se trimite pe evenimentul
+  `invoice.upcoming` de la Stripe, nu dintr-o treabă programată de noi: el
+  știe data fiecărei reînnoiri și îl trimite o dată pe factură. **Câte zile
+  înainte se alege din contul Stripe** (Billing → Subscriptions and emails →
+  „Upcoming invoice"); implicit sunt 3, pentru două zile se schimbă acolo.
+  De ce mesajul: un om care vede pe extras o sumă pe care n-o mai ținea minte
+  o contestă la bancă — comision, rată de acceptare stricată pentru toți, și
+  tot se oprește donația, dar cu un om supărat la capăt.
+  Linkul din mesaj **nu oprește nimic când e deschis**: duce la
+  `/opreste-donatia`, o pagină cu un buton, iar oprirea se face prin POST.
+  Scanerele de e-mail ale firmelor deschid din reflex toate adresele dintr-un
+  mesaj; pe GET, donațiile s-ar fi oprit singure. Semnătura din link acoperă
+  identificatorul abonamentului și ziua expirării (35 de zile), deci nu se
+  poate schimba abonamentul din ea și nu ține o viață.
+  Probă: `BAZA=… PAROLA_ADMIN=… SECRET_SESIUNE=… node scripts/qa/oprire-lunara.mjs`.
 - **Căile de plată se văd toate din capul formularului de card**: „Card",
   „PayPal (în euro)" dacă are chei, „Transfer bancar". Înainte pagina începea
   direct cu formularul de card, iar celelalte stăteau după o cotitură de

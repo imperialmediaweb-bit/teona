@@ -201,3 +201,21 @@ export async function opresteAbonamentul(
   await ia().subscriptions.cancel(id);
   return true;
 }
+
+/**
+ * Oprește un abonament știut deja ca fiind al cui trebuie.
+ *
+ * Fără verificarea de proprietar din `opresteAbonamentul`, pentru că aici
+ * dovada e alta și e deja făcută: semnătura din linkul trimis pe e-mail
+ * (`oprire-lunara.ts`), care acoperă chiar identificatorul ăsta. A cere și
+ * adresa ar însemna să-i cerem omului să intre în cont pentru un gest pe care
+ * asociația îl face la un telefon, fără să întrebe de ce.
+ *
+ * Nu se cheamă niciodată cu un identificator venit direct dintr-un formular.
+ */
+export async function opresteAbonamentulDupaId(id: string): Promise<boolean> {
+  if (!areStripe()) return false;
+  if (!/^sub_[A-Za-z0-9]+$/.test(id)) return false;
+  await ia().subscriptions.cancel(id);
+  return true;
+}

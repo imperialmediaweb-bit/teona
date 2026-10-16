@@ -11,6 +11,7 @@ import {
 } from "../formulare";
 import { compuneContractulNesemnat } from "../contract";
 import { compuneAnuntTransfer, compuneTransferAnuntat } from "../transfer";
+import { compuneVesteaReinnoirii } from "../reinnoire";
 import {
   compuneConfirmareaDeContact,
   compuneMesajulDeContact,
@@ -77,6 +78,21 @@ export function exemple(): Exemplu[] {
         frecventa: "lunar",
         destinatie: "tabere",
         reinnoire: true,
+      }),
+    },
+    {
+      id: "inainte-de-reinnoire",
+      titlu: "Cu două zile înainte de reînnoirea lunară",
+      cand: "Înainte de fiecare plată lunară, cu butonul de oprire în mesaj.",
+      catre: "om",
+      compus: compuneVesteaReinnoirii({
+        email: "maria@exemplu.ro",
+        prenume: "Maria",
+        sumaBani: 15000,
+        moneda: "RON",
+        destinatie: "tabere",
+        cand: ZI_DE_PROBA,
+        abonament: "sub_deproba123",
       }),
     },
     {

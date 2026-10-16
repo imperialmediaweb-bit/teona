@@ -11,6 +11,7 @@ import {
 import { citesteEveniment } from "@/lib/plati/stripe";
 import { laBuletin } from "@/lib/buletin";
 import { trimiteMultumirea } from "@/lib/email/donatie";
+import { trimiteVesteaReinnoirii } from "@/lib/email/reinnoire";
 
 /**
  * Confirmarea plăților, de la Stripe.
@@ -120,6 +121,45 @@ async function prelucreaza(eveniment: Stripe.Event) {
       return;
     }
 
+    /*
+      Vestea de dinaintea reînnoirii.
+
+      Stripe trimite `invoice.upcoming` cu câteva zile înainte să ia suma.
+      **Câte zile se alege din contul Stripe**, nu de aici: Billing →
+      Subscriptions and emails → „Upcoming invoice" webhook. Implicit sunt 3;
+      pentru două zile, se schimbă acolo. Am ales evenimentul lui, nu o
+      treabă programată de noi, fiindcă el știe singur data fiecărei
+      reînnoiri, îl trimite o dată pe factură și nu trebuie ținut în viață
+      niciun ceas pe server.
+
+      Factura asta n-are încă bani în ea și nu se scrie nimic în evidență: e
+      doar un mesaj către om. Dacă trimiterea cade, donația merge înainte
+      neatinsă — de aceea nu cerem reîncercarea.
+    */
+    case "invoice.upcoming": {
+      const factura = eveniment.data.object as Stripe.Invoice;
+      const abonament = idAbonamentului(factura);
+      const catre = factura.customer_email;
+      if (!abonament || !catre) return;
+
+      const date = metadateleAbonamentului(factura);
+      const rand = factura.lines?.data?.[0];
+      await trimiteVesteaReinnoirii({
+        email: catre,
+        prenume: date.prenume || null,
+        sumaBani: factura.amount_due ?? rand?.amount ?? 0,
+        moneda: (factura.currency ?? "ron").toUpperCase(),
+        destinatie: date.destinatie || "oriunde",
+        cand: new Date(
+          (factura.next_payment_attempt ??
+            rand?.period?.end ??
+            Math.floor(Date.now() / 1000)) * 1000,
+        ).toISOString(),
+        abonament,
+      }).catch(() => undefined);
+      return;
+    }
+
     default:
       // Restul evenimentelor nu ne privesc. Răspundem 200 ca Stripe să nu
       // le retrimită.
@@ -193,4 +233,24 @@ async function dupaIncasare(
   if (rand.acord_buletin) {
     await laBuletin(rand.email).catch(() => undefined);
   }
+}
+
+/**
+ * Abonamentul de pe o factură.
+ *
+ * Ca și metadatele, Stripe l-a mutat între versiuni de API: în cele noi stă
+ * sub `parent.subscription_details.subscription`, în cele vechi direct în
+ * `subscription`. Versiunea e aleasă în contul asociației, nu aici, deci se
+ * citesc amândouă.
+ */
+function idAbonamentului(factura: Stripe.Invoice): string | null {
+  const f = factura as unknown as {
+    parent?: {
+      subscription_details?: { subscription?: string | { id: string } };
+    };
+    subscription?: string | { id: string } | null;
+  };
+  const brut = f.parent?.subscription_details?.subscription ?? f.subscription;
+  if (!brut) return null;
+  return typeof brut === "string" ? brut : brut.id;
 }
