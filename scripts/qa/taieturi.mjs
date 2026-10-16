@@ -1,12 +1,16 @@
 import { chromium } from "playwright";
 import { writeFileSync } from "node:fs";
+
+// Adresa serverului, ca la toate celelalte probe. Era scrisă de mână
+// „localhost:3000", deci proba cădea pe orice alt port.
+const BAZA = process.env.BAZA ?? "http://localhost:3000";
 const PAGINI = ["/","/despre-noi","/casa-teona","/proiecte","/doneaza","/redirectioneaza-3-5",
   "/directioneaza-20","/devino-voluntar","/contact","/sponsori-si-parteneri","/doneaza-ti-ziua","/suntem-in-presa"];
 const b = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium" });
 const p = await b.newPage({ viewport: { width: 1280, height: 950 } });
 const rau = new Map();
 for (const cale of PAGINI) {
-  await p.goto("http://localhost:3000" + cale, { waitUntil: "networkidle" });
+  await p.goto(BAZA + cale, { waitUntil: "networkidle" });
   await p.waitForTimeout(800);
   const r = await p.evaluate(() =>
     [...document.querySelectorAll("#continut img")].flatMap((i) => {
