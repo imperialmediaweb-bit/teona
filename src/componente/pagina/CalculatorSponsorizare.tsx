@@ -444,8 +444,8 @@ export default function CalculatorSponsorizare() {
               </button>
             </div>
             <p className="mt-3 text-nota text-cerneala-moale">
-              Cine semnează și în ce calitate rămân de completat în document.
-              Îl semnezi și ni-l trimiți pe e-mail; îl contrasemnăm și ți-l
+              Cine semnează și în ce calitate rămân de completat în document. Îl
+              semnezi și ni-l trimiți pe e-mail; îl contrasemnăm și ți-l
               trimitem înapoi.{" "}
               <Link
                 href={`${RUTE.directionare20}/contract?cui=${encodeURIComponent(

@@ -87,6 +87,7 @@ function Poza({
         alt={poza.alt}
         fill
         sizes={dimensiuni}
+        quality={86}
         className="object-cover"
       />
       <span

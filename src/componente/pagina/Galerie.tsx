@@ -151,8 +151,9 @@ export default function Galerie({
                       alt={poza.alt}
                       fill
                       sizes={forma.dimensiuni}
+                      quality={86}
                       style={{ objectPosition: taietura(poza.cale) }}
-          className="object-cover transition-transform duration-[1100ms] ease-cald group-hover:scale-[1.06] motion-reduce:group-hover:scale-100"
+                      className="object-cover transition-transform duration-[1100ms] ease-cald group-hover:scale-[1.06] motion-reduce:group-hover:scale-100"
                     />
                     {poza.legenda && (
                       <figcaption

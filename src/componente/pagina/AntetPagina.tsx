@@ -134,8 +134,9 @@ export default function AntetPagina({
                   fill
                   priority
                   sizes="(min-width: 1280px) 660px, (min-width: 1024px) 54vw, 94vw"
+                  quality={86}
                   style={{ objectPosition: taietura(poza.cale) }}
-                      className="object-cover"
+                  className="object-cover"
                 />
               </div>
 
@@ -157,6 +158,7 @@ export default function AntetPagina({
                       alt={pozaMica.alt}
                       fill
                       sizes="(min-width: 1024px) 260px, 40vw"
+                      quality={86}
                       style={{ objectPosition: taietura(pozaMica.cale) }}
                       className="object-cover"
                     />

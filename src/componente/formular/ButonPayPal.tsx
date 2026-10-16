@@ -95,8 +95,7 @@ export default function ButonPayPal({
       if (!raspuns.ok || !corp.adresa) {
         setStare({
           fel: "eroare",
-          mesaj:
-            corp.mesaj ?? "Nu am putut porni plata. Încearcă din nou.",
+          mesaj: corp.mesaj ?? "Nu am putut porni plata. Încearcă din nou.",
         });
         return;
       }

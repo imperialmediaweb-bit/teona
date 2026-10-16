@@ -52,8 +52,8 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
     intrebare: "Trebuie să am experiență în voluntariat?",
     raspuns: (
       <p>
-        Nu. În formular te întrebăm dacă ai mai făcut voluntariat, ca să știm
-        de unde pornim, nu ca să te selectăm. Mulți dintre voluntarii noștri au
+        Nu. În formular te întrebăm dacă ai mai făcut voluntariat, ca să știm de
+        unde pornim, nu ca să te selectăm. Mulți dintre voluntarii noștri au
         venit prima dată la o tabără fără să fi făcut asta vreodată.
       </p>
     ),
@@ -135,7 +135,9 @@ const GALERIE = [
 export default function DevinoVoluntar() {
   return (
     <>
-      <JsonLd date={jsonLdFir([{ nume: "Devino voluntar", cale: RUTE.voluntar }])} />
+      <JsonLd
+        date={jsonLdFir([{ nume: "Devino voluntar", cale: RUTE.voluntar }])}
+      />
       <AntetPagina
         scris="Culegătorii de Zâmbete"
         titlu="Devino voluntar"
@@ -160,17 +162,30 @@ export default function DevinoVoluntar() {
 
       {/* 11.2 și 11.3 */}
       <section className="relative overflow-hidden bg-hartie pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="spirala" className="pluteste-lent absolute top-16 right-[4%] size-9 text-turcoaz-200 lg:size-12" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="spirala"
+            className="pluteste-lent absolute top-16 right-[4%] size-9 text-turcoaz-200 lg:size-12"
+          />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <TitluSectiune scris="Doi pași, atât" titlu="Cum funcționează" culoare="miere" />
+          <TitluSectiune
+            scris="Doi pași, atât"
+            titlu="Cum funcționează"
+            culoare="miere"
+          />
 
           <div className="mt-12 grid gap-5 lg:grid-cols-12">
             <div className="lg:col-span-8">
               <Pasi
                 pasi={[
-                  { text: "Completezi formularul. Durează câteva minute.", pictograma: "document" },
+                  {
+                    text: "Completezi formularul. Durează câteva minute.",
+                    pictograma: "document",
+                  },
                   {
                     text: "Te contactăm și stabilim împreună unde poți fi cel mai de folos.",
                     pictograma: "comunicare",
@@ -183,7 +198,11 @@ export default function DevinoVoluntar() {
             <div className="lg:col-span-4">
               <Aparitie intarziere={0.1} className="h-full">
                 <div className="granulatie relative flex h-full min-h-[11rem] flex-col overflow-hidden colt-a border border-hartie-umbra bg-hartie p-6 shadow-[0_24px_50px_-26px_rgba(255,172,0,0.6)] sm:p-7">
-                  <Decor semn="soare" strokeWidth={0.8} className="absolute -top-10 -right-10 size-40 text-miere-100" />
+                  <Decor
+                    semn="soare"
+                    strokeWidth={0.8}
+                    className="absolute -top-10 -right-10 size-40 text-miere-100"
+                  />
                   <span className="colt-mic-b relative flex size-12 items-center justify-center bg-miere-400 text-cerneala shadow-[0_10px_22px_-10px_rgba(255,172,0,0.9)]">
                     <Pictograma nume="familie" className="size-6" />
                   </span>
@@ -195,7 +214,9 @@ export default function DevinoVoluntar() {
                   >
                     18+
                   </p>
-                  <h3 className="relative mt-3 text-h4 text-cerneala">Cine poate fi voluntar</h3>
+                  <h3 className="relative mt-3 text-h4 text-cerneala">
+                    Cine poate fi voluntar
+                  </h3>
                   <p className="relative mt-2 text-mic text-cerneala-moale">
                     Pentru a deveni voluntar, trebuie să ai minimum 18 ani.
                   </p>
@@ -209,9 +230,18 @@ export default function DevinoVoluntar() {
       {/* 11.4 — formularul */}
       <Val culoare="text-tenta-cald" className={VAL_PESTE} />
       <section className="granulatie relative overflow-hidden bg-tenta-cald pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="stea" className="pluteste-lent absolute top-16 right-[6%] size-8 text-miere-300 lg:size-11" />
-          <Decor semn="unda" className="pluteste-lent absolute bottom-24 left-[3%] size-9 text-caramiziu-200 lg:size-12" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="stea"
+            className="pluteste-lent absolute top-16 right-[6%] size-8 text-miere-300 lg:size-11"
+          />
+          <Decor
+            semn="unda"
+            className="pluteste-lent absolute bottom-24 left-[3%] size-9 text-caramiziu-200 lg:size-12"
+          />
         </div>
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:px-8">
           <div>
@@ -251,8 +281,14 @@ export default function DevinoVoluntar() {
       {/* 11.6 — alte moduri de a ajuta: trei carduri, ca pe prima pagină. */}
       <Val culoare="text-hartie-calda" className={VAL_PESTE} />
       <section className="granulatie relative overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <Decor semn="soare" className="pluteste-lent absolute top-12 right-[5%] size-10 text-miere-300 lg:size-14" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <Decor
+            semn="soare"
+            className="pluteste-lent absolute top-12 right-[5%] size-10 text-miere-300 lg:size-14"
+          />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <TitluSectiune titlu="Nu poți fi voluntar acum? Poți ajuta și altfel." />
@@ -271,6 +307,7 @@ export default function DevinoVoluntar() {
                       alt="Standul de la Casa Teona: cutia de donații cu sigla asociației, un afiș „Eu creez, împreună donăm… pentru copii cu dizabilități” și brățări colorate pe un suport"
                       fill
                       sizes="(min-width: 1024px) 400px, 92vw"
+                      quality={86}
                       className="object-cover"
                     />
                     <span className="colt-mic-b absolute top-4 left-4 flex size-12 items-center justify-center bg-caramiziu-700 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]">
@@ -282,7 +319,8 @@ export default function DevinoVoluntar() {
                       Donează
                     </h3>
                     <p className="mt-2 flex-1 text-mic text-cerneala-moale">
-                      O dată sau lunar, cu cardul, prin SMS sau prin transfer bancar.
+                      O dată sau lunar, cu cardul, prin SMS sau prin transfer
+                      bancar.
                     </p>
                     <span className="mt-5 inline-flex items-center gap-2 font-titlu text-mic font-semibold text-caramiziu-700">
                       Află cum
@@ -300,7 +338,11 @@ export default function DevinoVoluntar() {
                   href={RUTE.redirectionare35}
                   className="granulatie group relative flex h-full flex-col overflow-hidden colt-b bg-turcoaz-100 p-6 shadow-[0_28px_56px_-26px_rgba(42,159,163,0.7)] transition-all duration-500 ease-cald hover:-translate-y-1.5 motion-reduce:hover:translate-y-0 sm:p-7"
                 >
-                  <Decor semn="spirala" strokeWidth={0.8} className="absolute -right-12 -bottom-12 size-48 text-turcoaz-200" />
+                  <Decor
+                    semn="spirala"
+                    strokeWidth={0.8}
+                    className="absolute -right-12 -bottom-12 size-48 text-turcoaz-200"
+                  />
                   <span className="colt-mic-a relative flex size-12 items-center justify-center bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
                     <Pictograma nume="document" className="size-6" />
                   </span>
@@ -310,7 +352,9 @@ export default function DevinoVoluntar() {
                   >
                     3,5%
                   </p>
-                  <h3 className="relative mt-4 text-h4 text-turcoaz-900">Redirecționează 3,5%</h3>
+                  <h3 className="relative mt-4 text-h4 text-turcoaz-900">
+                    Redirecționează 3,5%
+                  </h3>
                   <p className="relative mt-2 flex-1 text-mic text-turcoaz-900/80">
                     Din impozitul pe venit, fără niciun cost pentru tine.
                   </p>
@@ -329,7 +373,11 @@ export default function DevinoVoluntar() {
                   href={RUTE.directionare20}
                   className="granulatie group relative flex h-full flex-col overflow-hidden colt-a bg-miere-300 p-6 shadow-[0_28px_56px_-26px_rgba(255,172,0,0.85)] transition-all duration-500 ease-cald hover:-translate-y-1.5 motion-reduce:hover:translate-y-0 sm:p-7"
                 >
-                  <Decor semn="stea" strokeWidth={0.8} className="absolute -top-10 -right-10 size-44 text-miere-200/80" />
+                  <Decor
+                    semn="stea"
+                    strokeWidth={0.8}
+                    className="absolute -top-10 -right-10 size-44 text-miere-200/80"
+                  />
                   <span className="colt-mic-b relative flex size-12 items-center justify-center bg-cerneala/10 text-cerneala">
                     <Pictograma nume="cladire" className="size-6" />
                   </span>
@@ -339,9 +387,12 @@ export default function DevinoVoluntar() {
                   >
                     20%
                   </p>
-                  <h3 className="relative mt-4 text-h4 text-miere-900">Direcționează 20%</h3>
+                  <h3 className="relative mt-4 text-h4 text-miere-900">
+                    Direcționează 20%
+                  </h3>
                   <p className="relative mt-2 flex-1 text-mic text-miere-900">
-                    Pentru firme: din impozitul pe profit, prin contract de sponsorizare.
+                    Pentru firme: din impozitul pe profit, prin contract de
+                    sponsorizare.
                   </p>
                   <span className="relative mt-5 inline-flex items-center gap-2 font-titlu text-mic font-semibold text-miere-900">
                     Află cum
@@ -377,8 +428,15 @@ export default function DevinoVoluntar() {
       <section className="granulatie relative overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-10 lg:pb-32">
         <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="granulatie relative overflow-hidden colt-b bg-turcoaz-100 p-8 text-center shadow-[0_30px_60px_-28px_rgba(42,159,163,0.6)] sm:p-10 lg:p-12">
-            <Decor semn="unda" strokeWidth={0.8} className="absolute -right-10 -bottom-10 size-44 text-turcoaz-200" />
-            <Decor semn="stea" className="absolute top-6 left-8 size-8 text-turcoaz-300" />
+            <Decor
+              semn="unda"
+              strokeWidth={0.8}
+              className="absolute -right-10 -bottom-10 size-44 text-turcoaz-200"
+            />
+            <Decor
+              semn="stea"
+              className="absolute top-6 left-8 size-8 text-turcoaz-300"
+            />
             <h2 className="relative text-h2 text-turcoaz-900">Ai întrebări?</h2>
             <p className="relative mx-auto mt-4 max-w-2xl text-amplu text-turcoaz-900/80">
               Scrie-ne la{" "}

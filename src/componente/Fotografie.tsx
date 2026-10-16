@@ -81,6 +81,9 @@ export default function Fotografie({
           fill
           priority={prioritara}
           sizes={dimensiuni}
+          // Peste cei 75 impliciți ai lui Next: aici fotografia e conținutul,
+          // nu decorul. Motivul lung e în `next.config.ts`, lângă listă.
+          quality={86}
           style={{ objectPosition: taietura(cale) }}
           className={`object-cover ${
             cuApropiere

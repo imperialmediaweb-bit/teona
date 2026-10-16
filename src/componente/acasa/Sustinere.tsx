@@ -80,6 +80,7 @@ export default function Sustinere() {
                     alt={POZE.doneaza.alt}
                     fill
                     sizes="(min-width: 1024px) 420px, 92vw"
+                    quality={86}
                     className="object-cover"
                   />
                   {/* Poza se stinge în portocaliu, nu se termină cu o linie:
@@ -228,6 +229,7 @@ export default function Sustinere() {
                     alt={POZE.sponsorizeaza.alt}
                     fill
                     sizes="(min-width: 1024px) 400px, (min-width: 640px) 46vw, 92vw"
+                    quality={86}
                     className="object-cover"
                   />
                   <span className="colt-mic-a absolute top-4 left-4 flex size-12 items-center justify-center bg-miere-400 text-cerneala shadow-[0_10px_22px_-10px_rgba(255,172,0,0.9)]">
@@ -266,6 +268,7 @@ export default function Sustinere() {
                     alt={POZE.voluntar.alt}
                     fill
                     sizes="(min-width: 1024px) 400px, (min-width: 640px) 46vw, 92vw"
+                    quality={86}
                     className="object-cover"
                   />
                   <span className="colt-mic-b absolute top-4 left-4 flex size-12 items-center justify-center bg-caramiziu-700 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]">

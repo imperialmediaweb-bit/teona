@@ -470,9 +470,7 @@ export default function Doneaza() {
                   <span className="colt-mic-b relative flex size-14 items-center justify-center bg-hartie/15 text-hartie">
                     <Pictograma nume="telefon" className="size-7" />
                   </span>
-                  <h3 className="relative mt-5 text-h3 text-hartie">
-                    Revolut
-                  </h3>
+                  <h3 className="relative mt-5 text-h3 text-hartie">Revolut</h3>
                   <p className="relative mt-3 text-amplu text-hartie/80">
                     Donezi din aplicația Revolut, în câteva secunde.
                   </p>

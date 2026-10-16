@@ -99,7 +99,8 @@ async function Continut({
           role="status"
           className="mb-7 colt-mic-a border border-turcoaz-200 bg-turcoaz-50 px-5 py-4 text-turcoaz-900"
         >
-          {gata === "urcat" && "Fișierul e sus. Se descarcă de la /formular-230."}
+          {gata === "urcat" &&
+            "Fișierul e sus. Se descarcă de la /formular-230."}
           {gata === "mutat" && "Mutat."}
           {gata === "sters" && "Șters, cu fișier cu tot."}
           {gata === "nesters" &&
@@ -161,15 +162,17 @@ async function Continut({
           <p className="mt-4 colt-mic-a bg-hartie-calda px-4 py-3 text-mic text-cerneala-moale">
             Depozitul de fișiere nu e configurat. În Railway trebuie puse{" "}
             <code className="rounded bg-hartie-umbra px-1">R2_ACCOUNT_ID</code>,{" "}
-            <code className="rounded bg-hartie-umbra px-1">R2_ACCESS_KEY_ID</code>,{" "}
+            <code className="rounded bg-hartie-umbra px-1">
+              R2_ACCESS_KEY_ID
+            </code>
+            ,{" "}
             <code className="rounded bg-hartie-umbra px-1">
               R2_SECRET_ACCESS_KEY
             </code>{" "}
             și <code className="rounded bg-hartie-umbra px-1">R2_BUCKET</code>.
             Dacă depozitul e creat în jurisdicția Uniunii Europene, mai trebuie
-            și{" "}
-            <code className="rounded bg-hartie-umbra px-1">R2_ENDPOINT</code>,
-            cu adresa lui.
+            și <code className="rounded bg-hartie-umbra px-1">R2_ENDPOINT</code>
+            , cu adresa lui.
           </p>
         )}
       </section>

@@ -24,7 +24,8 @@ export async function generateMetadata({
 }: PageProps<"/campanii/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const text = areBazaDeDate() ? await textPublicat("campanie", slug) : null;
-  if (!text) return { title: "Campanie", robots: { index: false, follow: false } };
+  if (!text)
+    return { title: "Campanie", robots: { index: false, follow: false } };
 
   return metadate({
     titlu: text.titlu,

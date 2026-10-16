@@ -52,11 +52,7 @@ function cand(iso: string): string {
   return iso ? DATA.format(new Date(iso)) : "—";
 }
 
-async function Continut({
-  searchParams,
-}: {
-  searchParams: Promise<Cautare>;
-}) {
+async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   await connection();
   const { stadiu, cauta = "", gresit, deschis, eroare } = await searchParams;
 
@@ -112,11 +108,7 @@ async function Continut({
     : [];
 
   return (
-    <Cadru
-      titlu="Firme"
-      activ="/admin/firme"
-      actiuni={<Descarca ce="firme" />}
-    >
+    <Cadru titlu="Firme" activ="/admin/firme" actiuni={<Descarca ce="firme" />}>
       {eroare && (
         <p
           role="alert"
@@ -184,7 +176,6 @@ async function Continut({
                   </div>
                   <Eticheta stadiu={f.stadiu} />
                 </div>
-
 
                 <div className="mt-4 grid gap-x-8 gap-y-1.5 text-mic sm:grid-cols-2">
                   <p className="text-cerneala-moale">

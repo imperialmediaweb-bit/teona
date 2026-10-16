@@ -275,18 +275,16 @@ async function Continut({
               {dosare.length > 0 ? (
                 <>
                   <span className="text-mic text-cerneala-moale">
-                    Toate pozele din folderul ales apar în galeria paginii,
-                    cele mai noi primele. Dacă lași gol, pozele se caută după
-                    dată, din numele folderului.
+                    Toate pozele din folderul ales apar în galeria paginii, cele
+                    mai noi primele. Dacă lași gol, pozele se caută după dată,
+                    din numele folderului.
                   </span>
                   <select
                     name="dosarCloud"
                     defaultValue={text?.dosarCloud ?? ""}
                     className={camp}
                   >
-                    <option value="">
-                      Fără folder ales — caută după dată
-                    </option>
+                    <option value="">Fără folder ales — caută după dată</option>
                     {dosare.map((d) => (
                       <option key={d.cale} value={d.cale}>
                         {d.cale}

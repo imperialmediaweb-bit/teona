@@ -223,6 +223,7 @@ export default function Erou() {
                     fill
                     priority={i === 0}
                     sizes="(min-width: 1280px) 640px, (min-width: 1024px) 52vw, 100vw"
+                    quality={86}
                     className={`object-cover transition-opacity duration-[1200ms] ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none ${stare}`}
                   />
                 );

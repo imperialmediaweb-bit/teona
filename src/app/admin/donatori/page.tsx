@@ -47,11 +47,7 @@ export default function PaginaDonatori({
   );
 }
 
-async function Continut({
-  searchParams,
-}: {
-  searchParams: Promise<Cautare>;
-}) {
+async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   await connection();
   const { filtru: cerut, cauta = "", gresit, deschis } = await searchParams;
 

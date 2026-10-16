@@ -115,7 +115,8 @@ export default function FormularSponsorizare() {
       if (!raspuns.ok) {
         setStare({
           fel: "eroare",
-          mesaj: corp.mesaj ?? "Nu am putut trimite cererea. Încercați din nou.",
+          mesaj:
+            corp.mesaj ?? "Nu am putut trimite cererea. Încercați din nou.",
         });
         return;
       }
@@ -146,8 +147,8 @@ export default function FormularSponsorizare() {
           Mulțumim! V-am trimis pașii pe e-mail.
         </p>
         <p className="relative mt-3 text-corp text-turcoaz-900/80">
-          Vă scrie {FUNDRAISING.nume} cu contractul de sponsorizare completat
-          cu datele noastre. Dacă e ceva urgent, sunați la{" "}
+          Vă scrie {FUNDRAISING.nume} cu contractul de sponsorizare completat cu
+          datele noastre. Dacă e ceva urgent, sunați la{" "}
           <a
             href={`tel:${FUNDRAISING.telefon.apel}`}
             className="font-titlu font-bold underline underline-offset-4"

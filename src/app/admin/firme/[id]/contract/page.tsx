@@ -114,7 +114,9 @@ async function Continut({
   */
   const cui = curataCui(firma.cui);
   const laAnaf =
-    cui !== null && cuiValid(cui) ? await cautaFirma(cui).catch(() => null) : null;
+    cui !== null && cuiValid(cui)
+      ? await cautaFirma(cui).catch(() => null)
+      : null;
 
   /** „JUD. SUCEAVA, MUN. SUCEAVA, STR. …” → sediul fără județ, și județul. */
   const adresa = laAnaf?.adresa ?? "";
@@ -310,8 +312,8 @@ async function Continut({
             className="mt-0.5 size-5"
           />
           <span>
-            Mută firma la „Contract trimis” și notează în istoric că s-a
-            generat contractul.
+            Mută firma la „Contract trimis” și notează în istoric că s-a generat
+            contractul.
           </span>
         </label>
 

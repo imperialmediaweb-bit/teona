@@ -51,7 +51,10 @@ export default function Semneaza() {
       />
 
       <section className="relative overflow-hidden bg-hartie pt-4 pb-24 lg:pt-8 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
           <Decor
             semn="spirala"
             className="pluteste-lent absolute top-20 right-[4%] size-10 text-turcoaz-200 lg:size-14"

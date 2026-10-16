@@ -2,12 +2,7 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import {
-  LIMITE,
-  OCAZII,
-  POZA_MAXIM,
-  textGataFacut,
-} from "@/date/aniversari";
+import { LIMITE, OCAZII, POZA_MAXIM, textGataFacut } from "@/date/aniversari";
 import { RUTE } from "@/date/asociatie";
 import Pictograma from "@/componente/Pictograma";
 import Camp, {
@@ -112,7 +107,9 @@ export default function FormularAniversare({
       }
       el.value = corp.text.slice(0, LIMITE.mesaj);
       setLungimeMesaj(el.value.length);
-      setNotaMesaj("Îndreptat. Citește-l — dacă ți-a schimbat înțelesul, scrie-l tu.");
+      setNotaMesaj(
+        "Îndreptat. Citește-l — dacă ți-a schimbat înțelesul, scrie-l tu.",
+      );
     } catch {
       setNotaMesaj("N-am putut îndrepta textul acum. Verifică-ți conexiunea.");
     } finally {
@@ -134,7 +131,6 @@ export default function FormularAniversare({
     if (!sir("nume_public")) gasite.nume = "Scrie numele care apare pe pagină.";
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(sir("email")))
       gasite.email = "Introdu o adresă de e-mail validă.";
-
 
     const poza = date.get("poza");
     if (poza instanceof File && poza.size > POZA_MAXIM)

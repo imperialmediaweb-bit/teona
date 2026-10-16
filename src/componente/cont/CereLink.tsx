@@ -55,7 +55,8 @@ export default function CereLink() {
       }
       setStare({
         fel: "trimis",
-        mesaj: corp.mesaj ?? "Dacă adresa are donații la noi, ți-am trimis un link.",
+        mesaj:
+          corp.mesaj ?? "Dacă adresa are donații la noi, ți-am trimis un link.",
       });
     } catch {
       setStare({

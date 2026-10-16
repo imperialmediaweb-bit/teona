@@ -235,7 +235,10 @@ export default function SponsoriSiParteneri() {
       */}
       <Val culoare="text-hartie" className={VAL_PESTE} />
       <section className="relative overflow-hidden bg-hartie pt-6 pb-24 lg:pt-10 lg:pb-32">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
           <Decor
             semn="unda"
             strokeWidth={0.7}
@@ -263,9 +266,9 @@ export default function SponsoriSiParteneri() {
                     Contract de sponsorizare
                   </h3>
                   <p className="mt-2 flex-1 text-mic text-cerneala-moale">
-                    Până la 20% din impozitul pe profit poate merge la
-                    asociație în loc să meargă la stat. Firma semnează un
-                    contract, face plata și scade suma din impozit.
+                    Până la 20% din impozitul pe profit poate merge la asociație
+                    în loc să meargă la stat. Firma semnează un contract, face
+                    plata și scade suma din impozit.
                   </p>
                   <span className="mt-5 inline-flex items-center gap-2 font-titlu text-mic font-semibold text-caramiziu-700">
                     Calculator și pași
@@ -287,9 +290,9 @@ export default function SponsoriSiParteneri() {
                     Declarația 177
                   </h3>
                   <p className="mt-2 flex-1 text-mic text-cerneala-moale">
-                    Pentru sponsorizarea deja plătită, firma cere redirecționarea
-                    sumei prin Declarația 177. Termenul îl confirmăm împreună cu
-                    contabilitatea.
+                    Pentru sponsorizarea deja plătită, firma cere
+                    redirecționarea sumei prin Declarația 177. Termenul îl
+                    confirmăm împreună cu contabilitatea.
                   </p>
                   <span className="mt-5 inline-flex items-center gap-2 font-titlu text-mic font-semibold text-turcoaz-700">
                     Cum se depune

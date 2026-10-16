@@ -20,7 +20,6 @@ import { redirectionariProiecte } from "./src/lib/redirectionari-proiecte.mjs";
  */
 const cloudinary = (process.env.CLOUDINARY_CLOUD_NAME ?? "").trim();
 
-
 /**
  * Antetele de securitate, pe fiecare răspuns.
  *
@@ -137,9 +136,30 @@ const nextConfig: NextConfig = {
     return [{ source: "/(.*)", headers: ANTETE_DE_SECURITATE }];
   },
 
+  /*
+    Calitatea la care se comprimă fotografiile.
+
+    Next comprimă implicit la 75. Pentru un site în care fotografia e
+    conținutul — copii în tabără, Casa Teona, oameni —, 75 în WebP netezește
+    tocmai detaliul care contează: firele de păr, textura hainelor, ochii.
+    La mărimile mari de pe ecranele dese se vede ca o ceață fină peste toată
+    pagina, iar cine o vede nu zice „e comprimată", zice „arată ieftin".
+
+    86 costă vreo 40% mai mulți octeți pe fotografiile mari și opresc acolo:
+    peste 90, WebP crește repede fără să se mai vadă diferența.
+
+    Lista trebuie scrisă aici: din Next 15.4 orice calitate necerută explicit
+    e refuzată, ca să nu poată cineva cere 100 pentru fiecare poză dintr-o
+    adresă și să încarce serverul. 75 rămâne în listă pentru pictograme și
+    sigle, unde nu se vede oricum.
+  */
   images: cloudinary
-    ? { loader: "custom", loaderFile: "./src/lib/incarcator-imagini.ts" }
-    : {},
+    ? {
+        loader: "custom",
+        loaderFile: "./src/lib/incarcator-imagini.ts",
+        qualities: [75, 86],
+      }
+    : { qualities: [75, 86] },
 
   env: {
     // Încărcătorul rulează și în browser, deci numele contului trebuie să fie

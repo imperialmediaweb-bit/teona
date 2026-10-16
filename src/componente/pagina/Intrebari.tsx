@@ -108,7 +108,7 @@ export default function Intrebari({
                     fill
                     sizes="(min-width: 1024px) 440px, 0px"
                     style={{ objectPosition: taietura(poza.cale) }}
-                      className="object-cover"
+                    className="object-cover"
                   />
                 </div>
                 {poza.legenda && (

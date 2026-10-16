@@ -50,13 +50,11 @@ export default function Multumim() {
         <p className="scris mt-7 text-amplu text-caramiziu-700">
           {ASOCIATIA.motto}
         </p>
-        <h1 className="mt-2 text-h1 text-cerneala">
-          Mulțumim pentru donație!
-        </h1>
+        <h1 className="mt-2 text-h1 text-cerneala">Mulțumim pentru donație!</h1>
         <p className="mx-auto mt-5 max-w-2xl text-amplu text-cerneala-moale">
-          Donația ta înseamnă mult pentru noi. Vei primi o confirmare pe
-          e-mail din partea platformei de plată — dacă nu ajunge în câteva
-          minute, uită-te și în „Spam”.
+          Donația ta înseamnă mult pentru noi. Vei primi o confirmare pe e-mail
+          din partea platformei de plată — dacă nu ajunge în câteva minute,
+          uită-te și în „Spam”.
         </p>
 
         <div className="granulatie mt-10 colt-b border border-hartie-umbra bg-hartie p-7 text-left shadow-[0_24px_50px_-28px_rgba(35,35,35,0.35)] sm:p-9">
@@ -68,8 +66,8 @@ export default function Multumim() {
                 className="mt-2 size-2 shrink-0 rounded-full bg-caramiziu-700"
               />
               <span>
-                Confirmarea plății îți vine pe e-mail, de la procesator. Ea e
-                și dovada donației.
+                Confirmarea plății îți vine pe e-mail, de la procesator. Ea e și
+                dovada donației.
               </span>
             </li>
             <li className="flex gap-3">

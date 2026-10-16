@@ -460,14 +460,38 @@ export default function DespreNoi() {
                       i % 2 === 0 ? "colt-a" : "colt-b"
                     } border border-hartie-umbra bg-hartie shadow-[0_24px_50px_-26px_rgba(35,35,35,0.45)]`}
                   >
-                    {membru.poza ? (
-                      <div className="relative bg-hartie-calda pt-7">
-                        <Decor
-                          semn={i % 2 === 0 ? "unda" : "spirala"}
-                          strokeWidth={0.9}
-                          className="absolute -top-6 -right-6 size-28 text-caramiziu-100"
-                        />
-                        <div className="relative mx-auto size-32 overflow-hidden rounded-full border-[5px] border-hartie bg-hartie shadow-[0_16px_32px_-16px_rgba(35,35,35,0.5)]">
+                    {/*
+                      Un singur fel de cap de card, cu sau fără fotografie.
+
+                      Înainte erau două: cine avea poză primea un câmp palid
+                      cu un cerc mic în mijloc, cine n-avea primea o bandă
+                      colorată cu inițiale mari. Puse una lângă alta, cele
+                      șase cartonașe nu se mai citeau ca un set — păreau
+                      făcute de doi oameni diferiți, iar cele cu fotografie
+                      ieșeau mai sărace decât cele fără.
+
+                      Acum banda e aceeași la toate: aceeași înălțime,
+                      aceeași culoare din scara asociației, același semn
+                      decorativ în colț. În mijloc stă ori fotografia, într-un
+                      cerc, ori inițialele, la aceeași mărime.
+
+                      **Cercul, nu fotografia lățită peste toată banda.**
+                      Fotografiile moștenite de pe site-ul vechi au 176 px
+                      lățime; întinse pe toată banda ar fi fost o pată
+                      neclară. Într-un cerc de 112 px se văd curat, iar când
+                      asociația trimite fotografii mari nu se schimbă nimic
+                      aici: aceeași casetă, pixeli mai mulți.
+                    */}
+                    <div
+                      className={`granulatie relative flex h-36 items-center justify-center overflow-hidden ${CAMPURI_ECHIPA[i % CAMPURI_ECHIPA.length]}`}
+                    >
+                      <Decor
+                        semn={i % 2 === 0 ? "stea" : "soare"}
+                        strokeWidth={0.8}
+                        className="absolute -top-8 -right-8 size-36 opacity-25"
+                      />
+                      {membru.poza ? (
+                        <div className="relative size-28 overflow-hidden rounded-full border-4 border-hartie/80 bg-hartie shadow-[0_14px_28px_-14px_rgba(35,35,35,0.55)]">
                           <Image
                             src={membru.poza}
                             alt={
@@ -476,28 +500,20 @@ export default function DespreNoi() {
                                 : `${membru.nume}, din echipa ${ASOCIATIA.denumire}`
                             }
                             fill
-                            sizes="128px"
-                            className="object-cover"
+                            sizes="112px"
+                            quality={86}
+                            className="object-cover object-top"
                           />
                         </div>
-                      </div>
-                    ) : (
-                      <div
-                        className={`granulatie relative flex h-36 items-center justify-center overflow-hidden ${CAMPURI_ECHIPA[i % CAMPURI_ECHIPA.length]}`}
-                      >
-                        <Decor
-                          semn={i % 2 === 0 ? "stea" : "soare"}
-                          strokeWidth={0.8}
-                          className="absolute -top-8 -right-8 size-36 opacity-25"
-                        />
+                      ) : (
                         <span
                           aria-hidden="true"
                           className="relative font-titlu text-[3.5rem] leading-none font-extrabold tracking-tight"
                         >
                           {initiale(membru.nume)}
                         </span>
-                      </div>
-                    )}
+                      )}
+                    </div>
 
                     <div className="flex flex-1 flex-col p-6 sm:p-7">
                       <h3 className="text-h4 text-cerneala">{membru.nume}</h3>
@@ -611,6 +627,7 @@ export default function DespreNoi() {
                           alt={poza.alt}
                           fill
                           sizes="(min-width: 1024px) 300px, 46vw"
+                          quality={86}
                           className="object-cover transition-transform duration-[1100ms] ease-cald group-hover:scale-[1.06] motion-reduce:group-hover:scale-100"
                         />
                       </figure>

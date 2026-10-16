@@ -27,7 +27,9 @@ import Camp, {
  * mai mulți, care vin să copieze un cont, nu să completeze un formular.
  */
 
-type Erori = Partial<Record<"nume" | "suma" | "data" | "email" | "confirm", string>>;
+type Erori = Partial<
+  Record<"nume" | "suma" | "data" | "email" | "confirm", string>
+>;
 
 type Stare =
   | { fel: "gol" }
@@ -136,9 +138,9 @@ export default function AnuntTransfer() {
 
       <div className="border-t-2 border-turcoaz-200 p-5">
         <p className="text-mic text-turcoaz-900/80">
-          Nu e nevoie, dar ne ajută: știm ce sumă să căutăm în extrasul de
-          cont și pe cine să trecem în evidență. Nu se plătește nimic de aici
-          și nu se cere niciun card.
+          Nu e nevoie, dar ne ajută: știm ce sumă să căutăm în extrasul de cont
+          și pe cine să trecem în evidență. Nu se plătește nimic de aici și nu
+          se cere niciun card.
         </p>
 
         <form onSubmit={trimite} noValidate className="mt-5 grid gap-4">
@@ -282,9 +284,9 @@ export default function AnuntTransfer() {
           </Bifa>
 
           <p className="text-nota text-cerneala-slab">
-            Anunțul nu e o plată și nu intră în totalurile asociației până
-            când transferul e găsit în extrasul de cont. Datele rămân la
-            asociație; întrebări, la {EMAIL.contact}.
+            Anunțul nu e o plată și nu intră în totalurile asociației până când
+            transferul e găsit în extrasul de cont. Datele rămân la asociație;
+            întrebări, la {EMAIL.contact}.
           </p>
 
           {stare.fel === "eroare" && (

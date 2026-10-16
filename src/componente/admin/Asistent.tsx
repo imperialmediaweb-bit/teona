@@ -87,8 +87,9 @@ export default function Asistent() {
       // formularul de e-mail. Se completează cel care există pe pagină.
       completeaza("text", corp.text);
       completeaza("continut", corp.text);
-      if (!(document.querySelector('[name="subiect"]') as HTMLInputElement)
-        ?.value) {
+      if (
+        !(document.querySelector('[name="subiect"]') as HTMLInputElement)?.value
+      ) {
         completeaza("subiect", corp.titlu);
       }
       setStare({ fel: "gata" });

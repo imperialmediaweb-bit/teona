@@ -89,10 +89,7 @@ const CAI: Record<string, string | string[]> = {
   // ── Panoul de administrare ──────────────────────────────────────────────
   // Patru cadrane: semnul obișnuit pentru „tabloul de bord”, înțeles fără
   // text. Nu e nevoie să semene cu nimic din lume.
-  panou: [
-    "M4 4.5h6v6H4zM14 4.5h6v4h-6z",
-    "M14 12.5h6v7h-6zM4 14.5h6v5H4z",
-  ],
+  panou: ["M4 4.5h6v6H4zM14 4.5h6v4h-6z", "M14 12.5h6v7h-6zM4 14.5h6v5H4z"],
   // Trei bare de înălțimi diferite: statistici.
   grafic: ["M5 19.5V11M12 19.5V5M19 19.5v-6", "M3.5 19.5h17"],
 };

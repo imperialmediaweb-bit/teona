@@ -45,11 +45,7 @@ export default function PaginaDonatii({
   );
 }
 
-async function Continut({
-  searchParams,
-}: {
-  searchParams: Promise<Cautare>;
-}) {
+async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   await connection();
   const { gata, respins, eroare, gresit } = await searchParams;
 
@@ -138,9 +134,9 @@ async function Continut({
             Transferuri anunțate de donatori ({anuntate.length})
           </h2>
           <p className="mt-1 max-w-2xl text-mic text-turcoaz-900/80">
-            Oamenii ăștia spun că au făcut transferul. Caută suma în extrasul
-            de cont: dacă e acolo, apasă „Am găsit-o în extras” și donația
-            intră în totaluri, cu data de mai jos. Dacă nu, scoate-o.
+            Oamenii ăștia spun că au făcut transferul. Caută suma în extrasul de
+            cont: dacă e acolo, apasă „Am găsit-o în extras” și donația intră în
+            totaluri, cu data de mai jos. Dacă nu, scoate-o.
           </p>
 
           <ul className="mt-5 grid gap-4">
@@ -358,9 +354,7 @@ async function Continut({
                     )}
                   </td>
                   <td className="py-2.5 pr-4 text-cerneala-moale">
-                    {d.nume ?? (
-                      <span className="text-cerneala-slab">—</span>
-                    )}
+                    {d.nume ?? <span className="text-cerneala-slab">—</span>}
                     {d.email && (
                       <span className="block text-nota break-all text-cerneala-slab">
                         {d.email}

@@ -32,13 +32,13 @@ export async function generateMetadata({
 }: PageProps<"/noutati/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const text = areBazaDeDate() ? await textPublicat("noutate", slug) : null;
-  if (!text) return { title: "Noutate", robots: { index: false, follow: false } };
+  if (!text)
+    return { title: "Noutate", robots: { index: false, follow: false } };
 
   return metadate({
     titlu: text.titlu,
     descriere:
-      text.rezumat ||
-      `${text.titlu} — o noutate de la ${ASOCIATIA.denumire}.`,
+      text.rezumat || `${text.titlu} — o noutate de la ${ASOCIATIA.denumire}.`,
     cale: `${RUTE.noutati}/${text.slug}`,
     imagine: text.poza
       ? { cale: adresaPentruDistribuire(text.poza.id), alt: text.poza.alt }

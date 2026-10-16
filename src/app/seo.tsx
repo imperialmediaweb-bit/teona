@@ -88,7 +88,8 @@ export const absoluta = (cale: string) =>
  * nevoie de o adresă stabilă din `public/`, nu de `icon.png`, pe care Next îl
  * servește cu un hash în adresă.
  */
-const SIGLA = "/poze/2024/11/cropped-Screenshot11removebgpreview-2512x512-1.png";
+const SIGLA =
+  "/poze/2024/11/cropped-Screenshot11removebgpreview-2512x512-1.png";
 
 /**
  * Metadatele unei pagini: titlu, descriere, adresă canonică, Open Graph și
@@ -128,9 +129,13 @@ export function metadate({
   /** `true` = titlul e deja complet și nu trece prin șablon (prima pagină). */
   titluAbsolut?: boolean;
 }): Metadata {
-  const titluComplet = titluAbsolut ? titlu : `${titlu} · ${ASOCIATIA.denumire}`;
+  const titluComplet = titluAbsolut
+    ? titlu
+    : `${titlu} · ${ASOCIATIA.denumire}`;
   const imagini = [
-    imagine ? { url: absoluta(imagine.cale), alt: imagine.alt } : IMAGINE_GENERALA,
+    imagine
+      ? { url: absoluta(imagine.cale), alt: imagine.alt }
+      : IMAGINE_GENERALA,
   ];
 
   return {
@@ -321,7 +326,9 @@ export function textDin(nod: ReactNode): string {
     if (Array.isArray(n)) return n.map(extrage).join("");
     if (isValidElement<{ children?: ReactNode }>(n)) {
       const text = extrage(n.props.children);
-      return typeof n.type === "string" && BLOCURI.has(n.type) ? `${text} ` : text;
+      return typeof n.type === "string" && BLOCURI.has(n.type)
+        ? `${text} `
+        : text;
     }
     return "";
   };

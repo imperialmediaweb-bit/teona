@@ -44,7 +44,8 @@ export default function FormularRedirectionare() {
     const nume = String(date.get("nume") ?? "").trim();
     const email = String(date.get("email") ?? "").trim();
 
-    if (nume.length < 2) gasite.nume = "Scrie-ți numele, ca să știm cui scriem.";
+    if (nume.length < 2)
+      gasite.nume = "Scrie-ți numele, ca să știm cui scriem.";
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
       gasite.email = "Introdu o adresă de e-mail validă.";
     if (date.get("acord") !== "da")

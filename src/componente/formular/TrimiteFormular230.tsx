@@ -277,7 +277,9 @@ export default function TrimiteFormular230() {
             disabled={stare.fel === "trimite"}
             className={claseButonTrimite}
           >
-            {stare.fel === "trimite" ? "Se trimite…" : "Am completat formularul"}
+            {stare.fel === "trimite"
+              ? "Se trimite…"
+              : "Am completat formularul"}
           </button>
         </div>
       </form>

@@ -2,10 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
-import {
-  campaniiDeVerificat,
-  campaniiPublicateCuBani,
-} from "@/lib/campanii";
+import { campaniiDeVerificat, campaniiPublicateCuBani } from "@/lib/campanii";
 import { adresaPoza } from "@/lib/poza-urcata";
 import { scrieSuma } from "@/lib/suma";
 import { etichetaOcaziei } from "@/date/aniversari";
@@ -37,7 +34,9 @@ export default function Verificare({
   searchParams: Promise<{ gresit?: string }>;
 }) {
   return (
-    <Suspense fallback={<Cadru titlu="Aniversări de aprobat">Se încarcă…</Cadru>}>
+    <Suspense
+      fallback={<Cadru titlu="Aniversări de aprobat">Se încarcă…</Cadru>}
+    >
       <Continut searchParams={searchParams} />
     </Suspense>
   );
@@ -161,9 +160,7 @@ async function Continut({
                 <span className="font-titlu font-bold whitespace-nowrap text-cerneala">
                   {scrieSuma(p.bani / 100)}
                   <span className="ml-2 font-normal text-cerneala-slab">
-                    {p.donatii === 1
-                      ? "o donație"
-                      : `${p.donatii} donații`}
+                    {p.donatii === 1 ? "o donație" : `${p.donatii} donații`}
                   </span>
                 </span>
               </li>
@@ -202,7 +199,6 @@ async function Continut({
             <p className="mt-5 max-w-3xl whitespace-pre-line text-cerneala-moale">
               {c.mesaj}
             </p>
-
 
             <div className="mt-6 flex flex-wrap gap-3 border-t border-hartie-umbra pt-5">
               <form action="/api/admin/aniversari" method="post">

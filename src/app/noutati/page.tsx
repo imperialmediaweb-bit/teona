@@ -70,7 +70,10 @@ export default function PaginaNoutati() {
         </div>
       </section>
 
-      <IndemnFinal peste titlu="Lucrurile astea se întâmplă pentru că cineva ajută" />
+      <IndemnFinal
+        peste
+        titlu="Lucrurile astea se întâmplă pentru că cineva ajută"
+      />
     </>
   );
 }

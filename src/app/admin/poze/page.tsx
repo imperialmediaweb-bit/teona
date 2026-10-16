@@ -170,7 +170,10 @@ async function Continut({
         aria-label="Unde ești"
         className="flex flex-wrap items-center gap-x-2 gap-y-1 text-mic text-cerneala-moale"
       >
-        <Link href="/admin/poze" className="font-semibold text-caramiziu-700 hover:underline">
+        <Link
+          href="/admin/poze"
+          className="font-semibold text-caramiziu-700 hover:underline"
+        >
           Toate folderele
         </Link>
         {bucati.map((bucata, i) => {

@@ -128,7 +128,13 @@ export default function CampCui({
 
   return (
     <div>
-      <Camp id={id} eticheta={eticheta} obligatoriu={obligatoriu} nota={nota} eroare={eroare}>
+      <Camp
+        id={id}
+        eticheta={eticheta}
+        obligatoriu={obligatoriu}
+        nota={nota}
+        eroare={eroare}
+      >
         <input
           id={id}
           name={name}

@@ -202,6 +202,7 @@ async function Continut(proprietati: Proprietati) {
                 width={campanie.pozaLatime ?? 1400}
                 height={campanie.pozaInaltime ?? 900}
                 sizes="(min-width: 1024px) 896px, 92vw"
+                quality={86}
                 className="h-auto w-full object-cover"
                 priority
                 unoptimized

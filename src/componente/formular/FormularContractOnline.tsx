@@ -32,7 +32,13 @@ import CampCui, { type Firma } from "./CampCui";
 
 type Erori = Partial<
   Record<
-    "denumire" | "cui" | "reprezentant" | "email" | "valoare" | "semnatura" | "acord",
+    | "denumire"
+    | "cui"
+    | "reprezentant"
+    | "email"
+    | "valoare"
+    | "semnatura"
+    | "acord",
     string
   >
 >;
@@ -270,9 +276,7 @@ function Formular() {
               autoComplete="name"
               maxLength={120}
               aria-invalid={Boolean(erori.reprezentant)}
-              className={
-                erori.reprezentant ? claseControlGresit : claseControl
-              }
+              className={erori.reprezentant ? claseControlGresit : claseControl}
             />
           </Camp>
 
@@ -415,8 +419,8 @@ function Formular() {
           </p>
           <p className="mt-2 text-mic text-turcoaz-900/85">
             Semnați-l și trimiteți-ni-l înapoi. Butonul de mai jos deschide
-            e-mailul cu adresa și subiectul deja scrise — rămâne doar să
-            atașați documentul semnat.
+            e-mailul cu adresa și subiectul deja scrise — rămâne doar să atașați
+            documentul semnat.
           </p>
           <a
             href={`mailto:${EMAIL.contact}?subject=${encodeURIComponent(

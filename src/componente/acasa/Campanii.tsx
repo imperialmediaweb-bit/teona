@@ -112,6 +112,7 @@ export default function Campanii() {
                                 ? "(min-width: 1024px) 620px, 92vw"
                                 : "(min-width: 1024px) 300px, (min-width: 640px) 46vw, 92vw"
                             }
+                            quality={86}
                             className="object-cover transition-transform duration-[1100ms] ease-cald group-hover:scale-[1.06] motion-reduce:group-hover:scale-100"
                           />
                           {/* Legenda stă sus, nu jos: jos vine cardul de text. */}

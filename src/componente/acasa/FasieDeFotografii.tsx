@@ -118,6 +118,7 @@ export default function FasieDeFotografii() {
               aria-hidden={fotografie.copie || undefined}
               fill
               sizes="(min-width: 640px) 416px, 288px"
+              quality={86}
               className="object-cover"
             />
           </figure>
