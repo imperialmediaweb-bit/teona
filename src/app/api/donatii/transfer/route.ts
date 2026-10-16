@@ -9,6 +9,7 @@ import { areBazaDeDate } from "@/lib/baza";
 import { anuntaTransfer } from "@/lib/plati/donatori";
 import { anuntaTransferulPeEmail } from "@/lib/email/transfer";
 import { citesteSuma } from "@/lib/suma";
+import { esteCanal } from "@/lib/atribuire";
 import { esteDestinatie, inBani, sumaAcceptata } from "@/date/plati";
 import { EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
 
@@ -135,6 +136,13 @@ export async function POST(cerere: Request) {
     nume,
     telefon: text(camp("telefon"), 40) ?? undefined,
     observatii: text(camp("observatii"), 1_000) ?? undefined,
+    /*
+      De unde a venit donatorul. Mai ales aici: cât timp plata cu cardul nu e
+      pornită, transferul anunțat e singura donație care trece prin site, deci
+      singura care poate spune dacă afișul cu cod QR sau reclama au adus ceva.
+    */
+    canal: esteCanal(camp("canal")) ? camp("canal") : null,
+    sursa: text(camp("sursa"), 120) ?? null,
   });
 
   /*

@@ -50,6 +50,17 @@ ${lista([
   "/admin/aniversari — aprobarea paginilor de ziua cuiva.",
   "Export în Excel pentru donații, donatori, firme și cereri.",
   'Segmente gata făcute: „s-au oprit" (au dat de cel puțin două ori, nimic în ultimele patru luni) și „donatori mari" (peste 1.000 de lei adunat).',
+  "/admin/qr — coduri QR de tipărit (afișe, fluturași, cutii de donații), fiecare cu eticheta locului lui, ca să se vadă în panou ce a adus fiecare afiș. Se descarcă PNG sau SVG.",
+])}
+
+De unde se știe din ce canal a venit o donație:
+${lista([
+  "fiecare donație începută pe site păstrează canalul din care a venit omul: e-mail, reclame Facebook sau Instagram, Facebook neplătit, căutare Google, cod QR tipărit, alt site, direct;",
+  "se scrie din eticheta linkului pe care a apăsat (utm_source, utm_medium) sau din site-ul de pe care a venit; nu se ghicește niciodată după;",
+  'linkurile din șabloanele de e-mail și codurile QR din panou poartă etichetele singure — cele puse de mână într-o postare, nu, deci donațiile venite din ele cad în „direct";',
+  "donațiile dinainte de asta și cele adăugate de mână din extrasul de cont n-au canal și sunt numărate separat, nu împărțite pe canale;",
+  'la /admin/analiza, „De unde vin donatorii" pune vizitele (numărate de Google) lângă donații (numărate de baza noastră) — două măsurători diferite, niciodată adunate;',
+  "dacă în Railway sunt META_TOKEN și META_AD_ACCOUNT_ID, tot acolo se vede și cât s-a cheltuit pe reclamele Meta, lângă ce au adus.",
 ])}
 
 Ce se trimite automat, fără ca nimeni să apese ceva:

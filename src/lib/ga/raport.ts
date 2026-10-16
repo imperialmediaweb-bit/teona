@@ -1,4 +1,5 @@
 import { jetonDeAcces, arePropietate, proprietatea } from "./jeton";
+import { canalDin, ORDINE_CANALE, type Canal } from "@/lib/atribuire";
 
 /**
  * Cifrele de vizite, luate din Google Analytics.
@@ -66,6 +67,14 @@ export type Vizite = {
   /** Aceleași cifre, pe perioada dinainte, la fel de lungă. */
   inainte: { utilizatori: number; sesiuni: number };
   surse: Array<{ sursa: string; sesiuni: number }>;
+  /**
+   * Aceleași vizite, strânse pe canalele din `src/lib/atribuire.ts`.
+   *
+   * Numele canalelor sunt aceleași cu cele scrise pe donații, deci rândurile
+   * se pot citi unele lângă altele: vizitele vin de la Google, donațiile din
+   * baza noastră, iar singurul lucru pe care îl au în comun e vocabularul.
+   */
+  canale: Array<{ canal: Canal; sesiuni: number }>;
   pagini: Array<{ cale: string; vizualizari: number }>;
   campanii: Array<{ nume: string; sesiuni: number }>;
 };
@@ -89,6 +98,19 @@ const SURSE: Record<string, string> = {
   "bing / organic": "Căutare Bing",
   "google / cpc": "Reclame Google",
 };
+
+/** Vizitele, strânse pe canale. Ordinea e cea din `CANALE`. */
+function peCanale(randuri: Rand[]): Array<{ canal: Canal; sesiuni: number }> {
+  const sume = new Map<Canal, number>();
+  for (const r of randuri) {
+    const { canal } = canalDin({ sursa: text(r, 0), mediu: text(r, 1) });
+    sume.set(canal, (sume.get(canal) ?? 0) + nr(r));
+  }
+  return ORDINE_CANALE.filter((c) => sume.has(c)).map((canal) => ({
+    canal,
+    sesiuni: sume.get(canal) ?? 0,
+  }));
+}
 
 export function areVizite(): boolean {
   return arePropietate();
@@ -119,7 +141,12 @@ export async function vizite(zile = 28): Promise<Vizite | null> {
       dimensions: [{ name: "sessionSource" }, { name: "sessionMedium" }],
       metrics: [{ name: "sessions" }],
       orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
-      limit: 8,
+      /*
+        Mai multe rânduri decât se arată: tabelul are opt, dar strânsul pe
+        canale are nevoie de coadă — zece surse mici de pe Facebook adună cât
+        una mare, iar tăiate la opt ar dispărea din socoteală.
+      */
+      limit: 25,
     }),
     cere({
       dateRanges: [acum],
@@ -148,10 +175,11 @@ export async function vizite(zile = 28): Promise<Vizite | null> {
       utilizatori: nr((capInainte ?? [])[0] ?? {}, 0),
       sesiuni: nr((capInainte ?? [])[0] ?? {}, 1),
     },
-    surse: (surse ?? []).map((r) => {
+    surse: (surse ?? []).slice(0, 8).map((r) => {
       const cheie = `${text(r, 0)} / ${text(r, 1)}`;
       return { sursa: SURSE[cheie] ?? cheie, sesiuni: nr(r) };
     }),
+    canale: peCanale(surse ?? []),
     pagini: (pagini ?? []).map((r) => ({
       cale: text(r),
       vizualizari: nr(r),

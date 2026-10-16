@@ -41,6 +41,9 @@ export type CerereDonatie = {
   telefon: string | null;
   acordBuletin: boolean;
   campanieSlug: string | null;
+  /** Canalul din care a venit donatorul, dus mai departe în metadate. */
+  canal?: string | null;
+  sursa?: string | null;
   adresaSite: string;
 };
 
@@ -103,6 +106,14 @@ function metadate(cerere: CerereDonatie): Record<string, string> {
     telefon: cerere.telefon ?? "",
     acord_buletin: cerere.acordBuletin ? "da" : "nu",
     campanie: cerere.campanieSlug ?? "",
+    /*
+      Canalul merge în metadatele abonamentului, nu doar ale primei plăți:
+      altfel a doua lună a unui donator adus de o reclamă s-ar înregistra fără
+      canal, iar „cât au adus reclamele" ar arăta numai prima lună din fiecare
+      donație lunară — adică exact pe dos de cum stau lucrurile.
+    */
+    canal: cerere.canal ?? "",
+    sursa: cerere.sursa ?? "",
   };
 }
 

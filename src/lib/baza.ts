@@ -353,6 +353,24 @@ const ADAOSURI = `
   ALTER TABLE donatii ADD COLUMN IF NOT EXISTS adaugat_de text;
   /* Ce a scris omul la adăugarea manuală: „transfer BCR 12 mart", chitanța etc. */
   ALTER TABLE donatii ADD COLUMN IF NOT EXISTS observatii text;
+
+  /*
+    De unde a venit donatorul: canalul și urma brută.
+
+    Coloana „canal" ține unul dintre numele din src/lib/atribuire.ts —
+    același vocabular în care se traduc și sursele din Google Analytics, ca
+    rândurile să se poată citi unele lângă altele. Coloana „sursa" păstrează
+    perechea nealterată („facebook / cpc"), fiindcă traducerea pierde
+    amănuntul.
+
+    Amândouă pot lipsi, și lipsesc des: cine scrie adresa de mână n-are nicio
+    urmă, iar o donație dinainte de coloana asta n-are de unde s-o ia. De aceea
+    în panou rândul „nelegate" se scrie separat, nu se împarte pe canale.
+  */
+  ALTER TABLE donatii ADD COLUMN IF NOT EXISTS canal text;
+  ALTER TABLE donatii ADD COLUMN IF NOT EXISTS sursa text;
+  CREATE INDEX IF NOT EXISTS donatii_dupa_canal
+    ON donatii (canal, platita_la DESC);
 `;
 
 async function pregateste(): Promise<void> {

@@ -7,11 +7,15 @@ import { areBazaDeDate } from "@/lib/baza";
 import {
   analize,
   campanii,
+  canale,
   profilulDonatorilor,
   profilulFirmelor,
+  type Canalul,
   type ProfilDonatori,
   type ProfilFirme,
 } from "@/lib/analiza/cifre";
+import { CANALE, numeCanal, type Canal } from "@/lib/atribuire";
+import { areReclame, reclame, type Reclame } from "@/lib/reclame/meta";
 import { areAnaliza, rezumat } from "@/lib/analiza/intreaba";
 import type { Campanie as CampanieCifre } from "@/lib/analiza/cifre";
 import Sfatuitor from "@/componente/admin/Sfatuitor";
@@ -351,6 +355,283 @@ function Campanii({
   );
 }
 
+/**
+ * De unde vin oamenii și de unde vin banii, pe aceleași rânduri.
+ *
+ * **Două surse, niciodată adunate.** Coloana „vizite" o numără Google
+ * Analytics; „donații" și „strâns" le numără baza noastră. Un canal cu multe
+ * vizite și nicio donație e cu totul altceva decât unul pe care nu l-a văzut
+ * nimeni, iar fără amândouă cifrele nu se poate spune care dintre ele e.
+ *
+ * **Canalul se scrie la donație și nu se ghicește după.** Donațiile dinainte
+ * de coloana asta, și cele adăugate de mână din extras, n-au canal — stau în
+ * rândul de dedesubt, numărate separat. Aproape de început ele sunt aproape
+ * tot; e sincer așa, nu împărțit „proporțional" pe canale, cum ar fi ieșit o
+ * cifră frumoasă și inventată.
+ */
+function DeUndeVin({
+  c,
+  v,
+}: {
+  c: { lista: Canalul[]; nelegate: number; baniNelegate: number };
+  v: Vizite | null;
+}) {
+  const vizitePe = new Map<string, number>(
+    (v?.canale ?? []).map((x) => [x.canal as string, x.sesiuni]),
+  );
+  const donatiiPe = new Map(c.lista.map((x) => [x.canal, x]));
+
+  // Rândurile: toate canalele despre care știm ceva, în ordinea din listă.
+  const randuri = CANALE.map((def) => ({
+    id: def.id as Canal,
+    nume: def.nume,
+    lamurire: def.lamurire,
+    vizite: vizitePe.get(def.id) ?? null,
+    date: donatiiPe.get(def.id) ?? null,
+  })).filter((r) => r.vizite !== null || r.date !== null);
+
+  const totalVizite = randuri.reduce((s, r) => s + (r.vizite ?? 0), 0);
+  const totalBani = randuri.reduce((s, r) => s + (r.date?.bani ?? 0), 0);
+
+  if (randuri.length === 0) {
+    return (
+      <div className="colt-a border border-hartie-umbra bg-hartie p-5 sm:p-6">
+        <p className="max-w-3xl text-amplu text-cerneala-moale">
+          Încă nimic de arătat. Canalul se scrie pe fiecare donație începută de
+          pe site de acum înainte; vizitele vin de la Google Analytics, când e
+          legat.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-3xl text-left text-mic">
+          <thead>
+            <tr className="border-b border-hartie-umbra">
+              <CapTabel>Canal</CapTabel>
+              <CapTabel>Vizite</CapTabel>
+              <CapTabel>Donații</CapTabel>
+              <CapTabel>Donatori</CapTabel>
+              <CapTabel>Strâns</CapTabel>
+              <CapTabel>Din 100 de vizite, donează</CapTabel>
+            </tr>
+          </thead>
+          <tbody>
+            {randuri.map((r) => (
+              <tr
+                key={r.id}
+                className="border-b border-hartie-umbra/60 last:border-0"
+              >
+                <td className="py-3 pr-4">
+                  <span className="font-titlu font-bold text-cerneala">
+                    {r.nume}
+                  </span>
+                  <span className="block max-w-xs text-nota text-cerneala-slab">
+                    {r.lamurire}
+                  </span>
+                </td>
+                <td className="py-3 pr-4 whitespace-nowrap text-cerneala-moale">
+                  {r.vizite === null ? "—" : r.vizite}
+                </td>
+                <td className="py-3 pr-4 text-cerneala-moale">
+                  {r.date?.donatii ?? "—"}
+                </td>
+                <td className="py-3 pr-4 text-cerneala-moale">
+                  {r.date?.donatori ?? "—"}
+                </td>
+                <td className="py-3 pr-4 whitespace-nowrap font-titlu font-bold text-cerneala">
+                  {r.date ? lei(r.date.bani) : "—"}
+                </td>
+                <td className="py-3 whitespace-nowrap text-cerneala-moale">
+                  {r.vizite && r.vizite > 0 && r.date
+                    ? `${((r.date.donatii / r.vizite) * 100).toFixed(1)}`
+                    : "—"}
+                </td>
+              </tr>
+            ))}
+            <tr className="border-t-2 border-hartie-umbra">
+              <td className="py-3 pr-4 font-titlu font-bold text-cerneala">
+                Total pe canalele știute
+              </td>
+              <td className="py-3 pr-4 text-cerneala-moale">
+                {totalVizite || "—"}
+              </td>
+              <td className="py-3 pr-4" />
+              <td className="py-3 pr-4" />
+              <td className="py-3 pr-4 whitespace-nowrap font-titlu font-bold text-cerneala">
+                {lei(totalBani)}
+              </td>
+              <td />
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p className="mt-4 max-w-3xl text-nota text-cerneala-slab">
+        <strong className="text-cerneala-moale">
+          Vizitele le numără Google, donațiile baza noastră.
+        </strong>{" "}
+        Sunt două măsurători diferite, puse alături, nu adunate; când nu se
+        potrivesc, baza de date are dreptate.{" "}
+        {c.nelegate > 0 && (
+          <>
+            <strong className="text-cerneala-moale">
+              {c.nelegate} donații ({lei(c.baniNelegate)})
+            </strong>{" "}
+            n-au niciun canal: sunt cele dinainte ca site-ul să-l scrie, cele
+            adăugate de mână din extrasul de cont și cele ale oamenilor care au
+            scris adresa site-ului de mână. Nu le împărțim pe canale — ar fi o
+            cifră inventată.{" "}
+          </>
+        )}
+        {vizitePe.size === 0 &&
+          "Coloana cu vizite e goală cât timp Google Analytics nu e legat."}
+      </p>
+    </>
+  );
+}
+
+/** Cheltuiala pe reclame Meta, lângă donațiile venite din ele. */
+function Reclamele({ r, c }: { r: Reclame; c: Canalul | null }) {
+  const donatii = c?.donatii ?? 0;
+  const stranse = c?.bani ?? 0;
+  return (
+    <>
+      {!r.cont.activ && (
+        <p className="mb-4 colt-mic-a bg-caramiziu-50 px-4 py-3 text-mic font-semibold text-caramiziu-900">
+          Contul de reclame nu e activ acum (stare dată de Meta). Cifrele de
+          mai jos sunt cele de până acum; reclame noi nu rulează până nu se
+          limpezește contul.
+        </p>
+      )}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Cifra
+          eticheta="Cheltuit pe reclame"
+          valoare={lei(r.cheltuitBani)}
+          nota={
+            r.inainteBani !== null && r.inainteBani > 0
+              ? `${r.cheltuitBani >= r.inainteBani ? "+" : ""}${Math.round(
+                  ((r.cheltuitBani - r.inainteBani) / r.inainteBani) * 100,
+                )}% față de perioada dinainte`
+              : `Ultimele ${r.zile} de zile`
+          }
+        />
+        <Cifra
+          eticheta="Apăsări pe reclame"
+          valoare={String(r.apasari)}
+          nota={`${r.afisari} afișări, ${r.ctr.toFixed(1)}% le-au apăsat`}
+        />
+        <Cifra
+          eticheta="Cost pe apăsare"
+          valoare={lei(r.cpcBani)}
+          nota={`Până la ${r.oameni} oameni deosebiți`}
+        />
+        <Cifra
+          eticheta="Donații din canalul plătit"
+          valoare={donatii > 0 ? `${donatii} · ${lei(stranse)}` : "—"}
+          nota={
+            donatii > 0
+              ? `Aproximativ ${lei(Math.round(r.cheltuitBani / donatii))} cheltuiți pe donație`
+              : "Încă nicio donație legată de reclame"
+          }
+        />
+      </div>
+
+      {r.campanii.length > 0 && (
+        <div className="mt-5 overflow-x-auto">
+          <table className="w-full min-w-3xl text-left text-mic">
+            <thead>
+              <tr className="border-b border-hartie-umbra">
+                <CapTabel>Reclama</CapTabel>
+                <CapTabel>Cheltuit</CapTabel>
+                <CapTabel>Afișări</CapTabel>
+                <CapTabel>Apăsări</CapTabel>
+                <CapTabel>Au apăsat</CapTabel>
+                <CapTabel>Cost pe apăsare</CapTabel>
+              </tr>
+            </thead>
+            <tbody>
+              {r.campanii.map((x) => (
+                <tr
+                  key={x.id || x.nume}
+                  className="border-b border-hartie-umbra/60 last:border-0"
+                >
+                  <td className="py-3 pr-4 font-titlu font-bold text-cerneala">
+                    {x.nume}
+                  </td>
+                  <td className="py-3 pr-4 whitespace-nowrap text-cerneala">
+                    {lei(x.cheltuitBani)}
+                  </td>
+                  <td className="py-3 pr-4 text-cerneala-moale">{x.afisari}</td>
+                  <td className="py-3 pr-4 text-cerneala-moale">{x.apasari}</td>
+                  <td className="py-3 pr-4 text-cerneala-moale">
+                    {x.ctr.toFixed(1)}%
+                  </td>
+                  <td className="py-3 whitespace-nowrap text-cerneala-moale">
+                    {lei(x.cpcBani)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <p className="mt-4 max-w-3xl text-nota text-cerneala-slab">
+        Contul{" "}
+        <strong className="text-cerneala-moale">{r.cont.nume}</strong> (
+        {r.cont.id}), în {r.cont.moneda}. Cheltuiala o spune Meta, donațiile le
+        numără baza noastră;{" "}
+        <strong className="text-cerneala-moale">
+          costul pe donație e o apropiere
+        </strong>
+        , nu o măsurătoare — cine a văzut reclama azi și a făcut transferul
+        peste două săptămâni, de pe alt telefon, nu se leagă de ea.
+      </p>
+    </>
+  );
+}
+
+/** Ce trebuie pus în Railway ca să se vadă reclamele. */
+function FaraReclame() {
+  return (
+    <div className="colt-a border border-hartie-umbra bg-hartie p-5 sm:p-6">
+      <p className="max-w-3xl text-amplu text-cerneala-moale">
+        Donațiile venite din reclame se văd în tabelul de mai sus și fără asta.
+        Ca să apară și <strong>cât s-a cheltuit</strong> pe ele — adică dacă
+        banii dați s-au întors — e nevoie în Railway de:
+      </p>
+      <ul className="mt-3 grid gap-1.5 text-mic text-cerneala-moale">
+        {[
+          [
+            "META_AD_ACCOUNT_ID",
+            "numărul contului de reclame, din Meta Ads Manager (începe cu „act_”)",
+          ],
+          [
+            "META_TOKEN",
+            "un jeton de acces cu dreptul „ads_read” pe contul acela",
+          ],
+        ].map(([cheie, ce]) => (
+          <li key={cheie}>
+            <code className="rounded bg-hartie-umbra px-1.5 py-0.5">
+              {cheie}
+            </code>{" "}
+            — {ce}
+          </li>
+        ))}
+      </ul>
+      <p className="mt-3 max-w-3xl text-nota text-cerneala-slab">
+        Jetonul se face în business.facebook.com, la System Users, și se dă
+        numai dreptul de citire: panoul nu pornește, nu oprește și nu schimbă
+        nicio reclamă.
+      </p>
+    </div>
+  );
+}
+
 function CapTabel({ children }: { children: React.ReactNode }) {
   return (
     <th className="py-2 pr-4 font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
@@ -663,13 +944,16 @@ async function Continut({
     );
   }
 
-  const [donatori, firme, vechi, deVizite, deCampanii] = await Promise.all([
-    profilulDonatorilor(),
-    profilulFirmelor(),
-    analize(6).catch(() => []),
-    areVizite() ? vizite().catch(() => null) : Promise.resolve(null),
-    campanii().catch(() => null),
-  ]);
+  const [donatori, firme, vechi, deVizite, deCampanii, deCanale, deReclame] =
+    await Promise.all([
+      profilulDonatorilor(),
+      profilulFirmelor(),
+      analize(6).catch(() => []),
+      areVizite() ? vizite().catch(() => null) : Promise.resolve(null),
+      campanii().catch(() => null),
+      canale().catch(() => null),
+      areReclame() ? reclame().catch(() => null) : Promise.resolve(null),
+    ]);
   const ultima = vechi[0];
   /*
     Cifrele care s-ar trimite acum.
@@ -679,7 +963,14 @@ async function Continut({
     Când există deja o analiză, se arată cifrele salvate odată cu ea — alea
     au plecat atunci, nu cele de azi.
   */
-  const acum = rezumat(donatori, firme, deVizite, deCampanii);
+  const acum = rezumat(
+    donatori,
+    firme,
+    deVizite,
+    deCampanii,
+    deCanale,
+    deReclame,
+  );
 
   return (
     <Cadru
@@ -732,6 +1023,39 @@ async function Continut({
           </Suspense>
         ) : (
           <FaraAnalytics />
+        )}
+      </Sectiune>
+
+      {deCanale && (
+        <Sectiune
+          titlu="De unde vin donatorii"
+          nota="E-mail, reclame, căutare, cod QR tipărit. Vizitele de la Google, banii din baza noastră."
+        >
+          <DeUndeVin c={deCanale} v={deVizite} />
+        </Sectiune>
+      )}
+
+      <Sectiune
+        titlu="Reclamele de pe Facebook și Instagram"
+        nota="Cât s-a cheltuit, lângă ce au adus."
+      >
+        {deReclame ? (
+          <Reclamele
+            r={deReclame}
+            c={
+              deCanale?.lista.find((x) => x.canal === "facebook-plata") ?? null
+            }
+          />
+        ) : areReclame() ? (
+          <div className="colt-a border border-hartie-umbra bg-hartie p-5 sm:p-6">
+            <p className="text-amplu text-cerneala-moale">
+              Meta n-a răspuns. Dacă jetonul tocmai a fost pus, mai încearcă
+              peste câteva minute; dacă nu, verifică dacă mai e valabil — cele
+              făcute dintr-un cont personal expiră.
+            </p>
+          </div>
+        ) : (
+          <FaraReclame />
         )}
       </Sectiune>
 

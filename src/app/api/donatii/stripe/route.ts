@@ -11,7 +11,20 @@ import { areBazaDeDate } from "@/lib/baza";
 import { scrieInitiata } from "@/lib/plati/donatii";
 import { areStripe, deschideSesiune } from "@/lib/plati/stripe";
 import { esteDestinatie, inBani, sumaAcceptata } from "@/date/plati";
+import { esteCanal } from "@/lib/atribuire";
 import { ADRESA_SITE } from "@/app/seo";
+
+/**
+ * Canalul scris de browser, acceptat numai dacă e unul dintre ale noastre.
+ *
+ * Vine dintr-un formular public, deci n-are nicio autoritate: dacă cineva
+ * trimite „facebook-plata" de mână, cifra reclamelor s-ar umfla fără ca
+ * nimeni să vadă de ce. Nu se poate opri de tot, dar se poate ține în lista
+ * închisă de nume, ca o valoare inventată să cadă în loc să se strecoare.
+ */
+function canalPrimit(ceva: unknown): string | null {
+  return esteCanal(ceva) ? ceva : null;
+}
 
 /** Pornește o plată cu cardul și întoarce adresa paginii de plată Stripe. */
 export async function POST(cerere: Request) {
@@ -72,6 +85,8 @@ export async function POST(cerere: Request) {
       telefon: text(corp.telefon, 40),
       acordBuletin: corp.buletin === "da",
       campanieSlug: text(corp.campanie, 120),
+      canal: canalPrimit(corp.canal),
+      sursa: text(corp.sursa, 120) || null,
       adresaSite: ADRESA_SITE,
     });
 
@@ -93,6 +108,8 @@ export async function POST(cerere: Request) {
         telefon: text(corp.telefon, 40),
         acordBuletin: corp.buletin === "da",
         campanieSlug: text(corp.campanie, 120),
+        canal: canalPrimit(corp.canal),
+        sursa: text(corp.sursa, 120) || null,
       }).catch(() => undefined);
     }
 

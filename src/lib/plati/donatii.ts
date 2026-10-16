@@ -24,14 +24,19 @@ export type DonatieNoua = {
   telefon: string | null;
   acordBuletin: boolean;
   campanieSlug?: string | null;
+  /** Canalul din care a venit donatorul (`src/lib/atribuire.ts`). */
+  canal?: string | null;
+  /** Perechea brută „sursă / mediu", pentru amănunt. */
+  sursa?: string | null;
 };
 
 export async function scrieInitiata(d: DonatieNoua): Promise<void> {
   await intreaba(
     `INSERT INTO donatii
        (procesator, referinta, suma_bani, moneda, frecventa, destinatie,
-        email, prenume, nume, telefon, acord_buletin, campanie_slug)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+        email, prenume, nume, telefon, acord_buletin, campanie_slug,
+        canal, sursa)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
      ON CONFLICT (procesator, referinta) DO NOTHING`,
     [
       d.procesator,
@@ -46,6 +51,8 @@ export async function scrieInitiata(d: DonatieNoua): Promise<void> {
       d.telefon,
       d.acordBuletin,
       d.campanieSlug ?? null,
+      d.canal ?? null,
+      d.sursa ?? null,
     ],
   );
 }

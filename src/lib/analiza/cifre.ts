@@ -521,3 +521,64 @@ export async function analize(limita = 10): Promise<AnalizaSalvata[]> {
     creatLa: new Date(r.creat_la).toISOString(),
   }));
 }
+
+/**
+ * Donațiile, pe canalul din care a venit omul.
+ *
+ * Canalul se scrie la donație (`src/lib/atribuire.ts`) și **nu se ghicește
+ * niciodată după**: o donație fără canal rămâne fără canal. Aproape toate
+ * donațiile de dinainte de coloana asta sunt așa, deci `nelegate` o să fie
+ * mult timp cel mai mare număr de pe pagină. Scrie acolo de ce.
+ */
+export type Canalul = {
+  canal: string;
+  donatii: number;
+  bani: number;
+  donatori: number;
+  /** Ce scria în adresă, nealterat: „facebook / cpc", „qr / offline". */
+  urme: string[];
+};
+
+export async function canale(): Promise<{
+  lista: Canalul[];
+  nelegate: number;
+  baniNelegate: number;
+}> {
+  const [pe, fara] = await Promise.all([
+    intreaba<{
+      canal: string;
+      nr: string;
+      bani: string;
+      donatori: string;
+      urme: string[] | null;
+    }>(
+      `SELECT canal,
+              count(*)                     AS nr,
+              coalesce(sum(suma_bani), 0)  AS bani,
+              count(DISTINCT lower(email)) AS donatori,
+              (array_agg(DISTINCT sursa) FILTER (WHERE sursa IS NOT NULL
+                                                   AND sursa <> ''))[1:4] AS urme
+         FROM donatii
+        WHERE ${INCASATE} AND canal IS NOT NULL
+        GROUP BY canal
+        ORDER BY sum(suma_bani) DESC`,
+    ),
+    intreaba<{ nr: string; bani: string }>(
+      `SELECT count(*) AS nr, coalesce(sum(suma_bani), 0) AS bani
+         FROM donatii
+        WHERE ${INCASATE} AND canal IS NULL`,
+    ),
+  ]);
+
+  return {
+    lista: pe.map((r) => ({
+      canal: r.canal,
+      donatii: Number(r.nr),
+      bani: Number(r.bani),
+      donatori: Number(r.donatori),
+      urme: r.urme ?? [],
+    })),
+    nelegate: Number(fara[0]?.nr ?? 0),
+    baniNelegate: Number(fara[0]?.bani ?? 0),
+  };
+}

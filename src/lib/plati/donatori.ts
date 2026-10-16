@@ -345,14 +345,17 @@ export async function anuntaTransfer(date: {
   nume?: string;
   telefon?: string;
   observatii?: string;
+  /** Canalul din care a venit donatorul (`src/lib/atribuire.ts`). */
+  canal?: string | null;
+  sursa?: string | null;
 }): Promise<{ ok: true } | { ok: false; motiv: "duplicat" | "eroare" }> {
   try {
     const randuri = await intreaba<{ id: string }>(
       `INSERT INTO donatii
          (procesator, referinta, suma_bani, moneda, frecventa, destinatie,
           email, prenume, nume, telefon, stare, platita_la,
-          observatii, adaugat_de)
-       VALUES ($1,$2,$3,'RON','o-data',$4,$5,NULL,$6,$7,'anuntata',$8,$9,'donator')
+          observatii, adaugat_de, canal, sursa)
+       VALUES ($1,$2,$3,'RON','o-data',$4,$5,NULL,$6,$7,'anuntata',$8,$9,'donator',$10,$11)
        ON CONFLICT (procesator, referinta) DO NOTHING
        RETURNING id`,
       [
@@ -365,6 +368,8 @@ export async function anuntaTransfer(date: {
         date.telefon ?? null,
         date.data,
         date.observatii ?? null,
+        date.canal ?? null,
+        date.sursa ?? null,
       ],
     );
     return randuri.length > 0 ? { ok: true } : { ok: false, motiv: "duplicat" };

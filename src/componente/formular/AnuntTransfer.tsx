@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
+import { atribuireaCurenta } from "@/lib/atribuire-browser";
 import { DESTINATII_DONATIE, EMAIL } from "@/date/asociatie";
 import Pictograma from "../Pictograma";
 import Camp, {
@@ -88,6 +89,12 @@ export default function AnuntTransfer() {
     if (Object.keys(gasite).length > 0) return;
 
     setStare({ fel: "trimite" });
+    // De unde a venit omul — vezi `src/lib/atribuire-browser.ts`.
+    const deUnde = atribuireaCurenta();
+    if (deUnde) {
+      date.set("canal", deUnde.canal);
+      date.set("sursa", deUnde.bruta);
+    }
     try {
       const raspuns = await fetch("/api/donatii/transfer", {
         method: "POST",

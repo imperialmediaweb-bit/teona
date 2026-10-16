@@ -1,7 +1,14 @@
 import { cate } from "@/lib/numere-ro";
 import { scrieSuma } from "@/lib/suma";
 import type { Vizite } from "@/lib/ga/raport";
-import type { Campanie, ProfilDonatori, ProfilFirme } from "./cifre";
+import type {
+  Campanie,
+  Canalul,
+  ProfilDonatori,
+  ProfilFirme,
+} from "./cifre";
+import { numeCanal } from "@/lib/atribuire";
+import type { Reclame } from "@/lib/reclame/meta";
 
 /**
  * Analiza cifrelor, cerută unui model de limbaj.
@@ -87,6 +94,12 @@ export function rezumat(
     faraEticheta: number;
     baniFaraEticheta: number;
   } | null,
+  can?: {
+    lista: Canalul[];
+    nelegate: number;
+    baniNelegate: number;
+  } | null,
+  rec?: Reclame | null,
 ): string {
   const randuri: string[] = [];
 
@@ -238,6 +251,59 @@ export function rezumat(
         "- nu avem vizitele pe campanii de la Google: ori nu e legat Analytics, ori linkurile n-au purtat etichete UTM. Fără ele nu se poate spune dacă o campanie n-a adus bani fiindcă n-a văzut-o nimeni sau fiindcă n-a convins.",
       );
     }
+  }
+
+  /*
+    De unde vin donatorii.
+
+    Aceleași două surse, nicăieri adunate: vizitele le numără Google,
+    donațiile baza noastră. Modelului i se spune răspicat, fiindcă e exact
+    locul în care o însumare ar părea firească și ar fi greșită.
+  */
+  if (can && (can.lista.length > 0 || can.nelegate > 0)) {
+    randuri.push("");
+    randuri.push("DE UNDE VIN DONATORII");
+    const vizitePe = new Map<string, number>(
+      (v?.canale ?? []).map((x) => [x.canal as string, x.sesiuni]),
+    );
+    for (const x of can.lista) {
+      const sesiuni = vizitePe.get(x.canal) ?? null;
+      const bucati = [
+        `${cate(x.donatii, "donație", "donații")}`,
+        lei(x.bani),
+        `${cate(x.donatori, "donator", "donatori")}`,
+      ];
+      if (sesiuni !== null) {
+        bucati.push(`${cate(sesiuni, "vizită", "vizite")} (de la Google)`);
+        if (sesiuni > 0) bucati.push(`au donat ${procent(x.donatii, sesiuni)}`);
+      }
+      randuri.push(`- ${numeCanal(x.canal)}: ${bucati.join(", ")}`);
+    }
+    for (const x of v?.canale ?? []) {
+      if (can.lista.some((y) => y.canal === x.canal)) continue;
+      randuri.push(
+        `- ${numeCanal(x.canal)}: ${cate(x.sesiuni, "vizită", "vizite")}, nicio donație legată`,
+      );
+    }
+    randuri.push(
+      `- ${cate(can.nelegate, "donație nu are", "donații nu au")} niciun canal (${lei(can.baniNelegate)}): sunt cele dinainte ca site-ul să-l scrie, cele adăugate de mână din extrasul de cont și cele ale oamenilor care au scris adresa de mână. Nu se împart pe canale.`,
+    );
+  }
+
+  if (rec) {
+    randuri.push("");
+    randuri.push(`RECLAME META (ultimele ${rec.zile} de zile)`);
+    randuri.push(
+      `- cheltuit ${lei(rec.cheltuitBani)}, ${rec.afisari} afișări, ${rec.apasari} apăsări (${rec.ctr.toFixed(1)}%), cost pe apăsare ${lei(rec.cpcBani)}`,
+    );
+    for (const x of rec.campanii.slice(0, 8)) {
+      randuri.push(
+        `- „${x.nume}": ${lei(x.cheltuitBani)}, ${x.apasari} apăsări, ${x.ctr.toFixed(1)}% au apăsat`,
+      );
+    }
+    randuri.push(
+      "- cheltuiala o spune Meta, donațiile baza noastră; costul pe donație iese din două măsurători diferite, deci e o apropiere, nu o cifră exactă.",
+    );
   }
 
   if (v) {

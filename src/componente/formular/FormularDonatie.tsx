@@ -12,6 +12,7 @@ import {
 } from "@/date/asociatie";
 import Decor from "../Decor";
 import Pictograma from "../Pictograma";
+import { atribuireaCurenta } from "@/lib/atribuire-browser";
 import { citesteSuma, scrieSuma } from "@/lib/suma";
 import { SUMA_MAXIMA, SUMA_MINIMA } from "@/date/plati";
 import Camp, {
@@ -203,6 +204,7 @@ function Formular({
     if (Object.keys(gasite).length > 0) return;
 
     setSeTrimite(true);
+    const deUnde = atribuireaCurenta();
     try {
       const raspuns = await fetch("/api/donatii/stripe", {
         method: "POST",
@@ -218,6 +220,12 @@ function Formular({
           buletin: date.get("buletin") === "da" ? "da" : "nu",
           acord: "da",
           ...(campania ? { campanie: campania } : {}),
+          /*
+            De unde a venit omul. Se citește în clipa trimiterii, nu la
+            randare: urma se scrie la aterizare, iar formularul poate fi
+            deschis mai târziu, pe altă pagină.
+          */
+          ...(deUnde ? { canal: deUnde.canal, sursa: deUnde.bruta } : {}),
           site_web: date.get("site_web") ?? "",
         }),
       });

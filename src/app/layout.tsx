@@ -6,6 +6,7 @@ import Antet from "@/componente/Antet";
 import BannerCookieuri from "@/componente/BannerCookieuri";
 import BaraDeAnunt from "@/componente/BaraDeAnunt";
 import Analitice from "@/componente/Analitice";
+import Urma from "@/componente/Urma";
 import ButonDoneazaMobil from "@/componente/ButonDoneazaMobil";
 import AsistentDacaExista from "@/componente/AsistentDacaExista";
 import Newsletter from "@/componente/Newsletter";
@@ -222,6 +223,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </Suspense>
         <BannerCookieuri />
         <Analitice />
+        <Urma />
       </body>
     </html>
   );

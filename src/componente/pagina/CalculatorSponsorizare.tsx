@@ -423,7 +423,7 @@ export default function CalculatorSponsorizare() {
         {firma && rezultat ? (
           <div className="relative mt-6">
             <p className="font-titlu text-mic font-bold text-cerneala">
-              Ia contractul, completat cu datele firmei
+              Generează contractul de sponsorizare, completat cu datele firmei
             </p>
             <div className="mt-3 flex flex-wrap gap-3">
               <button
@@ -432,7 +432,9 @@ export default function CalculatorSponsorizare() {
                 disabled={descarc !== null}
                 className="inline-flex min-h-12 items-center justify-center rounded-full bg-caramiziu-700 px-6 py-3 font-titlu font-bold text-hartie transition-colors hover:bg-caramiziu-600 disabled:opacity-60"
               >
-                {descarc === "word" ? "Se pregătește…" : "Descarcă în Word"}
+                {descarc === "word"
+                  ? "Se pregătește…"
+                  : "Generează contractul (Word)"}
               </button>
               <button
                 type="button"
@@ -440,22 +442,32 @@ export default function CalculatorSponsorizare() {
                 disabled={descarc !== null}
                 className="inline-flex min-h-12 items-center justify-center rounded-full border-2 border-caramiziu-300 bg-hartie px-6 py-3 font-titlu font-bold text-caramiziu-800 transition-colors hover:border-caramiziu-500 disabled:opacity-60"
               >
-                {descarc === "pdf" ? "Se pregătește…" : "Descarcă în PDF"}
+                {descarc === "pdf"
+                  ? "Se pregătește…"
+                  : "Generează contractul (PDF)"}
               </button>
-            </div>
-            <p className="mt-3 text-nota text-cerneala-moale">
-              Cine semnează și în ce calitate rămân de completat în document. Îl
-              semnezi și ni-l trimiți pe e-mail; îl contrasemnăm și ți-l
-              trimitem înapoi.{" "}
+              {/*
+                A treia cale, ca buton, nu ca rând mărunt sub butoane.
+
+                Documentul scos mai sus lasă în alb cine semnează și în ce
+                calitate — datele alea nu sunt la ANAF, le știe numai firma.
+                Cât timp calea spre ele era un link într-un rând de notă, se
+                citea ca o explicație, nu ca ceva de apăsat, iar firma rămânea
+                cu un contract de completat de mână.
+              */}
               <Link
                 href={`${RUTE.directionare20}/contract?cui=${encodeURIComponent(
                   cuiText.trim(),
                 )}&valoare=${encodeURIComponent(scrieCifre(rezultat.maxim))}`}
-                className="font-titlu font-semibold text-caramiziu-700 underline underline-offset-2"
+                className="inline-flex min-h-12 items-center justify-center rounded-full border-2 border-caramiziu-300 bg-hartie px-6 py-3 font-titlu font-bold text-caramiziu-800 transition-colors hover:border-caramiziu-500"
               >
-                Sau completează tot acum
+                Completează și semnează online
               </Link>
-              .
+            </div>
+            <p className="mt-3 text-nota text-cerneala-moale">
+              În documentul descărcat rămân de completat cine semnează și în ce
+              calitate. Îl semnezi și ni-l trimiți pe e-mail; îl contrasemnăm și
+              ți-l trimitem înapoi.
             </p>
             {eroareDescarcare && (
               <p

@@ -111,6 +111,8 @@ async function prelucreaza(eveniment: Stripe.Event) {
         telefon: date.telefon || null,
         acordBuletin: date.acord_buletin === "da",
         campanieSlug: date.campanie || null,
+        canal: date.canal || null,
+        sursa: date.sursa || null,
       });
       const randReinnoire = await marcheazaPlatita(
         "stripe",
