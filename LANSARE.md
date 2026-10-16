@@ -163,10 +163,8 @@ Ce pleacă, și către cine:
 Mulțumirea pentru donație **nu e chitanță** și scrie asta în ea. Chitanța
 fiscală o emite asociația.
 
-Șabloanele se pot privi în dezvoltare, fără să trimită nimic nimănui:
-`/api/proba-email?fel=…` (`o-data`, `lunar`, `reinnoire`, `sponsorizare`,
-`redirectionare`, `campanie-trimisa`, `campanie-publicata`,
-`campanie-respinsa`, și variantele `-anunt`). În producție ruta dă 404.
+Toate mesajele se văd în panou, la **`/admin/emailuri`**, compuse cu date de
+probă și cu varianta text simplu alături. Nu se trimite nimic de acolo.
 
 ## 7. Contul donatorului
 
