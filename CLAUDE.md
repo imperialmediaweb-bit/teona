@@ -152,6 +152,22 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
   `BAZA=… PAROLA_ADMIN=… DATABASE_URL=… node scripts/qa/analiza.mjs`.
   Fără `ANTHROPIC_API_KEY` pagina rămâne utilă: cifrele se calculează oricum,
   doar interpretarea lipsește.
+- **Consultantul de strângere de fonduri**, tot la `/admin/analiza`, sub
+  analiză: o casetă în care se vorbește. Analiza scrisă răspunde la „cum
+  stăm"; munca începe la întrebarea următoare — „de unde încep cu cei care
+  s-au oprit?", „ce le scriu firmelor care n-au răspuns?" —, iar alea nu se
+  pot ghici dinainte, deci nu încap într-un raport scris o dată pe lună.
+  **Știe trei lucruri și numai trei:** uneltele platformei
+  (`src/lib/analiza/platforma.ts` — pagini de ziua ta, calculatorul firmelor,
+  șabloanele de e-mail, segmentele, exportul, ce mesaje pleacă automat),
+  calendarul fiscal (25 mai pentru Formularul 230 e sigur; termenul
+  Declarației 177 nu, îl confirmă contabilitatea firmei) și **aceleași
+  agregate** ca analiza scrisă. Nu are nume, adrese sau telefoane și nu poate
+  avea: întrebat cine a donat cel mai mult, trimite la segmentele din panou.
+  Partea fixă — regulile și uneltele — poartă `cache_control`, deci a doua
+  întrebare costă a zecea parte din prima. Conversația nu se salvează.
+  Model din `MODEL_ANALIZA`, implicit `claude-opus-5-5`, prin SDK-ul oficial.
+  Aceeași probă verifică ambele căi spre model: `scripts/qa/analiza.mjs`.
 - **Vizitele din Google Analytics**, tot la `/admin/analiza`, sus: câți
   oameni au intrat pe site în ultimele 28 de zile, de unde au venit (sursele
   sunt traduse: „google / organic" se citește „Căutare Google"), ce pagini au

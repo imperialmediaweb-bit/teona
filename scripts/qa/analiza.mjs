@@ -158,6 +158,30 @@ if (!process.env.DATABASE_URL) {
     cer.on("data", (b) => (corp += b));
     cer.on("end", () => {
       primit = corp;
+      /*
+        Două feluri de răspuns, după cine întreabă.
+
+        Analiza scrisă cere un răspuns întreg, dintr-o bucată. Consultantul
+        cu care se vorbește cere un flux de evenimente, prin SDK-ul oficial.
+        Serverul fals trebuie să le imite pe amândouă, altfel proba ar
+        verifica numai jumătate din locurile prin care pleacă date.
+      */
+      if (corp.includes('"stream":true')) {
+        raspunde.writeHead(200, { "content-type": "text/event-stream" });
+        const e = (tip, date) =>
+          raspunde.write(`event: ${tip}\ndata: ${JSON.stringify(date)}\n\n`);
+        e("message_start", {
+          type: "message_start",
+          message: { id: "m", type: "message", role: "assistant", model: "probă", content: [], stop_reason: null, stop_sequence: null, usage: { input_tokens: 1, output_tokens: 1 } },
+        });
+        e("content_block_start", { type: "content_block_start", index: 0, content_block: { type: "text", text: "" } });
+        e("content_block_delta", { type: "content_block_delta", index: 0, delta: { type: "text_delta", text: "Un sfat de probă." } });
+        e("content_block_stop", { type: "content_block_stop", index: 0 });
+        e("message_delta", { type: "message_delta", delta: { stop_reason: "end_turn", stop_sequence: null }, usage: { output_tokens: 1 } });
+        e("message_stop", { type: "message_stop" });
+        raspunde.end();
+        return;
+      }
       raspunde.writeHead(200, { "content-type": "application/json" });
       raspunde.end(
         JSON.stringify({
@@ -236,6 +260,66 @@ if (!process.env.DATABASE_URL) {
         scapate.length ? ` — scăpate: ${scapate.join(", ")}` : ""
       }`,
     );
+
+    /*
+      Consultantul cu care se vorbește: a doua cale prin care pleacă date.
+
+      Se verifică aceleași două lucruri ca la analiza scrisă — că ajung
+      cifrele agregate și că nu ajunge niciun nume și nicio adresă. O a doua
+      cale deschisă spre model, neverificată, ar fi făcut degeaba toată
+      grija de la prima.
+    */
+    primit = "";
+    const sfat = await fetch(
+      `http://127.0.0.1:${PORT_SITE}/api/admin/sfatuitor`,
+      {
+        method: "POST",
+        headers: {
+          cookie: cookie2,
+          "content-type": "application/json",
+          "x-forwarded-for": DE_LA,
+        },
+        body: JSON.stringify({
+          conversatie: [
+            { rol: "om", text: "Cine a donat cel mai mult? Dă-mi numele." },
+          ],
+        }),
+      },
+    );
+    const textSfat = await sfat.text();
+    verifica(
+      sfat.ok && textSfat.length > 0,
+      `consultantul răspunde (${sfat.status})`,
+    );
+    verifica(
+      primit.includes("DONATORI") && primit.includes("FIRME"),
+      "consultantul primește cifrele agregate",
+    );
+    verifica(
+      !primit.includes("@"),
+      "în cererea consultantului nu e nicio adresă de e-mail",
+    );
+    const scapate2 = nume.filter((n) => primit.includes(n));
+    verifica(
+      scapate2.length === 0,
+      `niciun nume de donator în cererea consultantului${
+        scapate2.length ? ` — scăpate: ${scapate2.join(", ")}` : ""
+      }`,
+    );
+    verifica(
+      primit.includes("UNELTELE CARE EXISTĂ DEJA"),
+      "consultantul știe ce unelte are platforma",
+    );
+
+    const fara = await fetch(
+      `http://127.0.0.1:${PORT_SITE}/api/admin/sfatuitor`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-forwarded-for": DE_LA },
+        body: JSON.stringify({ conversatie: [{ rol: "om", text: "ceva" }] }),
+      },
+    );
+    verifica(fara.status === 403, `fără parolă, consultantul refuză (${fara.status})`);
 
     const dupa = await fetch(`http://127.0.0.1:${PORT_SITE}/admin/analiza`, {
       headers: { cookie: cookie2 },

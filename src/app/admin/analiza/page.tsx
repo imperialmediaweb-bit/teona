@@ -12,6 +12,7 @@ import {
   type ProfilFirme,
 } from "@/lib/analiza/cifre";
 import { areAnaliza, rezumat } from "@/lib/analiza/intreaba";
+import Sfatuitor from "@/componente/admin/Sfatuitor";
 import { areVizite, vizite } from "@/lib/ga/raport";
 import { cate } from "@/lib/numere-ro";
 import { scrieSuma } from "@/lib/suma";
@@ -713,6 +714,30 @@ async function Continut({
               ))}
             </div>
           </details>
+        )}
+
+        {/*
+          Consultantul, sub analiză.
+
+          Analiza de sus răspunde la „cum stăm". Munca începe la întrebarea
+          următoare — „de unde încep cu cei care s-au oprit?", „ce le scriu
+          firmelor care n-au răspuns?" —, iar alea nu se pot ghici dinainte,
+          deci nu încap într-un raport scris o dată pe lună.
+
+          Vede exact aceleași cifre, agregate: le trimite serverul, nu caseta.
+        */}
+        {areAnaliza() ? (
+          <div className="mt-6">
+            <Sfatuitor />
+          </div>
+        ) : (
+          <p className="mt-6 colt-a border border-hartie-umbra bg-hartie-calda px-5 py-4 text-mic text-cerneala-moale">
+            Consultantul cu care se poate vorbi are nevoie de aceeași cheie,{" "}
+            <code className="rounded bg-hartie-umbra px-1.5 py-0.5">
+              ANTHROPIC_API_KEY
+            </code>
+            .
+          </p>
         )}
       </Sectiune>
     </Cadru>
