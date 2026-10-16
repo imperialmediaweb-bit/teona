@@ -287,6 +287,26 @@ nou nu se mai uită într-un fișier.
   ignoră fundalul unui `<a>`; Gmail taie `<style>` din `<head>`).
 - Toate se văd la **`/admin/emailuri`**, compuse cu date de probă.
 
+## Fotografiile se comprimă la 86, nu la 75
+
+Next comprimă implicit la calitate 75. Pentru un site în care fotografia e
+conținutul, 75 în WebP netezește tocmai detaliul care contează — firele de
+păr, textura hainelor, ochii — iar pe ecranele dese se vede ca o ceață fină
+peste toată pagina. Fotografiile de conținut cer acum **86** (vreo 40% mai
+mulți octeți pe cele mari); siglele și pictogramele rămân la 75.
+
+Lista calităților permise se scrie în `next.config.ts` (`images.qualities`):
+din Next 15.4 o calitate necerută explicit e refuzată, ca să nu poată cineva
+cere 100 pentru fiecare poză dintr-o adresă și să încarce serverul.
+
+**Rezoluția era deja bună; compresia nu.** Măsurat pe fir — octeții primiți
+de browser față de ce cere un ecran la densitate dublă — din 56 de
+fotografii de pe paginile principale doar 7 sunt chiar sub rezoluție, și
+acelea fiindcă originalul moștenit de pe Facebook e mic (vezi „Ce lipsește
+de la client"). `naturalWidth` **nu** e bun la măsurătoarea asta: la
+`srcset` cu descriptori `w`, browserul îl corectează cu densitatea, deci
+arată mărimea în pixeli CSS, nu pixelii primiți.
+
 ## Asistentul de pe site
 
 Caseta „Întreabă-ne", jos în pagină, răspunde vizitatorilor: cum se donează,
@@ -385,6 +405,26 @@ Formularul 230 și Declarația 177 precompletate,
 testimonialele, siglele și adresele sponsorilor, fotografiile recente,
 poza și descrierea Mihaelei Sfichi (lipsește de pe site-ul actual),
 conturile „Culegătorii de Zâmbete", certificatul de înregistrare.
+
+**Fotografii în rezoluție mare.** Cele moștenite de pe Facebook sunt prea
+mici pentru locul în care stau: pe un ecran dens se văd înmuiate oricât de
+puțin le-am comprima. Măsurat pe fir, șase fotografii de pe paginile
+principale și cele trei portrete de echipă au originalul sub ce cere
+ecranul:
+
+| unde | fișier | are | ar trebui |
+|---|---|---|---|
+| `/despre-noi` | `278495378_…-1024x768.jpg` | 1024×768 | ≥1200 |
+| `/casa-teona` | `379338367_…_n.jpg` | 720×960 | ≥1200 |
+| `/casa-teona`, `/proiecte` | `347598753_…_n.jpg` | 768×1024 | ≥1200 |
+| `/doneaza` | `449496204_…-768x1024.jpg` | 768×1024 | ≥1200 |
+| `/doneaza` | `438814270_…-766x1024.jpg` | 766×1024 | ≥1000 |
+| `/devino-voluntar` | `348477655_…_n.jpg` | 1024×768 | ≥1240 |
+| echipă | `Screenshot_27…`, `Strimbu-Daniel-1`, `Screenshot_28…` | 176×265 | ≥400 |
+
+Restul fotografiilor sunt deja servite la rezoluția ecranului. Dacă vin
+originalele, se înlocuiesc fișierele cu același nume și nu se schimbă nimic
+în cod.
 
 ## Comenzi
 
