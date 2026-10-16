@@ -131,10 +131,22 @@ const MISIUNE: ReadonlyArray<{
  * site-ul actual), iar conducerea nu are fotografii în arhiva preluată.
  * Cardul fără poză afișează inițialele pe un câmp de culoare, nu o siluetă
  * de stoc.
+ *
+ * **Paula Tolontan lipsea cu totul.** Lista de aici e scrisă de mână, după
+ * caietul de sarcini, iar caietul n-o pomenește — dar ea e pe site-ul
+ * actual, cu descriere și cu fotografie, iar fotografia ei stătea descărcată
+ * în `public/poze/2023/12/`, nefolosită. Un om scos de pe pagina echipei la
+ * trecerea pe site-ul nou e exact felul de pierdere pe care n-o reclamă
+ * nimeni până nu o vede ea însăși.
+ *
+ * **Rolul ei rămâne gol**, ca în exportul WordPress, unde toate rolurile
+ * sunt goale: „Coordonator" sau „Asistent social" ar fi invenții, iar un rol
+ * greșit pe pagina echipei e mai rău decât niciun rol. De confirmat cu
+ * asociația.
  */
 const ECHIPA: ReadonlyArray<{
   nume: string;
-  rol: string;
+  rol?: string;
   descriere?: string;
   poza?: string;
 }> = [
@@ -173,6 +185,12 @@ const ECHIPA: ReadonlyArray<{
     descriere:
       "Capta atenția publicului și transmite mesajele esențiale ale asociației, într-un mod atractiv și eficient.",
     poza: "/poze/2023/12/Strimbu-Daniel-1.jpeg",
+  },
+  {
+    nume: "Paula Tolontan",
+    descriere:
+      "Studentă la Facultatea de Asistență Socială din Suceava. Cu empatie, responsabilitate și multă energie, aduce bucurie și sprijin în tot ce face pentru comunitate.",
+    poza: "/poze/2023/12/Screenshot_28__2_-removebg-preview__1_-removebg-preview.png",
   },
 ];
 
@@ -452,7 +470,11 @@ export default function DespreNoi() {
                         <div className="relative mx-auto size-32 overflow-hidden rounded-full border-[5px] border-hartie bg-hartie shadow-[0_16px_32px_-16px_rgba(35,35,35,0.5)]">
                           <Image
                             src={membru.poza}
-                            alt={`${membru.nume}, ${membru.rol.toLowerCase()} la ${ASOCIATIA.denumire}`}
+                            alt={
+                              membru.rol
+                                ? `${membru.nume}, ${membru.rol.toLowerCase()} la ${ASOCIATIA.denumire}`
+                                : `${membru.nume}, din echipa ${ASOCIATIA.denumire}`
+                            }
                             fill
                             sizes="128px"
                             className="object-cover"
@@ -479,9 +501,16 @@ export default function DespreNoi() {
 
                     <div className="flex flex-1 flex-col p-6 sm:p-7">
                       <h3 className="text-h4 text-cerneala">{membru.nume}</h3>
-                      <p className="mt-2 inline-flex w-fit rounded-full bg-caramiziu-100 px-3 py-1 font-titlu text-nota font-bold text-caramiziu-700">
-                        {membru.rol}
-                      </p>
+                      {/*
+                        Eticheta cu rolul apare doar dacă e scris. Goală, ar
+                        fi lăsat o pastilă portocalie de un deget, fără nimic
+                        în ea — semnul că un câmp n-a fost completat.
+                      */}
+                      {membru.rol && (
+                        <p className="mt-2 inline-flex w-fit rounded-full bg-caramiziu-100 px-3 py-1 font-titlu text-nota font-bold text-caramiziu-700">
+                          {membru.rol}
+                        </p>
+                      )}
                       {membru.descriere && (
                         <p className="mt-4 text-mic text-cerneala-moale">
                           {membru.descriere}

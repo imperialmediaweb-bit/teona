@@ -4,6 +4,18 @@ import { writeFileSync } from "node:fs";
 // Adresa serverului, ca la toate celelalte probe. Era scrisă de mână
 // „localhost:3000", deci proba cădea pe orice alt port.
 const BAZA = process.env.BAZA ?? "http://localhost:3000";
+
+/*
+  Dosarul în care scrie proba.
+
+  Era scris de patru ori ca `process.env.IESIRE ?? "/tmp" + "/fisier"`, ceea
+  ce înseamnă altceva decât pare: `+` leagă mai strâns decât `??`, deci cu
+  IESIRE nesetat ieșea calea bună din întâmplare, iar cu el setat ieșea
+  dosarul fără nume de fișier. La linia cu `"file://" + process.env.IESIRE ??
+  …` ieșea de-a dreptul `file://undefined`, și proba cădea acolo de fiecare
+  dată.
+*/
+const IESIRE = process.env.IESIRE ?? "/tmp";
 const PAGINI = ["/","/despre-noi","/casa-teona","/proiecte","/doneaza","/redirectioneaza-3-5",
   "/directioneaza-20","/devino-voluntar","/contact","/sponsori-si-parteneri","/doneaza-ti-ziua","/suntem-in-presa"];
 const b = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium" });
@@ -43,11 +55,11 @@ const html = `<!doctype html><meta charset="utf-8"><style>
 ${l.map((x, i) => `<div><h3>${i + 1}. ${x.f.split("/").pop().slice(0, 26)}</h3>
   <div class="p">${cel(x, "50% 50%", "acum")}${cel(x, "50% 25%", "sus 25%")}</div></div>`).join("")}
 </div>`;
-writeFileSync(process.env.IESIRE ?? "/tmp" + "/inainte-dupa.html", html);
+writeFileSync(IESIRE + "/inainte-dupa.html", html);
 const pg = await b.newPage({ viewport: { width: 1340, height: 1000 } });
-await pg.goto("file://" + process.env.IESIRE ?? "/tmp" + "/inainte-dupa.html", { waitUntil: "networkidle" });
+await pg.goto("file://" + IESIRE + "/inainte-dupa.html", { waitUntil: "networkidle" });
 await pg.waitForTimeout(1800);
-await pg.screenshot({ path: process.env.IESIRE ?? "/tmp" + "/inainte-dupa.png", fullPage: true });
-writeFileSync(process.env.IESIRE ?? "/tmp" + "/taiate.json", JSON.stringify(l, null, 1));
+await pg.screenshot({ path: IESIRE + "/inainte-dupa.png", fullPage: true });
+writeFileSync(IESIRE + "/taiate.json", JSON.stringify(l, null, 1));
 console.log("portret în cutie lată:", l.length);
 await b.close();
