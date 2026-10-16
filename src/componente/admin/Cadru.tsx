@@ -182,6 +182,24 @@ function Nav({ activ }: { activ?: string }) {
                 <li key={p.href}>
                   <Link
                     href={p.href}
+                    /*
+                      Fără preîncărcare.
+
+                      Next cere din vreme pagina fiecărui link din bară, ca
+                      navigarea să pară instantanee. Aici asta înseamnă că
+                      la fiecare deschidere de pagină — și după fiecare
+                      salvare — pleacă nouă cereri deodată, iar fiecare
+                      pagină de panou face interogări în baza de date:
+                      tabloul de bord numără donațiile, rapoartele adună
+                      perioade, analiza citește profilurile. Nouă pagini
+                      interogate ca să se deschidă una.
+
+                      Panoul are câțiva oameni și e în spatele unei parole;
+                      jumătatea de secundă câștigată la navigare nu merită
+                      de nouă ori munca bazei de date la fiecare clic, pe un
+                      Postgres mic de Railway.
+                    */
+                    prefetch={false}
                     aria-current={aici ? "page" : undefined}
                     className={`flex items-center gap-2.5 rounded-lg px-3 py-1.5 font-titlu text-mic font-semibold whitespace-nowrap transition-colors ${
                       aici
@@ -275,6 +293,7 @@ export default function Cadru({
         <div className="px-4 py-3 lg:px-5 lg:py-5">
           <Link
             href="/admin"
+            prefetch={false}
             className="inline-flex rounded-lg transition-opacity hover:opacity-80"
           >
             <Sigla peFundalInchis className="text-[38px]" />
@@ -352,6 +371,7 @@ export default function Cadru({
         <div className="flex items-center justify-between gap-2 border-t border-hartie/10 px-3 py-2 lg:grid lg:gap-0.5 lg:py-2.5">
           <Link
             href="/"
+            prefetch={false}
             className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 font-titlu text-nota font-semibold whitespace-nowrap text-hartie/65 transition-colors hover:bg-hartie/10 hover:text-hartie"
           >
             <Pictograma
