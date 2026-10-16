@@ -80,6 +80,9 @@ export type Text = {
   publicat: boolean;
   publicatLa: string | null;
   schimbatLa: string;
+  /** Identificatorul postării de pe pagina de Facebook, dacă a plecat. */
+  facebookId: string | null;
+  facebookLa: string | null;
 };
 
 type Rand = {
@@ -101,6 +104,8 @@ type Rand = {
   stare: string;
   publicat_la: Date | null;
   schimbat_la: Date;
+  facebook_id: string | null;
+  facebook_la: Date | null;
 };
 
 function dinRand(r: Rand): Text {
@@ -133,12 +138,14 @@ function dinRand(r: Rand): Text {
     publicat: r.stare === "publicat",
     publicatLa: r.publicat_la ? r.publicat_la.toISOString() : null,
     schimbatLa: r.schimbat_la.toISOString(),
+    facebookId: r.facebook_id,
+    facebookLa: r.facebook_la ? r.facebook_la.toISOString() : null,
   };
 }
 
 const COLOANE = `id, fel, slug, titlu, rezumat, continut, poza_id, poza_latime,
   poza_inaltime, poza_alt, tinta_bani, data_inceput, data_citita, dosar_cloud,
-  categorie, stare, publicat_la, schimbat_la`;
+  categorie, stare, publicat_la, schimbat_la, facebook_id, facebook_la`;
 
 /**
  * Textele publicate, cele mai noi primele.
@@ -337,4 +344,25 @@ export async function cateTexte(): Promise<
       ciorne: Number(r?.ciorne ?? 0),
     };
   });
+}
+
+
+/**
+ * Ține minte că textul a plecat pe pagina de Facebook.
+ *
+ * Se scrie numai dacă nu era deja scris: dacă două apăsări se suprapun, a
+ * doua nu suprascrie prima postare cu a ei, iar panoul nu arată niciodată o
+ * legătură spre o postare ștearsă de cealaltă.
+ */
+export async function marcheazaFacebook(
+  id: string,
+  postare: string,
+): Promise<boolean> {
+  const randuri = await intreaba<{ id: string }>(
+    `UPDATE texte SET facebook_id = $2, facebook_la = now()
+      WHERE id = $1 AND facebook_id IS NULL
+      RETURNING id`,
+    [id, postare],
+  );
+  return randuri.length > 0;
 }

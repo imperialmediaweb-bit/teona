@@ -91,6 +91,72 @@ Ce înseamnă asta în practică:
 - proba `node scripts/qa/poze-cloud.mjs` verifică potrivirea fără cheile
   adevărate, cu un server care imită Cloudinary.
 
+## De unde vin donatorii
+
+Fiecare donație începută de pe site păstrează **canalul** din care a venit
+omul: e-mail, reclame Facebook sau Instagram, Facebook neplătit, Instagram,
+reclame Google, căutare Google, altă căutare, cod QR tipărit, SMS, alt site,
+direct. Numele lor stau o singură dată, în `src/lib/atribuire.ts`, și sunt
+aceleași în care se traduc sursele din Google Analytics — de aceea în panou
+vizitele și donațiile pot sta pe același rând.
+
+- **Nu se ghicește nimic.** Canalul se scrie din eticheta linkului
+  (`utm_source`, `utm_medium`), din `fbclid`/`gclid` sau din site-ul de pe
+  care s-a venit. O donație fără urmă rămâne fără canal și se numără separat,
+  în „nelegate" — nu se împarte „proporțional" pe canale.
+- **Urma ține cât ține fila** (`src/lib/atribuire-browser.ts`, pusă în pagină
+  de `src/componente/Urma.tsx`): omul vine din reclamă pe prima pagină și
+  donează după două apăsări, când adresa nu mai are nicio etichetă. Se
+  păstrează două cuvinte — canalul și perechea brută —, niciun identificator;
+  `fbclid` se citește, se traduce în canal și **nu se scrie**. De aceea nu
+  atârnă de bannerul de cookie-uri, pe care atârnă Google Analytics: acolo e
+  un script străin care urmărește omul între site-uri, aici e un cuvânt
+  despre o donație în curs.
+- **Prima urmă câștigă** („first touch"): cine a venit din reclamă, a plecat
+  pe Facebook să întrebe un prieten și s-a întors, rămâne al reclamei.
+- Canalul merge și în metadatele abonamentului Stripe, deci **reînnoirile
+  lunare îl păstrează** — altfel o donație lunară adusă de o reclamă s-ar
+  număra acolo o singură lună.
+- Canalul venit din browser se acceptă numai dacă e unul dintre numele
+  noastre: altfel oricine ar umfla rândul reclamelor dintr-un formular.
+- În panou, la `/admin/analiza`, „De unde vin donatorii": vizite (de la
+  Google) lângă donații (din baza noastră), **niciodată adunate**.
+- Probă: `BAZA=… PAROLA_ADMIN=… node scripts/qa/atribuire.mjs`
+
+### Reclamele Meta
+
+Cu `META_TOKEN` și `META_AD_ACCOUNT_ID` în Railway, tot la `/admin/analiza`
+se vede cât s-a cheltuit pe reclame, pe campanie, lângă donațiile venite din
+canalul plătit. **Costul pe donație e o apropiere**, nu o măsurătoare: cele
+două cifre vin din locuri care nu se cunosc. Numele contului e scris lângă
+cifre — un cont greșit (al altei asociații, al agenției) ar umple panoul cu
+cifre verosimile și false.
+
+### Codurile QR
+
+`/admin/qr` face codurile de tipărit, cu link etichetat
+(`?utm_source=qr&utm_medium=offline&utm_campaign=<locul>`). Fiecare loc cu
+numele lui, altfel nu se poate spune care afiș a adus oamenii. PNG pentru
+tipar obișnuit, SVG pentru bannere. Codul se face aici, nu pe un site
+gratuit, fiindcă alea duc la o adresă intermediară a lor: dacă se închide,
+afișele tipărite rămân cu un cod mort.
+
+### Pagina de Facebook
+
+`/admin/facebook` arată cifrele paginii (urmăritori, câți au văzut-o, câți
+au reacționat) și trimite pe ea o noutate sau o campanie publicată, **la
+apăsarea unui om**, o singură dată (`texte.facebook_id` ține minte). Linkul
+din postare poartă etichetă, deci donațiile venite de acolo se văd separat
+de reclame.
+
+**Nu există buton „Conectează cu Facebook"**, și nu din lene: ca un site să
+publice în numele unei pagini, Meta cere o aplicație aprobată, cu verificare
+de business. Pentru o asociație mică, calea e un utilizator de sistem în
+Business Manager, cu jeton care nu expiră: `META_PAGE_ID`, `META_PAGE_TOKEN`
+(drepturi `pages_read_engagement`, `pages_manage_posts`, `read_insights`).
+Pașii sunt scriși pe pagină. Probă:
+`PAROLA_ADMIN=… DATABASE_URL=… node scripts/qa/facebook.mjs`
+
 ## Firma se completează din CUI
 
 Pe `/directioneaza-20`, în formularul de sponsorizare și la contact, o firmă
@@ -106,6 +172,12 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
   unde era.
 - **Procentele din calculator:** 20% din impozitul pe profit și 0,75% din cifra
   de afaceri; suma e cea mai mică dintre ele.
+- **Suma din contract se scrie, nu se presupune.** Câmpul vine completat cu
+  maximul calculat, dar se poate schimba: o firmă poate sponsoriza mai puțin
+  decât îi permite legea, iar contractul trebuie să poarte suma pe care o dă
+  ea, nu plafonul. Contractul iese pe loc, în Word sau PDF, cu denumirea,
+  sediul și nr. de la registrul comerțului de la ANAF; rămân de completat
+  cine semnează și în ce calitate.
 - **Cifra de control a CUI-ului** se verifică în browser înainte de orice
   cerere: cheia e aliniată la dreapta, cu zerouri în față (`src/lib/cui.ts`).
 - Căutarea nu blochează nimic: dacă ANAF nu răspunde, câmpurile se completează

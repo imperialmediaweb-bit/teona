@@ -94,6 +94,7 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
       },
       { href: "/admin/poze", eticheta: "Poze", pictograma: "arta" },
       { href: "/admin/qr", eticheta: "Cod QR", pictograma: "panou" },
+      { href: "/admin/facebook", eticheta: "Facebook", pictograma: "comunicare" },
     ],
   },
 ];

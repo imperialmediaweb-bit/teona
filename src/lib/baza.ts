@@ -367,6 +367,16 @@ const ADAOSURI = `
     urmă, iar o donație dinainte de coloana asta n-are de unde s-o ia. De aceea
     în panou rândul „nelegate" se scrie separat, nu se împarte pe canale.
   */
+  /*
+    Dacă noutatea a fost trimisă pe pagina de Facebook, și când.
+
+    Se ține ca să nu plece de două ori. Un text publicat de două ori pe
+    pagină arată ca o greșeală a asociației, iar cine a văzut-o prima dată
+    nu mai citește a doua.
+  */
+  ALTER TABLE texte ADD COLUMN IF NOT EXISTS facebook_id text;
+  ALTER TABLE texte ADD COLUMN IF NOT EXISTS facebook_la timestamptz;
+
   ALTER TABLE donatii ADD COLUMN IF NOT EXISTS canal text;
   ALTER TABLE donatii ADD COLUMN IF NOT EXISTS sursa text;
   CREATE INDEX IF NOT EXISTS donatii_dupa_canal

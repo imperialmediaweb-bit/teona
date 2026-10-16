@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { RUTE } from "@/date/asociatie";
+import { EMAIL, RUTE } from "@/date/asociatie";
 import Link from "next/link";
 import Buton from "../Buton";
 import Pictograma from "../Pictograma";
@@ -57,6 +57,16 @@ export default function CalculatorSponsorizare() {
   const [firma, setFirma] = useState<Firma | null>(null);
   const [descarc, setDescarc] = useState<"pdf" | "word" | null>(null);
   const [eroareDescarcare, setEroareDescarcare] = useState("");
+  /*
+    Suma scrisă în contract.
+
+    Șirul gol înseamnă „cât a ieșit la calcul" — maximul. E altceva decât zero
+    și altceva decât o sumă aleasă: firma poate sponsoriza și mai puțin decât
+    poate direcționa, iar contractul trebuie să poarte suma pe care o dă ea,
+    nu plafonul legal. Rămâne gol până se atinge cineva de el, ca să nu fie
+    nevoie de o a doua apăsare pentru cazul obișnuit.
+  */
+  const [sumaContract, setSumaContract] = useState("");
 
   /** Completează cele două câmpuri din ultimul bilanț depus. */
   function completeaza(gasita: Firma) {
@@ -93,13 +103,15 @@ export default function CalculatorSponsorizare() {
     setDescarc(fel);
     setEroareDescarcare("");
     try {
+      const aleasa = { suma: scrisaInContract };
       const date = new URLSearchParams({
         fel,
         denumire: firma.denumire,
         cui: String(firma.cui),
         sediu: firma.adresa ?? "",
         regCom: firma.nrRegCom ?? "",
-        valoare: scrieCifre(rezultat.maxim),
+        // Suma scrisă de firmă, dacă a scris una; altfel maximul calculat.
+        valoare: scrieCifre(aleasa.suma ?? rezultat.maxim),
       });
       const raspuns = await fetch("/api/contract/descarca", {
         method: "POST",
@@ -130,6 +142,9 @@ export default function CalculatorSponsorizare() {
       setDescarc(null);
     }
   }
+
+  /** Suma scrisă de firmă în câmpul contractului, dacă a scris una bună. */
+  const scrisaInContract = citesteSuma(sumaContract).suma;
 
   const cifra = citesteSuma(cifraText);
   const impozit = citesteSuma(impozitText);
@@ -425,6 +440,36 @@ export default function CalculatorSponsorizare() {
             <p className="font-titlu text-mic font-bold text-cerneala">
               Generează contractul de sponsorizare, completat cu datele firmei
             </p>
+
+            {/*
+              Suma din contract, scrisă aici, nu în document cu pixul.
+
+              Vine gata completată cu maximul calculat — cazul obișnuit — dar
+              se poate schimba: o firmă poate sponsoriza mai puțin decât îi
+              permite legea, și atunci contractul trebuie să poarte suma ei.
+              Altfel documentul iese cu plafonul legal trecut drept angajament,
+              ceea ce nu e același lucru și n-ar trebui semnat.
+            */}
+            <label className="mt-3 grid max-w-64 gap-1">
+              <span className="font-titlu text-nota font-bold text-cerneala">
+                Suma din contract (lei)
+              </span>
+              <input
+                name="suma-contract"
+                inputMode="decimal"
+                value={sumaContract}
+                onChange={(e) => setSumaContract(e.target.value)}
+                placeholder={scrieCifre(rezultat.maxim)}
+                className="min-h-12 colt-mic-a border border-caramiziu-200 bg-hartie px-3 font-titlu font-bold text-cerneala"
+              />
+              <span className="text-nota text-cerneala-moale">
+                {scrisaInContract === null
+                  ? `Lăsat gol, în contract intră maximul: ${scrieSuma(rezultat.maxim)}.`
+                  : scrisaInContract > rezultat.maxim
+                    ? `Mai mult decât maximul calculat (${scrieSuma(rezultat.maxim)}). Se poate dona oricât, dar peste prag banii nu se mai scad din impozit.`
+                    : "Suma asta intră în contract."}
+              </span>
+            </label>
             <div className="mt-3 flex flex-wrap gap-3">
               <button
                 type="button"
@@ -466,8 +511,14 @@ export default function CalculatorSponsorizare() {
             </div>
             <p className="mt-3 text-nota text-cerneala-moale">
               În documentul descărcat rămân de completat cine semnează și în ce
-              calitate. Îl semnezi și ni-l trimiți pe e-mail; îl contrasemnăm și
-              ți-l trimitem înapoi.
+              calitate. Îl semnezi, îl ștampilezi și ni-l trimiți pe e-mail, la{" "}
+              <a
+                href={`mailto:${EMAIL.contact}`}
+                className="font-titlu font-semibold text-caramiziu-700 underline underline-offset-2"
+              >
+                {EMAIL.contact}
+              </a>
+              ; îl contrasemnăm și ți-l trimitem înapoi.
             </p>
             {eroareDescarcare && (
               <p
