@@ -10,7 +10,6 @@ import {
 } from "@/date/asociatie";
 import { curat, tabel, trimiteEmail } from "./trimite";
 import { MIC, P, buton, caseta, paginaInterna, pagina, pasi } from "./plic";
-import { alege } from "./variante";
 import type { Compus } from "./campanie";
 
 /**
@@ -296,18 +295,10 @@ const WHATSAPP = `https://wa.me/${TELEFON_PRINCIPAL.apel.replace(/\D/g, "")}`;
  * **Nu confirmă că am primit formularul**, pentru că nu l-am primit: site-ul
  * nu primește poza și nu ține niciun CNP. Confirmă doar că știm să-l așteptăm.
  */
-/* Cinci variante, alese ca la mulțumiri (`variante.ts`). */
-const DESCHIDERI_230 = [
-  "Ne-ai spus pe site că ai completat Formularul 230. Mulțumim — îți mai rămân două lucruri, și ambele contează:",
-  "Am notat că ai completat Formularul 230. Mulțumim că te-ai gândit la copiii de aici. Mai sunt două lucruri de făcut:",
-  "Mulțumim că ai completat Formularul 230. Partea grea a trecut; au mai rămas două lucruri, amândouă scurte:",
-  "Ți-am notat anunțul. 3,5% din impozitul pe care oricum îl plătești ajunge la copii — dacă mai faci două lucruri:",
-  "Am primit anunțul tău. Formularul e completat, dar încă n-a ajuns la noi: mai sunt doi pași, ăștia:",
-] as const;
-
 export function compuneFormular230(d: Formular230): Compus {
   const titlu = "Am notat formularul tău 230";
-  const deschidere = alege(DESCHIDERI_230, d.email, new Date());
+  const deschidere =
+    "Îți mulțumim că ai completat Formularul 230. Mai rămân doi pași, amândoi necesari:";
   const corp = `
     <p style="${P}">Bună, ${curat(d.nume.split(" ")[0])},</p>
     <p style="${P}font-size:18px;">${curat(deschidere)}</p>

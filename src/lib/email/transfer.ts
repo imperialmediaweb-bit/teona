@@ -4,7 +4,6 @@ import { DESTINATII } from "@/date/plati";
 import { scrieSuma } from "@/lib/suma";
 import { curat, tabel, trimiteEmail } from "./trimite";
 import { MIC, P, buton, caseta, paginaInterna, pagina } from "./plic";
-import { alege } from "./variante";
 import type { Compus } from "./campanie";
 
 /**
@@ -54,32 +53,14 @@ function pentruCe(destinatie: string): string {
   return brut.charAt(0).toUpperCase() + brut.slice(1);
 }
 
-/* Cinci variante, alese ca la mulțumiri (`variante.ts`). */
-const DESCHIDERI = [
-  "Ne-ai spus pe site că ai făcut un transfer către asociație. Am notat ce ai scris și îl căutăm în extrasul de cont — <strong>îți scriem imediat ce îl găsim</strong>.",
-  "Am primit anunțul tău. Rămâne să găsim transferul în extrasul de cont, iar atunci <strong>îți scriem din nou</strong>.",
-  "Mulțumim că ne-ai spus. Ne uităm în extras după el și <strong>îți scriem când îl găsim</strong> — nu trebuie să faci nimic altceva.",
-  "Am notat transferul tău. Până apare în extrasul de cont nu-l trecem nicăieri ca donație, dar nici nu-l pierdem: <strong>îți scriem imediat ce îl găsim</strong>.",
-  "Ne-ai anunțat, am notat. Urmează partea noastră: îl căutăm în extras și <strong>îți confirmăm</strong>.",
-] as const;
-
-const DE_CE_DUREAZA = [
-  "De ce durează: transferul bancar nu trece prin site, deci nu-l vedem în clipa în care îl faci. Apare în extrasul nostru de cont, pe care îl citește un om — de obicei în câteva zile lucrătoare.",
-  "Transferul bancar nu trece prin site și nu avem cum să-l vedem când îl faci: ajunge în extrasul nostru de cont, pe care îl citește un om. De obicei, în câteva zile lucrătoare.",
-  "Nu te lăsăm să aștepți degeaba, dar nici nu putem confirma pe loc: banii apar în extrasul de cont, iar extrasul îl verifică cineva cu ochii, nu un program. Câteva zile lucrătoare.",
-  "Dacă te întrebi de ce nu ți-am confirmat deja: site-ul nu e legat la bancă. Transferul apare în extras, pe care îl citește un om din asociație, de obicei în câteva zile lucrătoare.",
-  "Partea asta e de mână: cineva din asociație se uită peste extrasul de cont și potrivește transferurile cu anunțurile. De aia durează câteva zile lucrătoare.",
-] as const;
-
 /** Către donator: am notat, urmează controlul în extras. */
 export function compuneTransferAnuntat(d: Anuntat): Compus {
   const suma = scrieSuma(d.sumaBani / 100);
   const titlu = "Am notat transferul tău";
-  // Ziua transferului, nu ziua de azi: aceeași donație compusă de două ori dă
-  // același text, deci proba din panou arată ce a primit omul.
-  const zi = new Date(d.data);
-  const deschidere = alege(DESCHIDERI, d.email ?? d.nume, zi);
-  const deCeDureaza = alege(DE_CE_DUREAZA, d.email ?? d.nume, zi);
+  const deschidere =
+    "Îți mulțumim pentru anunț. Am înregistrat datele transferului și îl verificăm în extrasul de cont. Îți scriem imediat ce îl identificăm.";
+  const deCeDureaza =
+    "Transferul bancar nu se procesează prin site, deci nu îl vedem în momentul în care îl faci: apare în extrasul nostru de cont, verificat de o persoană din asociație, de obicei în câteva zile lucrătoare.";
   const campuri = tabel([
     ["Nume pe transfer", d.nume],
     ["Suma", suma],
@@ -106,7 +87,7 @@ export function compuneTransferAnuntat(d: Anuntat): Compus {
     ),
     text: `Bună, ${d.nume},
 
-${deschidere.replace(/<[^>]+>/g, "")}
+${deschidere}
 
 ${campuri.text}
 
