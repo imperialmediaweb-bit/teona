@@ -400,6 +400,38 @@ const ADAOSURI = `
     ON contacte_presa (activ, publicatie);
 
   /*
+    Registrul contractelor de sponsorizare.
+
+    Până acum numărul se scria de mână la fiecare generare, iar contractul
+    dispărea după descărcare. Un ONG are nevoie de un registru: la final de an
+    contabilul cere lista — număr, dată, firmă, sumă —, iar din ea se scrie și
+    Declarația 177. Reconstituit din inbox, registrul iese altfel de fiecare
+    dată.
+
+    Numărul se dă pe an și e unic pe an (UNIQUE pe an plus numar). Două apăsări în
+    aceeași secundă nu pot primi același număr — a doua cade și cere altul,
+    în loc să scrie două contracte „3/2026".
+  */
+  CREATE TABLE IF NOT EXISTS contracte (
+    id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    an            integer NOT NULL,
+    numar         integer NOT NULL,
+    firma_id      uuid REFERENCES firme(id) ON DELETE SET NULL,
+    denumire      text NOT NULL,
+    cui           text,
+    valoare_bani  bigint,
+    data_contract date NOT NULL DEFAULT current_date,
+    /* generat → semnat → incasat, sau anulat. */
+    stadiu        text NOT NULL DEFAULT 'generat',
+    observatii    text,
+    creat_la      timestamptz NOT NULL DEFAULT now(),
+    schimbat_la   timestamptz NOT NULL DEFAULT now(),
+    UNIQUE (an, numar)
+  );
+  CREATE INDEX IF NOT EXISTS contracte_dupa_an
+    ON contracte (an DESC, numar DESC);
+
+  /*
     Plățile lunare care n-au trecut.
 
     Un card expiră, o bancă îl reemite, plata cade. Stripe mai încearcă de

@@ -10,6 +10,9 @@ import {
   numeleFisierului,
   type DateContract,
 } from "@/lib/contract";
+import { numarPentruContract } from "@/lib/contracte";
+import { citesteSuma } from "@/lib/suma";
+import { inBani } from "@/date/plati";
 
 /**
  * Contractul de sponsorizare, ca fișier PDF.
@@ -40,8 +43,36 @@ export async function POST(cerere: Request) {
   const firma = await iaFirma(id);
   if (!firma) return raspuns("Firmă necunoscută.", 400);
 
+  /*
+    Numărul vine din registru, nu din capul omului.
+
+    Dacă în formular s-a scris unul, ăla rămâne — un contract vechi, refăcut,
+    își păstrează numărul. Dacă nu, se ia următorul liber pe anul ăsta și se
+    scrie în registru, ca la final de an să existe lista pe care o cere
+    contabilul. Dacă baza nu răspunde, contractul se face oricum, fără număr:
+    mai bine un contract fără număr decât o firmă care așteaptă.
+  */
+  let numar = camp("numar");
+  if (!numar) {
+    const inregistrat = await numarPentruContract({
+      firmaId: id,
+      denumire: camp("denumire") || firma.denumire,
+      cui: camp("cui") || firma.cui,
+      /*
+        În registru suma stă în bani, ca peste tot în baza asta. Fără
+        înmulțire, 1.500 de lei ar fi intrat ca 15 lei — iar totalul anului
+        ar fi fost de o sută de ori mai mic, fără ca nimic să arate de ce.
+      */
+      valoareBani: (() => {
+        const { suma } = citesteSuma(camp("valoare"));
+        return suma === null ? null : inBani(suma);
+      })(),
+    }).catch(() => null);
+    if (inregistrat) numar = inregistrat.scris;
+  }
+
   const date: DateContract = {
-    numar: camp("numar"),
+    numar,
     data: camp("data"),
     denumire: camp("denumire") || firma.denumire,
     sediu: camp("sediu"),

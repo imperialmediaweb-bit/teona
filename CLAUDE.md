@@ -210,6 +210,22 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
   ea, nu plafonul. Contractul iese pe loc, în Word sau PDF, cu denumirea,
   sediul și nr. de la registrul comerțului de la ANAF; rămân de completat
   cine semnează și în ce calitate.
+- **Registrul contractelor** (`/admin/contracte`): numărul nu se mai scrie de
+  mână, se dă singur la generare, pe an, de la 1 — iar rândul intră în registru
+  cu firmă, CUI, sumă, dată și stadiu. Word și PDF-ul aceluiași contract împart
+  un număr (se refolosește rândul „generat" al aceleiași firme, cu aceeași
+  sumă); o a doua sponsorizare, cu altă sumă, primește alt număr. `UNIQUE (an,
+  numar)` nu lasă două contracte „3/2026" să existe, iar la coliziune se
+  încearcă următorul număr liber.
+  **Registrul nu ține fișierul**: documentul se descarcă și se trimite firmei;
+  ce semnează ea se întoarce pe e-mail. Un PDF ținut și la noi ar fi al
+  treilea loc în care același document poate să difere.
+  Sus stau totalurile anului și, separat, **„semnate, bani neintrați"** —
+  sponsorizarea se scade din impozitul anului **în care a fost plătită**, deci
+  un contract semnat în noiembrie și plătit în ianuarie pierde anul fiscal
+  pentru firmă. Dedesubt, **cine a sponsorizat înainte și anul ăsta nu**: în
+  ianuarie, lista aia e cea mai ieftină sursă de bani a asociației.
+  Probă: `BAZA=… PAROLA_ADMIN=… DATABASE_URL=… node scripts/qa/contracte.mjs`
 - **Cifra de control a CUI-ului** se verifică în browser înainte de orice
   cerere: cheia e aliniată la dreapta, cu zerouri în față (`src/lib/cui.ts`).
 - Căutarea nu blochează nimic: dacă ANAF nu răspunde, câmpurile se completează
