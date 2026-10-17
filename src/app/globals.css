@@ -421,6 +421,98 @@
     }
   }
 
+  /*
+    Sclipirea de pe butoanele pline.
+
+    O dâră de lumină care trece o dată peste buton, la trecerea cursorului
+    sau la focalizare. E singurul loc din site cu un efect „lucios”, și e pus
+    acolo dinadins: butonul principal e lucrul pe care vrem să-l apese omul.
+
+    Se mișcă numai `transform`, iar elementul care o face e un
+    pseudo-element în spatele textului (`z-index: -1` într-un context izolat),
+    deci nu acoperă nimic și nu schimbă nicio dimensiune. Cine cere mișcare
+    redusă nu vede nimic.
+  */
+  .sclipire {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .sclipire::after {
+    content: "";
+    position: absolute;
+    inset: -60% 0;
+    z-index: -1;
+    background: linear-gradient(
+      105deg,
+      transparent 30%,
+      rgb(255 255 255 / 0.5) 50%,
+      transparent 70%
+    );
+    transform: translate3d(-115%, 0, 0);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .sclipire:hover::after,
+    .sclipire:focus-visible::after {
+      transform: translate3d(115%, 0, 0);
+      /*
+        Liniar, nu cu accelerare: o dâră de lumină care pornește brusc și se
+        oprește moale nu arată ca lumina, arată ca un element care se mișcă.
+      */
+      transition: transform 700ms linear;
+    }
+  }
+
+  /*
+    Cât ai citit din pagină, în muchia de jos a antetului.
+
+    Antetul stă oricum acolo, deci bara nu ia niciun pixel în plus și nu mută
+    nimic. Creșterea e legată de derulare prin `animation-timeline: scroll()`,
+    deci fără niciun rând de JavaScript și fără ascultător de evenimente.
+
+    Unde browserul nu știe `scroll()`, bara rămâne la zero — adică invizibilă.
+    Nu e nimic de pierdut: e o podoabă, nu o informație.
+  */
+  .progres-pista {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 2px;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .progres-citire {
+    display: block;
+    height: 100%;
+    width: 100%;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    background-image: linear-gradient(
+      to right,
+      var(--color-caramiziu-500),
+      var(--color-miere-400) 60%,
+      var(--color-turcoaz-500)
+    );
+  }
+
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .progres-citire {
+        animation: creste-progres linear both;
+        animation-timeline: scroll(root block);
+      }
+    }
+  }
+
+  @keyframes creste-progres {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
   /* Subliniere desenată, nu chenar: apare sub cuvântul accentuat din titluri. */
   .subliniat {
     background-image: linear-gradient(

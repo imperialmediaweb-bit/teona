@@ -73,7 +73,13 @@ export default function Fotografie({
         />
       )}
       <div
-        className={`relative overflow-hidden colt-${colt} bg-hartie-calda transition-all duration-500 ease-cald group-hover:-translate-y-1.5 motion-reduce:group-hover:translate-y-0 ${raport} ${UMBRE[umbra]}`}
+        /*
+          Inelul interior de un pixel nu e chenar: la 6% negru nu se vede ca
+          linie, dar oprește fotografiile deschise să se topească în hârtia
+          din spate. E diferența dintre o poză pusă pe pagină și una tipărită
+          pe ea.
+        */
+        className={`relative overflow-hidden colt-${colt} bg-hartie-calda ring-1 ring-cerneala/[0.06] ring-inset transition-all duration-500 ease-cald group-hover:-translate-y-1.5 motion-reduce:group-hover:translate-y-0 ${raport} ${UMBRE[umbra]}`}
       >
         <Image
           src={cale}

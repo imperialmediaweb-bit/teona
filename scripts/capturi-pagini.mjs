@@ -8,7 +8,7 @@ const DIR = process.argv[3] ?? '/tmp/claude-0';
 const RUTE = process.argv.length > 4 ? process.argv.slice(4) : [
   '/despre-noi', '/casa-teona', '/proiecte', '/sponsori-si-parteneri',
   '/suntem-in-presa', '/devino-voluntar', '/contact', '/doneaza',
-  '/redirectioneaza-3-5', '/directioneaza-20', '/raport-de-activitate-2025',
+  '/redirectioneaza-3-5', '/directioneaza-20',
   '/politica-de-confidentialitate',
 ];
 

@@ -233,6 +233,18 @@ export default function Antet() {
           : ""
       }`}
     >
+      {/*
+        Cât ai citit din pagină, în muchia de jos a antetului.
+
+        Nu ia niciun pixel în plus — antetul stă oricum acolo — și nu
+        pornește din JavaScript: creșterea e legată de derulare prin
+        `animation-timeline: scroll()`. Unde browserul nu știe, bara rămâne
+        la zero și nu se vede. E decor, nu informație.
+      */}
+      <div aria-hidden="true" className="progres-pista">
+        <span className="progres-citire" />
+      </div>
+
       {/* Panglica mărcii: cele trei culori, una în alta, pe toată lățimea.
           Patru pixeli de culoare care spun al cui e site-ul înainte de orice
           text. Decorativă, deci în afara ordinii de citire. */}
@@ -309,7 +321,7 @@ export default function Antet() {
           <Link
             href={RUTE.doneaza}
             aria-label="Donează"
-            className={`group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 p-2.5 font-titlu font-bold text-hartie shadow-[0_2px_0_0_var(--color-caramiziu-700),0_12px_28px_-12px_rgba(247,79,34,0.9)] transition-all duration-200 ease-cald hover:translate-y-px hover:shadow-[0_1px_0_0_var(--color-caramiziu-700),0_10px_30px_-8px_rgba(247,79,34,1)] motion-reduce:hover:translate-y-0 min-[360px]:px-3.5 min-[360px]:py-2.5 min-[412px]:px-4 ${
+            className={`sclipire group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 p-2.5 font-titlu font-bold text-hartie shadow-[0_2px_0_0_var(--color-caramiziu-700),0_12px_28px_-12px_rgba(247,79,34,0.9)] transition-all duration-200 ease-cald hover:translate-y-px hover:shadow-[0_1px_0_0_var(--color-caramiziu-700),0_10px_30px_-8px_rgba(247,79,34,1)] motion-reduce:hover:translate-y-0 min-[360px]:px-3.5 min-[360px]:py-2.5 min-[412px]:px-4 ${
               compact ? "text-mic xl:py-2.5" : "xl:px-6 xl:py-3 xl:text-amplu"
             }`}
           >
@@ -598,7 +610,7 @@ export default function Antet() {
             <div className="mx-auto mt-4 flex max-w-7xl flex-col gap-3 border-t border-hartie-umbra pt-4 sm:flex-row sm:items-center sm:justify-between">
               <Link
                 href={RUTE.doneaza}
-                className="group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 px-6 py-3 font-titlu text-amplu font-bold text-hartie shadow-[0_2px_0_0_var(--color-caramiziu-700),0_12px_28px_-12px_rgba(247,79,34,0.9)] transition-all duration-200 ease-cald hover:translate-y-px motion-reduce:hover:translate-y-0 sm:order-2"
+                className="sclipire group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 px-6 py-3 font-titlu text-amplu font-bold text-hartie shadow-[0_2px_0_0_var(--color-caramiziu-700),0_12px_28px_-12px_rgba(247,79,34,0.9)] transition-all duration-200 ease-cald hover:translate-y-px motion-reduce:hover:translate-y-0 sm:order-2"
               >
                 <Inima className="bate-la-hover size-5" />
                 Donează

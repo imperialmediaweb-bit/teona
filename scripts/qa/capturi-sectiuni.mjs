@@ -50,7 +50,6 @@ await captura("/devino-voluntar", "form#formular", "s320-formular-voluntar");
 await captura("/contact", "form", "s320-formular-contact");
 await captura("/", "footer", "s320-subsol");
 await captura("/proiecte", '[role="tablist"]', "s320-filtre");
-await captura("/raport-de-activitate-2025", "p:has-text('Rezultat financiar')", "s320-rezultat-financiar");
 await captura("/redirectioneaza-3-5", "#documente", "s390-documente", 390);
 await captura("/", "main > section:first-of-type", "s1280-erou", 1280);
 await captura("/doneaza", "main > section:first-of-type", "s1280-doneaza-sus", 1280);

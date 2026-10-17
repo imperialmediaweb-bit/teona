@@ -7,7 +7,7 @@ const ADRESA = process.argv[2] ?? 'http://localhost:3000';
 const RUTE = [
   '/despre-noi', '/casa-teona', '/proiecte', '/sponsori-si-parteneri',
   '/suntem-in-presa', '/devino-voluntar', '/contact', '/doneaza',
-  '/redirectioneaza-3-5', '/directioneaza-20', '/raport-de-activitate-2025',
+  '/redirectioneaza-3-5', '/directioneaza-20',
   '/politica-de-confidentialitate',
 ];
 

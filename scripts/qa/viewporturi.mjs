@@ -6,7 +6,7 @@ const log = (...a) => console.log(...a);
 const DIR = "/tmp/claude-0/-home-user-teona/4a139e8f-245b-53d8-993d-5496bf182b26/scratchpad/capturi";
 mkdirSync(DIR, { recursive: true });
 const ACORD = () => localStorage.setItem("teona:acord-cookieuri", JSON.stringify({ necesare: true, statistici: false, marketing: false, laData: new Date().toISOString() }));
-const PAGINI = ["/", "/despre-noi", "/casa-teona", "/proiecte", "/sponsori-si-parteneri", "/redirectioneaza-3-5", "/directioneaza-20", "/suntem-in-presa", "/devino-voluntar", "/contact", "/doneaza", "/contul-meu", "/politica-de-confidentialitate", "/raport-de-activitate-2025", "/proiecte/tabara-respiro-dedicata-copiilor-cu-sindrom-down-si-autism-30-septembrie", "/pagina-inexistenta"];
+const PAGINI = ["/", "/despre-noi", "/casa-teona", "/proiecte", "/sponsori-si-parteneri", "/redirectioneaza-3-5", "/directioneaza-20", "/suntem-in-presa", "/devino-voluntar", "/contact", "/doneaza", "/contul-meu", "/politica-de-confidentialitate", "/proiecte/tabara-respiro-dedicata-copiilor-cu-sindrom-down-si-autism-30-septembrie", "/pagina-inexistenta"];
 
 /*
   Paginile panoului, la fel de măturate ca restul.

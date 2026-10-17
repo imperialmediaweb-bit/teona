@@ -180,7 +180,7 @@ export default function Newsletter() {
             <button
               type="submit"
               disabled={stare.fel === "trimite"}
-              className="inline-flex w-fit items-center justify-center rounded-full bg-caramiziu-700 px-8 py-3.5 font-titlu font-semibold text-hartie shadow-[0_12px_26px_-12px_rgba(247,79,34,0.9)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:bg-caramiziu-600 disabled:opacity-60 motion-reduce:hover:translate-y-0"
+              className="sclipire inline-flex w-fit items-center justify-center rounded-full bg-caramiziu-700 px-8 py-3.5 font-titlu font-semibold text-hartie shadow-[0_12px_26px_-12px_rgba(247,79,34,0.9)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:bg-caramiziu-600 disabled:opacity-60 motion-reduce:hover:translate-y-0"
             >
               {stare.fel === "trimite" ? "Se trimite…" : "Abonează-mă"}
             </button>

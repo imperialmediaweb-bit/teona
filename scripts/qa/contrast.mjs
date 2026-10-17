@@ -43,7 +43,6 @@ const PAGINI = [
   "/sponsori-si-parteneri",
   "/doneaza-ti-ziua",
   "/suntem-in-presa",
-  "/raport-de-activitate-2025",
 ];
 
 const MASURA = () => {

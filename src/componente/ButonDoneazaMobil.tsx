@@ -40,7 +40,7 @@ export default function ButonDoneazaMobil() {
     <div className="doar-site pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-end p-4 sm:hidden">
       <Link
         href={RUTE.doneaza}
-        className="pointer-events-auto flex min-h-12 items-center justify-center gap-2 rounded-full bg-caramiziu-700 px-5 py-3 font-titlu font-bold text-hartie shadow-[0_10px_26px_-8px_rgba(35,35,35,0.55)] transition active:translate-y-px"
+        className="sclipire pointer-events-auto flex min-h-12 items-center justify-center gap-2 rounded-full bg-caramiziu-700 px-5 py-3 font-titlu font-bold text-hartie shadow-[0_10px_26px_-8px_rgba(35,35,35,0.55)] transition active:translate-y-px"
       >
         <svg
           viewBox="0 0 24 24"

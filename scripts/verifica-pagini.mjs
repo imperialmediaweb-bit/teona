@@ -29,7 +29,6 @@ const PAGINI = [
   "/devino-voluntar",
   "/contact",
   "/doneaza",
-  "/raport-de-activitate-2025",
   "/politica-de-confidentialitate",
   "/termeni-si-conditii",
   "/politica-de-cookieuri",

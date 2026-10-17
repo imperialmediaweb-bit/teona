@@ -3,11 +3,15 @@ import type { ComponentProps, ReactNode } from "react";
 
 type Varianta = "principal" | "secundar" | "contur" | "discret";
 
+/*
+  `sclipire` e pe variantele pline, nu pe toate: dâra de lumină e albă, deci
+  pe un buton de hârtie n-ar avea pe ce să treacă. Vezi `globals.css`.
+*/
 const variante: Record<Varianta, string> = {
   principal:
-    "bg-caramiziu-700 text-hartie hover:bg-caramiziu-800 shadow-[0_2px_0_0_var(--color-caramiziu-900)] hover:shadow-[0_1px_0_0_var(--color-caramiziu-900)] hover:translate-y-px",
+    "sclipire bg-caramiziu-700 text-hartie hover:bg-caramiziu-800 shadow-[0_2px_0_0_var(--color-caramiziu-900)] hover:shadow-[0_1px_0_0_var(--color-caramiziu-900)] hover:translate-y-px",
   secundar:
-    "bg-miere-400 text-cerneala hover:bg-miere-300 shadow-[0_2px_0_0_var(--color-miere-600)] hover:shadow-[0_1px_0_0_var(--color-miere-600)] hover:translate-y-px",
+    "sclipire bg-miere-400 text-cerneala hover:bg-miere-300 shadow-[0_2px_0_0_var(--color-miere-600)] hover:shadow-[0_1px_0_0_var(--color-miere-600)] hover:translate-y-px",
   contur:
     "border-2 border-cerneala/15 text-cerneala hover:border-caramiziu-500 hover:text-caramiziu-700 bg-hartie",
   discret:
@@ -52,7 +56,10 @@ export default function Buton({
 
   const clase = [
     "inline-flex items-center justify-center gap-2 rounded-full font-titlu font-semibold",
-    "transition-all duration-200 ease-cald",
+    // Apăsarea se simte: butonul coboară un pixel sub deget, apoi revine.
+    // Pe telefon e singurul răspuns pe care îl primește omul înainte ca
+    // pagina să se schimbe.
+    "transition-all duration-200 ease-cald active:translate-y-0.5",
     variante[varianta],
     marimi[marime],
     className,
