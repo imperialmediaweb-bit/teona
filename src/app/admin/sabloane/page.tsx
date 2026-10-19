@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
-import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
+import {
+  areParolaConfigurata,
+  arePermisiune,
+  esteAutentificat,
+} from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { campaniileDeRaportat } from "@/lib/rapoarte/date";
 import { areCampanii, grupuri } from "@/lib/email/mailerlite";
@@ -16,6 +20,7 @@ import {
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
+import CumScriem from "@/componente/admin/CumScriem";
 
 export const metadata: Metadata = {
   title: "Șabloane de e-mail",
@@ -212,6 +217,8 @@ async function Continut({
               </label>
             ))}
           </fieldset>
+
+          <CumScriem />
 
           <div className="grid gap-2">
             <Eticheta htmlFor="titlu" copii="Titlul" />

@@ -3,7 +3,11 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
+import {
+  areParolaConfigurata,
+  arePermisiune,
+  esteAutentificat,
+} from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { esteFel, felul, textDupaId, type Text } from "@/lib/texte";
 import { adresaPoza, areCloudinary } from "@/lib/poza-urcata";
@@ -15,6 +19,7 @@ import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 import Asistent from "@/componente/admin/Asistent";
+import CumScriem from "@/componente/admin/CumScriem";
 
 export const metadata: Metadata = {
   title: "Scrie",
@@ -173,6 +178,8 @@ async function Continut({
         locul lui, pentru că aici se scrie.
       */}
       {nou && areAsistent() && <Asistent />}
+
+      <CumScriem deschis={nou} />
 
       <form
         action="/api/admin/texte"

@@ -1,4 +1,5 @@
 import { ASOCIATIA, CIFRE, EMAIL, RUTE, TELEFOANE } from "@/date/asociatie";
+import { CUM_SCRIE_ASOCIATIA } from "./ton-asociatie";
 
 /**
  * Asistentul din panoul de admin: scrie o ciornă de e-mail, nu o trimite.
@@ -17,6 +18,17 @@ import { ASOCIATIA, CIFRE, EMAIL, RUTE, TELEFOANE } from "@/date/asociatie";
 
 const MODEL = "claude-sonnet-5-5";
 const PLAFON_RASPUNS = 2000;
+
+/**
+ * Adresa API-ului. `ANTHROPIC_API` o mută pe un server de probă.
+ *
+ * Aceeași convenție ca în `analiza/intreaba.ts`: fără ea, proba care verifică
+ * ce pleacă spre model n-ar avea unde să asculte, și singurul fel de a afla
+ * ce se trimite ar fi citirea codului — adică exact felul în care un șablon
+ * necompletat trece neobservat.
+ */
+const ADRESA =
+  process.env.ANTHROPIC_API?.replace(/\/+$/, "") ?? "https://api.anthropic.com";
 
 export function areAsistent(): boolean {
   return Boolean(process.env.ANTHROPIC_API_KEY);
@@ -57,9 +69,9 @@ export function esteFel(x: unknown): x is Fel {
 }
 
 function instructiuni(fel: Fel): string {
-  const cifre = CIFRE.map(
-    (c) => `- ${c.valoare}${c.sufix} ${c.eticheta}`,
-  ).join("\n");
+  const cifre = CIFRE.map((c) => `- ${c.valoare}${c.sufix} ${c.eticheta}`).join(
+    "\n",
+  );
 
   return `Scrii pentru ${ASOCIATIA.denumire}, o asociație din Suceava care aduce bucurie copiilor cu nevoi speciale, copiilor care au trecut prin cancer și familiilor lor. Organizează tabere RESPIRO și ține deschisă Casa Teona, un loc cu jocuri, ateliere și consiliere pentru părinți.
 
@@ -75,11 +87,7 @@ Date de contact, dacă textul le cere:
 - ${EMAIL.contact}
 - donații: ${RUTE.doneaza} · redirecționare 3,5%: ${RUTE.redirectionare35} · firme: ${RUTE.directionare20}
 
-Cum scrii:
-- la obiect, fără limbă de lemn, fără „suntem încântați să vă anunțăm”;
-- concret, nu emoționant cu orice preț. Nu scrie despre copii ca despre niște sărmani; sunt copii;
-- fără superlative și fără semne de exclamare în lanț;
-- nu promite ce nu ți s-a spus că se întâmplă.
+${CUM_SCRIE_ASOCIATIA}
 
 ${FELURI[fel].indicatie}
 
@@ -138,7 +146,7 @@ export async function indreaptaTextul(text: string): Promise<string | null> {
   ].join("\n");
 
   try {
-    const raspuns = await fetch("https://api.anthropic.com/v1/messages", {
+    const raspuns = await fetch(`${ADRESA}/v1/messages`, {
       method: "POST",
       headers: {
         "x-api-key": cheie,
@@ -176,7 +184,7 @@ export async function scrieCiorna(cerere: {
   if (!cheie) return null;
 
   try {
-    const raspuns = await fetch("https://api.anthropic.com/v1/messages", {
+    const raspuns = await fetch(`${ADRESA}/v1/messages`, {
       method: "POST",
       headers: {
         "x-api-key": cheie,

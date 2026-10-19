@@ -34,6 +34,47 @@ grabă a afișat „Sorem ipsum dolor sit amet…" pe prima pagină, pentru că 
 fost completat și tema a folosit valoarea din fabrică. Verifică fiecare câmp al unei
 componente înainte s-o publici, nu doar pe cele la care te-ai gândit.
 
+## Cum scrie asociația: frazele lor sunt șablonul
+
+Textele site-ului se scriu din trei locuri — eu, ei (din panou) și modelul care
+face prima ciornă. Trei mâini, trei registre, și al meu e cel mai lung și cel
+mai explicativ: îmi vine să scriu *de ce* funcționează ceva într-un fel, când
+omul voia să afle ce are de făcut.
+
+Singurul eșantion adevărat al vocii lor sunt **două fraze scrise de ei**, în
+documentul din 16 octombrie 2026. Stau în `src/lib/ton-asociatie.ts`, cuvânt cu
+cuvânt, cu regulile citite din ele (fiecare regulă poartă bucata din care s-a
+citit, ca să se poată verifica):
+
+- vorbește cu omul, cu „tu" — **afară de firme**, cărora li se scrie cu
+  „dumneavoastră": paginile de sponsorizare sunt o scrisoare de afaceri, iar
+  amândouă frazele lor sunt scrise către un om;
+- începe de la el, nu de la noi; propoziții scurte, una după alta; spune ce
+  face el, cu verbe; numește lucrurile pe nume (fraza lor despre tot ce face
+  asociația n-are nici un adjectiv);
+- **nu explica de ce merge așa** — greșeala mea, nu a lor;
+- dacă e simplu, spune că e simplu. Fără semne de exclamare.
+
+Se scrie **o dată, pentru toate căile**: blocul pleacă spre model din
+`asistent.ts` (ciorna din panou) și se vede ca „Cum scriem" lângă câmp, la
+`/admin/scrie` și `/admin/sabloane`. Dacă ar fi scris de două ori, una din
+copii s-ar strica fără să observe nimeni — ca la `analiza/ton.ts`.
+
+**Prozele lungi din paginile principale sunt ale lor, nu ale mele.** Textele de
+pe „Despre noi", „Casa Teona", „Donează", „Devino voluntar" vin din caietul de
+sarcini sau din site-ul vechi. Nu se rescriu, nici „ca să sune mai bine". Ce e
+al meu e legătura dintre ele: întrebările frecvente, notițele de sub câmpuri,
+textele de stare. Alea se îndreaptă după frazele lor.
+
+Proba — fără chei adevărate, fără internet, fără bază de date; verifică la
+nivel de rețea că frazele lor pleacă întregi, că perechea „așa nu / așa da" e
+acolo, că sunt cifrele verificate și că **niciun șablon `${…}` necompletat** nu
+ajunge la model (un rând scris între ghilimele drepte în loc de accente grave
+nu se interpolează niciodată și nu dă nicio eroare — aceeași greșeală ca
+„Sorem ipsum"):
+`PAROLA_ADMIN=… node scripts/qa/ton-asociatie.mjs` (cere un `npm run build`
+făcut înainte: pornește singură un al doilea site, pe alt port).
+
 ## Date reale, verificate (nu le reinventa)
 
 - Denumire: **Asociația Teona Ariana Suceava**, CIF **43533953**

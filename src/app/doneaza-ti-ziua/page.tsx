@@ -26,10 +26,8 @@ const INTREBARI = [
     intrebare: "Cât durează până apare pagina?",
     raspuns: (
       <>
-        De obicei câteva ore, în zilele lucrătoare. Fiecare pagină e citită de
-        cineva din asociație înainte să apară public — e site-ul unei asociații
-        de copii, iar textele și pozele nu pot apărea nevăzute. Îți scriem pe
-        e-mail când e gata.
+        O citim înainte s-o publicăm. De obicei durează câteva ore, în zilele
+        lucrătoare, și îți scriem pe e-mail când e gata.
       </>
     ),
   },
@@ -37,9 +35,9 @@ const INTREBARI = [
     intrebare: "Unde ajung banii?",
     raspuns: (
       <>
-        Direct la asociație, prin Galantom, platforma pe care o folosim pentru
-        donații online. Pagina de pe site-ul nostru nu încasează ea însăși bani:
-        ea îi spune povestea ta și trimite mai departe la Galantom.
+        La asociație, prin Galantom — platforma pe care o folosim pentru
+        donații online. Pagina de aici nu încasează bani. Ea spune de ce o faci
+        și trimite mai departe la Galantom.
       </>
     ),
   },
@@ -48,9 +46,9 @@ const INTREBARI = [
     raspuns: (
       <>
         Da, dacă îți faci întâi o pagină personală pe Galantom și ne dai linkul
-        în formular. Atunci butonul „Donează” duce la pagina ta, iar totalul se
-        vede acolo. Dacă nu, butonul duce la proiectul asociației, iar donațiile
-        intră la general — fără să știm care sunt ale tale.
+        în formular. Atunci butonul „Donează” duce la pagina ta și totalul se
+        vede acolo. Dacă nu, butonul duce la proiectul asociației și donațiile
+        intră la general. Atunci nu putem spune care sunt ale tale.
       </>
     ),
   },
