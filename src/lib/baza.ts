@@ -412,6 +412,45 @@ const ADAOSURI = `
     aceeași secundă nu pot primi același număr — a doua cade și cere altul,
     în loc să scrie două contracte „3/2026".
   */
+  /*
+    Întâi, tabelul „contracte" de dinainte, dat la o parte.
+
+    Panoul a căzut cu totul — nu numai contractele — timp de două zile, din
+    cauza asta. Semnatul contractului pe ecran a fost scos din site, dar
+    tabelul lui a rămas în baza de date, cu alte coloane: pdf, amprenta, ip.
+    CREATE TABLE IF NOT EXISTS contracte, de mai jos, a văzut un tabel cu
+    numele ăsta și n-a făcut nimic; apoi CREATE INDEX ... (an DESC) a cerut o
+    coloană care nu există acolo și a picat cu „column «an» does not exist".
+
+    Și de aici tot ce urmează: blocul ăsta pleacă spre Postgres ca o singură
+    cerere, deci merge sau nu merge în întregime. O picătură la index a dat
+    rollback la tot, ADAOSURI n-a mai rulat deloc, iar pregateste() aruncă la
+    fiecare cerere — adică *orice* pagină care atinge baza răspundea 500, nu
+    doar registrul de contracte.
+
+    Tabelul vechi nu se șterge: ține PDF-uri de contracte semnate, cu IP și
+    amprentă. Se mută deoparte, cu numele schimbat, și rămâne de citit dacă
+    cere cineva un contract de atunci.
+
+    Condiția se uită după coloana pdf, care există numai în cel vechi, și
+    sare dacă mutarea s-a făcut deja — altfel a doua rulare ar lua la mână
+    tabelul cel nou.
+  */
+  DO $$
+  BEGIN
+    IF EXISTS (
+      SELECT 1 FROM information_schema.columns
+      WHERE table_schema = current_schema()
+        AND table_name = 'contracte' AND column_name = 'pdf'
+    ) AND NOT EXISTS (
+      SELECT 1 FROM information_schema.tables
+      WHERE table_schema = current_schema()
+        AND table_name = 'contracte_semnate_pe_ecran'
+    ) THEN
+      ALTER TABLE contracte RENAME TO contracte_semnate_pe_ecran;
+    END IF;
+  END $$;
+
   CREATE TABLE IF NOT EXISTS contracte (
     id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     an            integer NOT NULL,
