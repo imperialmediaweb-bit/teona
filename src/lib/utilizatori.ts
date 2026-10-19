@@ -72,10 +72,18 @@ export const NUMELE_ROLULUI: Record<Rol, string> = {
   fundraising: "Strângere de fonduri",
 };
 
+/*
+  Ce spune rolul despre el însuși.
+
+  Textul trebuie să promită exact cât dă. Un rol al cărui nume sună mai strâmt
+  decât e — „strângere de fonduri", care deschide de fapt tot panoul în afară
+  de conturi — e felul în care cineva dă mai mult acces decât crede, cu cele
+  mai bune intenții și fără să greșească nimic.
+*/
 export const EXPLICATIA_ROLULUI: Record<Rol, string> = {
-  administrator: "Vede și face tot, inclusiv conturile celorlalți.",
+  administrator: "Tot panoul, plus conturile celorlalți oameni.",
   fundraising:
-    "Banii, firmele, contractele și oamenii de sunat. Fără Formularele 230, fără scrisul pe site.",
+    "Tot panoul — bani, donatori, firme, contracte, Formularele 230, scrisul pe site, pozele, Facebook. Singurul lucru care-i lipsește e facerea conturilor.",
 };
 
 /**
@@ -87,15 +95,25 @@ export const EXPLICATIA_ROLULUI: Record<Rol, string> = {
  * în meniu. Un drept uitat într-unul din cele trei locuri e exact felul în
  * care o pagină ascunsă rămâne deschisă pentru cine îi știe adresa.
  *
- * Ce **nu** intră la `fundraising`, și de ce:
+ * **Un singur lucru nu intră la `fundraising`: `/admin/utilizatori`.** Cine
+ * poate face conturi își poate face unul de administrator, deci dreptul ăsta
+ * *este* dreptul de administrator; dat altcuiva, rolurile n-ar mai însemna
+ * nimic.
  *
- * - `/admin/formulare` — Formularele 230 vin cu coduri numerice personale și
- *   cu fișiere trimise de oameni. Nu-ți trebuie ca să strângi bani;
- * - `/admin/scrie`, `/admin/poze`, `/admin/facebook` — ce apare pe site și pe
- *   pagina asociației rămâne la cine răspunde de ele. O publicare greșită nu
- *   se mai ia înapoi;
- * - `/admin/utilizatori` — cine poate face conturi își poate face unul de
- *   administrator, deci dreptul ăsta *este* dreptul de administrator.
+ * Restul au intrat toate, la cererea asociației, iar două dintre ele merită
+ * scrise negru pe alb, ca să nu pară o scăpare:
+ *
+ * - `/admin/formulare` — Formularele 230 au **coduri numerice personale** în
+ *   ele și legătură de WhatsApp către oameni. Era pagina pe care rolul n-o
+ *   avea; o are acum fiindcă redirecționarea a 3,5% din impozit *este* muncă
+ *   de strângere de fonduri, iar cine o face trebuie să-i poată suna. Un rol
+ *   de fundraising înseamnă deci acces la date personale sensibile — de aceea
+ *   contează cui se dă, și de aceea oprirea contului are efect pe loc;
+ * - `/admin/scrie`, `/admin/poze`, `/admin/facebook` — scrisul campaniei,
+ *   poza ei și trimiterea pe pagina asociației. Fuseseră lăsate deoparte
+ *   fiindcă o publicare greșită nu se mai ia înapoi, dar rolul avea deja
+ *   șabloanele de e-mail pentru campanii: pleca poșta despre o campanie pe
+ *   care omul nu putea s-o creeze.
  */
 export const PAGINI: ReadonlyArray<{ cale: string; roluri: readonly Rol[] }> = [
   { cale: "/admin", roluri: ["administrator", "fundraising"] },
@@ -122,10 +140,11 @@ export const PAGINI: ReadonlyArray<{ cale: string; roluri: readonly Rol[] }> = [
     acum, ca un cookie furat să nu fie de ajuns pentru a lua contul definitiv.
   */
   { cale: "/admin/parola", roluri: ["administrator", "fundraising"] },
-  { cale: "/admin/formulare", roluri: ["administrator"] },
-  { cale: "/admin/scrie", roluri: ["administrator"] },
-  { cale: "/admin/poze", roluri: ["administrator"] },
-  { cale: "/admin/facebook", roluri: ["administrator"] },
+  { cale: "/admin/formulare", roluri: ["administrator", "fundraising"] },
+  { cale: "/admin/scrie", roluri: ["administrator", "fundraising"] },
+  { cale: "/admin/poze", roluri: ["administrator", "fundraising"] },
+  { cale: "/admin/facebook", roluri: ["administrator", "fundraising"] },
+  /* Singura pagină a cărei lipsă deosebește rolurile. Vezi mai sus de ce. */
   { cale: "/admin/utilizatori", roluri: ["administrator"] },
 ];
 

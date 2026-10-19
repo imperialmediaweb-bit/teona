@@ -245,8 +245,11 @@ socoteala, în trei feluri care n-au nicio legătură cu neîncrederea:
 - **nu se vedea cine a făcut ce** — jurnalul discuțiilor spunea „l-am sunat”,
   nu cine l-a sunat. Când sună doi oameni, rândul fără nume e aproape
   nefolositor: se sună de două ori sau niciodată;
-- **nu se putea da mai puțin** — parola deschide tot, deci cine venea să ajute
-  cu firmele primea și Formularele 230, cu coduri numerice personale în ele.
+- **nu se putea da mai puțin** — parola deschide tot, inclusiv facerea de
+  conturi noi și, mâine, orice pagină adăugată. Azi cele două roluri sunt
+  aproape la fel (vezi tabelul); ce s-a câștigat e că *se poate* da mai puțin,
+  fără să rescrie nimeni nimic — un contabil, un voluntar venit pe o lună, un
+  om care are nevoie numai de rapoarte.
 
 Acum sunt **două roluri**, scrise o dată în `src/lib/utilizatori.ts`:
 
@@ -254,17 +257,30 @@ Acum sunt **două roluri**, scrise o dată în `src/lib/utilizatori.ts`:
 |---|---|---|
 | tabloul de bord, rapoarte, analiză | da | da |
 | donații, donatori, firme, contracte | da | da |
-| cereri, aniversări | da | da |
+| cereri, aniversări, **Formulare 230** | da | da |
 | șabloane, mesaje, QR, presă, calendar, căutare | da | da |
-| Formulare 230 | da | — |
-| scrie pe site, poze, Facebook | da | — |
+| **scrie pe site, poze, Facebook** | da | da |
 | utilizatori | da | — |
 
-Formularele 230 lipsesc fiindcă au CNP-uri în ele, iar ca să strângi bani n-ai
-nevoie de ele. Scrisul pe site și Facebook lipsesc fiindcă o publicare greșită
-nu se mai ia înapoi. Utilizatorii lipsesc fiindcă **cine poate face conturi își
-poate face unul de administrator** — dreptul ăla *este* dreptul de
-administrator.
+**Rolul de fundraising deschide tot panoul în afară de conturi.** Așa a cerut
+asociația, și două lucruri din tabel merită scrise negru pe alb, ca să nu pară
+scăpări:
+
+- **Formularele 230 au CNP-uri în ele** și legătură de WhatsApp către oameni.
+  Rolul le are fiindcă redirecționarea a 3,5% din impozit *este* muncă de
+  strângere de fonduri, iar cine o face trebuie să-i poată suna. Un rol de
+  fundraising înseamnă deci acces la date personale sensibile — de aceea
+  contează cui se dă, și de aceea oprirea contului are efect pe loc;
+- **scrisul pe site, pozele și Facebook** fuseseră lăsate deoparte fiindcă o
+  publicare greșită nu se mai ia înapoi. Dar rolul avea deja șabloanele de
+  e-mail pentru campanii: pleca poșta despre o campanie pe care omul nu putea
+  s-o creeze.
+
+Utilizatorii lipsesc fiindcă **cine poate face conturi își poate face unul de
+administrator** — dreptul ăla *este* dreptul de administrator, iar dat altcuiva
+rolurile n-ar mai însemna nimic. Textul rolului din panou spune pe față cât dă:
+un nume care sună mai strâmt decât e („strângere de fonduri", care deschide
+aproape tot) e felul în care cineva dă mai mult acces decât crede.
 
 Cum merge, punct cu punct:
 

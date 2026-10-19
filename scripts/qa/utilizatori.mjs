@@ -204,40 +204,60 @@ if (!om.cookie) {
 }
 
 // ─── 5. Ce vede și ce nu vede ─────────────────────────────────────────────
-const firme = await ia("/admin/firme", om.cookie);
-const htmlFirme = await firme.text();
-verifica(
-  firme.status === 200 && !htmlFirme.includes('action="/api/admin/intrare"'),
-  "pagina Firme se deschide pentru rolul de fundraising",
-);
+/*
+  Rolul de fundraising deschide tot panoul în afară de conturi.
 
-const formulare = await ia("/admin/formulare", om.cookie);
-const htmlFormulare = await formulare.text();
-verifica(
-  htmlFormulare.includes("nu e deschisă pentru rolul tău"),
-  "pagina Formulare 230 se închide, deși adresa a fost scrisă de mână",
-);
-verifica(
-  !/\bCNP\b/.test(htmlFormulare),
-  "pe pagina refuzată nu scapă nimic din conținutul ei",
-);
+  Așa a cerut asociația, și asta înseamnă și Formularele 230 — care au coduri
+  numerice personale în ele. Nu e o scăpare, e o hotărâre: redirecționarea a
+  3,5% din impozit e muncă de strângere de fonduri, iar cine o face trebuie
+  să-i poată suna pe oameni. De aceea contează cui se dă rolul, și de aceea
+  oprirea contului are efect pe loc.
+*/
+const deschise = [
+  ["/admin/firme", "Firme"],
+  ["/admin/formulare", "Formulare 230"],
+  ["/admin/scrie", "Scrie pe site"],
+  ["/admin/poze", "Poze"],
+  ["/admin/facebook", "Facebook"],
+  ["/admin/parola", "Parola mea"],
+];
+for (const [cale, nume] of deschise) {
+  const r = await ia(cale, om.cookie);
+  const html = await r.text();
+  verifica(
+    r.status === 200 &&
+      !html.includes('action="/api/admin/intrare"') &&
+      !html.includes("nu e deschisă pentru rolul tău"),
+    `pagina ${nume} se deschide pentru rolul de fundraising`,
+  );
+}
 
+/*
+  Singura închisă. Cine poate face conturi își poate face unul de
+  administrator, deci dreptul ăsta *este* dreptul de administrator.
+*/
 const utilizatori = await ia("/admin/utilizatori", om.cookie);
+const htmlUtilizatori = await utilizatori.text();
 verifica(
-  (await utilizatori.text()).includes("nu e deschisă pentru rolul tău"),
-  "pagina Utilizatori se închide: cine face conturi își face unul de administrator",
+  htmlUtilizatori.includes("nu e deschisă pentru rolul tău"),
+  "pagina Utilizatori se închide, deși adresa a fost scrisă de mână",
+);
+verifica(
+  !htmlUtilizatori.includes(EMAIL) && !htmlUtilizatori.includes("Fă contul"),
+  "pe pagina refuzată nu scapă nimic din conținutul ei: nici lista, nici formularul",
 );
 
-// ─── 6. Meniul nu arată ce nu se poate deschide ───────────────────────────
+// ─── 6. Meniul arată exact ce se poate deschide ───────────────────────────
 const tablou = await ia("/admin", om.cookie);
 const htmlTablou = await tablou.text();
 verifica(
-  htmlTablou.includes("/admin/firme"),
-  "meniul arată Firme, pe care rolul o are",
+  htmlTablou.includes('href="/admin/firme"') &&
+    htmlTablou.includes('href="/admin/formulare"'),
+  "meniul arată paginile pe care rolul le are",
 );
 verifica(
-  !htmlTablou.includes('href="/admin/formulare"'),
-  "meniul nu arată Formulare 230, pe care rolul n-o are",
+  !htmlTablou.includes('href="/admin/utilizatori"'),
+  "meniul nu arată Utilizatori, singura pe care rolul n-o are",
 );
 verifica(
   htmlTablou.includes(NUME),
@@ -245,32 +265,58 @@ verifica(
 );
 
 // ─── 7. Rutele din spate cer același drept ca paginile ────────────────────
-const texte = await fetch(`${BAZA}/api/admin/texte`, {
-  method: "POST",
-  headers: { cookie: om.cookie },
-  body: new URLSearchParams({ fel: "noutate" }),
-  redirect: "manual",
-});
-verifica(
-  texte.status === 403,
-  `ruta care scrie pe site refuză rolul de fundraising (a dat ${texte.status})`,
-);
-
 /*
-  POST, nu GET: ruta Formularelor 230 nu răspunde decât la POST, iar un GET ar
-  lua 405 înainte să ajungă la verificarea drepturilor — adică proba ar fi
-  trecut fără să verifice nimic.
+  Ruta conturilor, cerută de-a dreptul cu cookie-ul omului care n-are voie pe
+  pagina ei. O pagină închisă în față, cu ruta deschisă în spate, e o poartă
+  cu lacăt pe ușa din față: de aici s-ar face un cont de administrator.
 */
-const formulareApi = await fetch(`${BAZA}/api/admin/formulare`, {
+const conturiApi = await fetch(`${BAZA}/api/admin/utilizatori`, {
   method: "POST",
   headers: { cookie: om.cookie },
-  body: new URLSearchParams({ fel: "stadiu" }),
+  body: new URLSearchParams({
+    fel: "adauga",
+    nume: "Intrus",
+    email: "intrus@exemplu.invalid",
+    rol: "administrator",
+    parola: "parola-destul-de-lunga-ca-sa-treaca",
+  }),
   redirect: "manual",
 }).then((r) => r.status);
 verifica(
-  formulareApi === 403,
-  `ruta Formularelor 230 refuză rolul de fundraising (a dat ${formulareApi})`,
+  conturiApi === 403,
+  `ruta care face conturi refuză rolul de fundraising (a dat ${conturiApi})`,
 );
+const intrusi = await client.query(
+  "SELECT count(*)::int AS nr FROM utilizatori WHERE email = $1",
+  ["intrus@exemplu.invalid"],
+);
+verifica(
+  intrusi.rows[0].nr === 0,
+  "și nu s-a scris niciun rând: refuzul vine înainte de orice atingere a bazei",
+);
+
+/*
+  Rutele pe care rolul **le are** trebuie să răspundă altceva decât 403 —
+  altfel verificarea de drepturi ar fi pusă prea strâmt, iar omul ar avea
+  pagina în meniu și butoanele moarte. POST, nu GET: ruta Formularelor 230 nu
+  răspunde decât la POST, iar un GET ar lua 405 înainte să ajungă la
+  verificarea drepturilor, deci proba ar trece fără să verifice nimic.
+*/
+for (const [cale, corp, nume] of [
+  ["/api/admin/formulare", { fel: "stadiu" }, "Formularelor 230"],
+  ["/api/admin/texte", { fel: "noutate" }, "care scrie pe site"],
+]) {
+  const stare = await fetch(`${BAZA}${cale}`, {
+    method: "POST",
+    headers: { cookie: om.cookie },
+    body: new URLSearchParams(corp),
+    redirect: "manual",
+  }).then((r) => r.status);
+  verifica(
+    stare !== 403,
+    `ruta ${nume} nu-l mai refuză (a dat ${stare}, orice în afară de 403)`,
+  );
+}
 
 /* Exportul cere dreptul listei cerute, nu unul singur pentru toată ruta. */
 const exportFirme = await ia("/api/admin/export?ce=firme", om.cookie);
