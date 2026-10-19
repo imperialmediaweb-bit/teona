@@ -374,7 +374,7 @@ export default function Directioneaza20() {
                 <p className="mt-3 text-mic text-cerneala-moale">
                   Contractul e și în{" "}
                   <a
-                    href="/documente/contract-de-sponsorizare.pdf"
+                    href="/documente/contract-de-sponsorizare"
                     download
                     className="font-titlu font-bold text-caramiziu-700 underline-offset-4 hover:underline"
                   >
@@ -399,7 +399,7 @@ export default function Directioneaza20() {
                   , în care suma o virează ANAF din impozitul firmei, contractul
                   e altul:{" "}
                   <a
-                    href="/documente/contract-sponsorizare-declaratia-177.pdf"
+                    href="/documente/contract-declaratia-177"
                     download
                     className="font-titlu font-bold text-caramiziu-700 underline-offset-4 hover:underline"
                   >

@@ -76,7 +76,7 @@ export default function Semneaza() {
             filă nouă și e același text care iese semnat.
           */}
           <a
-            href="/documente/contract-de-sponsorizare.pdf"
+            href="/documente/contract-de-sponsorizare"
             target="_blank"
             rel="noreferrer"
             className="flex items-center justify-between gap-4 colt-mic-b border-2 border-turcoaz-300 bg-turcoaz-50 px-5 py-4 font-titlu font-bold text-turcoaz-900 transition-colors hover:border-turcoaz-500"
@@ -120,7 +120,7 @@ export default function Semneaza() {
                 />
                 <span>
                   <a
-                    href="/documente/contract-de-sponsorizare.pdf"
+                    href="/documente/contract-de-sponsorizare"
                     download
                     className="font-titlu font-bold text-caramiziu-700 underline-offset-4 hover:underline"
                   >

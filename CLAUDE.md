@@ -106,6 +106,44 @@ site, ciorna scrisă de model și șablonul de e-mail de campanie.
   scris cu punct de mii nu devine 7 și că un text în locul cifrei e refuzat,
   apoi pune cifrele înapoi cum erau.
 
+## Documentele de descărcat se înlocuiesc din panou
+
+Caietul o cere în două locuri: la **2.4**, pentru contractul de sponsorizare și
+Declarația 177 — „Asociația poate înlocui singură cele două fișiere când se
+actualizează modelele" — și la **7.5**, pentru cele trei documente de la pagina
+de 3,5%, adăugând că „fără ele, butoanele de descărcare rămân **inactive** la
+lansare".
+
+`/admin/documente` ține cele cinci. Lista e fixă (`src/lib/documente.ts`):
+fiecare rând e legat de un buton anume, de pe o pagină anume. Un document urcat
+fără un buton care să ducă la el ar sta în depozit nevăzut, iar cine l-a urcat
+ar crede că l-a publicat.
+
+- **Adresa publică nu se schimbă niciodată:** `/documente/<slug>`. Deci un link
+  pus într-un e-mail acum trei luni duce la modelul de acum.
+- **Trei trepte, în ordinea asta:** fișierul urcat din panou (din R2) · fișierul
+  din depozitul de cod, pentru documentele care au unul (`rezerva`) · o pagină
+  404 care spune pe față că fișierul nu e pe site, cu telefon și e-mail. Cele
+  două contracte au rezervă, deci **se descarcă și cu R2 neconfigurat** — ce
+  funcționează azi trebuie să funcționeze și mâine.
+- **Butonul e inactiv cât timp fișierul nu există**, cum cere caietul.
+  `documenteGata()` (`src/lib/documente-gata.ts`) verifică ce e acolo cerând
+  **un singur octet** (`Range: bytes=0-0`): un GET întreg ar descărca zece
+  megaocteți de contract la fiecare randare. Verificarea stă în alt fișier
+  decât lista, ca lista să rămână date curate — aceeași lecție ca la tipul
+  `Cifra`.
+- **Ruta de urcare nu crede slugul pe cuvânt:** îl caută în lista fixă și ia
+  cheia din R2 de acolo. Altfel cineva ar putea scrie orice cale în formular și
+  ar scrie peste orice fișier din depozit. Se verifică și **primii patru
+  octeți** (`%PDF`), nu extensia: un Word redenumit în `.pdf` ajunge la firmă
+  și nu se deschide, iar firma crede că e vina ei.
+- Formularul 230 se urcă **și** de la `/admin/formulare`, lângă formularele
+  primite, cu aceeași cheie din R2. Două locuri, un singur fișier.
+- Probă, fără chei de R2: `BAZA=… PAROLA_ADMIN=… node scripts/qa/documente.mjs`
+  — 23 de verificări: rezerva din depozit merge, ce nu există răspunde 404 cu
+  pagină omenească, un slug din afara listei nu urcă nimic, un fișier care nu
+  începe cu `%PDF` e refuzat.
+
 ## Date reale, verificate (nu le reinventa)
 
 - Denumire: **Asociația Teona Ariana Suceava**, CIF **43533953**
@@ -526,6 +564,8 @@ picată, `pause_turn`, pistă respinsă care nu învie:
 - **`/admin/aniversari`** — aprobarea campaniilor de ziua cuiva. Se numea
   `/admin/campanii`; adresa veche redirecționează.
 - **`/admin/cifre`** — cele patru cifre de pe site. Vezi secțiunea de mai sus.
+- **`/admin/documente`** — fișierele de descărcat: Formularul 230, declarația
+  de consimțământ, informarea GDPR, cele două contracte. Vezi mai sus.
 - **`/admin/poze`** — ce e în Cloudinary și la ce proiect au ajuns pozele.
 - **`/admin/radar`** — ce a găsit căutarea automată pe internet: apeluri de
   finanțare noi, ca piste de verificat la sursă. Vezi secțiunea de mai sus.
@@ -961,10 +1001,9 @@ De reținut, pentru data viitoare:
 2. **Cine editează conținutul.** Din panou se scriu acum: noutățile și
    campaniile (`/admin/scrie`), descrierile taberelor, testimonialele
    (`/admin/testimoniale`) și cele patru cifre (`/admin/cifre`). Rămân prin
-   dezvoltator **documentele de descărcat** (Formularul 230, contractul,
-   Declarația 177 — caietul cere la 2.4 ca asociația să le poată înlocui
-   singură) și **siglele sponsorilor** (cerute de asociație în octombrie:
-   „o să pot și eu adăuga ulterior sigle?"). Plus textele paginilor fixe.
+   dezvoltator **siglele sponsorilor** (cerute de asociație în octombrie:
+   „o să pot și eu adăuga ulterior sigle?") și textele paginilor fixe.
+   Documentele de descărcat se înlocuiesc din `/admin/documente`.
 3. **CRM pentru donatori**, cu campanii de e-mail — urmează.
 
 ## Ce lipsește de la client

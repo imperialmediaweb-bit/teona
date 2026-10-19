@@ -14,6 +14,7 @@ import Aparitie from "@/componente/Aparitie";
 import Buton from "@/componente/Buton";
 import Cifre from "@/componente/Cifre";
 import { cifreSite } from "@/lib/cifre";
+import { documenteGata } from "@/lib/documente-gata";
 import Decor from "@/componente/Decor";
 import Fotografie from "@/componente/Fotografie";
 import IndemnFinal from "@/componente/IndemnFinal";
@@ -147,6 +148,14 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
 
 export default async function Redirectioneaza35() {
   const cifre = await cifreSite();
+  /*
+    Ce document se poate descărca chiar acum.
+
+    Caietul cere la 7.5 ca butoanele să rămână inactive până vin fișierele, și
+    `DocumentDeDescarcat` desenează cardul altfel când n-are ce descărca. De
+    aceea pagina întreabă ce există, nu presupune.
+  */
+  const gata = await documenteGata();
   const an = await anulCurent();
   const bcr = CONTURI[0];
 
@@ -347,6 +356,9 @@ export default async function Redirectioneaza35() {
                 <DocumentDeDescarcat
                   titlu="Formularul 230"
                   descriere="Completat în prealabil cu datele asociației. Tu adaugi doar datele tale și semnătura."
+                  fisier={
+                    gata.includes("formular-230") ? "/formular-230" : undefined
+                  }
                   format="PDF"
                   colt="a"
                 />
@@ -357,6 +369,11 @@ export default async function Redirectioneaza35() {
                 <DocumentDeDescarcat
                   titlu="Declarația de consimțământ"
                   descriere="Ne dai dreptul să depunem formularul la ANAF în numele tău."
+                  fisier={
+                    gata.includes("acord-depunere-230")
+                      ? "/documente/acord-depunere-230"
+                      : undefined
+                  }
                   format="PDF"
                   colt="b"
                 />
@@ -367,6 +384,11 @@ export default async function Redirectioneaza35() {
                 <DocumentDeDescarcat
                   titlu="Informare GDPR"
                   descriere="Ce date primim, pentru ce le folosim și cât le păstrăm."
+                  fisier={
+                    gata.includes("informare-gdpr-230")
+                      ? "/documente/informare-gdpr-230"
+                      : undefined
+                  }
                   format="PDF"
                   colt="a"
                 />

@@ -111,6 +111,11 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
       },
       { href: "/admin/cifre", eticheta: "Cifrele", pictograma: "grafic" },
       {
+        href: "/admin/documente",
+        eticheta: "Documente",
+        pictograma: "document",
+      },
+      {
         href: "/admin/sabloane",
         eticheta: "Șabloane de e-mail",
         pictograma: "plic",

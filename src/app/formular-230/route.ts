@@ -1,5 +1,6 @@
 import { legaturaSemnata, areR2 } from "@/lib/r2";
 import { ASOCIATIA, EMAIL, RUTE, TELEFON_PRINCIPAL } from "@/date/asociatie";
+import { CHEIE_FORMULAR } from "@/lib/documente";
 
 /**
  * Formularul 230 gol, pe care îl descarcă oamenii.
@@ -12,7 +13,6 @@ import { ASOCIATIA, EMAIL, RUTE, TELEFON_PRINCIPAL } from "@/date/asociatie";
  * Nu se redirecționează către legătura semnată: aia expiră în zece minute,
  * iar o adresă trimisă pe WhatsApp e deschisă și a doua zi.
  */
-export const CHEIE_FORMULAR = "public/formular-230.pdf";
 
 export async function GET() {
   if (!areR2()) return lipseste();

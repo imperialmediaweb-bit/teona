@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { limitaDeRata, raspuns } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areR2, urcaInR2 } from "@/lib/r2";
-import { CHEIE_FORMULAR } from "@/app/formular-230/route";
+import { CHEIE_FORMULAR } from "@/lib/documente";
 
 /**
  * Urcarea fișierului 230 gol, cel pe care îl descarcă oamenii.
