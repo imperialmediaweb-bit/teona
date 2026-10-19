@@ -2,7 +2,8 @@ import { Suspense, cache } from "react";
 import Link from "next/link";
 import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
 import Sigla from "@/componente/Sigla";
-import { esteAutentificat } from "@/lib/admin";
+import { cineEsteConectat, esteAutentificat, rolulConectat } from "@/lib/admin";
+import { NUMELE_ROLULUI, poateVedea } from "@/lib/utilizatori";
 import { areBazaDeDate } from "@/lib/baza";
 import { deFacutAcum } from "@/lib/statistici";
 
@@ -73,6 +74,17 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
         eticheta: "Aniversări de aprobat",
         pictograma: "maini",
       },
+    ],
+  },
+  {
+    titlu: "Panoul",
+    pagini: [
+      {
+        href: "/admin/utilizatori",
+        eticheta: "Utilizatori",
+        pictograma: "familie",
+      },
+      { href: "/admin/parola", eticheta: "Parola mea", pictograma: "stea" },
     ],
   },
   {
@@ -172,10 +184,30 @@ async function Semn({ href, aici }: { href: string; aici: boolean }) {
   );
 }
 
-function Nav({ activ }: { activ?: string }) {
+/**
+ * Meniul, din care lipsesc paginile pe care rolul tău nu le vede.
+ *
+ * Ascunsul nu e protecția — aia e în pagină și în rută, care refuză chiar și
+ * adresa scrisă de mână. Meniul se curăță pentru că un link care duce la
+ * „pagina asta nu e deschisă pentru tine" e o promisiune pe care panoul n-o
+ * ține: omul îl apasă o dată, poate de două ori, și învață să nu se mai uite
+ * în bară.
+ *
+ * Grupurile rămase goale nu se mai scriu, altfel ar rămâne un titlu de
+ * secțiune cu nimic sub el.
+ */
+async function Nav({ activ }: { activ?: string }) {
+  const rol = await rolulConectat();
+  const grupuri = rol
+    ? GRUPURI.map((grup) => ({
+        ...grup,
+        pagini: grup.pagini.filter((p) => poateVedea(rol, p.href)),
+      })).filter((grup) => grup.pagini.length > 0)
+    : GRUPURI;
+
   return (
     <>
-      {GRUPURI.map((grup) => (
+      {grupuri.map((grup) => (
         <div key={grup.titlu} className="lg:mt-5 lg:first:mt-0">
           <p className="hidden px-3 pb-2 font-titlu text-nota font-bold tracking-wide text-hartie/45 uppercase lg:block">
             {grup.titlu}
@@ -249,9 +281,21 @@ function Nav({ activ }: { activ?: string }) {
  * panou, deși parola era bună.
  */
 async function Iesirea() {
-  if (!(await esteAutentificat())) return null;
+  const cine = await cineEsteConectat();
+  if (!cine) return null;
   return (
     <form action="/api/admin/iesire" method="post">
+      {/*
+        Cine e înăuntru, scris lângă butonul de ieșire.
+
+        Cu o parolă comună întrebarea n-avea rost. Cu conturi are: pe
+        calculatorul din birou intră azi unul, mâine altul, iar cine scrie un
+        rând de jurnal trebuie să vadă cu al cui nume îl scrie înainte să-l
+        scrie, nu după.
+      */}
+      <p className="px-3 pb-1 font-titlu text-nota text-hartie/45">
+        {cine.nume} · {NUMELE_ROLULUI[cine.rol]}
+      </p>
       <button
         type="submit"
         className="flex w-full items-center gap-2.5 rounded-lg px-3 py-1.5 font-titlu text-nota font-semibold whitespace-nowrap text-hartie/65 transition-colors hover:bg-hartie/10 hover:text-hartie"
@@ -335,7 +379,14 @@ export default function Cadru({
           aria-label="Panou"
           className="overflow-x-auto px-3 pb-4 lg:min-h-0 lg:flex-1 lg:overflow-x-visible lg:overflow-y-auto lg:pb-6"
         >
-          <Nav activ={activ} />
+          {/*
+            `Suspense`, fiindcă meniul își cere acum rolul din baza de date ca
+            să știe ce linkuri să arate. Fără el, bara ar ține toată pagina în
+            loc până răspunde Postgres.
+          */}
+          <Suspense fallback={null}>
+            <Nav activ={activ} />
+          </Suspense>
 
           <div className="hidden lg:mt-6 lg:block">
             <p className="px-3 pb-2 font-titlu text-nota font-bold tracking-wide text-hartie/45 uppercase">

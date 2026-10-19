@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
+import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areEmail } from "@/lib/email/trimite";
 import { exemple } from "@/lib/email/exemple";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
+import FaraDrept from "@/componente/admin/FaraDrept";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -111,6 +112,10 @@ async function Continut({
         <Intrare gresit={Boolean(gresit)} unde="/admin/emailuri" />
       </Cadru>
     );
+  }
+
+  if (!(await arePermisiune("/admin/emailuri"))) {
+    return <FaraDrept titlu="Mesajele trimise" activ="/admin/emailuri" />;
   }
 
   const toate = exemple();

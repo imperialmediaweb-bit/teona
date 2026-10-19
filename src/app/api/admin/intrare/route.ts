@@ -1,38 +1,38 @@
 import { NextResponse } from "next/server";
 import { limitaDeRata, raspuns } from "@/lib/api";
-import { COOKIE_ADMIN, parolaCorecta, valoareaCookieului } from "@/lib/admin";
+import {
+  COOKIE_ADMIN,
+  parolaCorecta,
+  valoareaCookieului,
+  valoareaCookieuluiUtilizator,
+} from "@/lib/admin";
+import { PAGINI, intraCuParola, poateVedea } from "@/lib/utilizatori";
+import type { Rol } from "@/lib/utilizatori";
 
 /**
  * Unde poate duce intrarea.
  *
- * Lista e închisă dinadins: `unde` vine dintr-un câmp al formularului, adică
- * din afară. Fără ea, cineva ar putea trimite un formular cu `unde` pus pe
- * alt sit, iar răspunsul nostru ar deveni o trambulină de redirecționare,
+ * Lista vine din `utilizatori.ts`, aceeași din care se hotărăște cine vede
+ * ce. Înainte era scrisă aici a doua oară, și rămăsese în urmă: cinci pagini
+ * adăugate de atunci — contracte, calendar, presă, QR, Facebook — nu erau în
+ * ea, deci cine se autentifica de pe ele ajungea la tabloul de bord și
+ * trebuia să navigheze înapoi, după ce tocmai își scrisese parola.
+ *
+ * Verificarea rămâne necesară: `unde` vine dintr-un câmp al formularului,
+ * adică din afară. Fără ea, cineva ar putea trimite un formular cu `unde` pus
+ * pe alt sit, iar răspunsul nostru ar deveni o trambulină de redirecționare,
  * semnată cu domeniul asociației.
  */
-const PAGINI = new Set([
-  "/admin",
-  "/admin/aniversari",
-  "/admin/scrie",
-  "/admin/cereri",
-  "/admin/donatii",
-  "/admin/donatori",
-  "/admin/firme",
-  "/admin/poze",
-  "/admin/cauta",
-  "/admin/formulare",
-  "/admin/rapoarte",
-  "/admin/analiza",
-  "/admin/sabloane",
-  "/admin/emailuri",
-]);
-
-function unde(formular: FormData | null): string {
+function unde(formular: FormData | null, rol: Rol): string {
   const cerut = formular ? String(formular.get("unde") ?? "") : "";
-  return PAGINI.has(cerut) ? cerut : "/admin";
+  const exista = PAGINI.some((p) => p.cale === cerut);
+  // Cerută și permisă. Un om de fundraising care deschide Formularele 230 și
+  // se autentifică ajunge pe tabloul de bord, nu pe un refuz.
+  if (exista && poateVedea(rol, cerut)) return cerut;
+  return "/admin";
 }
 
-/** Intrarea în zona de verificare. Parola vine prin POST, niciodată prin adresă. */
+/** Intrarea în panou. Parola vine prin POST, niciodată prin adresă. */
 export async function POST(cerere: Request) {
   // Limită strânsă: o parolă se ghicește prin încercări repetate.
   const prea = limitaDeRata(cerere, {
@@ -44,14 +44,36 @@ export async function POST(cerere: Request) {
 
   const formular = await cerere.formData().catch(() => null);
   const parola = formular ? String(formular.get("parola") ?? "") : "";
-  const valoare = valoareaCookieului();
+  const email = formular ? String(formular.get("email") ?? "").trim() : "";
 
-  // Omul se întoarce de unde a plecat. Înainte ajungea întotdeauna la
-  // campanii, chiar dacă voia să scrie un e-mail — și trebuia să navigheze
-  // înapoi, după ce tocmai își scrisese parola.
-  const pagina = unde(formular);
+  /*
+    Cu e-mail: cont propriu. Fără: cheia asociației.
 
-  if (!valoare || !parolaCorecta(parola)) {
+    Se încearcă una, nu amândouă. Dacă s-ar încerca și cheia după ce contul a
+    picat, cine știe `PAROLA_ADMIN` ar intra scriind orice adresă, iar
+    panoul ar spune că e omul acela.
+  */
+  const intrat = email
+    ? await intraCuParola(email, parola).catch(() => null)
+    : null;
+
+  const valoare = email
+    ? intrat
+      ? valoareaCookieuluiUtilizator(intrat.id)
+      : null
+    : parolaCorecta(parola)
+      ? valoareaCookieului()
+      : null;
+
+  const rol: Rol = intrat?.rol ?? "administrator";
+  const pagina = unde(formular, rol);
+
+  if (!valoare) {
+    /*
+      Același mesaj pentru orice nepotrivire — adresă necunoscută, cont oprit,
+      parolă greșită. Altfel formularul de intrare devine un instrument de
+      aflat cine lucrează la asociație.
+    */
     return NextResponse.redirect(new URL(`${pagina}?gresit=1`, cerere.url), {
       status: 303,
     });

@@ -473,6 +473,19 @@ const ADAOSURI = `
   ALTER TABLE texte ADD COLUMN IF NOT EXISTS facebook_id text;
   ALTER TABLE texte ADD COLUMN IF NOT EXISTS facebook_la timestamptz;
 
+  /*
+    Cine a scris rândul de jurnal.
+
+    Cât timp panoul avea o singură parolă, întrebarea n-avea răspuns: toți
+    erau „asociația". Cu conturi pe oameni, un rând care spune „l-am sunat"
+    fără să spună cine l-a sunat e aproape nefolositor — se sună de două ori
+    sau niciodată.
+
+    Rămâne liberă: rândurile de dinainte n-au de unde lua un nume, iar un nume
+    pus cu de-a sila acolo ar fi o minune inventată despre trecut.
+  */
+  ALTER TABLE interactiuni ADD COLUMN IF NOT EXISTS scris_de text;
+
   ALTER TABLE donatii ADD COLUMN IF NOT EXISTS canal text;
   ALTER TABLE donatii ADD COLUMN IF NOT EXISTS sursa text;
   CREATE INDEX IF NOT EXISTS donatii_dupa_canal

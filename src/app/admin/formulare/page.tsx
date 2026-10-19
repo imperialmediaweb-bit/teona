@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
+import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { areR2 } from "@/lib/r2";
 import { STADII_CERERE, cereri } from "@/lib/crm";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
+import FaraDrept from "@/componente/admin/FaraDrept";
 
 export const metadata: Metadata = {
   title: "Formulare 230",
@@ -73,6 +74,10 @@ async function Continut({
         <Intrare gresit={Boolean(gresit)} unde="/admin/formulare" />
       </Cadru>
     );
+  }
+
+  if (!(await arePermisiune("/admin/formulare"))) {
+    return <FaraDrept titlu="Formulare 230" activ="/admin/formulare" />;
   }
 
   /*

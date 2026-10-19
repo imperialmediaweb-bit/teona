@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
+import { arePermisiune, areParolaConfigurata, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { campaniiDeVerificat, campaniiPublicateCuBani } from "@/lib/campanii";
 import { adresaPoza } from "@/lib/poza-urcata";
@@ -9,6 +9,8 @@ import { etichetaOcaziei } from "@/date/aniversari";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import Cadru from "@/componente/admin/Cadru";
+import Intrare from "@/componente/admin/Intrare";
+import FaraDrept from "@/componente/admin/FaraDrept";
 
 export const metadata: Metadata = {
   title: "Aniversări de aprobat",
@@ -67,36 +69,14 @@ async function Continut({
   if (!(await esteAutentificat())) {
     return (
       <Cadru titlu="Aniversări de aprobat" activ="/admin/aniversari">
-        <form action="/api/admin/intrare" method="post" className="max-w-sm">
-          <label
-            htmlFor="parola"
-            className="mb-2 block font-titlu text-mic font-bold text-cerneala"
-          >
-            Parola
-          </label>
-          <input
-            id="parola"
-            name="parola"
-            type="password"
-            autoComplete="current-password"
-            className="w-full rounded-moale border border-hartie-umbra bg-hartie px-4 py-3 font-titlu"
-          />
-          {gresit && (
-            <p
-              role="alert"
-              className="mt-3 font-titlu font-semibold text-caramiziu-700"
-            >
-              Parolă greșită.
-            </p>
-          )}
-          <button
-            type="submit"
-            className="mt-5 w-full rounded-full bg-caramiziu-600 px-6 py-3 font-titlu font-bold text-hartie"
-          >
-            Intră
-          </button>
-        </form>
+        <Intrare gresit={Boolean(gresit)} unde="/admin/aniversari" />
       </Cadru>
+    );
+  }
+
+  if (!(await arePermisiune("/admin/aniversari"))) {
+    return (
+      <FaraDrept titlu="Aniversări de aprobat" activ="/admin/aniversari" />
     );
   }
 

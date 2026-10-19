@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { limitaDeRata, raspuns } from "@/lib/api";
 
-import { esteAutentificat } from "@/lib/admin";
+import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import {
   campanii,
@@ -45,7 +45,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await esteAutentificat())) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/analiza"))) return raspuns("Nu ai acces.", 403);
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
   if (!areAnaliza()) return inapoi(cerere, "fara-cheie");
 

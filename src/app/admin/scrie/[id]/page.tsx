@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
+import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { esteFel, felul, textDupaId, type Text } from "@/lib/texte";
 import { adresaPoza, areCloudinary } from "@/lib/poza-urcata";
@@ -13,6 +13,7 @@ import { CATEGORII } from "@/date/proiecte-tipuri";
 import { areAsistent } from "@/lib/asistent";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
+import FaraDrept from "@/componente/admin/FaraDrept";
 import Asistent from "@/componente/admin/Asistent";
 
 export const metadata: Metadata = {
@@ -79,6 +80,10 @@ async function Continut({
         <Intrare gresit={Boolean(gresit)} unde="/admin/scrie" />
       </Cadru>
     );
+  }
+
+  if (!(await arePermisiune("/admin/scrie"))) {
+    return <FaraDrept titlu="Scrie" activ="/admin/scrie" />;
   }
 
   if (!areBazaDeDate()) {

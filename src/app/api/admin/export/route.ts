@@ -1,5 +1,5 @@
 import { limitaDeRata, raspuns } from "@/lib/api";
-import { esteAutentificat } from "@/lib/admin";
+import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import {
   caTabel,
@@ -25,11 +25,24 @@ export async function GET(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await esteAutentificat())) return raspuns("Nu ai acces.", 403);
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
 
   const lista = new URL(cerere.url).searchParams.get("ce");
   if (!esteLista(lista)) return raspuns("Listă necunoscută.", 400);
+
+  /*
+    Dreptul cerut e al paginii din care se exportă, nu unul singur pentru toată
+    ruta.
+
+    Cele patru liste sunt exact patru pagini de panou — donații, donatori,
+    firme, cereri —, iar fișierul scos are în el aceleași nume și adrese care
+    se văd pe ele. Un drept comun ar fi însemnat că cine n-are voie pe o
+    pagină o descarcă întreagă de la adresa asta, cu tot cu datele personale,
+    și fără să i-o arate nimeni în meniu.
+  */
+  if (!(await arePermisiune(`/admin/${lista}`))) {
+    return raspuns("Nu ai acces.", 403);
+  }
 
   const { antet, randuri } = await dateleListei(lista);
 

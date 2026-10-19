@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { limitaDeRata, raspuns, text } from "@/lib/api";
-import { esteAutentificat } from "@/lib/admin";
+import { arePermisiune, numeleConectat } from "@/lib/admin";
 import { esteFelInteractiune, scrieInteractiune } from "@/lib/crm";
 
 /**
@@ -10,6 +10,12 @@ import { esteFelInteractiune, scrieInteractiune } from "@/lib/crm";
  * deschis jurnalul, cu filtrele ei cu tot. Vine dintr-un câmp de formular,
  * deci din afară: se acceptă numai o cale din panou, altfel răspunsul ar
  * putea fi folosit ca trambulină de redirecționare către alt sit.
+ *
+ * Calea aia e și **dreptul cerut**. Jurnalul se scrie din trei liste —
+ * firme, donatori, cereri — și un rând de jurnal spune ceva despre omul sau
+ * firma din lista respectivă. Verificat o dată, pentru pagina de unde se
+ * scrie, în loc de un drept comun care ar lăsat ruta deschisă pentru cine
+ * n-are voie pe niciuna dintre cele trei.
  */
 const INAPOI = /^\/admin\/(firme|donatori|cereri)(\?[\w=&%.\-+]*)?$/;
 
@@ -21,10 +27,19 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await esteAutentificat())) return raspuns("Nu ai acces.", 403);
-
   const formular = await cerere.formData().catch(() => null);
   if (!formular) return raspuns("Cerere invalidă.", 400);
+
+  const cerut = String(formular.get("inapoi") ?? "");
+  const potrivit = INAPOI.exec(cerut);
+  // Fără o cale cunoscută nu știm nici unde se întoarce omul, nici ce drept
+  // să cerem. Mai bine un refuz decât un drept ghicit.
+  if (!potrivit) return raspuns("Cerere invalidă.", 400);
+  const inapoi = cerut;
+
+  if (!(await arePermisiune(`/admin/${potrivit[1]}`))) {
+    return raspuns("Nu ai acces.", 403);
+  }
 
   const fel = formular.get("fel");
   if (!esteFelInteractiune(fel)) return raspuns("Fel necunoscut.", 400);
@@ -39,11 +54,24 @@ export async function POST(cerere: Request) {
   }
   if (!email && !firmaId) return raspuns("Cerere invalidă.", 400);
 
-  const scris = await scrieInteractiune({ email, firmaId, fel, rezumat });
+  /*
+    Cine a scris rândul.
+
+    Numele vine din sesiune, nu din formular: altfel ar fi un câmp în care
+    scrii ce vrei, iar „l-a sunat Maria" n-ar mai însemna nimic. Când se intră
+    cu parola asociației, în loc de nume se scrie „Asociația" — mai cinstit
+    decât un nume ghicit, și se vede din listă că rândul ăla vine de dinainte
+    de conturi, sau de la cheia comună.
+  */
+  const scris = await scrieInteractiune({
+    email,
+    firmaId,
+    fel,
+    rezumat,
+    scrisDe: (await numeleConectat()) ?? undefined,
+  });
   if (!scris) return raspuns("Nu am putut salva.", 502);
 
-  const cerut = String(formular.get("inapoi") ?? "");
-  const inapoi = INAPOI.test(cerut) ? cerut : "/admin";
   const cheie = firmaId ?? email ?? "";
   const separator = inapoi.includes("?") ? "&" : "?";
 

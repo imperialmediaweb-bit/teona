@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
-import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
+import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { numeleMetodei, rezumat } from "@/lib/plati/donatori";
 import {
@@ -24,6 +24,7 @@ import { DESTINATII_DONATIE } from "@/date/asociatie";
 import { scrieSuma } from "@/lib/suma";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
+import FaraDrept from "@/componente/admin/FaraDrept";
 import {
   Card,
   Cifra,
@@ -122,6 +123,10 @@ async function Continut({
         <Intrare gresit={Boolean(gresit)} unde="/admin" />
       </Cadru>
     );
+  }
+
+  if (!(await arePermisiune("/admin"))) {
+    return <FaraDrept titlu="Tabloul de bord" activ="/admin" />;
   }
 
   if (!areBazaDeDate()) {

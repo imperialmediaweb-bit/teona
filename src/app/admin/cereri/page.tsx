@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
+import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import {
   FELURI_CERERE,
@@ -15,6 +15,7 @@ import {
 import Cadru from "@/componente/admin/Cadru";
 import Descarca from "@/componente/admin/Descarca";
 import Intrare from "@/componente/admin/Intrare";
+import FaraDrept from "@/componente/admin/FaraDrept";
 
 export const metadata: Metadata = {
   title: "Cereri",
@@ -65,6 +66,10 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
         <Intrare gresit={Boolean(gresit)} unde="/admin/cereri" />
       </Cadru>
     );
+  }
+
+  if (!(await arePermisiune("/admin/cereri"))) {
+    return <FaraDrept titlu="Cereri" activ="/admin/cereri" />;
   }
 
   if (!areBazaDeDate()) {

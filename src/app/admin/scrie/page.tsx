@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
-import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
+import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { FELURI, esteFel, felul, toateTextele } from "@/lib/texte";
 import { adresaPoza } from "@/lib/poza-urcata";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
+import FaraDrept from "@/componente/admin/FaraDrept";
 
 export const metadata: Metadata = {
   title: "Scrie pe site",
@@ -70,6 +71,10 @@ async function Continut({
         <Intrare gresit={Boolean(gresit)} unde="/admin/scrie" />
       </Cadru>
     );
+  }
+
+  if (!(await arePermisiune("/admin/scrie"))) {
+    return <FaraDrept titlu="Scrie pe site" activ="/admin/scrie" />;
   }
 
   if (!areBazaDeDate()) {

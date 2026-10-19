@@ -1,28 +1,54 @@
 import { createHmac } from "node:crypto";
-import { egale } from "./comparatie";
+import { cache } from "react";
 import { cookies } from "next/headers";
+import { egale } from "./comparatie";
+import {
+  type Rol,
+  type Utilizator,
+  poateVedea,
+  utilizatorDupaId,
+} from "./utilizatori";
 
 /**
- * Intrarea în zona de verificare a campaniilor.
+ * Intrarea în panou.
  *
- * O singură parolă, ținută în `PAROLA_ADMIN`, pentru omul din asociație care
- * se uită peste campanii. Nu e un sistem de conturi și nici nu pretinde să
- * fie: pentru o listă pe care o verifică una-două persoane, un sistem de
- * utilizatori ar fi mai mult de întreținut decât de câștigat.
+ * Două căi, dinadins:
  *
- * Parola nu umblă niciodată prin adresă — ar ajunge în istoricul browserului
- * și în jurnalele serverului. Se trimite prin POST, iar ce rămâne în browser
- * e un cookie `httpOnly` cu o semnătură, nu parola.
+ * - **`PAROLA_ADMIN`** — cheia asociației. Deschide tot, nu are nume și nu
+ *   lasă urmă. Rămâne pentru că fără ea un tabel gol de utilizatori ar
+ *   însemna un panou în care nu mai poate intra nimeni, și pentru că din ea
+ *   se face primul cont;
+ * - **cont propriu** (`utilizatori.ts`) — e-mail și parolă, cu rol. Ce vede
+ *   omul atârnă de rol, iar oprirea contului îl dă afară de îndată.
+ *
+ * Nici într-un caz, nici în celălalt parola nu umblă prin adresă — ar ajunge
+ * în istoricul browserului și în jurnalele serverului. Se trimite prin POST,
+ * iar ce rămâne în browser e un cookie `httpOnly` cu o semnătură.
  */
 
 export const COOKIE_ADMIN = "teona_verificare";
+
+/** Cât ține sesiunea. Douăsprezece ore: o zi de lucru, nu o săptămână. */
+const VIATA_S = 12 * 60 * 60;
 
 function cheie(): string | null {
   const parola = process.env.PAROLA_ADMIN;
   return parola && parola.length >= 12 ? parola : null;
 }
 
-/** Semnătura pusă în cookie. Schimbarea parolei invalidează sesiunile vechi. */
+/**
+ * Cheia cu care se semnează sesiunea unui cont.
+ *
+ * Aceeași alegere ca la contul donatorului: `SECRET_SESIUNE` dacă există,
+ * altfel parola de administrator. Lipsa amândurora nu trece pe o valoare
+ * implicită — una implicită e aceeași pe toate instalările, deci publică.
+ */
+function cheieSesiune(): string | null {
+  const c = process.env.SECRET_SESIUNE ?? process.env.PAROLA_ADMIN;
+  return c && c.length >= 16 ? c : null;
+}
+
+/** Semnătura pusă în cookie de cheia asociației. */
 function semnatura(parola: string): string {
   return createHmac("sha256", parola)
     .update("verificare-campanii")
@@ -45,10 +71,115 @@ export function areParolaConfigurata(): boolean {
   return cheie() !== null;
 }
 
-export async function esteAutentificat(): Promise<boolean> {
+/*
+  Cookie-ul unui cont: `u:<id>:<expiră>:<semnătură>`.
+
+  Expirarea stă **în** semnătură, nu doar în `maxAge`. `maxAge` e o rugăminte
+  făcută browserului: cine păstrează valoarea cookie-ului o poate trimite și
+  peste un an. Ceasul care contează e al serverului.
+
+  Identificatorul, nu adresa de e-mail: o adresă se schimbă, iar un rând de
+  jurnal legat de ea ar rămâne în urmă.
+*/
+function semneazaSesiunea(id: string, expira: number): string | null {
+  const c = cheieSesiune();
+  if (!c) return null;
+  return createHmac("sha256", c)
+    .update(`panou:${id}:${expira}`)
+    .digest("hex");
+}
+
+export function valoareaCookieuluiUtilizator(id: string): string | null {
+  const expira = Math.floor(Date.now() / 1000) + VIATA_S;
+  const sem = semneazaSesiunea(id, expira);
+  return sem ? `u:${id}:${expira}:${sem}` : null;
+}
+
+/** Cine e conectat: cheia asociației, un cont, sau nimeni. */
+export type Conectat =
+  | { fel: "cheie"; rol: Rol; nume: string }
+  | { fel: "cont"; rol: Rol; nume: string; utilizator: Utilizator };
+
+/**
+ * Scoate identificatorul din cookie-ul unui cont, dacă semnătura ține.
+ *
+ * Nu atinge baza de date: partea care chiar poate greși e verificarea
+ * semnăturii, și trebuie să poată fi pusă la probă fără server.
+ */
+export function cititSesiuneaUtilizator(brut: string | undefined): string | null {
+  if (!brut || !brut.startsWith("u:")) return null;
+  const parti = brut.split(":");
+  if (parti.length !== 4) return null;
+  const [, id, expiraText, sem] = parti;
+
+  const expira = Number(expiraText);
+  if (!Number.isInteger(expira) || expira * 1000 <= Date.now()) return null;
+
+  const asteptat = semneazaSesiunea(id, expira);
+  if (!asteptat) return null;
+  return egale(sem, asteptat) ? id : null;
+}
+
+/**
+ * Cine e conectat acum.
+ *
+ * `cache` de la React, nu o variabilă de modul: pe o pagină de panou
+ * verificarea se cere de zeci de ori — cadrul, meniul, fiecare bucată care se
+ * închide —, iar fără dedublare ar fi zeci de interogări identice pe cerere.
+ * Cu `cache`, prima o face, celelalte o primesc. O variabilă de modul ar
+ * amesteca cererile între ele, deci omul altcuiva.
+ *
+ * Contul se citește din baza de date la **fiecare** cerere, nu doar la
+ * intrare. Asta e tot rostul conturilor: un om oprit la 10:00 nu mai intră la
+ * 10:01, nu la expirarea cookie-ului.
+ */
+export const cineEsteConectat = cache(async (): Promise<Conectat | null> => {
+  const borcan = await cookies();
+  const gasit = borcan.get(COOKIE_ADMIN)?.value;
+  if (!gasit) return null;
+
   const asteptat = valoareaCookieului();
-  if (!asteptat) return false;
-  const gasit = (await cookies()).get(COOKIE_ADMIN)?.value;
-  if (!gasit) return false;
-  return egale(gasit, asteptat);
+  if (asteptat && egale(gasit, asteptat)) {
+    return { fel: "cheie", rol: "administrator", nume: "Asociația" };
+  }
+
+  const id = cititSesiuneaUtilizator(gasit);
+  if (!id) return null;
+
+  const utilizator = await utilizatorDupaId(id).catch(() => null);
+  if (!utilizator || !utilizator.activ) return null;
+
+  return {
+    fel: "cont",
+    rol: utilizator.rol,
+    nume: utilizator.nume,
+    utilizator,
+  };
+});
+
+export async function esteAutentificat(): Promise<boolean> {
+  return (await cineEsteConectat()) !== null;
+}
+
+/** Rolul celui conectat, sau `null` dacă nu e nimeni. */
+export async function rolulConectat(): Promise<Rol | null> {
+  return (await cineEsteConectat())?.rol ?? null;
+}
+
+/**
+ * Are cel conectat voie pe pagina asta?
+ *
+ * Întrebarea e una singură, pusă din trei locuri: pagina, meniul și ruta din
+ * `/api/admin`. Dacă fiecare ar hotărî singur, un drept uitat într-unul din
+ * ele ar lăsa o pagină ascunsă în meniu, dar deschisă pentru cine îi știe
+ * adresa.
+ */
+export async function arePermisiune(cale: string): Promise<boolean> {
+  const cine = await cineEsteConectat();
+  return cine ? poateVedea(cine.rol, cale) : false;
+}
+
+/** Numele celui conectat, pentru rândurile de jurnal. */
+export async function numeleConectat(): Promise<string | null> {
+  return (await cineEsteConectat())?.nume ?? null;
 }

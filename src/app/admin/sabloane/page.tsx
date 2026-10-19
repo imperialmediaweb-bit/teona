@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
-import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
+import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { campaniileDeRaportat } from "@/lib/rapoarte/date";
 import { areCampanii, grupuri } from "@/lib/email/mailerlite";
@@ -15,6 +15,7 @@ import {
 } from "@/lib/email/campanie-sabloane";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
+import FaraDrept from "@/componente/admin/FaraDrept";
 
 export const metadata: Metadata = {
   title: "Șabloane de e-mail",
@@ -131,6 +132,10 @@ async function Continut({
         <Intrare gresit={Boolean(gresit)} unde="/admin/sabloane" />
       </Cadru>
     );
+  }
+
+  if (!(await arePermisiune("/admin/sabloane"))) {
+    return <FaraDrept titlu="Șabloane de e-mail" activ="/admin/sabloane" />;
   }
 
   const ales: FelSablon = esteFelSablon(fel) ? fel : "persoane";

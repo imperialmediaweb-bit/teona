@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { limitaDeRata, raspuns, text } from "@/lib/api";
-import { esteAutentificat } from "@/lib/admin";
+import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { marcheazaFacebook, textDupaId, felul } from "@/lib/texte";
 import { arePagina, publicaPePagina } from "@/lib/reclame/pagina-fb";
@@ -22,7 +22,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await esteAutentificat())) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/facebook"))) return raspuns("Nu ai acces.", 403);
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
   if (!arePagina()) return inapoi(cerere, "fara-pagina");
 

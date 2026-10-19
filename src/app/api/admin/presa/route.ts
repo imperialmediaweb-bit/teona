@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { limitaDeRata, raspuns, text } from "@/lib/api";
-import { esteAutentificat } from "@/lib/admin";
+import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import {
   adaugaContactPresa,
@@ -18,7 +18,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await esteAutentificat())) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/presa"))) return raspuns("Nu ai acces.", 403);
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
 
   const formular = await cerere.formData().catch(() => null);

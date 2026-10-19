@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { limitaDeRata, raspuns, text as curataText } from "@/lib/api";
 import { email as emailValid } from "@/lib/api";
-import { esteAutentificat } from "@/lib/admin";
+import { arePermisiune } from "@/lib/admin";
 import { ASOCIATIA, EMAIL } from "@/date/asociatie";
 import { pozaPentruEmail } from "@/lib/cloudinary-listare";
 import { creeazaCiorna } from "@/lib/email/mailerlite";
@@ -95,7 +95,7 @@ function paginaHtml(html: string) {
 
 /** Previzualizarea din panou, pentru cadrul care arată șablonul gol. */
 export async function GET(cerere: Request) {
-  if (!(await esteAutentificat())) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/sabloane"))) return raspuns("Nu ai acces.", 403);
   const fel = new URL(cerere.url).searchParams.get("fel");
   return paginaHtml(
     sablonCampanie(esteFelSablon(fel) ? fel : "persoane", EXEMPLU),
@@ -109,7 +109,7 @@ export async function POST(cerere: Request) {
     fereastraMs: 15 * 60 * 1000,
   });
   if (prea) return prea;
-  if (!(await esteAutentificat())) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/sabloane"))) return raspuns("Nu ai acces.", 403);
 
   const formular = await cerere.formData().catch(() => null);
   if (!formular) return raspuns("Cerere invalidă.", 400);

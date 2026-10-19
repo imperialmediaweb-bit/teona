@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
-import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
+import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { cautaPeste } from "@/lib/cautare";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
+import FaraDrept from "@/componente/admin/FaraDrept";
 
 export const metadata: Metadata = {
   title: "Căutare",
@@ -63,6 +64,10 @@ async function Continut({
         <Intrare gresit={Boolean(gresit)} unde="/admin" />
       </Cadru>
     );
+  }
+
+  if (!(await arePermisiune("/admin/cauta"))) {
+    return <FaraDrept titlu="Căutare" activ="/admin/cauta" />;
   }
 
   const cautat = q.trim();

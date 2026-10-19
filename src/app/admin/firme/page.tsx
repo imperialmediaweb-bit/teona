@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
+import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import {
   STADII_FIRMA,
@@ -15,6 +15,7 @@ import { scrieSuma } from "@/lib/suma";
 import Cadru from "@/componente/admin/Cadru";
 import Descarca from "@/componente/admin/Descarca";
 import Intrare from "@/componente/admin/Intrare";
+import FaraDrept from "@/componente/admin/FaraDrept";
 import Jurnal from "@/componente/admin/Jurnal";
 
 export const metadata: Metadata = {
@@ -74,6 +75,10 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
         <Intrare gresit={Boolean(gresit)} unde="/admin/firme" />
       </Cadru>
     );
+  }
+
+  if (!(await arePermisiune("/admin/firme"))) {
+    return <FaraDrept titlu="Firme" activ="/admin/firme" />;
   }
 
   if (!areBazaDeDate()) {

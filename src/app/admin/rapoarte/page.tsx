@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
+import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { LISTE } from "@/lib/export-csv";
 import { campaniileDeRaportat } from "@/lib/rapoarte/date";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
+import FaraDrept from "@/componente/admin/FaraDrept";
 import Pictograma from "@/componente/Pictograma";
 
 export const metadata: Metadata = {
@@ -170,6 +171,10 @@ async function Continut({
         <Intrare gresit={Boolean(gresit)} unde="/admin/rapoarte" />
       </Cadru>
     );
+  }
+
+  if (!(await arePermisiune("/admin/rapoarte"))) {
+    return <FaraDrept titlu="Rapoarte" activ="/admin/rapoarte" />;
   }
 
   if (!areBazaDeDate()) {

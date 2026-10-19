@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
-import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
+import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import {
   areCheiCloudinary,
   dosare,
@@ -14,6 +14,7 @@ import { proiecteAfisate } from "@/date/proiecte";
 import { alegeDosar } from "@/date/proiecte-cloud";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
+import FaraDrept from "@/componente/admin/FaraDrept";
 import DeCopiat from "@/componente/pagina/DeCopiat";
 
 export const metadata: Metadata = {
@@ -92,6 +93,10 @@ async function Continut({
         <Intrare gresit={Boolean(gresit)} unde="/admin/poze" />
       </Cadru>
     );
+  }
+
+  if (!(await arePermisiune("/admin/poze"))) {
+    return <FaraDrept titlu="Poze" activ="/admin/poze" />;
   }
 
   if (!areCheiCloudinary()) {

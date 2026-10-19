@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
-import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
+import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
+import FaraDrept from "@/componente/admin/FaraDrept";
 import { toateTextele, felul, type Text } from "@/lib/texte";
 import { MOMENTE, RITM_LUNAR, type Moment } from "@/date/calendar-fundraising";
 
@@ -92,6 +93,10 @@ async function Continut({
         <Intrare gresit={Boolean(gresit)} unde="/admin/calendar" />
       </Cadru>
     );
+  }
+
+  if (!(await arePermisiune("/admin/calendar"))) {
+    return <FaraDrept titlu="Calendar" activ="/admin/calendar" />;
   }
 
   const { an, luna } = lunaDinAdresa(lunaScrisa);

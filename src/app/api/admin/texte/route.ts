@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { limitaDeRata, raspuns } from "@/lib/api";
-import { esteAutentificat } from "@/lib/admin";
+import { arePermisiune } from "@/lib/admin";
 import {
   creeazaText,
   esteFel,
@@ -30,7 +30,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await esteAutentificat())) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/scrie"))) return raspuns("Nu ai acces.", 403);
 
   const formular = await cerere.formData().catch(() => null);
   if (!formular) return raspuns("Cerere invalidă.", 400);

@@ -1,5 +1,5 @@
 import { limitaDeRata, raspuns, text as curataText } from "@/lib/api";
-import { esteAutentificat } from "@/lib/admin";
+import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import {
   campanii,
@@ -40,7 +40,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await esteAutentificat())) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/analiza"))) return raspuns("Nu ai acces.", 403);
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
   if (!areSfatuitor()) {
     return raspuns("Lipsește ANTHROPIC_API_KEY din Railway.", 503);

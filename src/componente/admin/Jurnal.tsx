@@ -112,6 +112,12 @@ export default function Jurnal({
                 {FELURI_INTERACTIUNE.find((f) => f.id === i.fel)?.eticheta ??
                   i.fel}{" "}
                 · {CAND.format(new Date(i.cand))}
+                {/*
+                  Numele apare numai dacă e scris. Rândurile de dinainte de
+                  conturi n-au de unde-l lua, iar un „— Asociația" pus acolo
+                  ar fi o afirmație inventată despre cine a sunat.
+                */}
+                {i.scrisDe ? ` · ${i.scrisDe}` : ""}
               </p>
               <p className="text-cerneala-moale">{i.rezumat}</p>
             </li>

@@ -234,6 +234,83 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
 - Probă: `BAZA=http://localhost:3000 node scripts/qa/firma-anaf.mjs` (cere
   internet — datele vin de la ANAF, în direct).
 
+## Conturile: cine intră în panou
+
+Panoul a mers cu **o singură parolă**, în `PAROLA_ADMIN`, cât timp îl deschideau
+două persoane care făceau același lucru. Omul de strângere de fonduri schimbă
+socoteala, în trei feluri care n-au nicio legătură cu neîncrederea:
+
+- **nu se putea opri unul singur** — ca să-i iei accesul trebuia să schimbi
+  parola tuturor, deci să suni pe toată lumea;
+- **nu se vedea cine a făcut ce** — jurnalul discuțiilor spunea „l-am sunat”,
+  nu cine l-a sunat. Când sună doi oameni, rândul fără nume e aproape
+  nefolositor: se sună de două ori sau niciodată;
+- **nu se putea da mai puțin** — parola deschide tot, deci cine venea să ajute
+  cu firmele primea și Formularele 230, cu coduri numerice personale în ele.
+
+Acum sunt **două roluri**, scrise o dată în `src/lib/utilizatori.ts`:
+
+| | administrator | strângere de fonduri |
+|---|---|---|
+| tabloul de bord, rapoarte, analiză | da | da |
+| donații, donatori, firme, contracte | da | da |
+| cereri, aniversări | da | da |
+| șabloane, mesaje, QR, presă, calendar, căutare | da | da |
+| Formulare 230 | da | — |
+| scrie pe site, poze, Facebook | da | — |
+| utilizatori | da | — |
+
+Formularele 230 lipsesc fiindcă au CNP-uri în ele, iar ca să strângi bani n-ai
+nevoie de ele. Scrisul pe site și Facebook lipsesc fiindcă o publicare greșită
+nu se mai ia înapoi. Utilizatorii lipsesc fiindcă **cine poate face conturi își
+poate face unul de administrator** — dreptul ăla *este* dreptul de
+administrator.
+
+Cum merge, punct cu punct:
+
+- **`PAROLA_ADMIN` rămâne**, ca cheie a asociației: deschide tot, n-are nume și
+  nu lasă urmă în jurnal. Din ea se face primul cont, și cu ea se intră când
+  s-a încurcat ceva — fără ea, un tabel gol de utilizatori ar însemna un panou
+  în care nu mai poate intra nimeni. Pe `/admin/utilizatori` scrie pe față când
+  ești înăuntru cu ea.
+- **Parolă, nu link pe e-mail.** Contul donatorului (`cont.ts`) intră fără
+  parolă, dinadins, și argumentul de acolo rămâne întreg — un donator intră de
+  două ori pe an și ar uita parola. Aici sunt trei-cinci oameni care intră
+  zilnic: un link cerut la fiecare intrare ar face munca de zi mai grea, iar
+  cutia poștală ar deveni singura cheie a panoului. Parolele stau trecute prin
+  **`scrypt`**, cu sare pe fiecare și cu parametrii scriși lângă amprentă, ca o
+  întărire de mai târziu să nu dea afară oamenii cu parole vechi.
+- **Oprirea are efect pe loc.** Contul se citește din baza de date la *fiecare*
+  cerere, nu doar la intrare: un om oprit la 10:00 nu mai intră la 10:01, nu la
+  expirarea cookie-ului de douăsprezece ore. Ăsta e tot rostul conturilor.
+- **Conturile nu se șterg, se opresc.** Jurnalul poartă numele celui care a
+  scris rândul, iar „l-a sunat cineva care nu mai există” e mai rău decât
+  numele unui om plecat.
+- **Dreptul se cere în trei locuri, din aceeași listă**: pagina (care se
+  închide), meniul (care nu mai arată linkul) și ruta din `/api/admin` (care
+  refuză chiar și adresa scrisă de mână). Un drept uitat într-unul din ele ar
+  lăsa o pagină ascunsă în meniu, dar deschisă pentru cine îi știe adresa. De
+  aceea `/admin/utilizatori` scrie tabelul de mai sus din `PAGINI`, nu de mână:
+  un tabel scris separat ar rămâne în urmă la prima pagină nouă și ar spune
+  despre panou ceva care nu mai e adevărat.
+- **Exportul CSV cere dreptul listei cerute**, nu unul pentru toată ruta: cele
+  patru liste sunt exact patru pagini, iar fișierul are în el aceleași nume și
+  adrese.
+- **Parola nu trece niciodată prin adresă** și nu se arată nicăieri — nici cea
+  pusă de administrator la facerea contului. El o scrie, deci o știe; i-o spune
+  omului cum vrea, iar omul o schimbă din `/admin/parola`, unde se cere și
+  parola de acum (un laptop lăsat deschis nu e de ajuns ca să iei contul
+  definitiv). După asta n-o mai știe nimeni altcineva.
+- **Nimeni nu se oprește singur** și nu-și scade singur rolul: butoanele stau
+  pe același rând la toți, iar al tău e primul pe care îl nimerești.
+- Răspunsul la o adresă necunoscută e **la fel** ca la o parolă greșită sau un
+  cont oprit — altfel formularul de intrare devine un instrument de aflat cine
+  lucrează la asociație.
+- Probă: `BAZA=… PAROLA_ADMIN=… DATABASE_URL=… node scripts/qa/utilizatori.mjs`
+  (face și șterge singură un cont de probă; **patru intrări**, cât încape în
+  limita de 5 la 15 minute a rutei de intrare — a doua rulare la rând ia 429,
+  ceea ce e limita care funcționează, nu o cădere).
+
 ## Panoul: ce se face de unde
 
 - **`/admin`** — tabloul de bord. Începe cu „De făcut acum" (cereri noi,
@@ -247,6 +324,12 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
 - **`/admin/aniversari`** — aprobarea campaniilor de ziua cuiva. Se numea
   `/admin/campanii`; adresa veche redirecționează.
 - **`/admin/poze`** — ce e în Cloudinary și la ce proiect au ajuns pozele.
+- **`/admin/utilizatori`** — conturile oamenilor: făcute, oprite, cu rolul
+  schimbat. Numai administratorii. Jos, tabelul „ce vede fiecare rol", scris
+  din aceeași listă din care se hotărăște accesul.
+- **`/admin/parola`** — fiecare își schimbă parola lui, cu cea de acum în mână.
+  Deschisă tuturor; cine e înăuntru cu parola asociației află de aici că ea se
+  schimbă în Railway, nu de pe pagină.
 - **Contractul de sponsorizare** se generează din fișa firmei
   (`/admin/firme/<id>/contract`): denumirea și contactul vin din fișă, sediul
   și nr. de la registrul comerțului de la ANAF după CUI, clauzele sunt cele

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
+import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
+import FaraDrept from "@/componente/admin/FaraDrept";
 import CopiazaAdrese from "@/componente/admin/CopiazaAdrese";
 import {
   contactePresa,
@@ -79,6 +80,10 @@ async function Continut({
         <Intrare gresit={Boolean(gresit)} unde="/admin/presa" />
       </Cadru>
     );
+  }
+
+  if (!(await arePermisiune("/admin/presa"))) {
+    return <FaraDrept titlu="Presă" activ="/admin/presa" />;
   }
 
   if (!areBazaDeDate()) {

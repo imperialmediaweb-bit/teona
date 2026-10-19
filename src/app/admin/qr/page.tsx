@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
+import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
+import FaraDrept from "@/componente/admin/FaraDrept";
 import { caNume, caSvg, linkEtichetat, LOCURI } from "@/lib/qr";
 
 export const metadata: Metadata = {
@@ -71,6 +72,10 @@ async function Continut({
         <Intrare gresit={Boolean(gresit)} unde="/admin/qr" />
       </Cadru>
     );
+  }
+
+  if (!(await arePermisiune("/admin/qr"))) {
+    return <FaraDrept titlu="Cod QR" activ="/admin/qr" />;
   }
 
   const aleasa =

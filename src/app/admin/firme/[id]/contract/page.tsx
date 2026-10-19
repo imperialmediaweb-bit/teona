@@ -3,13 +3,14 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
+import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { firma as iaFirma } from "@/lib/crm";
 import { cautaFirma, cuiValid, curataCui } from "@/lib/anaf";
 import { scrieSuma } from "@/lib/suma";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
+import FaraDrept from "@/componente/admin/FaraDrept";
 
 export const metadata: Metadata = {
   title: "Contract de sponsorizare",
@@ -90,6 +91,10 @@ async function Continut({
         <Intrare gresit={Boolean(gresit)} unde="/admin/firme" />
       </Cadru>
     );
+  }
+
+  if (!(await arePermisiune("/admin/firme"))) {
+    return <FaraDrept titlu="Contract de sponsorizare" activ="/admin/firme" />;
   }
 
   if (!areBazaDeDate()) {

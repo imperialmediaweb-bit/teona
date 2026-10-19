@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
-import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
+import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import {
   analize,
@@ -25,6 +25,7 @@ import { cate } from "@/lib/numere-ro";
 import { scrieSuma } from "@/lib/suma";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
+import FaraDrept from "@/componente/admin/FaraDrept";
 import TextScris from "@/componente/pagina/TextScris";
 
 export const metadata: Metadata = {
@@ -904,6 +905,10 @@ async function Continut({
         <Intrare gresit={Boolean(gresit)} unde="/admin/analiza" />
       </Cadru>
     );
+  }
+
+  if (!(await arePermisiune("/admin/analiza"))) {
+    return <FaraDrept titlu="Analiză" activ="/admin/analiza" />;
   }
 
   /*

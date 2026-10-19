@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { areParolaConfigurata, esteAutentificat } from "@/lib/admin";
+import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
+import FaraDrept from "@/componente/admin/FaraDrept";
 import { toateTextele, felul, type Text } from "@/lib/texte";
 import {
   adresaPostarii,
@@ -87,6 +88,10 @@ async function Continut({
         <Intrare gresit={Boolean(gresit)} unde="/admin/facebook" />
       </Cadru>
     );
+  }
+
+  if (!(await arePermisiune("/admin/facebook"))) {
+    return <FaraDrept titlu="Facebook" activ="/admin/facebook" />;
   }
 
   const [fisa, texte] = await Promise.all([

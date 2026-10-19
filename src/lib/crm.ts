@@ -314,6 +314,8 @@ export type Interactiune = {
   fel: FelInteractiune;
   rezumat: string;
   cand: string;
+  /** Cine l-a scris. Lipsește la rândurile de dinainte de conturi. */
+  scrisDe: string | null;
 };
 
 export async function scrieInteractiune(date: {
@@ -321,12 +323,26 @@ export async function scrieInteractiune(date: {
   firmaId?: string;
   fel: FelInteractiune;
   rezumat: string;
+  /*
+    Numele celui care scrie, luat din sesiune de cel care cheamă funcția.
+
+    Fără el rândul spune „l-am sunat", nu „cine l-a sunat" — iar când sună doi
+    oameni, un rând fără nume e aproape nefolositor: se sună de două ori sau
+    niciodată.
+  */
+  scrisDe?: string;
 }): Promise<boolean> {
   if (!date.email && !date.firmaId) return false;
   await intreaba(
-    `INSERT INTO interactiuni (email, firma_id, fel, rezumat)
-     VALUES ($1,$2,$3,$4)`,
-    [date.email ?? null, date.firmaId ?? null, date.fel, date.rezumat],
+    `INSERT INTO interactiuni (email, firma_id, fel, rezumat, scris_de)
+     VALUES ($1,$2,$3,$4,$5)`,
+    [
+      date.email ?? null,
+      date.firmaId ?? null,
+      date.fel,
+      date.rezumat,
+      date.scrisDe ?? null,
+    ],
   );
   return true;
 }
@@ -341,8 +357,9 @@ export async function interactiuni(cui: {
     fel: string;
     rezumat: string;
     cand: Date;
+    scris_de: string | null;
   }>(
-    `SELECT id, fel, rezumat, cand FROM interactiuni
+    `SELECT id, fel, rezumat, cand, scris_de FROM interactiuni
       WHERE ($1::text IS NOT NULL AND email = $1)
          OR ($2::uuid IS NOT NULL AND firma_id = $2)
       ORDER BY cand DESC
@@ -354,5 +371,6 @@ export async function interactiuni(cui: {
     fel: r.fel as FelInteractiune,
     rezumat: r.rezumat,
     cand: r.cand.toISOString(),
+    scrisDe: r.scris_de,
   }));
 }

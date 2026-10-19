@@ -1,5 +1,5 @@
 import { limitaDeRata, raspuns } from "@/lib/api";
-import { esteAutentificat } from "@/lib/admin";
+import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { pdfAnual, pdfCampanie, pdfLunar } from "@/lib/rapoarte/scrie";
 
@@ -32,7 +32,7 @@ export async function GET(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await esteAutentificat())) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/rapoarte"))) return raspuns("Nu ai acces.", 403);
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
 
   const cauta = new URL(cerere.url).searchParams;

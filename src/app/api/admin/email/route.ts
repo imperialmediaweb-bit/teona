@@ -1,5 +1,5 @@
 import { raspuns } from "@/lib/api";
-import { esteAutentificat } from "@/lib/admin";
+import { arePermisiune } from "@/lib/admin";
 import { exemplu } from "@/lib/email/exemple";
 
 /**
@@ -11,7 +11,7 @@ import { exemplu } from "@/lib/email/exemple";
  * ceva care seamănă cu ele.
  */
 export async function GET(cerere: Request) {
-  if (!(await esteAutentificat())) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/emailuri"))) return raspuns("Nu ai acces.", 403);
 
   const cauta = new URL(cerere.url).searchParams;
   const gasit = exemplu(cauta.get("ce") ?? "");
