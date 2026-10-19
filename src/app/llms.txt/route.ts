@@ -185,7 +185,7 @@ plătită, redirecționarea se cere prin Declarația 177. Pe pagină e un calcul
 
 **Voluntariat** (${absoluta(RUTE.voluntar)})
 
-De la 18 ani, fără experiență necesară. Se completează un formular; asociația
+De la 16 ani, fără experiență necesară. Se completează un formular; asociația
 contactează persoana și stabilesc împreună unde poate ajuta.
 
 **Campanie de ziua ta** (${absoluta(RUTE.ziuaTa)})

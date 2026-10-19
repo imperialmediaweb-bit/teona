@@ -43,8 +43,8 @@ const BLOCURI: ReadonlyArray<{
     ],
     poza: {
       cale: "/poze/2024/11/WhatsApp-Image-2024-11-28-at-09.31.33-1.jpeg",
-      alt: "Un băiețel urmărește conturul unei stele proiectate pe podeaua interactivă din sala senzorială",
-      legenda: "Sala senzorială",
+      alt: "Un băiețel urmărește conturul unei stele proiectate pe podeaua interactivă, la jocurile interactive de la Casa Teona",
+      legenda: "Jocuri interactive",
     },
     umbra: "turcoaz",
   },
@@ -77,8 +77,8 @@ const BLOCURI: ReadonlyArray<{
       "Casa Teona înseamnă, în același timp, joacă, încredere, sprijin și apartenență la o comunitate. Este locul în care copiii pot fi copii, iar părinții pot respira. Dacă vrei să ne cunoști mai bine, să ne vizitezi sau să ne sprijini, ne bucurăm să te primim.",
     ],
     poza: {
-      cale: "/poze/2024/11/379338367_6701680123253673_2000889653328296894_n.jpg",
-      alt: "O femeie și o fată zâmbesc, obraz lângă obraz, într-o grădină cu flori",
+      cale: "/poze/2026/10/intalnire-cu-parintii-casa-teona.jpg",
+      alt: "Șapte părinți stau în cerc, pe fotolii, la o întâlnire în camera luminoasă de la Casa Teona; pe măsuța din mijloc sunt cești de cafea, iar pe perete desenele copiilor",
       legenda: "Împreună",
     },
     umbra: "caramiziu",
@@ -96,7 +96,6 @@ const GALERIE = [
   {
     cale: "/poze/2024/11/poza1_enhanced-1.webp",
     alt: "Un copil arată copăcelul din hârtie cu frunze verzi făcut la atelierul creativ",
-    legenda: "Atelier creativ",
   },
   {
     cale: "/poze/2024/11/339454935_239875385107246_1378022596723045576_n-1.jpg",
@@ -105,7 +104,6 @@ const GALERIE = [
   {
     cale: "/poze/2025/03/WhatsApp-Image-2025-03-18-at-15.19.13.jpeg",
     alt: "O voluntară și o fetiță, amândouă în tricourile albe ale asociației, în sala cu pictura din junglă de la Casa Teona, lângă standul cu brățări",
-    legenda: "Sala cu junglă",
   },
   {
     cale: "/poze/2024/11/347598753_3647630975458046_6343055552353416081_n.jpg",
@@ -118,7 +116,6 @@ const GALERIE = [
   {
     cale: "/poze/2024/11/poza3_enhanced.webp",
     alt: "Clădirea Casa Teona din Suceava, cu firma „Casa TEONA” deasupra intrării",
-    legenda: "Strada Zamca 22",
   },
 ] as const;
 

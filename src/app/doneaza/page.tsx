@@ -243,8 +243,8 @@ export default function Doneaza() {
               />
               <div className="colt-b relative aspect-[4/3] overflow-hidden bg-hartie-umbra shadow-[0_26px_52px_-24px_rgba(255,172,0,0.6)]">
                 <Image
-                  src="/poze/2025/03/WhatsApp-Image-2025-03-18-at-15.19.20.jpeg"
-                  alt="Standul de la Casa Teona: cutia de donații cu sigla asociației, un afiș „Eu creez, împreună donăm… pentru copii cu dizabilități” și brățări colorate pe un suport"
+                  src="/poze/2026/10/cutia-de-donatii-casa-teona.jpg"
+                  alt="O voluntară în tricoul alb al asociației ține în mâini cutia transparentă de donații, cu bancnote înăuntru și eticheta „Casa Teona — suport pentru copiii cu dizabilități”"
                   fill
                   sizes="(min-width: 1024px) 460px, 0px"
                   className="object-cover"

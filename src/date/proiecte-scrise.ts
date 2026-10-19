@@ -118,6 +118,17 @@ export const PROIECTE_SCRISE: readonly ProiectScris[] = [
     Paginile lor arată titlul și fotografiile, iar descrierea se adaugă când o
     scriu. `data` e doar cheie de ordonare — nu se vede nicăieri, de aceea
     `dataCitita` e `null` în loc de o dată inventată.
+
+    „Aniversări" a fost scoasă la cererea asociației (precizările din 16
+    octombrie 2026), iar „Scrisoare pentru Moș Crăciun" și „Ghiozdanul vesel"
+    au fost puse în locul ei.
+
+    **Cele două noi n-au încă `dosarCloud`**, dinadins: folderele lor din
+    Cloudinary nu există încă. Scris pe ghicite, numele ar putea nimeri
+    folderul altei campanii, iar pe pagină ar ajunge pozele altor copii —
+    exact ce apără regula din `proiecte-cloud.ts`. Până la urcarea pozelor,
+    galeria rămâne goală; se adaugă `dosarCloud` cu numele exact al
+    folderului, o dată ce există.
   */
   {
     slug: "banca-pentru-alimente",
@@ -131,14 +142,23 @@ export const PROIECTE_SCRISE: readonly ProiectScris[] = [
     descriere: [],
   },
   {
-    slug: "aniversari",
-    titlu: "Aniversări",
+    slug: "scrisoare-pentru-mos-craciun",
+    titlu: "Scrisoare pentru Moș Crăciun",
+    data: "2026-12-01",
+    dataCitita: null,
+    categorie: "campanii",
+    coperta: null,
+    poze: [],
+    descriere: [],
+  },
+  {
+    slug: "ghiozdanul-vesel",
+    titlu: "Ghiozdanul vesel",
     data: "2026-09-01",
     dataCitita: null,
     categorie: "campanii",
     coperta: null,
     poze: [],
-    dosarCloud: "aniversari",
     descriere: [],
   },
   {

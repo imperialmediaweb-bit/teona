@@ -60,7 +60,7 @@ const POVESTE: ReadonlyArray<{
     poza: {
       cale: "/poze/2024/11/WhatsApp-Image-2024-11-28-at-09.31.33-1.jpeg",
       alt: "Un băiețel se joacă pe podeaua interactivă de la Casa Teona, urmărind conturul unei stele proiectate pe jos",
-      legenda: "Sala senzorială",
+      legenda: "Jocuri interactive",
     },
     umbra: "turcoaz",
   },
@@ -132,17 +132,15 @@ const MISIUNE: ReadonlyArray<{
  * Cardul fără poză afișează inițialele pe un câmp de culoare, nu o siluetă
  * de stoc.
  *
- * **Paula Tolontan lipsea cu totul.** Lista de aici e scrisă de mână, după
- * caietul de sarcini, iar caietul n-o pomenește — dar ea e pe site-ul
- * actual, cu descriere și cu fotografie, iar fotografia ei stătea descărcată
- * în `public/poze/2023/12/`, nefolosită. Un om scos de pe pagina echipei la
- * trecerea pe site-ul nou e exact felul de pierdere pe care n-o reclamă
- * nimeni până nu o vede ea însăși.
+ * **Paula Tolontan a fost scoasă** la cererea asociației (precizările din
+ * 16 octombrie 2026). Fusese adăugată aici fiindcă apărea pe site-ul vechi,
+ * cu descriere și fotografie, iar caietul n-o pomenea — dar cine e în echipă
+ * hotărăște asociația, nu arhiva WordPress. Fotografia ei rămâne în
+ * `public/poze/2023/12/`, nefolosită, ca toate celelalte fișiere moștenite.
  *
- * **Rolul ei rămâne gol**, ca în exportul WordPress, unde toate rolurile
- * sunt goale: „Coordonator" sau „Asistent social" ar fi invenții, iar un rol
- * greșit pe pagina echipei e mai rău decât niciun rol. De confirmat cu
- * asociația.
+ * **Rolurile lui Daniel și al Eudochiei** sunt cele trimise de asociație în
+ * aceleași precizări, nu cele deduse din exportul WordPress (unde toate
+ * rolurile erau goale).
  */
 const ECHIPA: ReadonlyArray<{
   nume: string;
@@ -174,23 +172,17 @@ const ECHIPA: ReadonlyArray<{
   },
   {
     nume: "Eudochia Pîțu",
-    rol: "Coordonator voluntari",
+    rol: "Asistent social, coordonator voluntari",
     descriere:
       "Profesionist dedicat în domeniul asistenței sociale, cu experiență în coordonarea voluntarilor și organizarea taberelor.",
     poza: "/poze/2023/12/Screenshot_27__1_-removebg-preview__1_-removebg-preview.png",
   },
   {
     nume: "Daniel Strîmbu",
-    rol: "Comunicare",
+    rol: "Asistent social, terapeut",
     descriere:
       "Capta atenția publicului și transmite mesajele esențiale ale asociației, într-un mod atractiv și eficient.",
     poza: "/poze/2023/12/Strimbu-Daniel-1.jpeg",
-  },
-  {
-    nume: "Paula Tolontan",
-    descriere:
-      "Studentă la Facultatea de Asistență Socială din Suceava. Cu empatie, responsabilitate și multă energie, aduce bucurie și sprijin în tot ce face pentru comunitate.",
-    poza: "/poze/2023/12/Screenshot_28__2_-removebg-preview__1_-removebg-preview.png",
   },
 ];
 
@@ -244,7 +236,7 @@ export default function DespreNoi() {
       <AntetPagina
         scris="Împreună, din ianuarie 2021"
         titlu="Cine suntem"
-        subtitlu="Aducem bucurie copiilor cu nevoi speciale, copiilor care au trecut prin cancer și familiilor lor."
+        subtitlu="Sprijinim copiii cu nevoi speciale și pe părinții lor prin tabere, terapie prin joacă și consiliere."
         poza={{
           cale: "/poze/2024/11/449517170_497189979548012_3324146063316341558_n.jpg",
           alt: "Copii și voluntari cu căști și hamuri de escaladă, într-un parc de aventură",

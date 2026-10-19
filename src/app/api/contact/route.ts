@@ -130,16 +130,21 @@ export async function POST(cerere: Request) {
 
   if (corp.fel === "voluntariat") {
     // Formularul verifică vârsta în browser, dar browserul poate fi ocolit.
-    // Caietul (11.4) e categoric: sub 18 ani formularul nu se trimite. Datele
-    // unui minor nu trebuie să ajungă nici măcar într-un email.
+    // Sub vârsta minimă formularul nu se trimite: datele unui copil prea mic
+    // nu trebuie să ajungă nici măcar într-un email.
+    //
+    // Pragul e **16 ani**, nu 18. Caietul (11.4) scrie 18, dar asociația a
+    // corectat cifra în precizările din 16 octombrie 2026 („trebuie să aibă
+    // minim 16 ani, nu 18, am greșit eu aici"). Scris aici ca să nu fie pus
+    // cineva pe gânduri de nepotrivirea cu caietul și să-l dea înapoi.
     const nastere = typeof corp.nastere === "string" ? corp.nastere : "";
     const data = new Date(`${nastere}T00:00:00`);
     if (!nastere || Number.isNaN(data.getTime())) {
       return raspuns("Completează data nașterii.", 400);
     }
-    if (varsta(data, new Date()) < 18) {
+    if (varsta(data, new Date()) < 16) {
       return raspuns(
-        "Ne bucurăm că vrei să te implici! Deocamdată putem primi voluntari doar de la 18 ani.",
+        "Ne bucurăm că vrei să te implici! Deocamdată putem primi voluntari doar de la 16 ani.",
         400,
       );
     }

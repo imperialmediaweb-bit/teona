@@ -222,9 +222,11 @@ try {
   }
 
   // Campaniile: folder scris explicit, direct sub rădăcină.
+  // „Aniversări" a fost scoasă din campanii la cererea asociației (16 oct
+  // 2026). Folderul ei rămâne în Cloudinary-ul de mentiune de mai sus: proba
+  // verifică și că un folder fără proiect nu ajunge pe nicio pagină.
   for (const [slug, dosar] of [
     ["banca-pentru-alimente", "BANCA PENTRU ALIMENTE"],
-    ["aniversari", "aniversari"],
   ]) {
     const html = await (
       await fetch(`http://127.0.0.1:${PORT_SITE}/proiecte/${slug}`)

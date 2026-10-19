@@ -90,7 +90,7 @@ export default function DoneazaTiZiua() {
       <AntetPagina
         scris="În loc de cadouri"
         titlu="Donează-ți ziua de naștere"
-        subtitlu="Împlinești ani și ai tot ce-ți trebuie. Spune-le prietenilor că, în loc de un cadou, îți doresc o zi bună pentru un copil. Îți faci o pagină cu poza și cuvintele tale și o distribui — atât."
+        subtitlu="E ziua ta și vrei să o sărbătorești cu sens. Spune-le prietenilor că, în loc de cadou, îți dorești să ajuți copiii cu nevoi speciale. Îți faci o pagină cu poză și câteva cuvinte despre inițiativa ta și o distribui – e atât de simplu."
         accent="miere"
         poza={{
           cale: "/poze/2024/11/413839128_386434587290219_1905121098743660996_n.jpg",

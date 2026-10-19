@@ -100,7 +100,7 @@ function cateZile(luna: string, an: string): number {
  * la pasul 1 nu se pierde când omul merge la pasul 3 și înapoi.
  *
  * Verificarea vârstei se face în browser, înainte de trimitere, așa cum cere
- * caietul: „Dacă data nașterii arată sub 18 ani, formularul nu se trimite și
+ * caietul: „Dacă data nașterii arată sub [vârsta minimă], formularul nu se trimite și
  * apare mesajul de mai jos.” Mesajul e cel scris de asociație, cuvânt cu
  * cuvânt — e un refuz care trebuie să sune a bun venit, nu a eroare. Se
  * verifică la ieșirea din primul pas, ca omul să nu completeze degeaba
@@ -126,7 +126,7 @@ export default function FormularVoluntar() {
     anul la a doua apăsare. Anii merg descrescător, cu cei recenți primii.
 
     Formularul trimite mai departe tot `nastere`, în forma `2006-10-24`, dintr-un
-    câmp ascuns: ce se întâmplă mai departe — verificarea de 18 ani, salvarea —
+    câmp ascuns: ce se întâmplă mai departe — verificarea de 16 ani, salvarea —
     rămâne neschimbat.
   */
   const [zi, setZi] = useState("");
@@ -167,9 +167,9 @@ export default function FormularVoluntar() {
       const data = new Date(`${nastere}T00:00:00`);
       if (Number.isNaN(data.getTime())) {
         gasite.nastere = "Completează o dată validă.";
-      } else if (varsta(data, new Date()) < 18) {
+      } else if (varsta(data, new Date()) < 16) {
         gasite.nastere =
-          "Ne bucurăm că vrei să te implici! Deocamdată putem primi voluntari doar de la 18 ani.";
+          "Ne bucurăm că vrei să te implici! Deocamdată putem primi voluntari doar de la 16 ani.";
       }
     }
 

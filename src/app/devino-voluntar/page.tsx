@@ -19,7 +19,7 @@ import FormularVoluntar from "@/componente/formular/FormularVoluntar";
 export const metadata: Metadata = metadate({
   titlu: "Devino voluntar",
   descriere:
-    "Alătură-te Culegătorilor de Zâmbete, voluntarii Asociației Teona Ariana Suceava, în tabere și la Casa Teona. Completezi formularul, te contactăm. De la 18 ani.",
+    "Alătură-te Culegătorilor de Zâmbete, voluntarii Asociației Teona Ariana Suceava, în tabere și la Casa Teona. Completezi formularul, te contactăm. De la 16 ani.",
   cale: "/devino-voluntar",
 });
 
@@ -42,9 +42,9 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
     intrebare: "De la ce vârstă pot fi voluntar?",
     raspuns: (
       <p>
-        De la 18 ani. Formularul cere data nașterii exact pentru asta și nu se
-        trimite dacă ești mai mic. Dacă n-ai încă 18 ani, scrie-ne oricum: poți
-        ajuta altfel, iar peste un an te așteptăm.
+        De la 16 ani. Formularul cere data nașterii exact pentru asta și nu se
+        trimite dacă ești mai mic. Dacă n-ai încă 16 ani, scrie-ne oricum: poți
+        ajuta altfel, iar când îi împlinești te așteptăm.
       </p>
     ),
   },
@@ -107,7 +107,6 @@ const GALERIE = [
   {
     cale: "/poze/2024/11/348477655_10078995242126230_596613811472728663_n.jpg",
     alt: "Opt voluntari în uniforme medicale, cu diplomele de participare, în fața pensiunii din tabără",
-    legenda: "Tabăra RESPIRO",
   },
   {
     cale: "/poze/2024/11/Screenshot_56-1.png",
@@ -120,7 +119,6 @@ const GALERIE = [
   {
     cale: "/poze/2024/11/454507252_521713920428951_7631183889837889502_n-1.jpg",
     alt: "Opt tineri cu căști portocalii de escaladă și hamuri, în grup, sub un brad, în parcul de aventură",
-    legenda: "Parcul de aventură",
   },
   {
     cale: "/poze/2024/11/449597800_497189906214686_1996782188503194582_n.jpg",
@@ -218,7 +216,7 @@ export default function DevinoVoluntar() {
                     Cine poate fi voluntar
                   </h3>
                   <p className="relative mt-2 text-mic text-cerneala-moale">
-                    Pentru a deveni voluntar, trebuie să ai minimum 18 ani.
+                    Pentru a deveni voluntar, trebuie să ai minimum 16 ani.
                   </p>
                 </div>
               </Aparitie>

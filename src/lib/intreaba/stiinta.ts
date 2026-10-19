@@ -87,7 +87,7 @@ export function stiinta(): string {
     `4. **Transfer bancar**, în conturile de mai jos. După transfer se poate anunța pe ${RUTE.doneaza}, ca să fie găsit în extras.`,
     ...JURIDIC.conturi.map((c) => `   - ${c.banca} (${c.moneda}): ${c.iban}`),
     `5. **Campanie de ziua ta**: în loc de cadouri, prietenii donează. ${RUTE.ziuaTa}`,
-    `6. **Voluntariat**, de la 18 ani: ${RUTE.voluntar}`,
+    `6. **Voluntariat**, de la 16 ani: ${RUTE.voluntar}`,
     `7. **Galantom**: ${LINKURI_EXTERNE.galantom}`,
     "",
     "## Ce se întâmplă după o donație",

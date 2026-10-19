@@ -117,19 +117,35 @@ export const SIGLE_PRIMA_PAGINA = SIGLE_SPONSORI.slice(0, 12);
 /**
  * Partenerii instituționali (3.7) — pe pagina Despre noi, nu pe Sponsori.
  *
- * Doar Consiliul Județean Suceava are siglă în arhiva preluată. Restul apar cu
- * numele, până primim siglele și adresele de la asociație.
+ * Toate cele cinci au siglă din 16 octombrie 2026, trimise de asociație.
+ * Până atunci doar Consiliul Județean avea una, și aceea o fotografie luată
+ * de pe Facebook; restul apăreau cu numele și o pictogramă de clădire.
+ *
+ * Siglele se afișează la 56 px, deci și cele mici (USV e 200×200) sunt peste
+ * ce cere un ecran cu densitate dublă.
  */
 export const PARTENERI_INSTITUTIONALI: ReadonlyArray<Sigla> = [
   {
     nume: "Consiliul Județean Suceava",
-    cale: "/poze/2024/11/273840958_255539003431803_4458284824664985562_n.jpg",
+    cale: "/poze/2026/10/consiliul-judetean-suceava.jpg",
+  },
+  { nume: "DGASPC Suceava", cale: "/poze/2026/10/dgaspc.png" },
+  {
+    nume: "Spitalul Județean de Urgență „Sfântul Ioan cel Nou” Suceava",
+    cale: "/poze/2026/10/spitalul-judetean-suceava.png",
+  },
+  {
+    nume: "Colegiul Psihologilor din România (COPSI)",
+    cale: "/poze/2026/10/copsi.jpg",
+  },
+  {
+    nume: "Universitatea „Ștefan cel Mare” din Suceava",
+    cale: "/poze/2026/10/usv.jpg",
   },
 ];
 
-export const PARTENERI_FARA_SIGLA = [
-  "DGASPC Suceava",
-  "Spitalul Județean de Urgență „Sfântul Ioan cel Nou” Suceava",
-  "Colegiul Psihologilor din România (COPSI)",
-  "Universitatea „Ștefan cel Mare” din Suceava",
-] as const;
+/**
+ * Nicio instituție nu mai e fără siglă. Lista rămâne, goală, fiindcă e
+ * normal să mai apară una nouă înainte să vină și sigla ei.
+ */
+export const PARTENERI_FARA_SIGLA: ReadonlyArray<string> = [];

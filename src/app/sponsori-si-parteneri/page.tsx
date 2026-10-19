@@ -205,18 +205,6 @@ export default function SponsoriSiParteneri() {
               </li>
             ))}
           </ul>
-
-          <p className="mt-10 text-mic text-cerneala-slab">
-            Instituțiile cu care lucrăm — DGASPC Suceava, spitalul județean,
-            USV, Colegiul Psihologilor, Consiliul Județean — sunt pe pagina{" "}
-            <Link
-              href={RUTE.despre}
-              className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
-            >
-              Despre noi
-            </Link>
-            .
-          </p>
         </div>
       </section>
 

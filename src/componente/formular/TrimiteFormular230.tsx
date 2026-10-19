@@ -245,6 +245,12 @@ export default function TrimiteFormular230() {
           Formularul 230 are opțiunea de distribuire pe doi ani. Cine o
           bifează nu mai trebuie căutat la anul — iar asta schimbă complet
           lista de sunat în primăvara următoare.
+
+          **Implicit sunt doi ani**, la cererea asociației (precizările din
+          16 octombrie 2026). Un an rămâne la o apăsare distanță: cine a
+          bifat altfel pe hârtie trebuie să poată spune asta, iar cifra din
+          panou trebuie să fie cea de pe formularul semnat, nu cea comodă
+          pentru noi.
         */}
         <Optiuni
           name="ani"
@@ -253,7 +259,7 @@ export default function TrimiteFormular230() {
             { valoare: "1", eticheta: "Un an", pictograma: "document" },
             { valoare: "2", eticheta: "Doi ani", pictograma: "infinit" },
           ]}
-          defaultValue="1"
+          defaultValue="2"
         />
 
         <Bifa name="acord" obligatoriu eroare={erori.acord}>
