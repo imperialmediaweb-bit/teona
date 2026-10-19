@@ -327,6 +327,105 @@ Cum merge, punct cu punct:
   limita de 5 la 15 minute a rutei de intrare — a doua rulare la rând ia 429,
   ceea ce e limita care funcționează, nu o cădere).
 
+## Radarul de finanțări: caută singur, nu hotărăște nimic
+
+Patru termene mari au trecut pe lângă asociație în 2026 — Fondul SEE (8
+octombrie), subvenția pe Legea 34/1998 (sfârșitul lui septembrie, pentru 2027),
+apelul AFCN–Orange, apelul POIDS. Toate fuseseră anunțate public, cu luni
+înainte. N-au fost ratate din lipsă de informație, ci pentru că nimeni n-avea
+în sarcină să se uite: un om care face și comunicarea și evidența nu deschide
+șase site-uri în fiecare luni.
+
+`/admin/radar` caută în locul lui, o dată pe săptămână. Modelul primește
+unealta de **căutare pe server** (`web_search_20260209`, în `src/lib/radar.ts`),
+caută apeluri pentru care asociația ar fi eligibilă, și scrie ce a găsit în
+tabelul `radar`.
+
+**Caută, citește, scrie într-un tabel. Nu trimite nimic și nu depune nimic.**
+Un om deschide pagina, se uită, apasă „merită urmărit" sau „nu ne privește".
+Aceeași regulă ca la publicare: nimic nu pleacă singur.
+
+### Cum se apără de inventat
+
+Partea care contează cel mai mult, fiindcă un termen greșit e mai rău decât
+unul lipsă: după el se face muncă.
+
+- **Adresa trebuie să fi apărut într-un rezultat de căutare adevărat.** Se
+  adună toate adresele din blocurile `web_search_result` ale conversației, iar
+  o pistă a cărei adresă nu e între ele **se aruncă**. Dacă modelul scrie un
+  link verosimil pe care nu l-a văzut, nu intră în tabel. Câte s-au aruncat se
+  vede în panou: dacă cifra crește, modelul inventează și întrebarea trebuie
+  strânsă.
+- **Termenul se păstrează ca text, nu ca dată.** Modelul citește „8 octombrie
+  2026" sau „nu scrie" de pe o pagină; un câmp de tip dată l-ar obliga să
+  ghicească, iar ghicitul ar arăta în panou exact ca o certitudine. Ce a citit
+  se scrie cum l-a citit, cu linkul lângă.
+- **Fiecare rând e o pistă, nu o certitudine**, și pagina scrie asta pe ea.
+  Nimic de aici nu intră în calendar până nu deschide un om pagina sursă.
+- **Cheia e adresa.** Aceeași oportunitate găsită săptămâna viitoare nu intră a
+  doua oară și nici nu învie un rând respins deja de un om (`ON CONFLICT DO
+  NOTHING`). Altfel lista ar fi, după o lună, aceleași zece rânduri respinse
+  care se întorc în fiecare luni.
+
+### Trei capcane ale uneltei de căutare
+
+Niciuna nu se vede la citit codul, și toate trei ar trece drept „n-a găsit
+nimic":
+
+- **o căutare picată nu aruncă nicio excepție.** Vine cu HTTP 200 și un bloc
+  al cărui `content` e un *obiect* cu `error_code`, în loc de *lista* de
+  rezultate. Fără `Array.isArray`, codul ar continua cu zero adrese văzute, iar
+  filtrul de mai sus ar arunca toate pistele;
+- **API-ul se oprește la jumătate.** Cu unelte pe server rulează o buclă
+  proprie și după zece pași întoarce `stop_reason: "pause_turn"`. Reluarea se
+  face trimițând înapoi întrebarea și răspunsul de până atunci — **fără** un
+  mesaj „continuă": API-ul vede blocul de unealtă neterminat și știe singur.
+  Fără reluare, radarul vede doar prima jumătate din internet;
+- **nu se declară și execuția de cod** pe lângă unealta de căutare: varianta
+  asta o rulează oricum pe dedesubt, iar un al doilea mediu de execuție
+  încurcă modelul.
+
+### Cum rulează săptămânal
+
+**Orarul stă în afara aplicației.** Un `setInterval` într-un server web pare
+cea mai simplă cale și e cea mai înșelătoare: Railway repornește containerul la
+fiecare publicare, poate rula mai multe copii ale aplicației deodată — deci
+scanarea ar pleca de două ori — și un container adormit nu numără nimic.
+
+Cron-ul de pe Railway pornește un serviciu care **se încheie**; aplicația web
+nu se încheie niciodată, deci nu i se poate pune un orar. Se face un al doilea
+serviciu, mic, care cheamă o dată adresa și iese:
+
+```
+curl -fsS -X POST https://<site>/api/radar -H "x-radar: $RADAR_SECRET"
+```
+
+Orarul se pune pe serviciul ăla: `0 6 * * 1` = luni la 6:00 **UTC** (cron-ul de
+pe Railway e în UTC, nu ora României). Granularitatea minimă e 5 minute, iar
+dacă o rulare mai e în curs când vine următoarea, Railway o sare — nu le
+stivuiește. Pașii sunt scriși și pe pagină, ca la Facebook: omul care se
+întreabă „de ce n-a mai scanat nimic?" e în panou, nu în depozitul de cod.
+
+**Secretul nu e opțional.** Adresa cheltuiește bani la fiecare apel — cheamă un
+model și plătește căutări. Fără `RADAR_SECRET` configurat, ruta refuză de tot
+(503) în loc să rămână deschisă; cu secret greșit, 403, și nici într-un caz nu
+se cheamă modelul. Limită de 3 apeluri pe oră, pe lângă secret: o scanare pe
+săptămână e ce trebuie, iar cinci pe oră înseamnă că s-a stricat ceva — un orar
+pus de două ori — și limita oprește factura înainte s-o vadă cineva.
+Câte căutări are voie o scanare se scrie în `RADAR_CAUTARI` (implicit 12).
+
+**Un radar mort în tăcere e mai rău decât niciunul**, fiindcă liniștea arată la
+fel ca „n-a apărut nimic nou". De aceea scanările se scriu în
+`radar_scanari`, cu erorile lor, se văd în panou, pagina spune răspicat când
+ultima e mai veche de 10 zile, iar o scanare cu probleme întoarce cod de
+eroare — deci se vede și în jurnalul serviciului de cron, nu numai în panou.
+
+Model din `MODEL_RADAR`, implicit `claude-opus-5-5` (unealta de căutare cere un
+model care o are). Probă, fără chei adevărate și fără internet, cu un API de
+mențiune care joacă toate cele patru scenarii — pistă inventată, căutare
+picată, `pause_turn`, pistă respinsă care nu învie:
+`PAROLA_ADMIN=… DATABASE_URL=… node scripts/qa/radar.mjs`
+
 ## Panoul: ce se face de unde
 
 - **`/admin`** — tabloul de bord. Începe cu „De făcut acum" (cereri noi,
@@ -340,6 +439,8 @@ Cum merge, punct cu punct:
 - **`/admin/aniversari`** — aprobarea campaniilor de ziua cuiva. Se numea
   `/admin/campanii`; adresa veche redirecționează.
 - **`/admin/poze`** — ce e în Cloudinary și la ce proiect au ajuns pozele.
+- **`/admin/radar`** — ce a găsit căutarea automată pe internet: apeluri de
+  finanțare noi, ca piste de verificat la sursă. Vezi secțiunea de mai sus.
 - **`/admin/utilizatori`** — conturile oamenilor: făcute, oprite, cu rolul
   schimbat. Numai administratorii. Jos, tabelul „ce vede fiecare rol", scris
   din aceeași listă din care se hotărăște accesul.
