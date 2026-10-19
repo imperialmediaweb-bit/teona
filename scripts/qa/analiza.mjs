@@ -250,6 +250,10 @@ if (!process.env.DATABASE_URL) {
       "cererea conține cifrele agregate",
     );
     verifica(
+      primit.includes("CUM VORBEȘTI"),
+      "analiza scrisă primește aceleași reguli de ton",
+    );
+    verifica(
       !primit.includes("@"),
       "în cererea trimisă nu e nicio adresă de e-mail",
     );
@@ -324,8 +328,20 @@ if (!process.env.DATABASE_URL) {
     */
     const cached = (primit.match(/cache_control/g) ?? []).length;
     verifica(
-      cached === 3,
-      `partea fixă a consultantului se ține în cache (${cached} blocuri din 3)`,
+      cached === 4,
+      `partea fixă a consultantului se ține în cache (${cached} blocuri din 4)`,
+    );
+    /*
+      Tonul ajunge la model pe amândouă căile.
+
+      Fără el, un model pus să fie „consultant" alunecă singur în registrul de
+      guru: entuziasm, metode cu nume, promisiuni. Nu se poate verifica tonul
+      răspunsului cu un API de mențiune, dar se poate verifica faptul că
+      regulile pleacă — iar ele sunt singurul lucru care îl ține.
+    */
+    verifica(
+      primit.includes("CUM VORBEȘTI"),
+      "consultantul primește regulile de ton",
     );
     /*
       Niciun șablon necompletat în ce pleacă spre model.

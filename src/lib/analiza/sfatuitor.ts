@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { CE_POATE_PLATFORMA } from "./platforma";
 import { CUM_SE_CAUTA_FIRME } from "./prospectare";
+import { FARA_VANZARI_DE_VISE } from "./ton";
 
 /**
  * Consultantul de strângere de fonduri, cu care se poate vorbi.
@@ -96,21 +97,27 @@ export async function* raspundeSfatuitor(
   });
 
   /*
-    Patru blocuri de sistem, în ordinea în care se schimbă.
+    Cinci blocuri de sistem, în ordinea în care se schimbă.
 
-    Primele trei — regulile, uneltele platformei și metoda de căutat firme —
-    sunt aceleași la fiecare întrebare, deci poartă `cache_control` și se
-    păstrează în cache-ul API-ului. Al patrulea, cifrele, se schimbă de la o zi
-    la alta și stă la urmă, ca să nu strice cache-ul celorlalte.
+    Primele patru — regulile, tonul, uneltele platformei și metoda de căutat
+    firme — sunt aceleași la fiecare întrebare, deci poartă `cache_control` și
+    se păstrează în cache-ul API-ului. Al cincilea, cifrele, se schimbă de la o
+    zi la alta și stă la urmă, ca să nu strice cache-ul celorlalte.
 
     Ordinea nu e întâmplătoare: ce se schimbă cel mai rar stă primul. Un bloc
-    nou pus înaintea celorlalte le-ar invalida cache-ul la fiecare publicare.
+    nou pus înaintea celorlalte le invalidează cache-ul — o dată, la publicarea
+    care l-a adus, nu la fiecare întrebare.
   */
   const flux = client.messages.stream({
     model: MODEL,
     max_tokens: PLAFON_RASPUNS,
     system: [
       { type: "text", text: REGULI, cache_control: { type: "ephemeral" } },
+      {
+        type: "text",
+        text: FARA_VANZARI_DE_VISE,
+        cache_control: { type: "ephemeral" },
+      },
       {
         type: "text",
         text: CE_POATE_PLATFORMA,

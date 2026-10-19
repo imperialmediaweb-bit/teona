@@ -9,6 +9,7 @@ import type {
 } from "./cifre";
 import { numeCanal } from "@/lib/atribuire";
 import type { Reclame } from "@/lib/reclame/meta";
+import { FARA_VANZARI_DE_VISE } from "./ton";
 
 /**
  * Analiza cifrelor, cerută unui model de limbaj.
@@ -372,7 +373,9 @@ Trei-cinci acțiuni, numerotate, fiecare cu: ce anume, pentru cine (ce grup de d
 ## Ce nu putem ști încă
 Ce ar fi trebuit măsurat și nu e. Scurt.
 
-Nu adăuga alte secțiuni. Nu adăuga introducere sau încheiere.`;
+Nu adăuga alte secțiuni. Nu adăuga introducere sau încheiere.
+
+${FARA_VANZARI_DE_VISE}`;
 
 /** Întoarce analiza, sau `null` dacă nu merge. Panoul spune atunci ce s-a întâmplat. */
 export async function cereAnaliza(cifre: string): Promise<string | null> {

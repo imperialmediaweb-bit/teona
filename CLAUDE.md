@@ -486,11 +486,36 @@ picată, `pause_turn`, pistă respinsă care nu învie:
   contabilitatea firmei) și **aceleași agregate** ca analiza scrisă. Nu are
   nume, adrese sau telefoane și nu poate avea: întrebat cine a donat cel mai
   mult, trimite la segmentele din panou.
-  Partea fixă — regulile, uneltele și metoda de prospectare — poartă
+  Partea fixă — regulile, tonul, uneltele și metoda de prospectare — poartă
   `cache_control`, deci a doua întrebare costă a zecea parte din prima.
   Conversația nu se salvează.
   Model din `MODEL_ANALIZA`, implicit `claude-opus-5-5`, prin SDK-ul oficial.
   Aceeași probă verifică ambele căi spre model: `scripts/qa/analiza.mjs`.
+- **Tonul: fără vânzători de vise** (`src/lib/analiza/ton.ts`). Un model pus
+  să fie „consultant" sau „antrenor" alunecă singur în registrul de guru de pe
+  internet: entuziasm, cadre de lucru cu nume inventate, promisiuni de
+  rezultate, „best practice" fără sursă, încurajare la final. Registrul ăla
+  sună a ajutor și nu ajută — omul citește cinci rânduri calde și rămâne fără
+  nimic de făcut luni dimineață, iar timpul lui e singura resursă care nu se
+  mai întoarce.
+  Regulile interzic pe nume: lauda întrebării, motivarea, metodele cu nume
+  inventate, promisiunile de rezultate, autoritatea care nu există („studiile
+  arată"), jargonul („mindset", „funnel", „scalare", „win-win" — „pâlnia
+  firmelor" rămâne, așa se numește pagina) și verbele care nu spun nimic
+  („optimizează", „valorifică"). În schimb cer: ce anume, cu cine, când și cât
+  ia; ce costă, nu doar ce aduce; **„nu merită făcut"** când nu merită; „nu
+  știu" când nu se știe; și spus pe față când problema nu e de fundraising.
+  Fișierul ține și o pereche „așa nu / așa da" scrisă întreagă — un model își
+  schimbă purtarea mai mult de la un exemplu contrastant decât de la zece
+  reguli abstracte.
+  Se scrie **o dată, pentru toate căile spre model**: analiza scrisă și
+  consultantul au prompturi diferite, dar dacă tonul ar fi scris de două ori,
+  una din copii s-ar strica fără să observe nimeni. **Nu scrie numele nimănui:**
+  registrul se descrie prin ce face, nu prin cine îl face — un nume de om real
+  pus într-un fișier ca exemplu de ce să nu fii rămâne în istoricul depozitului
+  pentru totdeauna. Proba verifică pe amândouă căile că regulile pleacă spre
+  model; tonul răspunsului nu se poate verifica cu un API de mențiune, dar
+  regulile sunt singurul lucru care îl ține.
 - **Antrenorul de prospectare**, în același consultant
   (`src/lib/analiza/prospectare.ts`): de unde ies firmele de la care se cer
   bani, pe cine se caută în ele și în ce săptămână a anului se sună.
