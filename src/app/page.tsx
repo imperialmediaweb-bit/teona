@@ -20,6 +20,7 @@ import Realizari from "@/componente/acasa/Realizari";
 import Testimoniale, {
   type Testimonial,
 } from "@/componente/acasa/Testimoniale";
+import { testimonialePublice } from "@/lib/testimoniale";
 import { metadate } from "./seo";
 
 export const metadata: Metadata = metadate({
@@ -55,10 +56,31 @@ const PUNCTE_CASA: ReadonlyArray<{ text: string; pictograma: NumePictograma }> =
     { text: "Sprijin pentru întreaga familie", pictograma: "familie" },
   ];
 
-function citesteTestimoniale(): Testimonial[] {
-  return JSON.parse(
-    readFileSync(join(process.cwd(), "continut", "testimoniale.json"), "utf8"),
-  );
+/**
+ * Testimonialele: din panou, cu fișierul ca rezervă.
+ *
+ * Caietul (1.8) cere ca asociația să le poată adăuga și scoate oricând, deci
+ * stau în baza de date și se schimbă din `/admin/testimoniale`. Fișierul
+ * rămâne pentru prima pornire — tabelul se seamănă din el o singură dată —
+ * și pentru cazul în care baza nu răspunde: mai bine cinci testimoniale
+ * vechi decât o secțiune care dispare de pe prima pagină.
+ */
+async function citesteTestimoniale(): Promise<Testimonial[]> {
+  const aleLor = await testimonialePublice().catch(() => []);
+  if (aleLor.length > 0) {
+    return aleLor.map((t) => ({
+      citat: t.citat,
+      semnatura: t.semnatura,
+      sursa: t.sursa ?? undefined,
+    }));
+  }
+  try {
+    return JSON.parse(
+      readFileSync(join(process.cwd(), "continut", "testimoniale.json"), "utf8"),
+    );
+  } catch {
+    return [];
+  }
 }
 
 /*
@@ -70,8 +92,8 @@ function citesteTestimoniale(): Testimonial[] {
   `componente/acasa/`: pagina rămâne lizibilă, iar fiecare secțiune își ține
   fotografiile și motivele lângă ea.
 */
-export default function PrimaPagina() {
-  const testimoniale = citesteTestimoniale();
+export default async function PrimaPagina() {
+  const testimoniale = await citesteTestimoniale();
 
   return (
     <>
