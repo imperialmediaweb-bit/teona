@@ -56,13 +56,18 @@ const BLOCURI: ReadonlyArray<{
     paragrafe: [
       "Pentru mulți dintre copiii noștri, o petrecere obișnuită nu e ușor de organizat, iar aici găsesc un spațiu al lor, cu baloane, tort și oameni care se bucură împreună cu ei. Pentru un copil, să se simtă sărbătorit contează foarte mult.",
     ],
-    // Fotografia de dinainte (412883312…) nu era o petrecere: arăta voluntari
-    // într-o cameră modestă, la un caz umanitar, cu chipurile copiilor —
-    // caietul nu permite chipuri la cazuri umanitare. Până primim o poză de
-    // la o aniversare de la Casa Teona, stă aici atelierul de brățări.
+    /*
+      Poza de aniversare a venit (16 octombrie 2026), deci atelierul de
+      brățări care ținea locul aici iese.
+
+      Înaintea lui stătuse o fotografie (412883312…) care nu era o petrecere:
+      voluntari într-o cameră modestă, la un caz umanitar, cu chipurile
+      copiilor — caietul nu permite chipuri la cazuri umanitare. Asta e o
+      petrecere adevărată, la Casa Teona, trimisă de asociație pentru site.
+    */
     poza: {
-      cale: "/poze/2025/03/WhatsApp-Image-2025-03-18-at-15.19.17.jpeg",
-      alt: "Copii fac brățări din mărgele la o masă, lângă o fată în tricoul asociației, în sala cu pictura din junglă de la Casa Teona",
+      cale: "/poze/2026/10/petrecere-aniversare-casa-teona.jpg",
+      alt: "Doi băieți cu coifuri de hârtie stau pe covor la Casa Teona, în spatele unui tort de ciocolată cu lumânare în formă de cifra trei",
       legenda: "La Casa Teona",
     },
     umbra: "miere",

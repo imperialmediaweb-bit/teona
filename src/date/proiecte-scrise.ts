@@ -42,9 +42,14 @@ import type { ProiectAfisat } from "./proiecte-tipuri";
  * organizată pe ani, nu poate primi o adresă stabilă și nu-și poate găsi
  * folderul de poze. Se adaugă în clipa în care asociația spune când a fost.
  *
- * **Pozele nu sunt scrise aici.** Proiectele de mai jos au `poze: []` și
- * `coperta: null` intenționat: fotografiile se iau din Cloudinary, din
+ * **Pozele taberelor nu sunt scrise aici.** Taberele de mai jos au `poze: []`
+ * și `coperta: null` intenționat: fotografiile se iau din Cloudinary, din
  * folderul cu aceeași dată — vezi `proiecte-cloud.ts`.
+ *
+ * Excepția e „Scrisoare pentru Moș Crăciun": pozele ei au venit pe Drive, nu
+ * în Cloudinary, iar galeria citește oricum `coperta` plus `poze`
+ * (`pozeleProiectului`). A o lăsa goală până se urcă undeva ar fi fost o
+ * regulă ținută împotriva rostului ei.
  */
 
 /** Un proiect scris de mână: ca cele din export, plus descrierea. */
@@ -123,12 +128,14 @@ export const PROIECTE_SCRISE: readonly ProiectScris[] = [
     octombrie 2026), iar „Scrisoare pentru Moș Crăciun" și „Ghiozdanul vesel"
     au fost puse în locul ei.
 
-    **Cele două noi n-au încă `dosarCloud`**, dinadins: folderele lor din
-    Cloudinary nu există încă. Scris pe ghicite, numele ar putea nimeri
-    folderul altei campanii, iar pe pagină ar ajunge pozele altor copii —
-    exact ce apără regula din `proiecte-cloud.ts`. Până la urcarea pozelor,
-    galeria rămâne goală; se adaugă `dosarCloud` cu numele exact al
-    folderului, o dată ce există.
+    **Niciuna din cele două n-are `dosarCloud`**, dinadins: folderele lor din
+    Cloudinary nu există. Scris pe ghicite, numele ar putea nimeri folderul
+    altei campanii, iar pe pagină ar ajunge pozele altor copii — exact ce
+    apără regula din `proiecte-cloud.ts`.
+
+    „Scrisoare pentru Moș Crăciun" nu duce lipsă din cauza asta: pozele ei
+    sunt scrise mai jos, din Drive. „Ghiozdanul vesel" rămâne fără nicio
+    fotografie până trimite asociația una — pagina arată titlul și atât.
   */
   {
     slug: "banca-pentru-alimente",
@@ -147,8 +154,21 @@ export const PROIECTE_SCRISE: readonly ProiectScris[] = [
     data: "2026-12-01",
     dataCitita: null,
     categorie: "campanii",
-    coperta: null,
-    poze: [],
+    /*
+      Singura campanie cu pozele scrise aici, nu luate din Cloudinary: cele
+      patru au venit pe Drive pe 16 octombrie 2026, iar folderul ei din
+      Cloudinary nu există. Galeria citește oricum `coperta` plus `poze`,
+      deci nu era niciun motiv s-o lăsăm goală până se urcă undeva.
+
+      Coperta e fotografia de grup, singura peste 6000 px; celelalte trei
+      vin după ea, de la cele mari la cea mică.
+    */
+    coperta: "/poze/2026/10/scrisoare-mos-craciun-1-echipa.jpg",
+    poze: [
+      "/poze/2026/10/scrisoare-mos-craciun-2-daruri.jpg",
+      "/poze/2026/10/scrisoare-mos-craciun-3-imbratisare.jpg",
+      "/poze/2026/10/scrisoare-mos-craciun-4-plecarea.jpg",
+    ],
     descriere: [],
   },
   {
