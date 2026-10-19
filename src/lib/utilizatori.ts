@@ -171,6 +171,8 @@ export type Utilizator = {
   creatLa: Date;
   intratLa: Date | null;
   areParola: boolean;
+  /** Clipa invitației în aer, sau `null` dacă nu e niciuna. */
+  invitatLa: Date | null;
 };
 
 /*
@@ -276,6 +278,20 @@ const DEFINITIE = `
     schimbat_la  timestamptz NOT NULL DEFAULT now()
   );
   CREATE INDEX IF NOT EXISTS utilizatori_activi ON utilizatori (activ, nume);
+
+  /*
+    Când i s-a trimis invitația.
+
+    Ține loc de tabel de invitații, fiindcă e tot ce trebuie: clipa asta intră
+    în semnătura linkului. O invitație nouă o schimbă, deci linkul vechi moare
+    pe loc; iar după ce omul își pune parola se face NULL, deci linkul
+    folosit nu mai deschide nimic a doua oară.
+
+    NULL înseamnă „nicio invitație în aer", nu „n-a fost invitat niciodată":
+    și contul care tocmai și-a pus parola arată la fel. Ce s-a întâmplat se
+    vede din coloanele parola și intrat_la, nu de aici.
+  */
+  ALTER TABLE utilizatori ADD COLUMN IF NOT EXISTS invitat_la timestamptz;
 `;
 
 let gata: Promise<void> | null = null;
@@ -306,6 +322,7 @@ type Rand = {
   activ: boolean;
   creat_la: Date;
   intrat_la: Date | null;
+  invitat_la: Date | null;
 };
 
 /**
@@ -325,10 +342,12 @@ function cites(rand: Rand): Utilizator {
     creatLa: rand.creat_la,
     intratLa: rand.intrat_la,
     areParola: Boolean(rand.parola),
+    invitatLa: rand.invitat_la,
   };
 }
 
-const COLOANE = "id, email, nume, rol, parola, activ, creat_la, intrat_la";
+const COLOANE =
+  "id, email, nume, rol, parola, activ, creat_la, intrat_la, invitat_la";
 
 export async function utilizatorDupaId(id: string): Promise<Utilizator | null> {
   if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
@@ -396,14 +415,22 @@ const MOMEALA =
   "scrypt$16384$8$1$AAAAAAAAAAAAAAAAAAAAAA==$" +
   "cGFyb2xhIGNhcmUgbnUgZXhpc3RhIG5pY2kgbnUgdHJlYnVpZSBzYSBleGlzdGUgdmUyMDI2";
 
+/**
+ * Face un cont.
+ *
+ * `parola` poate lipsi: atunci contul se naște fără una, iar omul și-o pune
+ * singur din invitația primită pe e-mail. Un cont fără parolă nu poate intra
+ * — `intraCuParola` cere o amprentă ca s-o compare —, deci nu e o ușă
+ * deschisă, e o ușă care încă n-are cheie.
+ */
 export async function faceUtilizator(date: {
   email: string;
   nume: string;
   rol: Rol;
-  parola: string;
+  parola?: string;
 }): Promise<Utilizator | null> {
   await pregateste();
-  const parola = await pregatesteParola(date.parola);
+  const parola = date.parola ? await pregatesteParola(date.parola) : null;
   const randuri = await intreaba<Rand>(
     `INSERT INTO utilizatori (email, nume, rol, parola)
      VALUES ($1, $2, $3, $4)
