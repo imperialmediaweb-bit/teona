@@ -1,5 +1,6 @@
-import { ASOCIATIA, CIFRE, EMAIL, RUTE, TELEFOANE } from "@/date/asociatie";
+import { ASOCIATIA, EMAIL, RUTE, TELEFOANE } from "@/date/asociatie";
 import { CUM_SCRIE_ASOCIATIA } from "./ton-asociatie";
+import { CIFRE_DIN_COD, cifreSite, type Cifra } from "./cifre";
 
 /**
  * Asistentul din panoul de admin: scrie o ciornă de e-mail, nu o trimite.
@@ -68,10 +69,10 @@ export function esteFel(x: unknown): x is Fel {
   return typeof x === "string" && x in FELURI;
 }
 
-function instructiuni(fel: Fel): string {
-  const cifre = CIFRE.map((c) => `- ${c.valoare}${c.sufix} ${c.eticheta}`).join(
-    "\n",
-  );
+function instructiuni(fel: Fel, aleLor: ReadonlyArray<Cifra>): string {
+  const cifre = aleLor
+    .map((c) => `- ${c.valoare}${c.sufix} ${c.eticheta}`)
+    .join("\n");
 
   return `Scrii pentru ${ASOCIATIA.denumire}, o asociație din Suceava care aduce bucurie copiilor cu nevoi speciale, copiilor care au trecut prin cancer și familiilor lor. Organizează tabere RESPIRO și ține deschisă Casa Teona, un loc cu jocuri, ateliere și consiliere pentru părinți.
 
@@ -183,6 +184,16 @@ export async function scrieCiorna(cerere: {
   const cheie = process.env.ANTHROPIC_API_KEY;
   if (!cheie) return null;
 
+  /*
+    Cifrele le ia din panou, nu din cod.
+
+    Instrucțiunile îi spun modelului „astea sunt singurele cifre pe care le
+    poți folosi". Dacă asociația trece la a 34-a tabără și aici rămâne 33,
+    modelul scrie cuminte 33 în ciorna care ajunge publicată — iar greșeala
+    are, pe pagină, exact aerul unei cifre verificate.
+  */
+  const aleLor = await cifreSite().catch(() => CIFRE_DIN_COD);
+
   try {
     const raspuns = await fetch(`${ADRESA}/v1/messages`, {
       method: "POST",
@@ -194,7 +205,7 @@ export async function scrieCiorna(cerere: {
       body: JSON.stringify({
         model: MODEL,
         max_tokens: PLAFON_RASPUNS,
-        system: instructiuni(cerere.fel),
+        system: instructiuni(cerere.fel, aleLor),
         messages: [{ role: "user", content: cerere.despre }],
       }),
     });

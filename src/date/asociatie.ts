@@ -144,6 +144,22 @@ export const RETELE_ASOCIATIE = [
  * Cele patru cifre din bara de rezultate. Apar identic pe prima pagină, pe
  * Despre noi și pe Redirecționează 3,5%, pentru că vin de aici.
  */
+/**
+ * O cifră de pe bandă.
+ *
+ * Tipul stă aici, nu în `lib/cifre.ts`, fiindcă îl folosește și componenta
+ * `Cifre.tsx`, care rulează în browser. Un import din `lib/cifre.ts` ar trage
+ * după el `lib/baza.ts` și driverul de Postgres în pachetul trimis
+ * browserului — build-ul cade cu „module not found: pg", și nu se vede la
+ * verificarea de tipuri.
+ */
+export type Cifra = {
+  valoare: number;
+  /** „+" la 1.500+, gol la 33. Caietul le scrie exact așa. */
+  sufix: string;
+  eticheta: string;
+};
+
 export const CIFRE = [
   { valoare: 33, sufix: "", eticheta: "tabere organizate" },
   { valoare: 1500, sufix: "+", eticheta: "participanți" },

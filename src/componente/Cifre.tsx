@@ -2,7 +2,7 @@
 
 import { animate, useInView, useReducedMotion } from "motion/react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { CIFRE } from "@/date/asociatie";
+import { CIFRE, type Cifra } from "@/date/asociatie";
 
 /** 1.500 se scrie cu punct în română; 33 și 80 rămân cum sunt. */
 const formateaza = new Intl.NumberFormat("ro-RO").format;
@@ -101,16 +101,26 @@ function Numar({ valoare, sufix }: { valoare: number; sufix: string }) {
  * „preluată automat din aceleași date, ca să nu apară variante diferite”.
  * De aceea componenta nu primește cifrele ca proprietăți: le citește din sursă.
  */
-export default function Cifre() {
+export default function Cifre({
+  cifre = CIFRE,
+}: {
+  /*
+    Cifrele vin de la pagina care o desenează, fiindcă asta e o componentă de
+    browser (contoarele se animă) și nu poate citi singură baza de date.
+    Valoarea din cod rămâne implicită: o pagină care n-a fost încă trecută pe
+    cifrele din panou arată cifrele verificate, nu o bandă goală.
+  */
+  cifre?: ReadonlyArray<Cifra>;
+}) {
   return (
     <ul className="grid grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-4">
-      {CIFRE.map((cifra, i) => (
+      {cifre.map((cifra, i) => (
         <li key={cifra.eticheta} className="group relative text-center">
           {/* Pata de culoare din spatele cifrei: o ține pe pagină, ca un
               marcaj trecut cu carioca peste. */}
           <span
             aria-hidden="true"
-            className={`absolute top-1 left-1/2 -z-10 size-20 -translate-x-1/2 rounded-full blur-xl transition-transform duration-500 ease-cald group-hover:scale-125 motion-reduce:group-hover:scale-100 lg:size-24 ${CULORI[i].pata}`}
+            className={`absolute top-1 left-1/2 -z-10 size-20 -translate-x-1/2 rounded-full blur-xl transition-transform duration-500 ease-cald group-hover:scale-125 motion-reduce:group-hover:scale-100 lg:size-24 ${CULORI[i % CULORI.length].pata}`}
           />
           {/*
             Mărimea cifrei ține cont și de lățimea ecranului.
@@ -121,7 +131,7 @@ export default function Cifre() {
             dinainte.
           */}
           <p
-            className={`font-titlu text-[clamp(2.1rem,11vw,3.25rem)] leading-none font-extrabold transition-transform duration-500 ease-cald group-hover:-translate-y-1 motion-reduce:group-hover:translate-y-0 lg:text-[4.25rem] ${CULORI[i].cifra}`}
+            className={`font-titlu text-[clamp(2.1rem,11vw,3.25rem)] leading-none font-extrabold transition-transform duration-500 ease-cald group-hover:-translate-y-1 motion-reduce:group-hover:translate-y-0 lg:text-[4.25rem] ${CULORI[i % CULORI.length].cifra}`}
           >
             <Numar valoare={cifra.valoare} sufix={cifra.sufix} />
           </p>
@@ -131,7 +141,7 @@ export default function Cifre() {
             viewBox="0 0 160 10"
             preserveAspectRatio="none"
             aria-hidden="true"
-            className={`mx-auto mt-2 h-2 w-24 ${CULORI[i].linie}`}
+            className={`mx-auto mt-2 h-2 w-24 ${CULORI[i % CULORI.length].linie}`}
           >
             <path
               d="M4 6.5C40 2.5 80 2 120 4.5c12 .7 22 1.6 36 2"

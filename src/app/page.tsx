@@ -21,6 +21,7 @@ import Testimoniale, {
   type Testimonial,
 } from "@/componente/acasa/Testimoniale";
 import { testimonialePublice } from "@/lib/testimoniale";
+import { cifreSite } from "@/lib/cifre";
 import { metadate } from "./seo";
 
 export const metadata: Metadata = metadate({
@@ -93,6 +94,7 @@ async function citesteTestimoniale(): Promise<Testimonial[]> {
   fotografiile și motivele lângă ea.
 */
 export default async function PrimaPagina() {
+  const cifre = await cifreSite();
   const testimoniale = await citesteTestimoniale();
 
   return (
@@ -115,7 +117,7 @@ export default async function PrimaPagina() {
               semn="stea"
               className="absolute bottom-4 left-6 size-6 text-caramiziu-200 lg:size-8"
             />
-            <Cifre />
+            <Cifre cifre={cifre} />
           </div>
         </div>
       </section>

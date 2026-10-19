@@ -49,7 +49,11 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
       { href: "/admin", eticheta: "Tablou de bord", pictograma: "panou" },
       { href: "/admin/rapoarte", eticheta: "Rapoarte", pictograma: "grafic" },
       { href: "/admin/analiza", eticheta: "Analiză", pictograma: "stea" },
-      { href: "/admin/radar", eticheta: "Radar finanțări", pictograma: "harta" },
+      {
+        href: "/admin/radar",
+        eticheta: "Radar finanțări",
+        pictograma: "harta",
+      },
     ],
   },
   {
@@ -58,7 +62,11 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
       { href: "/admin/donatii", eticheta: "Donații", pictograma: "inima" },
       { href: "/admin/donatori", eticheta: "Donatori", pictograma: "familie" },
       { href: "/admin/firme", eticheta: "Firme", pictograma: "cladire" },
-      { href: "/admin/contracte", eticheta: "Contracte", pictograma: "document" },
+      {
+        href: "/admin/contracte",
+        eticheta: "Contracte",
+        pictograma: "document",
+      },
     ],
   },
   {
@@ -101,6 +109,7 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
         eticheta: "Testimoniale",
         pictograma: "inima",
       },
+      { href: "/admin/cifre", eticheta: "Cifrele", pictograma: "grafic" },
       {
         href: "/admin/sabloane",
         eticheta: "Șabloane de e-mail",
@@ -113,7 +122,11 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
       },
       { href: "/admin/poze", eticheta: "Poze", pictograma: "arta" },
       { href: "/admin/qr", eticheta: "Cod QR", pictograma: "panou" },
-      { href: "/admin/facebook", eticheta: "Facebook", pictograma: "comunicare" },
+      {
+        href: "/admin/facebook",
+        eticheta: "Facebook",
+        pictograma: "comunicare",
+      },
       { href: "/admin/presa", eticheta: "Presă", pictograma: "document" },
       { href: "/admin/calendar", eticheta: "Calendar", pictograma: "harta" },
     ],
@@ -377,66 +390,66 @@ export default function Cadru({
           — donator, firmă, om care a trimis un formular — și deschise trei
           pagini. Un singur câmp le caută pe toate trei.
         */}
-{!faraMeniu && (
+        {!faraMeniu && (
           <>
-        <form
-          action="/admin/cauta"
-          method="get"
-          role="search"
-          className="px-3 pb-3 lg:pb-1"
-        >
-          <label htmlFor="cautare-panou" className="sr-only">
-            Caută în panou
-          </label>
-          <input
-            id="cautare-panou"
-            name="q"
-            type="search"
-            placeholder="Caută nume, e-mail, CUI…"
-            className="w-full rounded-lg border border-hartie/20 bg-hartie/10 px-3 py-2 text-mic text-hartie placeholder:text-hartie/45 focus:border-hartie/40 focus:outline-none"
-          />
-        </form>
+            <form
+              action="/admin/cauta"
+              method="get"
+              role="search"
+              className="px-3 pb-3 lg:pb-1"
+            >
+              <label htmlFor="cautare-panou" className="sr-only">
+                Caută în panou
+              </label>
+              <input
+                id="cautare-panou"
+                name="q"
+                type="search"
+                placeholder="Caută nume, e-mail, CUI…"
+                className="w-full rounded-lg border border-hartie/20 bg-hartie/10 px-3 py-2 text-mic text-hartie placeholder:text-hartie/45 focus:border-hartie/40 focus:outline-none"
+              />
+            </form>
 
-        <nav
-          aria-label="Panou"
-          className="overflow-x-auto px-3 pb-4 lg:min-h-0 lg:flex-1 lg:overflow-x-visible lg:overflow-y-auto lg:pb-6"
-        >
-          {/*
+            <nav
+              aria-label="Panou"
+              className="overflow-x-auto px-3 pb-4 lg:min-h-0 lg:flex-1 lg:overflow-x-visible lg:overflow-y-auto lg:pb-6"
+            >
+              {/*
             `Suspense`, fiindcă meniul își cere acum rolul din baza de date ca
             să știe ce linkuri să arate. Fără el, bara ar ține toată pagina în
             loc până răspunde Postgres.
           */}
-          <Suspense fallback={null}>
-            <Nav activ={activ} />
-          </Suspense>
+              <Suspense fallback={null}>
+                <Nav activ={activ} />
+              </Suspense>
 
-          <div className="hidden lg:mt-6 lg:block">
-            <p className="px-3 pb-2 font-titlu text-nota font-bold tracking-wide text-hartie/45 uppercase">
-              În altă parte
-            </p>
-            <ul className="grid gap-1">
-              {AFARA.map((loc) => (
-                <li key={loc.href}>
-                  <a
-                    href={loc.href}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 font-titlu text-mic font-semibold text-hartie/60 transition-colors hover:bg-hartie/10 hover:text-hartie"
-                  >
-                    <Pictograma
-                      nume="sageata"
-                      aria-hidden="true"
-                      className="size-4 shrink-0 -rotate-45"
-                    />
-                    {loc.eticheta}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </nav>
+              <div className="hidden lg:mt-6 lg:block">
+                <p className="px-3 pb-2 font-titlu text-nota font-bold tracking-wide text-hartie/45 uppercase">
+                  În altă parte
+                </p>
+                <ul className="grid gap-1">
+                  {AFARA.map((loc) => (
+                    <li key={loc.href}>
+                      <a
+                        href={loc.href}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 font-titlu text-mic font-semibold text-hartie/60 transition-colors hover:bg-hartie/10 hover:text-hartie"
+                      >
+                        <Pictograma
+                          nume="sageata"
+                          aria-hidden="true"
+                          className="size-4 shrink-0 -rotate-45"
+                        />
+                        {loc.eticheta}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </nav>
 
-        {/*
+            {/*
           Jos: site-ul și ieșirea.
 
           Până acum nu exista nicio cale de a ieși din panou. Parola e una
@@ -446,23 +459,23 @@ export default function Cadru({
           POST, nu printr-un link: un link s-ar deschide din greșeală, iar
           orice imagine străină cu adresa aceea ar fi dat afară omul din panou.
         */}
-        <div className="flex items-center justify-between gap-2 border-t border-hartie/10 px-3 py-2 lg:grid lg:gap-0.5 lg:py-2.5">
-          <Link
-            href="/"
-            prefetch={false}
-            className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 font-titlu text-nota font-semibold whitespace-nowrap text-hartie/65 transition-colors hover:bg-hartie/10 hover:text-hartie"
-          >
-            <Pictograma
-              nume="sageata"
-              aria-hidden="true"
-              className="size-3.5 shrink-0 -rotate-45"
-            />
-            Vezi site-ul
-          </Link>
-          <Suspense fallback={null}>
-            <Iesirea />
-          </Suspense>
-        </div>
+            <div className="flex items-center justify-between gap-2 border-t border-hartie/10 px-3 py-2 lg:grid lg:gap-0.5 lg:py-2.5">
+              <Link
+                href="/"
+                prefetch={false}
+                className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 font-titlu text-nota font-semibold whitespace-nowrap text-hartie/65 transition-colors hover:bg-hartie/10 hover:text-hartie"
+              >
+                <Pictograma
+                  nume="sageata"
+                  aria-hidden="true"
+                  className="size-3.5 shrink-0 -rotate-45"
+                />
+                Vezi site-ul
+              </Link>
+              <Suspense fallback={null}>
+                <Iesirea />
+              </Suspense>
+            </div>
           </>
         )}
       </div>

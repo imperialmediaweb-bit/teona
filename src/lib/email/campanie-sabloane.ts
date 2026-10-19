@@ -2,7 +2,6 @@ import { ADRESA_SITE } from "@/app/seo";
 import {
   ADRESE,
   ASOCIATIA,
-  CIFRE,
   CONTACT_FIRME,
   EMAIL,
   JURIDIC,
@@ -12,6 +11,7 @@ import {
   SMS,
   TELEFOANE,
 } from "@/date/asociatie";
+import { CIFRE_DIN_COD, type Cifra } from "@/lib/cifre";
 
 /**
  * Cele două șabloane de campanie pentru MailerLite.
@@ -316,10 +316,10 @@ function subsol(continut: ContinutCampanie) {
  * strângere de fonduri ele fac munca pe care n-o poate face textul: arată că
  * în spatele cererii stau unsprezece ani de tabere, nu o idee bună.
  */
-function cifre(): string {
+function cifre(lista: ReadonlyArray<Cifra>): string {
   // „1.500+", nu „1500+": mia se desparte cu punct în română.
   const mii = new Intl.NumberFormat("ro-RO");
-  const celule = CIFRE.map(
+  const celule = lista.map(
     (c) =>
       `<td align="center" width="25%" style="padding:4px 6px;">
          <p style="margin:0;font-family:${FONT};font-size:22px;font-weight:bold;color:${PORTOCALIU};">${mii.format(c.valoare)}${c.sufix}</p>
@@ -347,6 +347,7 @@ function invelis(
   continut: ContinutCampanie,
   corp: string,
   preheader: string,
+  aleLor: ReadonlyArray<Cifra>,
 ): string {
   const paragrafe = continut.paragrafe
     .filter((p) => p.trim() !== "")
@@ -400,7 +401,7 @@ function invelis(
 
         ${corp}
 
-        ${cifre()}
+        ${cifre(aleLor)}
 
         ${subsol(continut)}
 
@@ -624,6 +625,7 @@ function corpFirme(c: ContinutCampanie): string {
 export function sablonCampanie(
   fel: FelSablon,
   continut: ContinutCampanie,
+  aleLor: ReadonlyArray<Cifra> = CIFRE_DIN_COD,
 ): string {
   const preheader =
     continut.paragrafe.find((p) => p.trim() !== "")?.slice(0, 140) ??
@@ -632,6 +634,7 @@ export function sablonCampanie(
     continut,
     fel === "firme" ? corpFirme(continut) : corpPersoane(continut),
     preheader,
+    aleLor,
   );
 }
 

@@ -5,6 +5,7 @@ import { ASOCIATIA, RUTE } from "@/date/asociatie";
 import Aparitie from "@/componente/Aparitie";
 import Buton from "@/componente/Buton";
 import Cifre from "@/componente/Cifre";
+import { cifreSite } from "@/lib/cifre";
 import Decor from "@/componente/Decor";
 import Fotografie from "@/componente/Fotografie";
 import IndemnFinal from "@/componente/IndemnFinal";
@@ -229,7 +230,8 @@ function initiale(nume: string) {
     .join("");
 }
 
-export default function DespreNoi() {
+export default async function DespreNoi() {
+  const cifre = await cifreSite();
   return (
     <>
       <JsonLd date={jsonLdFir([{ nume: "Despre noi", cale: RUTE.despre }])} />
@@ -552,7 +554,7 @@ export default function DespreNoi() {
               semn="stea"
               className="absolute bottom-4 left-6 size-6 text-caramiziu-200 lg:size-8"
             />
-            <Cifre />
+            <Cifre cifre={cifre} />
           </div>
         </div>
       </section>

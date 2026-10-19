@@ -132,14 +132,14 @@ async function Continut({
           </li>
           <li>
             Semnătura: <strong>prenumele și rolul</strong> — „Maria, mama unui
-            băiat din tabără", „Andrei, voluntar".
+            băiat din tabără”, „Andrei, voluntar”.
           </li>
           <li>
             Fără nume de familie și fără fotografii. Oamenii care vorbesc
             despre copiii lor n-au cerut să fie recunoscuți de tot internetul.
           </li>
           <li>
-            Dacă e o recenzie publică de pe Facebook, scrie asta la „De unde":
+            Dacă e o recenzie publică de pe Facebook, scrie asta la „De unde”:
             cine citește trebuie să știe că n-am cules-o noi.
           </li>
         </ul>

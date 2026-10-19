@@ -2,11 +2,11 @@ import { ADRESA_SITE } from "@/app/seo";
 import {
   ADRESE,
   ASOCIATIA,
-  CIFRE,
   EMAIL,
   RUTE,
   TELEFON_PRINCIPAL,
 } from "@/date/asociatie";
+import { CIFRE_DIN_COD, cifreSite, type Cifra } from "@/lib/cifre";
 
 /** Cerneala din plic, pentru un `strong` dintr-o casetă. */
 const CULORI_CERNEALA = "#232323";
@@ -77,6 +77,7 @@ export function compuneMesajulDeContact(d: MesajDeContact): Compus {
 /** Către om: am primit, îți răspundem. */
 export function compuneConfirmareaDeContact(
   d: Pick<MesajDeContact, "nume" | "email" | "voluntariat">,
+  cifre: ReadonlyArray<Cifra> = CIFRE_DIN_COD,
 ): Compus {
   const titlu = d.voluntariat
     ? "Am primit cererea ta de voluntariat"
@@ -88,7 +89,7 @@ export function compuneConfirmareaDeContact(
     : "Îți mulțumim pentru mesaj. L-am primit și îți răspundem în două-trei zile lucrătoare.";
 
   const urmeaza = d.voluntariat
-    ? `La Casa Teona este nevoie de voluntari la activitățile cu copiii, în tabere și la evenimente. Nu este necesară experiență anterioară — până acum au fost alături de noi peste ${CIFRE[3].valoare} de voluntari.`
+    ? `La Casa Teona este nevoie de voluntari la activitățile cu copiii, în tabere și la evenimente. Nu este necesară experiență anterioară — până acum au fost alături de noi peste ${cifre[3].valoare} de voluntari.`
     : "Dacă mesajul tău privește un copil sau o familie care are nevoie de ajutor, îl tratăm cu prioritate.";
 
   const corp = `
@@ -135,10 +136,11 @@ export function trimiteMesajulDeContact(d: MesajDeContact): Promise<boolean> {
 }
 
 /** Confirmarea către om. Dacă nu pleacă, mesajul lui a ajuns oricum. */
-export function trimiteConfirmareaDeContact(d: MesajDeContact) {
+export async function trimiteConfirmareaDeContact(d: MesajDeContact) {
+  const cifre = await cifreSite().catch(() => CIFRE_DIN_COD);
   return trimiteEmail({
     catre: d.email,
     raspundeLa: EMAIL.contact,
-    ...compuneConfirmareaDeContact(d),
+    ...compuneConfirmareaDeContact(d, cifre),
   });
 }

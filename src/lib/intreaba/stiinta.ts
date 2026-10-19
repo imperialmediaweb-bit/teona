@@ -1,7 +1,6 @@
 import {
   ADRESE,
   ASOCIATIA,
-  CIFRE,
   CONTACT_FIRME,
   DESTINATII_DONATIE,
   EMAIL,
@@ -12,6 +11,7 @@ import {
   SMS,
   TELEFOANE,
 } from "@/date/asociatie";
+import { CIFRE_DIN_COD, type Cifra } from "@/lib/cifre";
 import { proiecteAfisate } from "@/date/proiecte";
 
 /**
@@ -38,7 +38,7 @@ function lista(randuri: string[]): string {
   return randuri.filter(Boolean).join("\n");
 }
 
-export function stiinta(): string {
+export function stiinta(cifre: ReadonlyArray<Cifra> = CIFRE_DIN_COD): string {
   const proiecte = proiecteAfisate();
 
   /*
@@ -66,7 +66,7 @@ export function stiinta(): string {
     `- Cazuri umanitare și campanii punctuale. ${RUTE.campanii}`,
     "",
     "## Cifre verificate (singurele care pot fi spuse)",
-    ...CIFRE.map((c) => `- ${c.valoare}${c.sufix} ${c.eticheta}`),
+    ...cifre.map((c) => `- ${c.valoare}${c.sufix} ${c.eticheta}`),
     "",
     "## Unde se găsește asociația",
     `- Casa Teona: ${ADRESE.casaTeona.strada}, ${ADRESE.casaTeona.oras} ${ADRESE.casaTeona.cod}. ${ADRESE.casaTeona.program}. ${ADRESE.casaTeona.acces}.`,

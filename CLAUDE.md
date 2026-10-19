@@ -75,6 +75,37 @@ nu se interpolează niciodată și nu dă nicio eroare — aceeași greșeală c
 `PAROLA_ADMIN=… node scripts/qa/ton-asociatie.mjs` (cere un `npm run build`
 făcut înainte: pornește singură un al doilea site, pe alt port).
 
+## Cifrele se schimbă din panou, nu din cod
+
+Caietul le cere la pagina 1, printre regulile valabile pe tot site-ul:
+„Cifrele sunt aceleași peste tot […] **Asociația le poate modifica singură.**"
+Până acum a 34-a tabără însemna un mesaj către mine și o publicare.
+
+`/admin/cifre` ține cele patru rânduri: cifra, sufixul („+" la 1.500+, gol la
+33) și eticheta, care se poate schimba și ea. **Patru, nici mai multe, nici mai
+puține** — banda e desenată pentru patru și pe telefon se așază două pe două.
+
+`src/lib/cifre.ts` le citește, cu `CIFRE` din `date/asociatie.ts` ca
+**rezervă**, nu cu o listă goală: o bandă fără nimic pe prima pagină spune
+despre asociație că n-a făcut nimic. Se schimbă într-un loc și se schimbă peste
+tot — prima pagină, Despre noi, pagina de 3,5%, `llms.txt`, asistentul de pe
+site, ciorna scrisă de model și șablonul de e-mail de campanie.
+
+- **Tipul `Cifra` stă în `date/asociatie.ts`, nu în `lib/cifre.ts`.** Îl
+  folosește și `componente/Cifre.tsx`, care rulează în browser (contoarele se
+  animă), iar un import din `lib/cifre.ts` trage după el `lib/baza.ts` și
+  driverul de Postgres în pachetul trimis browserului: build-ul cade cu
+  „module not found: pg". **Verificarea de tipuri nu prinde asta** — a prins-o
+  build-ul.
+- **Ciorna scrisă de model primește cifrele din panou.** Instrucțiunile îi
+  spun „astea sunt singurele cifre pe care le poți folosi"; lăsate în cod, ar
+  fi scris cuminte 33 după ce asociația a trecut la 34, iar greșeala ar fi avut
+  în pagină exact aerul unei cifre verificate.
+- Probă: `BAZA=… PAROLA_ADMIN=… node scripts/qa/cifre.mjs` — schimbă o cifră
+  prin panou, o caută pe cele patru suprafețe publice, verifică că „7.777"
+  scris cu punct de mii nu devine 7 și că un text în locul cifrei e refuzat,
+  apoi pune cifrele înapoi cum erau.
+
 ## Date reale, verificate (nu le reinventa)
 
 - Denumire: **Asociația Teona Ariana Suceava**, CIF **43533953**
@@ -494,6 +525,7 @@ picată, `pause_turn`, pistă respinsă care nu învie:
   urcă. Asistentul (cu `ANTHROPIC_API_KEY`) scrie o primă ciornă.
 - **`/admin/aniversari`** — aprobarea campaniilor de ziua cuiva. Se numea
   `/admin/campanii`; adresa veche redirecționează.
+- **`/admin/cifre`** — cele patru cifre de pe site. Vezi secțiunea de mai sus.
 - **`/admin/poze`** — ce e în Cloudinary și la ce proiect au ajuns pozele.
 - **`/admin/radar`** — ce a găsit căutarea automată pe internet: apeluri de
   finanțare noi, ca piste de verificat la sursă. Vezi secțiunea de mai sus.
@@ -926,10 +958,13 @@ De reținut, pentru data viitoare:
 1. **Donațiile.** Acum merg prin GiveWP + Stripe pe WordPress, în lei, cu plată
    recurentă. Fie se rescrie peste Stripe aici, fie site-ul nou trimite la
    WordPress-ul existent pentru plăți. Nimic nu s-a decis.
-2. **Cine editează conținutul.** Rezolvat pe jumătate: noutățile și campaniile
-   se scriu din panou, cu poze (`/admin/scrie`). Rămân prin dezvoltator
-   testimonialele, descrierile proiectelor, documentele și textele paginilor
-   fixe.
+2. **Cine editează conținutul.** Din panou se scriu acum: noutățile și
+   campaniile (`/admin/scrie`), descrierile taberelor, testimonialele
+   (`/admin/testimoniale`) și cele patru cifre (`/admin/cifre`). Rămân prin
+   dezvoltator **documentele de descărcat** (Formularul 230, contractul,
+   Declarația 177 — caietul cere la 2.4 ca asociația să le poată înlocui
+   singură) și **siglele sponsorilor** (cerute de asociație în octombrie:
+   „o să pot și eu adăuga ulterior sigle?"). Plus textele paginilor fixe.
 3. **CRM pentru donatori**, cu campanii de e-mail — urmează.
 
 ## Ce lipsește de la client

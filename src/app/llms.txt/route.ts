@@ -1,7 +1,6 @@
 import {
   ADRESE,
   ASOCIATIA,
-  CIFRE,
   CONTURI,
   EMAIL,
   LINKURI_EXTERNE,
@@ -10,6 +9,7 @@ import {
   SMS,
   TELEFOANE,
 } from "@/date/asociatie";
+import { cifreSite, type Cifra } from "@/lib/cifre";
 import { proiecteAfisate } from "@/date/proiecte";
 import { ADRESA_SITE, INDEXABIL, absoluta } from "../seo";
 
@@ -118,11 +118,12 @@ const PAGINI_LEGALE: ReadonlyArray<{ titlu: string; cale: string }> = [
   { titlu: "Termeni și condiții", cale: RUTE.termeni },
 ];
 
-function cifra({ valoare, sufix }: (typeof CIFRE)[number]) {
+function cifra({ valoare, sufix }: Cifra) {
   return `${valoare.toLocaleString("ro-RO")}${sufix}`;
 }
 
-function scrie(): string {
+async function scrie(): Promise<string> {
+  const cifre = await cifreSite();
   const { casaTeona, sediuSocial } = ADRESE;
   const telefoane = TELEFOANE.map((t) => t.afisat).join(" și ");
 
@@ -157,7 +158,7 @@ ${RETELE_ASOCIATIE.map((r) => `- ${r.nume}: ${r.url}`).join("\n")}
 
 Cifre, așa cum le publică asociația:
 
-${CIFRE.map((c) => `- ${cifra(c)} ${c.eticheta}`).join("\n")}
+${cifre.map((c) => `- ${cifra(c)} ${c.eticheta}`).join("\n")}
 
 ## Cum poate fi ajutată
 
@@ -226,8 +227,8 @@ Harta completă: ${ADRESA_SITE}/sitemap.xml
 `;
 }
 
-export function GET() {
-  return new Response(scrie(), {
+export async function GET() {
+  return new Response(await scrie(), {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
       /*

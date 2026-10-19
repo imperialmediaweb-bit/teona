@@ -1,6 +1,7 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { REGULI, stiinta } from "./stiinta";
+import { CIFRE_DIN_COD, cifreSite } from "@/lib/cifre";
 
 /**
  * Asistentul de pe site: răspunde vizitatorilor, în numele asociației.
@@ -70,7 +71,7 @@ export async function* raspunde(
     system: [
       {
         type: "text",
-        text: `${REGULI}\n\n---\n\n${stiinta()}`,
+        text: `${REGULI}\n\n---\n\n${stiinta(await cifreSite().catch(() => CIFRE_DIN_COD))}`,
         cache_control: { type: "ephemeral" },
       },
     ],

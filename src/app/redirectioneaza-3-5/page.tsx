@@ -13,6 +13,7 @@ import { anulCurent } from "@/lib/an";
 import Aparitie from "@/componente/Aparitie";
 import Buton from "@/componente/Buton";
 import Cifre from "@/componente/Cifre";
+import { cifreSite } from "@/lib/cifre";
 import Decor from "@/componente/Decor";
 import Fotografie from "@/componente/Fotografie";
 import IndemnFinal from "@/componente/IndemnFinal";
@@ -145,6 +146,7 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
 ];
 
 export default async function Redirectioneaza35() {
+  const cifre = await cifreSite();
   const an = await anulCurent();
   const bcr = CONTURI[0];
 
@@ -488,7 +490,7 @@ export default async function Redirectioneaza35() {
               className="absolute bottom-4 left-6 size-6 text-caramiziu-200 lg:size-8"
             />
             <h3 className="sr-only">Rezultatele noastre</h3>
-            <Cifre />
+            <Cifre cifre={cifre} />
           </div>
         </div>
       </section>
