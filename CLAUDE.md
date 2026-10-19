@@ -83,7 +83,22 @@ Ce înseamnă asta în practică:
   explicit, prin `dosarCloud`;
 - contul e pe „dynamic folders”: folderul e un câmp separat de identificatorul
   pozei, deci listarea se face cu `resources/by_asset_folder`, nu cu `prefix`.
-  Căutarea pe identificator rămâne ca rezervă, pentru conturile în modul vechi;
+  Căutarea pe identificator rămâne ca rezervă, pentru conturile în modul vechi.
+  **Identificatorul n-are nicio legătură cu folderul**, deci o poză de tabără
+  se cheamă `M_ue0nhw`, nu `Teona/2025/…`: după calea folderului nu se poate
+  căuta în pagina randată, iar o galerie care merge arată, din afară, exact
+  ca una goală;
+- **ce nu e fotografie nu intră în galerie.** `by_asset_folder` întoarce tot
+  ce e în folder. În folderele taberelor au ajuns fișiere
+  `New_Text_Document_….txt`, urcate din greșeală odată cu pozele: veneau cu
+  `resource_type: "raw"`, treceau ca orice poză și, fiindcă lista se sortează
+  cu cea mai nouă prima, nimereau tocmai pe locul mare din capul galeriei — un
+  dreptunghi gol. Asta a fost „eroarea la poze” semnalată în octombrie 2026 la
+  taberele de autism din septembrie 2025. Se cer amândouă condițiile, tipul și
+  o lățime peste zero: un fișier fără dimensiuni nu e o fotografie pe care s-o
+  poți așeza în pagină, oricum ar fi etichetat. Cernerea se face **înainte** de
+  a hotărî dacă prima cerere a adus ceva, altfel un folder plin numai cu
+  fișiere text ar părea plin și rezerva n-ar mai fi încercată;
 - în panou, la `/admin/poze`, se vede sub fiecare folder la ce proiect au
   ajuns pozele lui, sau că n-a ajuns la niciunul;
 - taberele mari au pozele pe subfoldere („ZIUA 1”, „GRUP”); se citesc două
@@ -548,6 +563,38 @@ codul). Ce merge e în `src/proxy.ts`: filtrează slugurile înainte de randare
 și întoarce corpul paginii `/proiect-inexistent` cu codul 404.
 
 Proba: `BAZA=http://localhost:3000 node scripts/qa/coduri-404.mjs`.
+
+## Schema pleacă într-o singură cerere, deci cade în întregime
+
+`DEFINITIE` din `src/lib/baza.ts` e un bloc mare de SQL trimis ca o singură
+cerere. Postgres îl rulează într-o tranzacție implicită: **o greșeală la orice
+rând dă rollback la tot**, iar lanțul din `pregateste()` nu mai ajunge la
+`ADAOSURI`. Cum fiecare `intreaba()` așteaptă schema, o singură instrucțiune
+stricată face ca **orice** pagină care atinge baza să răspundă 500 — nu doar
+cea la care te-ai aștepta.
+
+S-a întâmplat în octombrie 2026, și panoul a stat căzut două zile. Semnatul
+contractului pe ecran fusese scos din site, dar tabelul lui, `contracte`,
+rămăsese în baza de date, cu alte coloane. Registrul de contracte a adus un
+tabel cu același nume, scris cu `CREATE TABLE IF NOT EXISTS` — care a văzut
+unul existent și n-a făcut nimic. Imediat sub el, `CREATE INDEX … (an DESC)`
+a cerut o coloană care nu există în tabelul vechi: „column «an» does not
+exist”. De acolo în jos n-a mai fost creat nimic: nici `plati_esuate`, nici
+coloanele din `ADAOSURI`.
+
+De reținut, pentru data viitoare:
+
+- **`CREATE TABLE IF NOT EXISTS` nu e o migrare.** Nu se uită la coloane: dacă
+  un tabel cu numele ăla există, din orice viață anterioară, instrucțiunea
+  trece tăcut și abia ce vine după ea crapă.
+- **Un tabel scos din cod nu dispare din baza de date.** Când o funcție e
+  ștearsă, tabelul ei rămâne, iar numele lui rămâne ocupat.
+- **Tabelele vechi nu se șterg, se mută deoparte.** Cel de aici ținea PDF-uri
+  de contracte semnate, cu IP și amprentă. A devenit
+  `contracte_semnate_pe_ecran`, printr-un `DO $$ … $$` care se uită după o
+  coloană ce există numai în cel vechi și sare dacă mutarea s-a făcut deja.
+- **Jurnalul Railway spune adevărul mai repede decât orice presupunere.**
+  Eroarea era acolo, cu cod cu tot (42703, `ComputeIndexAttrs`), de două zile.
 
 ## Decizii încă deschise
 
