@@ -23,6 +23,46 @@ import { rgb } from "pdf-lib";
 
 const PUNCTE = "…………………………………";
 
+/**
+ * Care dintre cele două contracte ale asociației.
+ *
+ * - `direct` — firma virează ea banii și scade suma din impozitul pe profit.
+ * - `declaratia177` — suma o virează **ANAF**, din impozitul firmei, pe baza
+ *   Declarației 177 (Ordinul ANAF nr. 1679/2022). E ruta microîntreprinderilor
+ *   pe impozit pe venit, adică exact firmele cărora calculatorul de pe
+ *   `/directioneaza-20` le spune că n-au de unde scădea o sponsorizare.
+ *
+ * Nu sunt două formatări ale aceluiași document: diferă cine plătește, deci
+ * diferă ce semnează firma și când intră banii.
+ */
+export type FelContract = "direct" | "declaratia177";
+
+/**
+ * Singurul loc în care textul celor două contracte diferă.
+ *
+ * Restul clauzelor — părțile, obiectul, durata, forța majoră, notificările,
+ * continuitatea, încetarea — sunt identice, cuvânt cu cuvânt. Scrise o dată,
+ * aici, fiindcă le folosesc și PDF-ul (`contract.ts`) și Word-ul
+ * (`contract-word.ts`): două copii s-ar depărta la prima corectură.
+ *
+ * Textul vine din contractul asociației (`contract sponsorizare 177
+ * 2026.pdf`, primit pe 16 octombrie 2026), cu două greșeli de tipar
+ * îndreptate — „autoritatea fiscal" → „fiscală" și „se oblige" → „se obligă".
+ * Atât: un contract nu e loc de reformulat.
+ */
+export const CLAUZE_PLATA: Readonly<
+  Record<FelContract, { art4: string; obligatiaSponsorului?: string }>
+> = {
+  direct: {
+    art4: "SPONSORUL se obligă să vireze în contul BENEFICIARULUI sau să înmâneze în numerar suma prevăzută la Art. 3.",
+  },
+  declaratia177: {
+    art4: "Plata sumei ce face obiectul prezentului contract se va efectua de către autoritatea fiscală (ANAF), în baza Declarației 177, completată și depusă de SPONSOR, în conformitate cu Ordinul ANAF nr. 1679/2022.",
+    obligatiaSponsorului:
+      "SPONSORUL se obligă să depună în termen Declarația 177 la ANAF și să anexeze prezentul contract la dosarul fiscal justificativ.",
+  },
+};
+
 export type DateContract = {
   numar: string;
   data: string;
@@ -38,6 +78,8 @@ export type DateContract = {
   /** Valoarea scrisă de om, în lei: „5.000” sau „5000,50”. */
   valoare: string;
   dataSemnarii: string;
+  /** Care contract. Lipsă înseamnă cel dintâi, ca înainte de 16 oct. 2026. */
+  fel?: FelContract;
 };
 
 /** Valoarea câmpului, sau punctele de completat cu pixul. */
@@ -146,10 +188,8 @@ export async function contractDeSponsorizare(
     culoare: PORTOCALIU,
   });
   c.linie();
-  c.scrie(
-    "Art. 4. SPONSORUL se obligă să vireze în contul BENEFICIARULUI sau să înmâneze în numerar suma prevăzută la Art. 3.",
-    { spatiuDupa: 8 },
-  );
+  const clauze = CLAUZE_PLATA[date.fel ?? "direct"];
+  c.scrie(`Art. 4. ${clauze.art4}`, { spatiuDupa: 8 });
   c.scrie("Art. 5. BENEFICIARUL se obligă:", { spatiuDupa: 6 });
   c.scrie(
     "•  să aducă la cunoștința publicului larg numele SPONSORULUI, prin diverse modalități;",
@@ -157,8 +197,11 @@ export async function contractDeSponsorizare(
   );
   c.scrie(
     "•  să folosească sumele primite exclusiv în scop caritabil și pentru ajutorarea persoanelor aflate în nevoie.",
-    { spatiuDupa: 9, indent: 14 },
+    { spatiuDupa: clauze.obligatiaSponsorului ? 6 : 9, indent: 14 },
   );
+  if (clauze.obligatiaSponsorului) {
+    c.scrie(clauze.obligatiaSponsorului, { spatiuDupa: 9, indent: 14 });
+  }
 
   c.scrie("IV. DURATA CONTRACTULUI", {
     gros: true,
@@ -261,5 +304,8 @@ export function numeleFisierului(date: DateContract): string {
     .replace(/[^A-Za-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 40);
-  return `Contract-sponsorizare-${firma || "firma"}.pdf`;
+  // Cele două contracte ajung în același inbox. Dacă s-ar numi la fel, al
+  // doilea l-ar suprascrie pe primul în Descărcări, fără să spună nimic.
+  const coada = date.fel === "declaratia177" ? "-declaratia-177" : "";
+  return `Contract-sponsorizare${coada}-${firma || "firma"}.pdf`;
 }

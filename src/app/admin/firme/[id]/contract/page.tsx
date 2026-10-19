@@ -323,15 +323,44 @@ async function Continut({
         </label>
 
         <div>
-          <button
-            type="submit"
-            className="colt-mic-a bg-caramiziu-700 px-6 py-3 font-titlu font-bold text-hartie transition-colors hover:bg-caramiziu-800"
-          >
-            Descarcă contractul (PDF)
-          </button>
+          {/*
+            Două butoane, două contracte. Numele câmpului pleacă odată cu
+            apăsarea, deci nu e nevoie de un selector separat pe care cineva
+            l-ar putea lăsa pe valoarea greșită fără să observe.
+          */}
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="submit"
+              name="contract"
+              value="direct"
+              className="colt-mic-a bg-caramiziu-700 px-6 py-3 font-titlu font-bold text-hartie transition-colors hover:bg-caramiziu-800"
+            >
+              Descarcă contractul (PDF)
+            </button>
+            <button
+              type="submit"
+              name="contract"
+              value="declaratia177"
+              className="colt-mic-b border-2 border-caramiziu-300 px-6 py-3 font-titlu font-bold text-caramiziu-800 transition-colors hover:border-caramiziu-500"
+            >
+              Contract pentru Declarația 177 (PDF)
+            </button>
+          </div>
           <p className="mt-2 text-nota text-cerneala-slab">
             Se deschide în fila asta ca fișier. Textul clauzelor e cel din
             contractul asociației, neschimbat.
+          </p>
+          <p className="mt-2 text-nota text-cerneala-slab">
+            <strong className="font-titlu font-bold text-cerneala">
+              Care din două:
+            </strong>{" "}
+            la cel dintâi, firma virează banii și scade suma din impozitul pe
+            profit. La cel pentru Declarația 177, suma o virează ANAF din
+            impozitul firmei (Ordinul ANAF 1679/2022) — calea
+            microîntreprinderilor pe impozit pe venit, cărora calculatorul de
+            pe site le spune că n-au de unde scădea o sponsorizare. Diferă
+            Art. 4 și o obligație în plus a sponsorului; restul clauzelor sunt
+            identice.
           </p>
         </div>
       </form>

@@ -27,7 +27,7 @@ import {
   VerticalAlign,
   WidthType,
 } from "docx";
-import type { DateContract } from "./contract";
+import { CLAUZE_PLATA, type DateContract } from "./contract";
 
 /**
  * Contractul de sponsorizare, ca document Word.
@@ -534,11 +534,18 @@ const subsol = () =>
 export async function contractWord(
   date: Partial<DateContract> = {},
 ): Promise<Uint8Array> {
+  // Aceleași două clauze ca la PDF, din aceeași sursă. Vezi `CLAUZE_PLATA`.
+  const clauze = CLAUZE_PLATA[date.fel ?? "direct"];
+  const pentru177 = date.fel === "declaratia177";
+
   const document = new Document({
     creator: "Asociația Teona Ariana Suceava",
-    title: "Contract de sponsorizare",
-    description:
-      "Model de contract de sponsorizare, de completat de firma sponsor.",
+    title: pentru177
+      ? "Contract de sponsorizare (Declarația 177)"
+      : "Contract de sponsorizare",
+    description: pentru177
+      ? "Model de contract de sponsorizare prin Declarația 177, în care suma o virează ANAF din impozitul firmei."
+      : "Model de contract de sponsorizare, de completat de firma sponsor.",
     styles: {
       default: {
         document: { run: { font: "Calibri", size: CORP, color: NEGRU } },
@@ -704,10 +711,7 @@ export async function contractWord(
           }),
 
           capitol("III. OBLIGAȚIILE PĂRȚILOR"),
-          articol(
-            4,
-            "SPONSORUL se obligă să vireze în contul BENEFICIARULUI sau să înmâneze în numerar suma prevăzută la Art. 3.",
-          ),
+          articol(4, clauze.art4),
           articol(5, "BENEFICIARUL se obligă:"),
           new Paragraph({
             numbering: { reference: "obligatii", level: 0 },
@@ -731,6 +735,26 @@ export async function contractWord(
               }),
             ],
           }),
+          /*
+            La contractul prin Declarația 177, sponsorul are o obligație în
+            plus. În originalul asociației nu e punct de listă, ci un paragraf
+            retras sub ele — aici la fel.
+          */
+          ...(clauze.obligatiaSponsorului
+            ? [
+                new Paragraph({
+                  alignment: AlignmentType.JUSTIFIED,
+                  spacing: { after: 140, line: 264 },
+                  indent: { left: 700 },
+                  children: [
+                    new TextRun({
+                      text: clauze.obligatiaSponsorului,
+                      size: CORP,
+                    }),
+                  ],
+                }),
+              ]
+            : []),
 
           capitol("IV. DURATA CONTRACTULUI"),
           articol(

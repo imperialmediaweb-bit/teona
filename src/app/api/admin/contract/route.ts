@@ -85,11 +85,20 @@ export async function POST(cerere: Request) {
     email: camp("email"),
     valoare: camp("valoare"),
     dataSemnarii: camp("dataSemnarii"),
+    /*
+      Care dintre cele două contracte. Vine dintr-un câmp al formularului,
+      deci din afară: orice altceva decât valoarea cunoscută înseamnă cel
+      dintâi contract, nu o eroare. Un buton nou în panou n-are voie să
+      schimbe clauzele dacă cineva trimite o valoare inventată.
+    */
+    fel: formular.get("contract") === "declaratia177" ? "declaratia177" : "direct",
   };
 
   // Lungimile sunt generoase pentru o denumire de firmă și strâmte cât să nu
   // intre un roman într-un câmp care ajunge într-un PDF.
-  if (Object.values(date).some((v) => v.length > 300)) {
+  if (
+    Object.values(date).some((v) => typeof v === "string" && v.length > 300)
+  ) {
     return raspuns("Un câmp e prea lung.", 400);
   }
 
@@ -103,7 +112,11 @@ export async function POST(cerere: Request) {
   await scrieInteractiune({
     firmaId: id,
     fel: "notita",
-    rezumat: `Contract generat${date.numar ? ` (nr. ${date.numar})` : ""}${
+    rezumat: `${
+      date.fel === "declaratia177"
+        ? "Contract pentru Declarația 177 generat"
+        : "Contract generat"
+    }${date.numar ? ` (nr. ${date.numar})` : ""}${
       date.valoare ? `, ${date.valoare} lei` : ""
     }`,
     scrisDe: (await numeleConectat()) ?? undefined,

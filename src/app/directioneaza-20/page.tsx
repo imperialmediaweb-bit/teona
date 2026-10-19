@@ -382,6 +382,32 @@ export default function Directioneaza20() {
                   </a>
                   . Același text, aceleași clauze.
                 </p>
+                {/*
+                  Al doilea contract, pentru cealaltă cale.
+
+                  La contractul de mai sus firma plătește ea și scade suma din
+                  impozit. La ăsta plătește ANAF, din impozitul firmei, pe baza
+                  Declarației 177 (Ordinul ANAF 1679/2022) — iar asta schimbă
+                  cine semnează ce și când intră banii. Sunt două documente, nu
+                  două formatări ale aceluiași, de aceea stau separat.
+                */}
+                <p className="mt-3 text-mic text-cerneala-moale">
+                  Dacă mergi pe{" "}
+                  <strong className="font-titlu font-bold text-cerneala">
+                    Declarația 177
+                  </strong>
+                  , în care suma o virează ANAF din impozitul firmei, contractul
+                  e altul:{" "}
+                  <a
+                    href="/documente/contract-sponsorizare-declaratia-177.pdf"
+                    download
+                    className="font-titlu font-bold text-caramiziu-700 underline-offset-4 hover:underline"
+                  >
+                    contractul pentru Declarația 177, în PDF
+                  </a>
+                  . Întreabă contabilitatea firmei care dintre cele două ți se
+                  potrivește.
+                </p>
               </li>
             </ul>
           </div>
