@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { RUTE } from "@/date/asociatie";
-import { SIGLE_PRIMA_PAGINA } from "@/date/sponsori";
+import { SIGLE_PRIMA_PAGINA, type Sigla } from "@/date/sponsori";
 import Aparitie from "@/componente/Aparitie";
 import Buton from "@/componente/Buton";
 import Decor from "@/componente/Decor";
@@ -33,7 +33,18 @@ const LINII = [
   "border-t-turcoaz-400",
 ] as const;
 
-export default function NeSustin() {
+export default function NeSustin({
+  /*
+    Siglele vin de la prima pagină, nu se citesc aici: ele stau în baza de
+    date, iar componenta asta e desenată în mijlocul unei secțiuni. Valoarea
+    din cod rămâne implicită, ca banda să nu apară goală dacă baza tace — o
+    bandă „Ne susțin" fără nimic în ea spune despre asociație că n-are
+    sponsori.
+  */
+  sigle = SIGLE_PRIMA_PAGINA,
+}: {
+  sigle?: ReadonlyArray<Sigla>;
+} = {}) {
   return (
     <section className="granulatie relative overflow-hidden bg-hartie-calda pt-8 pb-24 lg:pt-12 lg:pb-32">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
@@ -68,7 +79,7 @@ export default function NeSustin() {
             <h2 className="text-h2 text-cerneala">Ne susțin</h2>
 
             <ul className="mt-8 grid grid-cols-3 gap-3 sm:grid-cols-4">
-              {SIGLE_PRIMA_PAGINA.map((sigla, i) => (
+              {sigle.map((sigla, i) => (
                 <li key={sigla.nume}>
                   <div
                     className={`${i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"} flex h-20 items-center justify-center border-t-4 bg-hartie p-3 shadow-[0_14px_30px_-18px_rgba(35,35,35,0.5)] transition-all duration-400 ease-cald hover:-translate-y-1 hover:shadow-[0_18px_34px_-16px_rgba(247,79,34,0.45)] motion-reduce:hover:translate-y-0 sm:h-24 sm:p-4 ${LINII[i % 3]}`}

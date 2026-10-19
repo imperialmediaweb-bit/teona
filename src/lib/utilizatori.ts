@@ -147,6 +147,7 @@ export const PAGINI: ReadonlyArray<{ cale: string; roluri: readonly Rol[] }> = [
   { cale: "/admin/testimoniale", roluri: ["administrator", "fundraising"] },
   { cale: "/admin/cifre", roluri: ["administrator", "fundraising"] },
   { cale: "/admin/documente", roluri: ["administrator", "fundraising"] },
+  { cale: "/admin/sponsori", roluri: ["administrator", "fundraising"] },
   { cale: "/admin/facebook", roluri: ["administrator", "fundraising"] },
   /* Singura pagină a cărei lipsă deosebește rolurile. Vezi mai sus de ce. */
   { cale: "/admin/utilizatori", roluri: ["administrator"] },

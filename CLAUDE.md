@@ -144,6 +144,40 @@ ar crede că l-a publicat.
   pagină omenească, un slug din afara listei nu urcă nimic, un fișier care nu
   începe cu `%PDF` e refuzat.
 
+## Siglele sponsorilor se adaugă din panou
+
+Întrebarea e a asociației, din octombrie 2026: „La Sponsori o să pot și eu
+adăuga ulterior sigle? Ei sunt mai mulți decât apar acum pe site." Caietul cere
+la 6.3 să se adauge „și alte sigle ale sponsorilor care au mai apărut pe parcurs
+(de trimis de la asociație)" — adică, până atunci, trimise mie.
+
+`/admin/sponsori`: adaugă, redenumește, pune adresa firmei, scoate de pe site,
+mută cu ↑ și ↓. Sigla urcată merge în Cloudinary, în subdosarul `sigle`, și se
+scrie `/cloud/<identificator>` — convenția care există deja pentru pozele din
+panou, deci `next/image` o redimensionează ca pe oricare alta.
+
+- **Numele firmei e obligatoriu**, și regula e de dinainte: fără el, textul
+  alternativ ar fi „siglă de sponsor", care nu spune nimic cui ascultă pagina,
+  iar sub siglă n-ar scrie nimic.
+- **Pe prima pagină intră primele douăsprezece** (`PE_PRIMA_PAGINA`, scris o
+  dată în `date/sponsori.ts` — a treisprezecea rupe rândul). Panoul scrie pe
+  fiecare rând dacă se vede și pe prima pagină, altfel nimeni n-ar înțelege de
+  ce o siglă nouă nu apare acolo.
+- **↑ și ↓ mută între siglele la fel de vizibile, nu peste cele ascunse.**
+  Prima variantă schimba locul cu vecinul din lista întreagă: dacă vecinul era
+  o siglă scoasă de pe site, schimbul se făcea în baza de date și pe site nu se
+  vedea nimic. Omul apăsa o dată, nu se mișca nimic, și conchidea că butonul e
+  stricat. **Proba a prins-o**, nu citirea codului.
+- **Nimic nu se șterge, se scoate de pe site.** Un sponsor de anul trecut
+  rămâne un sponsor de anul trecut, iar dacă revine, sigla lui e tot acolo.
+- Rezerva sunt cele 30 de sigle din `date/sponsori.ts`: o bandă „Ne susțin"
+  goală pe prima pagină spune despre asociație că n-are sponsori.
+- Probă: `BAZA=… PAROLA_ADMIN=… node scripts/qa/sponsori.mjs` — 20 de
+  verificări. Ea **golește întâi cache-ul**, apoi citește banda: cache-ul cu
+  etichetă al lui Next trăiește în `.next/cache` și **trece peste reporniri**,
+  deci fără pasul ăsta proba compara banda de la o rulare de dinainte cu baza
+  de date de acum și arăta trei defecțiuni care nu existau.
+
 ## Date reale, verificate (nu le reinventa)
 
 - Denumire: **Asociația Teona Ariana Suceava**, CIF **43533953**
@@ -566,6 +600,7 @@ picată, `pause_turn`, pistă respinsă care nu învie:
 - **`/admin/cifre`** — cele patru cifre de pe site. Vezi secțiunea de mai sus.
 - **`/admin/documente`** — fișierele de descărcat: Formularul 230, declarația
   de consimțământ, informarea GDPR, cele două contracte. Vezi mai sus.
+- **`/admin/sponsori`** — siglele firmelor care vă susțin. Vezi mai sus.
 - **`/admin/poze`** — ce e în Cloudinary și la ce proiect au ajuns pozele.
 - **`/admin/radar`** — ce a găsit căutarea automată pe internet: apeluri de
   finanțare noi, ca piste de verificat la sursă. Vezi secțiunea de mai sus.
@@ -1001,9 +1036,11 @@ De reținut, pentru data viitoare:
 2. **Cine editează conținutul.** Din panou se scriu acum: noutățile și
    campaniile (`/admin/scrie`), descrierile taberelor, testimonialele
    (`/admin/testimoniale`) și cele patru cifre (`/admin/cifre`). Rămân prin
-   dezvoltator **siglele sponsorilor** (cerute de asociație în octombrie:
-   „o să pot și eu adăuga ulterior sigle?") și textele paginilor fixe.
-   Documentele de descărcat se înlocuiesc din `/admin/documente`.
+   dezvoltator **textele paginilor fixe** (Despre noi, Casa Teona, Donează) și
+   descrierile cazurilor umanitare. Tot ce cerea caietul pe nume se face acum
+   din panou: cifrele (`/admin/cifre`), documentele de descărcat
+   (`/admin/documente`), siglele sponsorilor (`/admin/sponsori`),
+   testimonialele, noutățile, campaniile și descrierile taberelor.
 3. **CRM pentru donatori**, cu campanii de e-mail — urmează.
 
 ## Ce lipsește de la client

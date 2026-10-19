@@ -22,6 +22,7 @@ import Testimoniale, {
 } from "@/componente/acasa/Testimoniale";
 import { testimonialePublice } from "@/lib/testimoniale";
 import { cifreSite } from "@/lib/cifre";
+import { siglePrimaPagina } from "@/lib/sponsori";
 import { metadate } from "./seo";
 
 export const metadata: Metadata = metadate({
@@ -77,7 +78,10 @@ async function citesteTestimoniale(): Promise<Testimonial[]> {
   }
   try {
     return JSON.parse(
-      readFileSync(join(process.cwd(), "continut", "testimoniale.json"), "utf8"),
+      readFileSync(
+        join(process.cwd(), "continut", "testimoniale.json"),
+        "utf8",
+      ),
     );
   } catch {
     return [];
@@ -95,6 +99,7 @@ async function citesteTestimoniale(): Promise<Testimonial[]> {
 */
 export default async function PrimaPagina() {
   const cifre = await cifreSite();
+  const sigle = await siglePrimaPagina();
   const testimoniale = await citesteTestimoniale();
 
   return (
@@ -212,7 +217,7 @@ export default async function PrimaPagina() {
       <FasieDeFotografii />
 
       {/* 1.6 — Ne susțin. Pe aceeași hârtie caldă ca fâșia de deasupra. */}
-      <NeSustin />
+      <NeSustin sigle={sigle} />
 
       {/* 1.7 — Ce am realizat împreună în ultimul an */}
       <Val culoare="text-hartie" className={VAL_PESTE} />

@@ -112,7 +112,16 @@ export const SIGLE_SPONSORI: ReadonlyArray<Sigla> = [
  * primele douăsprezece: trei rânduri de câte patru, lângă fotografie, fără să
  * împingă restul paginii în jos.
  */
-export const SIGLE_PRIMA_PAGINA = SIGLE_SPONSORI.slice(0, 12);
+export const PE_PRIMA_PAGINA = 12;
+
+/**
+ * Siglele din cod, pentru banda de pe prima pagină.
+ *
+ * Rezerva, când cele din panou nu se pot citi. `lib/sponsori.ts` taie la
+ * același număr, importat de aici: scris în două locuri, s-ar fi despărțit la
+ * prima schimbare și banda ar fi arătat altceva decât spune panoul.
+ */
+export const SIGLE_PRIMA_PAGINA = SIGLE_SPONSORI.slice(0, PE_PRIMA_PAGINA);
 
 /**
  * Partenerii instituționali (3.7) — pe pagina Despre noi, nu pe Sponsori.

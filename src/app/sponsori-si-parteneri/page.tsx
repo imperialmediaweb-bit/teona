@@ -3,7 +3,7 @@ import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
 import Image from "next/image";
 import Link from "next/link";
 import { ASOCIATIA, EMAIL, RUTE } from "@/date/asociatie";
-import { SIGLE_SPONSORI } from "@/date/sponsori";
+import { sigleSponsori } from "@/lib/sponsori";
 import Aparitie from "@/componente/Aparitie";
 import Buton from "@/componente/Buton";
 import Decor from "@/componente/Decor";
@@ -51,7 +51,8 @@ const LINII = [
   "border-t-turcoaz-400",
 ] as const;
 
-export default function SponsoriSiParteneri() {
+export default async function SponsoriSiParteneri() {
+  const sigle = await sigleSponsori();
   return (
     <>
       <JsonLd
@@ -177,7 +178,7 @@ export default function SponsoriSiParteneri() {
           />
 
           <ul className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-            {SIGLE_SPONSORI.map((sigla, i) => (
+            {sigle.map((sigla, i) => (
               <li key={sigla.nume}>
                 <Aparitie
                   intarziere={Math.min(i % 5, 5) * 0.03}
