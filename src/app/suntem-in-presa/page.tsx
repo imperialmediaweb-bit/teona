@@ -7,6 +7,7 @@ import Buton from "@/componente/Buton";
 import Decor from "@/componente/Decor";
 import IndemnFinal from "@/componente/IndemnFinal";
 import Pictograma from "@/componente/Pictograma";
+import VideoIncorporat from "@/componente/VideoIncorporat";
 import AntetPagina from "@/componente/pagina/AntetPagina";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
 
@@ -39,6 +40,7 @@ const PUBLICATII = {
   */
   intermedia: { nume: "Televiziunea Intermedia" },
   institutulBucovina: { nume: "Asociația Institutul Bucovina" },
+  antena3: { nume: "Antena 3 Suceava" },
 } as const;
 
 /**
@@ -84,6 +86,16 @@ const APARITII: ReadonlyArray<{
   an: string;
   titlu: string;
   adresa?: string;
+  /**
+   * Filmare de pe Facebook, arătată în pagină sub card.
+   *
+   * Facebook nu dă titlul unei postări fără cont, deci pentru cele două
+   * filmări de la Antena 3 nu aveam ce scrie pe card — iar un card gol n-are
+   * rost. Încorporate, titlul îl pune playerul lor; ce scriem noi deasupra e
+   * descrierea trimisă de asociație, ca text de orientare, nu ca titlu de
+   * articol.
+   */
+  incorporare?: string;
 }> = [
   {
     publicatie: "monitorul",
@@ -104,6 +116,14 @@ const APARITII: ReadonlyArray<{
       "https://www.monitorulsv.ro/asociatia-teona-ariana-suceava-a-organizat-prima-tabara-din-regiunea-moldovei-dedicata-copiilor-aflati-in-remisiune-dupa-cancer_2242ee/",
   },
   {
+    publicatie: "antena3",
+    data: "septembrie 2026",
+    an: "2026",
+    titlu: "Tabăra Respiro Împreună Oncologie, la televizor",
+    adresa: "https://www.facebook.com/reel/1958097188211260",
+    incorporare: "https://www.facebook.com/reel/1958097188211260",
+  },
+  {
     publicatie: "monitorul",
     data: "9 iulie 2026",
     an: "2026",
@@ -120,6 +140,14 @@ const APARITII: ReadonlyArray<{
       "42 de copii cu nevoi speciale și familiile lor au participat în Tabăra „Respiro”, la Vama",
     adresa:
       "https://www.monitorulsv.ro/42-de-copii-cu-nevoi-speciale-si-familiile-lor-au-participat-in-tabara-respiro-la-vama_1a2cba/",
+  },
+  {
+    publicatie: "antena3",
+    data: "2026",
+    an: "2026",
+    titlu: "Informare înainte de Tabăra Respiro Împreună Oncologie",
+    adresa: "https://www.facebook.com/watch/?v=1526997765333388",
+    incorporare: "https://www.facebook.com/watch/?v=1526997765333388",
   },
   {
     publicatie: "monitorul",
@@ -323,7 +351,9 @@ export default function SuntemInPresa() {
                           varianta="contur"
                           className="w-fit shrink-0"
                         >
-                          Citește articolul
+                          {aparitie.incorporare
+                            ? "Deschide pe Facebook"
+                            : "Citește articolul"}
                           <Pictograma nume="sageata" className="size-4" />
                         </Buton>
                       ) : (
@@ -338,6 +368,22 @@ export default function SuntemInPresa() {
                         </span>
                       )}
                     </article>
+
+                    {/*
+                      Filmarea, sub card, pe toată lățimea.
+
+                      Se încarcă abia la apăsare: vezi `VideoIncorporat`. Pe
+                      card rămâne și butonul către postare, pentru cine nu
+                      vrea player deloc.
+                    */}
+                    {aparitie.incorporare && (
+                      <div className="mt-4">
+                        <VideoIncorporat
+                          adresa={aparitie.incorporare}
+                          titlu={aparitie.titlu}
+                        />
+                      </div>
+                    )}
                   </Aparitie>
                 </li>
               );
