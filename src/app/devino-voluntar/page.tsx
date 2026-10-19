@@ -10,6 +10,7 @@ import Fotografie from "@/componente/Fotografie";
 import Pictograma from "@/componente/Pictograma";
 import Val, { VAL_PESTE } from "@/componente/Val";
 import AntetPagina from "@/componente/pagina/AntetPagina";
+import { textelePaginilor } from "@/lib/texte-pagini";
 import Galerie from "@/componente/pagina/Galerie";
 import Intrebari, { type Intrebare } from "@/componente/pagina/Intrebari";
 import Pasi from "@/componente/pagina/Pasi";
@@ -130,7 +131,8 @@ const GALERIE = [
   },
 ] as const;
 
-export default function DevinoVoluntar() {
+export default async function DevinoVoluntar() {
+  const texte = await textelePaginilor();
   return (
     <>
       <JsonLd
@@ -139,7 +141,7 @@ export default function DevinoVoluntar() {
       <AntetPagina
         scris="Culegătorii de Zâmbete"
         titlu="Devino voluntar"
-        subtitlu="Implică-te activ, schimbă vieți! Alătură-te Culegătorilor de Zâmbete și fii alături de copiii cu nevoi speciale și de familiile lor, în tabere, la Casa Teona și la alte activități ale asociației."
+        subtitlu={texte["voluntar.antet"]}
         accent="miere"
         poza={{
           cale: "/poze/2024/11/348477655_10078995242126230_596613811472728663_n.jpg",

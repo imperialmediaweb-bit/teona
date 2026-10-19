@@ -6,6 +6,20 @@ import Aparitie from "@/componente/Aparitie";
 import Buton from "@/componente/Buton";
 import Cifre from "@/componente/Cifre";
 import { cifreSite } from "@/lib/cifre";
+import { textelePaginilor } from "@/lib/texte-pagini";
+
+/**
+ * Rând gol = paragraf nou, ca în panou.
+ *
+ * Nu se folosește `TextScris` aici: blocul are clasele lui, din așezarea
+ * paginii, iar componenta aia își aduce ale ei. Se desparte doar textul.
+ */
+function paragrafe(text: string): string[] {
+  return (text ?? "")
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+}
 import Decor from "@/componente/Decor";
 import Fotografie from "@/componente/Fotografie";
 import IndemnFinal from "@/componente/IndemnFinal";
@@ -32,7 +46,8 @@ export const metadata: Metadata = metadate({
  */
 const POVESTE: ReadonlyArray<{
   titlu: string;
-  paragrafe: ReadonlyArray<string>;
+  /** Slotul din panou de unde vin paragrafele. Textul de pornire e acolo. */
+  cheie: string;
   poza: { cale: string; alt: string; legenda: string };
   umbra: "caramiziu" | "miere" | "turcoaz";
   numar: string;
@@ -40,11 +55,7 @@ const POVESTE: ReadonlyArray<{
   {
     titlu: "Cum am pornit",
     numar: "text-caramiziu-100",
-    paragrafe: [
-      "Asociația Teona Ariana Suceava a luat ființă în ianuarie 2021. Am pornit la drum cu o idee simplă: copiii cu nevoi speciale și familiile lor merită să aibă, din când în când, un loc în care să se simtă bine exact așa cum sunt. Nu aveam planuri mari, ci dorința de a face ceva concret, împreună cu oameni care gândesc la fel, indiferent de confesiune sau de opinii, pentru că bucuria nu ține de nicio etichetă.",
-      "Așa au apărut taberele RESPIRO. Ne-am dorit să fie o pauză pentru copii și pentru părinții lor, și de la o tabără la alta au venit tot mai multe familii, tot mai mulți voluntari și tot mai multe prietenii. Acolo copiii se joacă, încearcă lucruri noi și se împrietenesc, iar părinții au timp să respire și să vorbească cu alți părinți. Din primele tabere am învățat ce contează cu adevărat: ritmul fiecărui copil, atenția și răbdarea.",
-      "Pe drum, ne-am dorit să ajungem și la alți copii. Am început să sprijinim copii din sistemul de protecție a copilului, cu rezultate școlare deosebite, ca un „bravo” concret pentru munca lor, și să oferim burse și sprijin educațional, pentru ca fiecare copil să-și poată urma visul.",
-    ],
+    cheie: "despre.poveste.1",
     poza: {
       cale: "/poze/2024/11/278495378_647322639843213_2394948498616303816_n-1024x768.jpg",
       alt: "O voluntară ajută o fetiță la un atelier de bucătărie, într-o sală de lemn din tabără",
@@ -55,9 +66,7 @@ const POVESTE: ReadonlyArray<{
   {
     titlu: "Casa Teona",
     numar: "text-turcoaz-100",
-    paragrafe: [
-      "Apoi ne-am dorit ca bucuria să nu fie doar o vacanță. Casa Teona a devenit locul în care copiii vin pe tot parcursul anului: terapii de grup, ateliere creative, meloterapie, stimulare senzorială, activități de socializare și consiliere pentru părinți. Toate sunt gratuite, iar terapia prin joacă este adaptată fiecărui copil.",
-    ],
+    cheie: "despre.poveste.2",
     poza: {
       cale: "/poze/2024/11/WhatsApp-Image-2024-11-28-at-09.31.33-1.jpeg",
       alt: "Un băiețel se joacă pe podeaua interactivă de la Casa Teona, urmărind conturul unei stele proiectate pe jos",
@@ -68,11 +77,7 @@ const POVESTE: ReadonlyArray<{
   {
     titlu: "Anul acesta",
     numar: "text-miere-100",
-    paragrafe: [
-      "Anul acesta am organizat prima tabără RESPIRO pentru copii care au trecut prin cancer și pentru familiile lor, un pas pe care ni l-am dorit de mult și care ne-a arătat cât de mult mai putem face.",
-      "Motto-ul nostru, „Nimic fără Dumnezeu”, ne amintește că tot ce am realizat s-a născut din încredere, din bunătate și din faptul că am fost împreună.",
-      "Povestea noastră continuă. Dacă vrei să faci parte din ea, te așteptăm.",
-    ],
+    cheie: "despre.poveste.3",
     poza: {
       cale: "/poze/2024/11/449597800_497189906214686_1996782188503194582_n.jpg",
       alt: "Mâna unui voluntar îi întinde o minge portocalie unei fetițe, pe o alee din tabără",
@@ -86,18 +91,19 @@ const POVESTE: ReadonlyArray<{
 const MISIUNE: ReadonlyArray<{
   titlu: string;
   pictograma: NumePictograma;
-  text?: string;
+  /** Slotul din panou, pentru cardurile cu un singur text. */
+  cheie?: string;
   valori?: ReadonlyArray<{ nume: string; text: string }>;
 }> = [
   {
     titlu: "Misiune",
     pictograma: "inima",
-    text: "Aducem bucurie și sprijin copiilor cu nevoi speciale, copiilor care au trecut prin cancer și celor din medii defavorizate, prin tabere, joacă și consiliere pentru întreaga familie.",
+    cheie: "despre.misiune",
   },
   {
     titlu: "Viziune",
     pictograma: "infinit",
-    text: "O comunitate în care fiecare copil, indiferent de dificultățile sale sau de condițiile în care s-a născut, are șansa să se joace, să învețe și să viseze liber, iar fiecare părinte știe că nu e singur.",
+    cheie: "despre.viziune",
   },
   {
     titlu: "Valori",
@@ -232,13 +238,14 @@ function initiale(nume: string) {
 
 export default async function DespreNoi() {
   const cifre = await cifreSite();
+  const texte = await textelePaginilor();
   return (
     <>
       <JsonLd date={jsonLdFir([{ nume: "Despre noi", cale: RUTE.despre }])} />
       <AntetPagina
         scris="Împreună, din ianuarie 2021"
         titlu="Cine suntem"
-        subtitlu="Sprijinim copiii cu nevoi speciale și pe părinții lor prin tabere, terapie prin joacă și consiliere."
+        subtitlu={texte["despre.antet"]}
         poza={{
           cale: "/poze/2024/11/449517170_497189979548012_3324146063316341558_n.jpg",
           alt: "Copii și voluntari cu căști și hamuri de escaladă, într-un parc de aventură",
@@ -305,7 +312,7 @@ export default async function DespreNoi() {
                       {bloc.titlu}
                     </h3>
                     <div className="relative mt-5 grid gap-4 text-cerneala-moale">
-                      {bloc.paragrafe.map((paragraf) => (
+                      {paragrafe(texte[bloc.cheie]).map((paragraf) => (
                         <p key={paragraf.slice(0, 40)}>{paragraf}</p>
                       ))}
                     </div>
@@ -355,7 +362,7 @@ export default async function DespreNoi() {
                     {MISIUNE[0].titlu}
                   </h3>
                   <p className="relative mt-3 text-corp text-hartie/90">
-                    {MISIUNE[0].text}
+                    {texte[MISIUNE[0].cheie!]}
                   </p>
                 </article>
               </Aparitie>
@@ -380,7 +387,7 @@ export default async function DespreNoi() {
                     {MISIUNE[1].titlu}
                   </h3>
                   <p className="relative mt-3 text-corp text-cerneala-moale">
-                    {MISIUNE[1].text}
+                    {texte[MISIUNE[1].cheie!]}
                   </p>
                 </article>
               </Aparitie>
@@ -570,13 +577,7 @@ export default async function DespreNoi() {
               culoare="miere"
             />
             <div className="mt-5 grid gap-4 text-cerneala-moale">
-              <p>
-                Voluntarii sunt o parte esențială a activităților noastre. În
-                tabere și la Casa Teona se joacă cu copiii, îi însoțesc pe
-                parcursul zilei, ajută la organizare și îi sprijină pe părinți.
-                Datorită lor, fiecare copil primește atenția de care are nevoie,
-                iar activitățile se desfășoară în siguranță și cu bucurie.
-              </p>
+              <p>{texte["despre.voluntari"]}</p>
               <p>
                 Dacă vrei să faci parte din echipă, te așteptăm. Alătură-te
                 Culegătorilor de Zâmbete.

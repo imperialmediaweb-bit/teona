@@ -17,6 +17,7 @@ import ButonPayPal from "@/componente/formular/ButonPayPal";
 import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
 import Val, { VAL_PESTE } from "@/componente/Val";
 import DeCopiat from "@/componente/pagina/DeCopiat";
+import { textelePaginilor } from "@/lib/texte-pagini";
 import DocumentDeDescarcat from "@/componente/pagina/DocumentDeDescarcat";
 import Intrebari, { type Intrebare } from "@/componente/pagina/Intrebari";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
@@ -184,7 +185,8 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
   },
 ];
 
-export default function Doneaza() {
+export default async function Doneaza() {
+  const texte = await textelePaginilor();
   return (
     <>
       <JsonLd date={jsonLdFir([{ nume: "Donează", cale: RUTE.doneaza }])} />
@@ -213,8 +215,7 @@ export default function Doneaza() {
             </p>
             <h1 className="mt-3 text-h1 text-cerneala">Donează</h1>
             <p className="mt-6 max-w-xl text-amplu text-cerneala-moale">
-              Alege modul care ți se potrivește. Donația ta ne ajută enorm să
-              oferim în continuare sprijin celor care au atât de mare nevoie.
+              {texte["doneaza.antet"]}
             </p>
 
             <ul className="mt-9 grid grid-cols-2 gap-3">

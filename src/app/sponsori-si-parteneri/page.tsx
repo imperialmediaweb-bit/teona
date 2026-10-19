@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ASOCIATIA, EMAIL, RUTE } from "@/date/asociatie";
 import { sigleSponsori } from "@/lib/sponsori";
+import { textelePaginilor } from "@/lib/texte-pagini";
 import Aparitie from "@/componente/Aparitie";
 import Buton from "@/componente/Buton";
 import Decor from "@/componente/Decor";
@@ -53,6 +54,7 @@ const LINII = [
 
 export default async function SponsoriSiParteneri() {
   const sigle = await sigleSponsori();
+  const texte = await textelePaginilor();
   return (
     <>
       <JsonLd
@@ -63,7 +65,7 @@ export default async function SponsoriSiParteneri() {
       <AntetPagina
         scris="Împreună cu cei care cred în noi"
         titlu="Sponsori și parteneri"
-        subtitlu="Mulțumim companiilor care ne sunt alături."
+        subtitlu={texte["sponsori.antet"]}
         accent="miere"
         poza={{
           cale: "/poze/2024/11/351164060_277811291485883_1768298065998774964_n.webp",

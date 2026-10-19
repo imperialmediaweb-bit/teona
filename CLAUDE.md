@@ -178,6 +178,53 @@ panou, deci `next/image` o redimensionează ca pe oricare alta.
   deci fără pasul ăsta proba compara banda de la o rulare de dinainte cu baza
   de date de acum și arăta trei defecțiuni care nu existau.
 
+## Textele paginilor fixe se scriu din panou
+
+Ultimul lucru care trecea neapărat prin mine. Despre noi, Casa Teona, Donează
+— textul stătea în cod, deci o virgulă schimbată însemna un mesaj către mine și
+o publicare.
+
+`/admin/texte` ține **18 bucăți de text**, grupate pe pagini: fraza de pe prima
+pagină, cele trei blocuri din „Povestea noastră", misiunea, viziunea,
+Culegătorii de Zâmbete, cele trei blocuri de la Casa Teona, frazele din capul
+fiecărei pagini și textul „De ce Asociația Teona Ariana".
+
+- **Nimic nu se șterge.** Textul de acum rămâne scris în `src/lib/texte-pagini.ts`,
+  în `implicit`, pentru totdeauna. O schimbare din panou e un **rând nou** în
+  tabelul `texte_pagini`; „Pune textul de la început" șterge rândul ăla, nu
+  textul, iar ce scria la lansare se întoarce întreg. De aceea tabelul **nu se
+  seamănă**: lipsa unui rând înseamnă „n-a schimbat nimeni nimic aici".
+- **Se schimbă ce scrie, nu cum arată.** Titlurile de secțiuni, fotografiile,
+  butoanele și așezarea rămân în cod. Rând gol = paragraf nou; atât.
+- **Cifrele din proză se completează singure.** Textul de la 3,5% avea „33 de
+  tabere, cu peste 1.500 de participanți" scrise de mână — se învecheau în ziua
+  în care asociația trecea la a 34-a tabără, fără să observe nimeni, exact
+  împotriva regulii din caiet („aceleași peste tot […] preluate automat din
+  aceleași date"). Acum se scrie `{tabere}`, `{participanti}`, `{copii}`,
+  `{voluntari}`. **Ce nu e în lista aia rămâne scris cum e** — un `{tabre}`
+  greșit se vede pe pagină, iar panoul îl semnalează în roșu înainte de
+  salvare. Un loc care dispare în liniște e felul în care o frază ajunge pe
+  site fără jumătate din ea.
+- Probă: `BAZA=… PAROLA_ADMIN=… node scripts/qa/texte-pagini.mjs` — 23 de
+  verificări, din care cea mai importantă e că „Pune textul de la început"
+  readuce textul întreg.
+
+### Cât ține cache-ul a ce se scrie din panou
+
+`src/lib/cache-panou.ts`, folosit de cifre, texte, sponsori, testimoniale și
+documente: **stale 60s, revalidare 300s, expirare o zi** — scrise ca numere, nu
+ca nume de profil.
+
+Cazul obișnuit îl rezolvă eticheta: o salvare din panou golește cache-ul și
+schimbarea se vede pe loc. Numerele astea acoperă numai cazul celălalt, care nu
+se vede la citit codul: **Railway construiește fără acces la baza de date**,
+deci la build în cache intră rezerva din cod. Cu profilul `"hours"`, site-ul
+arăta o oră întreagă după fiecare publicare cifrele și textele de la lansare,
+nu pe ale asociației — omul schimba o cifră luni, eu publicam marți, iar cifra
+lui dispărea pentru o oră. Acum fereastra e de cinci minute. **Probele care
+citesc o pagină publică după o salvare trebuie să aștepte**, sau să golească
+întâi eticheta cu o salvare care nu schimbă nimic.
+
 ## Date reale, verificate (nu le reinventa)
 
 - Denumire: **Asociația Teona Ariana Suceava**, CIF **43533953**
@@ -601,6 +648,8 @@ picată, `pause_turn`, pistă respinsă care nu învie:
 - **`/admin/documente`** — fișierele de descărcat: Formularul 230, declarația
   de consimțământ, informarea GDPR, cele două contracte. Vezi mai sus.
 - **`/admin/sponsori`** — siglele firmelor care vă susțin. Vezi mai sus.
+- **`/admin/texte`** — ce scrie pe paginile fixe: Despre noi, Casa Teona,
+  Donează, frazele din capul paginilor. Vezi mai sus.
 - **`/admin/poze`** — ce e în Cloudinary și la ce proiect au ajuns pozele.
 - **`/admin/radar`** — ce a găsit căutarea automată pe internet: apeluri de
   finanțare noi, ca piste de verificat la sursă. Vezi secțiunea de mai sus.
@@ -1033,14 +1082,14 @@ De reținut, pentru data viitoare:
 1. **Donațiile.** Acum merg prin GiveWP + Stripe pe WordPress, în lei, cu plată
    recurentă. Fie se rescrie peste Stripe aici, fie site-ul nou trimite la
    WordPress-ul existent pentru plăți. Nimic nu s-a decis.
-2. **Cine editează conținutul.** Din panou se scriu acum: noutățile și
+2. **Cine editează conținutul. Rezolvat.** Din panou se scriu: noutățile și
    campaniile (`/admin/scrie`), descrierile taberelor, testimonialele
-   (`/admin/testimoniale`) și cele patru cifre (`/admin/cifre`). Rămân prin
-   dezvoltator **textele paginilor fixe** (Despre noi, Casa Teona, Donează) și
-   descrierile cazurilor umanitare. Tot ce cerea caietul pe nume se face acum
-   din panou: cifrele (`/admin/cifre`), documentele de descărcat
-   (`/admin/documente`), siglele sponsorilor (`/admin/sponsori`),
-   testimonialele, noutățile, campaniile și descrierile taberelor.
+   (`/admin/testimoniale`), cele patru cifre (`/admin/cifre`), documentele de
+   descărcat (`/admin/documente`), siglele sponsorilor (`/admin/sponsori`) și
+   textele paginilor fixe (`/admin/texte`).
+   Rămân prin dezvoltator: **structura** paginilor (titluri de secțiuni,
+   fotografii, butoane, așezare), fișa echipei, descrierile cazurilor
+   umanitare și paginile legale.
 3. **CRM pentru donatori**, cu campanii de e-mail — urmează.
 
 ## Ce lipsește de la client

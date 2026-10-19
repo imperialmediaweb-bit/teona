@@ -1,4 +1,5 @@
-import { cacheLife, cacheTag } from "next/cache";
+import { cacheTag } from "next/cache";
+import { cachePanou } from "./cache-panou";
 import { CIFRE, type Cifra } from "@/date/asociatie";
 import { areBazaDeDate, intreaba } from "./baza";
 
@@ -96,7 +97,7 @@ async function citeste(): Promise<Cifra[]> {
  */
 export async function cifreSite(): Promise<ReadonlyArray<Cifra>> {
   "use cache";
-  cacheLife("hours");
+  cachePanou();
   cacheTag(ETICHETA_CIFRE);
   if (!areBazaDeDate()) return CIFRE_DIN_COD;
   const ale = await citeste().catch(() => []);

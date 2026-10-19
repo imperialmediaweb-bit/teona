@@ -17,6 +17,7 @@ import Val, { VAL_PESTE } from "@/componente/Val";
 import CalculatorSponsorizare from "@/componente/pagina/CalculatorSponsorizare";
 import FormularSponsorizare from "@/componente/formular/FormularSponsorizare";
 import AntetPagina from "@/componente/pagina/AntetPagina";
+import { textelePaginilor } from "@/lib/texte-pagini";
 import DeCopiat from "@/componente/pagina/DeCopiat";
 import DocumentDeDescarcat from "@/componente/pagina/DocumentDeDescarcat";
 import Intrebari, { type Intrebare } from "@/componente/pagina/Intrebari";
@@ -152,7 +153,8 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
   },
 ];
 
-export default function Directioneaza20() {
+export default async function Directioneaza20() {
+  const texte = await textelePaginilor();
   return (
     <>
       <JsonLd
@@ -163,7 +165,7 @@ export default function Directioneaza20() {
       <AntetPagina
         scris="Pentru firme"
         titlu="Direcționează până la 20% din impozitul pe profit"
-        subtitlu="Firma ta poate susține copiii noștri, fără costuri suplimentare față de impozitul pe care îl plătește oricum."
+        subtitlu={texte["firme.antet"]}
         accent="turcoaz"
         poza={{
           cale: "/poze/2024/11/459590851_545309534736056_5697611419655887236_n.jpg",

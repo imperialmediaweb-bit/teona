@@ -57,7 +57,20 @@ const INTERVAL = 7000;
  * cea veche, care rămâne pe loc până e acoperită. Fără apropiere, fără
  * deplasare — forma și conținutul nu se mișcă sub ochi, doar se înlocuiesc.
  */
-export default function Erou() {
+/** Fraza de pornire, dacă n-a fost schimbată din panou. */
+const FRAZA_DIN_COD =
+  "Sprijinim copiii cu nevoi speciale și pe părinții lor prin tabere, terapie prin joacă și consiliere. Alătură-te celor care schimbă vieți.";
+
+export default function Erou({
+  /*
+    Fraza vine de la prima pagină: aici e componentă de browser (fotografiile
+    se schimbă singure), deci nu poate citi baza de date. Textul din cod
+    rămâne implicit — o pagină fără frază ar începe cu un titlu și un buton.
+  */
+  fraza = FRAZA_DIN_COD,
+}: {
+  fraza?: string;
+} = {}) {
   const fara_miscare = useReducedMotion();
   // Activă și anterioară într-o singură stare: se schimbă mereu împreună.
   const [{ activ, anterior }, setPozitie] = useState<{
@@ -147,9 +160,7 @@ export default function Erou() {
           </h1>
 
           <p className="mt-7 max-w-xl text-amplu text-cerneala-moale">
-            Sprijinim copiii cu nevoi speciale și pe părinții lor prin tabere,
-            terapie prin joacă și consiliere. Alătură-te celor care schimbă
-            vieți.
+            {fraza}
           </p>
 
           {/* Cele trei elemente din 1.1, în ordinea cerută. Blocul SMS e

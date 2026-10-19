@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { cacheLife, cacheTag } from "next/cache";
+import { cacheTag } from "next/cache";
+import { cachePanou } from "./cache-panou";
 import { areBazaDeDate, intreaba } from "./baza";
 
 /**
@@ -146,7 +147,7 @@ export async function testimonialePublice(): Promise<Testimonial[]> {
     `date/proiecte.ts`, unde prinderea e tot înăuntru, din același motiv.
   */
   "use cache";
-  cacheLife("hours");
+  cachePanou();
   cacheTag(ETICHETA_TESTIMONIALE);
   if (!areBazaDeDate()) return [];
   return citesteActive().catch(() => []);

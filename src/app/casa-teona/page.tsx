@@ -9,6 +9,15 @@ import IndemnFinal from "@/componente/IndemnFinal";
 import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
 import Val, { VAL_PESTE } from "@/componente/Val";
 import AntetPagina from "@/componente/pagina/AntetPagina";
+import { textelePaginilor } from "@/lib/texte-pagini";
+
+/** Rând gol = paragraf nou, ca în panou. */
+function paragrafe(text: string): string[] {
+  return (text ?? "")
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+}
 import Galerie from "@/componente/pagina/Galerie";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
 
@@ -27,8 +36,9 @@ export const metadata: Metadata = metadate({
  */
 const BLOCURI: ReadonlyArray<{
   titlu: string;
+  /** Slotul din panou de unde vin paragrafele. Textul de pornire e acolo. */
+  cheie: string;
   pictograma: NumePictograma;
-  paragrafe: ReadonlyArray<string>;
   poza: { cale: string; alt: string; legenda: string };
   umbra: "caramiziu" | "miere" | "turcoaz";
   pictogramaClase: string;
@@ -38,9 +48,7 @@ const BLOCURI: ReadonlyArray<{
     pictograma: "senzorial",
     pictogramaClase:
       "bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
-    paragrafe: [
-      "Zilele la Casa Teona sunt pline de activități. Copiii se joacă prin jocuri senzoriale, care îi ajută să-și descopere simțurile și să se liniștească. Desenează, pictează și lucrează în ateliere creative, unde contează mai mult cât se bucură decât cât de bine le iese. Învață prin joacă, pentru că așa învață cel mai bine, și își fac prieteni cu care se simt în largul lor.",
-    ],
+    cheie: "casa.bloc.1",
     poza: {
       cale: "/poze/2024/11/WhatsApp-Image-2024-11-28-at-09.31.33-1.jpeg",
       alt: "Un băiețel urmărește conturul unei stele proiectate pe podeaua interactivă, la jocurile interactive de la Casa Teona",
@@ -53,9 +61,7 @@ const BLOCURI: ReadonlyArray<{
     pictograma: "joaca",
     pictogramaClase:
       "bg-miere-400 text-cerneala shadow-[0_10px_22px_-10px_rgba(255,172,0,0.9)]",
-    paragrafe: [
-      "Pentru mulți dintre copiii noștri, o petrecere obișnuită nu e ușor de organizat, iar aici găsesc un spațiu al lor, cu baloane, tort și oameni care se bucură împreună cu ei. Pentru un copil, să se simtă sărbătorit contează foarte mult.",
-    ],
+    cheie: "casa.bloc.2",
     /*
       Poza de aniversare a venit (16 octombrie 2026), deci atelierul de
       brățări care ținea locul aici iese.
@@ -77,10 +83,7 @@ const BLOCURI: ReadonlyArray<{
     pictograma: "familie",
     pictogramaClase:
       "bg-caramiziu-700 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]",
-    paragrafe: [
-      "Părinții sunt la fel de importanți ca și copiii. Mulți dintre ei duc zilnic o încărcătură pe care puțini o văd. De aceea, la Casa Teona au loc întâlniri de terapie de grup pentru părinți, în care pot vorbi deschis despre ce îi preocupă, pot primi consiliere și pot descoperi că alți părinți trec prin aceleași lucruri. Uneori, simplul fapt de a fi ascultat și înțeles face o mare diferență.",
-      "Casa Teona înseamnă, în același timp, joacă, încredere, sprijin și apartenență la o comunitate. Este locul în care copiii pot fi copii, iar părinții pot respira. Dacă vrei să ne cunoști mai bine, să ne vizitezi sau să ne sprijini, ne bucurăm să te primim.",
-    ],
+    cheie: "casa.bloc.3",
     poza: {
       cale: "/poze/2026/10/intalnire-cu-parintii-casa-teona.jpg",
       alt: "Șapte părinți stau în cerc, pe fotolii, la o întâlnire în camera luminoasă de la Casa Teona; pe măsuța din mijloc sunt cești de cafea, iar pe perete desenele copiilor",
@@ -124,7 +127,8 @@ const GALERIE = [
   },
 ] as const;
 
-export default function CasaTeona() {
+export default async function CasaTeona() {
+  const texte = await textelePaginilor();
   const { casaTeona } = ADRESE;
 
   return (
@@ -135,7 +139,7 @@ export default function CasaTeona() {
       <AntetPagina
         scris="Aici nu există ritm greșit"
         titlu="Casa Teona"
-        subtitlu="Un loc unde copiii cu nevoi speciale învață prin joacă, iar părinții găsesc consiliere și sprijin."
+        subtitlu={texte["casa.antet"]}
         accent="turcoaz"
         poza={{
           cale: "/poze/2024/11/poza3_enhanced.webp",
@@ -225,7 +229,7 @@ export default function CasaTeona() {
                     </span>
                     <h2 className="mt-6 text-h3 text-cerneala">{bloc.titlu}</h2>
                     <div className="mt-4 grid gap-4 text-cerneala-moale">
-                      {bloc.paragrafe.map((paragraf) => (
+                      {paragrafe(texte[bloc.cheie]).map((paragraf) => (
                         <p key={paragraf.slice(0, 40)}>{paragraf}</p>
                       ))}
                     </div>

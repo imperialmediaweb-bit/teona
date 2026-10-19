@@ -1,4 +1,5 @@
-import { cacheLife, cacheTag } from "next/cache";
+import { cacheTag } from "next/cache";
+import { cachePanou } from "./cache-panou";
 import { PREFIX_CLOUD } from "./cloud";
 import { PE_PRIMA_PAGINA, SIGLE_SPONSORI, type Sigla } from "@/date/sponsori";
 import { areBazaDeDate, intreaba } from "./baza";
@@ -117,7 +118,7 @@ async function citesteActive(): Promise<Sigla[]> {
  */
 export async function sigleSponsori(): Promise<ReadonlyArray<Sigla>> {
   "use cache";
-  cacheLife("hours");
+  cachePanou();
   cacheTag(ETICHETA_SPONSORI);
   if (!areBazaDeDate()) return SIGLE_SPONSORI;
   const ale = await citesteActive().catch(() => []);

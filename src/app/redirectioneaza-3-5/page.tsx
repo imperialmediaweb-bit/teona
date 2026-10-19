@@ -15,6 +15,15 @@ import Buton from "@/componente/Buton";
 import Cifre from "@/componente/Cifre";
 import { cifreSite } from "@/lib/cifre";
 import { documenteGata } from "@/lib/documente-gata";
+import { completeazaCifrele, textelePaginilor } from "@/lib/texte-pagini";
+
+/** Rând gol = paragraf nou, ca în panou. */
+function paragrafe(text: string): string[] {
+  return (text ?? "")
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+}
 import Decor from "@/componente/Decor";
 import Fotografie from "@/componente/Fotografie";
 import IndemnFinal from "@/componente/IndemnFinal";
@@ -156,6 +165,7 @@ export default async function Redirectioneaza35() {
     aceea pagina întreabă ce există, nu presupune.
   */
   const gata = await documenteGata();
+  const texte = await textelePaginilor();
   const an = await anulCurent();
   const bcr = CONTURI[0];
 
@@ -169,7 +179,7 @@ export default async function Redirectioneaza35() {
       <AntetPagina
         scris="Un formular, o dată pe an"
         titlu="Redirecționează 3,5% din impozitul tău"
-        subtitlu="Nu te costă nimic în plus. Tu alegi unde ajunge o parte din impozitul pe venit."
+        subtitlu={texte["redirectionare.antet"]}
         poza={{
           cale: "/poze/2024/11/449597800_497189906214686_1996782188503194582_n.jpg",
           alt: "Mâna unui voluntar îi întinde o minge portocalie unei fetițe, pe o alee din tabără",
@@ -470,23 +480,19 @@ export default async function Redirectioneaza35() {
                 titlu="De ce Asociația Teona Ariana"
               />
               <div className="mt-6 grid gap-4 text-amplu text-cerneala-moale">
-                <p>
-                  În tabere vin și copiii, și părinții. Copiii se joacă, își fac
-                  prieteni și descoperă că pot mai mult decât credeau; părinții
-                  se odihnesc cu adevărat, poate pentru prima dată în anul
-                  acela, și stau de vorbă cu oameni care trec prin același
-                  lucru. Până acum s-au făcut 33 de tabere, cu peste 1.500 de
-                  participanți.
-                </p>
-                <p>
-                  Pe urmă vine restul anului, și pe el îl ține Casa Teona: peste
-                  80 de copii care au unde să meargă la ateliere și la jocuri,
-                  părinți care au unde să ceară un sfat.
-                </p>
-                <p>
-                  Acolo ajung cei 3,5% din impozitul tău: în săptămâna de tabără
-                  și în zilele de după ea.
-                </p>
+                {/*
+                  Cifrele din text vin din panou, prin locurile de completat.
+
+                  Scrise de mână — „33 de tabere", „1.500 de participanți" —
+                  se învecheau în ziua în care asociația trecea la a 34-a
+                  tabără, fără să observe nimeni. Caietul cere ca ele să fie
+                  „aceleași peste tot […] preluate automat din aceleași date".
+                */}
+                {paragrafe(
+                  completeazaCifrele(texte["redirectionare.de-ce"], cifre),
+                ).map((paragraf) => (
+                  <p key={paragraf.slice(0, 40)}>{paragraf}</p>
+                ))}
               </div>
             </div>
             <Fotografie

@@ -1,4 +1,5 @@
-import { cacheLife, cacheTag } from "next/cache";
+import { cacheTag } from "next/cache";
+import { cachePanou } from "./cache-panou";
 import { areR2, legaturaSemnata } from "@/lib/r2";
 import { DOCUMENTE } from "@/lib/documente";
 
@@ -59,7 +60,7 @@ async function exista(cheie: string): Promise<boolean> {
  */
 export async function documenteGata(): Promise<ReadonlyArray<string>> {
   "use cache";
-  cacheLife("hours");
+  cachePanou();
   cacheTag(ETICHETA_DOCUMENTE);
 
   const cuRezerva = DOCUMENTE.filter((d) => d.rezerva).map((d) => d.slug);

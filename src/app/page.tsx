@@ -23,6 +23,7 @@ import Testimoniale, {
 import { testimonialePublice } from "@/lib/testimoniale";
 import { cifreSite } from "@/lib/cifre";
 import { siglePrimaPagina } from "@/lib/sponsori";
+import { textelePaginilor } from "@/lib/texte-pagini";
 import { metadate } from "./seo";
 
 export const metadata: Metadata = metadate({
@@ -100,11 +101,12 @@ async function citesteTestimoniale(): Promise<Testimonial[]> {
 export default async function PrimaPagina() {
   const cifre = await cifreSite();
   const sigle = await siglePrimaPagina();
+  const texte = await textelePaginilor();
   const testimoniale = await citesteTestimoniale();
 
   return (
     <>
-      <Erou />
+      <Erou fraza={texte["acasa.fraza"]} />
 
       {/* 1.2 — bara cu cifre, fără titlu. Cifrele stau într-un panou care
           iese peste marginea curbă a eroului, nu într-o fâșie goală de alb:
