@@ -76,7 +76,7 @@ async function Continut({
 
   if (!(await esteAutentificat())) {
     return (
-      <Cadru titlu="Intră în panou" activ="/admin/presa">
+      <Cadru titlu="Intră în panou" activ="/admin/presa" faraMeniu>
         <Intrare gresit={Boolean(gresit)} unde="/admin/presa" />
       </Cadru>
     );

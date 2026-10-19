@@ -39,7 +39,7 @@ const CAND = new Intl.DateTimeFormat("ro-RO", {
 
 const RATAT: Record<string, string> = {
   "fara-pagina":
-    "Nu e legată nicio pagină. Pune META_PAGE_ID și META_PAGE_TOKEN în Railway.",
+    "Nu e legată nicio pagină. Faceți pașii de mai jos și trimiteți-ne jetonul — îl punem noi.",
   nepublicat:
     "Textul e încă ciornă. Publică-l întâi pe site — altfel linkul din postare duce la o pagină care nu există.",
   deja: "Textul ăsta a plecat deja pe pagină. N-a mai fost trimis a doua oară.",
@@ -84,7 +84,7 @@ async function Continut({
 
   if (!(await esteAutentificat())) {
     return (
-      <Cadru titlu="Intră în panou" activ="/admin/facebook">
+      <Cadru titlu="Intră în panou" activ="/admin/facebook" faraMeniu>
         <Intrare gresit={Boolean(gresit)} unde="/admin/facebook" />
       </Cadru>
     );
@@ -315,7 +315,7 @@ function CumSeLeaga() {
         Pagina nu e legată încă
       </h2>
       <p className="mt-2 max-w-3xl text-amplu text-cerneala-moale">
-        Nu există buton „Conectează cu Facebook", și nu din lene: ca un site să
+        Nu există buton „Conectează cu Facebook". Ca un site să
         publice în numele unei pagini, Meta cere o aplicație aprobată, cu
         verificare de business — săptămâni de așteptare pentru ceva ce
         asociația face de câteva ori pe lună. Calea scurtă e un jeton generat

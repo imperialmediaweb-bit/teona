@@ -39,7 +39,7 @@ const STARI: Record<string, { text: string; bun?: boolean }> = {
   diferite: { text: "Cele două parole noi nu sunt la fel." },
   aceeasi: { text: "Parola nouă e aceeași cu cea de acum." },
   "fara-cont": {
-    text: "Ești înăuntru cu parola asociației, nu cu un cont. Ea se schimbă în Railway, în PAROLA_ADMIN.",
+    text: "Ești înăuntru cu parola asociației, nu cu un cont. Ea nu se schimbă de aici — cere-i dezvoltatorului.",
   },
   necunoscut: { text: "N-am putut schimba parola." },
 };
@@ -79,7 +79,7 @@ async function Continut({
 
   if (!(await esteAutentificat())) {
     return (
-      <Cadru titlu="Intră în panou" activ="/admin/parola">
+      <Cadru titlu="Intră în panou" activ="/admin/parola" faraMeniu>
         <Intrare gresit={Boolean(gresit)} unde="/admin/parola" />
       </Cadru>
     );

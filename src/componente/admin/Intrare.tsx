@@ -32,12 +32,15 @@ export default function Intrare({
 }) {
   return (
     <div className="max-w-xl">
+      {/*
+        Titlul paginii îl scrie deja cadrul, deasupra. Aici rămâne numai
+        rândul care spune de ce vezi formularul în locul paginii cerute.
+      */}
       <p className="font-titlu text-mic font-bold tracking-wider text-caramiziu-700 uppercase">
         Nu ești autentificat
       </p>
-      <h2 className="mt-2 text-h3 text-cerneala">Intră în panou</h2>
 
-      <div className="mt-6 grid gap-3 colt-mic-a border-t-4 border-miere-400 bg-hartie-calda p-5">
+      <div className="mt-4 grid gap-3 colt-mic-a border-t-4 border-miere-400 bg-hartie-calda p-5">
         <p className="text-mic text-cerneala-moale">
           <strong className="font-titlu font-bold text-cerneala">
             Cu parola asociației:

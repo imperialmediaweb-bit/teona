@@ -317,6 +317,7 @@ export default function Cadru({
   descriere,
   activ,
   actiuni,
+  faraMeniu,
   children,
 }: {
   titlu: string;
@@ -325,6 +326,19 @@ export default function Cadru({
   activ?: string;
   /** Butoane sau filtre, în dreapta titlului. */
   actiuni?: React.ReactNode;
+  /**
+   * Bara laterală, fără meniu.
+   *
+   * Pe pagina de intrare, meniul întreg se desena și pentru cine nu era
+   * autentificat: douăzeci de linkuri, căutarea, butonul de ieșire. Arăta a
+   * panou deschis deși nu era, iar formularul de intrare de alături părea o
+   * casetă oarecare din pagină — un om a scris în el adresa și parola colegei
+   * pe care voia s-o adauge. Linkurile nici nu duceau nicăieri: fiecare
+   * pagină cerea din nou parola.
+   *
+   * Rămâne sigla, ca omul să vadă unde a nimerit, și atât.
+   */
+  faraMeniu?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -358,6 +372,8 @@ export default function Cadru({
           — donator, firmă, om care a trimis un formular — și deschise trei
           pagini. Un singur câmp le caută pe toate trei.
         */}
+{!faraMeniu && (
+          <>
         <form
           action="/admin/cauta"
           method="get"
@@ -442,6 +458,8 @@ export default function Cadru({
             <Iesirea />
           </Suspense>
         </div>
+          </>
+        )}
       </div>
 
       {/*
