@@ -17,9 +17,19 @@ import { useEffect, useRef, useState } from "react";
 
 type Schimb = { rol: "om" | "consultant"; text: string };
 
+/*
+  Întrebările de pornire.
+
+  Nu sunt decor: fără ele, caseta e un câmp gol în care nimeni nu știe ce se
+  poate întreba, iar jumătate din ce știe consultantul rămâne nefolosit. Cele
+  două despre firme sunt acolo pentru că partea de căutat sponsori e cea mai
+  nouă și cea pe care nimeni n-ar ghici-o.
+*/
 const INTREBARI = [
   "De unde încep cu donatorii care s-au oprit?",
+  "De unde iau firme de la care să cer sponsorizare?",
   "Ce fac luna asta ca să cresc donațiile lunare?",
+  "Pe cine caut pe LinkedIn într-o firmă și ce-i scriu?",
   "Unde se blochează firmele și ce le scriu?",
   "Merită o campanie acum, sau e mai bine să aștept?",
 ];
@@ -82,9 +92,10 @@ export default function Sfatuitor() {
         Întreabă consultantul
       </h2>
       <p className="mt-1 max-w-3xl text-nota text-cerneala-slab">
-        Vede aceleași cifre ca tine, agregate, și știe ce unelte are site-ul. Nu
-        are nume, adrese sau telefoane — nici nu poate avea. Conversația nu se
-        salvează nicăieri.
+        Vede aceleași cifre ca tine, agregate, știe ce unelte are site-ul și
+        cum se caută firme de la care se cer bani. Nu are nume, adrese sau
+        telefoane — nici nu poate avea, deci nu-ți dă o listă de firme, ci
+        îți arată cum se construiește. Conversația nu se salvează nicăieri.
       </p>
 
       {conversatie.length === 0 ? (

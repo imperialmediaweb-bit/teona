@@ -310,6 +310,38 @@ if (!process.env.DATABASE_URL) {
       primit.includes("UNELTELE CARE EXISTĂ DEJA"),
       "consultantul știe ce unelte are platforma",
     );
+    verifica(
+      primit.includes("CUM SE CAUTĂ FIRME"),
+      "consultantul știe și cum se caută firme de la care se cer bani",
+    );
+    /*
+      Trei blocuri păstrate în cache, nu două.
+
+      Partea fixă — regulile, uneltele, metoda de prospectare — se plătește o
+      dată, nu la fiecare întrebare. Un bloc nou adăugat fără `cache_control`
+      n-ar strica niciun răspuns: ar face doar ca fiecare întrebare să coste
+      de zece ori mai mult, tăcut, pe factura asociației. De aceea se numără.
+    */
+    const cached = (primit.match(/cache_control/g) ?? []).length;
+    verifica(
+      cached === 3,
+      `partea fixă a consultantului se ține în cache (${cached} blocuri din 3)`,
+    );
+    /*
+      Niciun șablon necompletat în ce pleacă spre model.
+
+      Blocurile fixe sunt template-uri cu `${…}` în ele. Un rând scris între
+      ghilimele în loc de accente grave nu se interpolează niciodată și nu dă
+      nicio eroare: textul ajunge la model cu `${CONTACT_FIRME[0].nume}` în el,
+      iar consultantul repetă asta omului. Exact greșeala cu „Sorem ipsum" de
+      pe site-ul vechi — un câmp necompletat, afișat ca atare. Prins o dată de
+      lint, fiindcă variabila rămăsese nefolosită; dar o variabilă folosită și
+      în altă parte n-ar mai fi ieșit nicăieri, deci se verifică și aici.
+    */
+    verifica(
+      !primit.includes("${"),
+      "niciun șablon necompletat în cererea consultantului",
+    );
 
     const fara = await fetch(
       `http://127.0.0.1:${PORT_SITE}/api/admin/sfatuitor`,

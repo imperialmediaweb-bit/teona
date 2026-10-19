@@ -376,17 +376,44 @@ Cum merge, punct cu punct:
   stăm"; munca începe la întrebarea următoare — „de unde încep cu cei care
   s-au oprit?", „ce le scriu firmelor care n-au răspuns?" —, iar alea nu se
   pot ghici dinainte, deci nu încap într-un raport scris o dată pe lună.
-  **Știe trei lucruri și numai trei:** uneltele platformei
+  **Știe patru lucruri și numai patru:** uneltele platformei
   (`src/lib/analiza/platforma.ts` — pagini de ziua ta, calculatorul firmelor,
   șabloanele de e-mail, segmentele, exportul, ce mesaje pleacă automat),
-  calendarul fiscal (25 mai pentru Formularul 230 e sigur; termenul
-  Declarației 177 nu, îl confirmă contabilitatea firmei) și **aceleași
-  agregate** ca analiza scrisă. Nu are nume, adrese sau telefoane și nu poate
-  avea: întrebat cine a donat cel mai mult, trimite la segmentele din panou.
-  Partea fixă — regulile și uneltele — poartă `cache_control`, deci a doua
-  întrebare costă a zecea parte din prima. Conversația nu se salvează.
+  **cum se caută firme de la care se cer bani**
+  (`src/lib/analiza/prospectare.ts`, mai jos), calendarul fiscal (25 mai
+  pentru Formularul 230 e sigur; termenul Declarației 177 nu, îl confirmă
+  contabilitatea firmei) și **aceleași agregate** ca analiza scrisă. Nu are
+  nume, adrese sau telefoane și nu poate avea: întrebat cine a donat cel mai
+  mult, trimite la segmentele din panou.
+  Partea fixă — regulile, uneltele și metoda de prospectare — poartă
+  `cache_control`, deci a doua întrebare costă a zecea parte din prima.
+  Conversația nu se salvează.
   Model din `MODEL_ANALIZA`, implicit `claude-opus-5-5`, prin SDK-ul oficial.
   Aceeași probă verifică ambele căi spre model: `scripts/qa/analiza.mjs`.
+- **Antrenorul de prospectare**, în același consultant
+  (`src/lib/analiza/prospectare.ts`): de unde ies firmele de la care se cer
+  bani, pe cine se caută în ele și în ce săptămână a anului se sună.
+  **Lista de firme nu vine de pe LinkedIn**, și scrie de ce: firmele mici din
+  Suceava n-au prezență acolo, deci o listă făcută din LinkedIn e lista
+  firmelor cu departament de marketing, nu a celor cu bani de sponsorizare.
+  LinkedIn e pentru pasul următor — găsește *omul* din firma deja aleasă și
+  drumul cald până la el.
+  Țintirea vine din lege, nu din intuiție: plafonul e cel mai mic dintre 20%
+  din impozitul pe profit și 0,75% din cifra de afaceri, deci o
+  microîntreprindere pe impozit pe venit n-are de unde să scadă sponsorizarea.
+  Asta se verifică înainte de primul telefon, cu calculatorul care există deja
+  pe `/directioneaza-20`. Fereastra cea mai bună e octombrie–noiembrie:
+  sponsorizarea se scade din impozitul anului **în care a fost plătită**.
+  **Nu dă nume de firme.** N-are bază de firme, iar un nume scos din memoria
+  modelului poate fi greșit sau vechi — iar asociația ar suna pe cineva pe
+  baza lui. Nu scrie nici cifre despre LinkedIn (câte filtre, câte rezultate,
+  cât costă abonamentul): se schimbă des, iar sursele nu se potrivesc între
+  ele. Metoda ține, cifrele n-ar ține nici șase luni.
+  Proba verifică, la nivel de rețea, că blocul ajunge la model, că e păstrat
+  în cache și că **niciun șablon `${…}` necompletat** nu pleacă spre el — un
+  rând scris între ghilimele în loc de accente grave nu se interpolează
+  niciodată și nu dă nicio eroare, ci ajunge la model ca text brut. Aceeași
+  greșeală ca „Sorem ipsum" de pe site-ul vechi.
 - **Ce a adus fiecare campanie**, tot la `/admin/analiza`: cât s-a strâns, din
   câte donații, de la câți oameni, cât din țintă și câte vizite au venit din
   linkul ei. **Banii vin din baza noastră, vizitele de la Google** — două

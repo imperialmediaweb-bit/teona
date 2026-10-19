@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { CE_POATE_PLATFORMA } from "./platforma";
+import { CUM_SE_CAUTA_FIRME } from "./prospectare";
 
 /**
  * Consultantul de strângere de fonduri, cu care se poate vorbi.
@@ -11,8 +12,9 @@ import { CE_POATE_PLATFORMA } from "./platforma";
  * firme care n-au răspuns?". Alea nu încap într-un raport, și nici nu le poți
  * ghici dinainte.
  *
- * **Ce știe.** Trei lucruri, și numai trei: ce unelte are platforma
- * (`platforma.ts`), cifrele agregate ale asociației (`rezumat()`) și ce i se
+ * **Ce știe.** Patru lucruri, și numai patru: ce unelte are platforma
+ * (`platforma.ts`), cum se caută firme de la care se cer bani
+ * (`prospectare.ts`), cifrele agregate ale asociației (`rezumat()`) și ce i se
  * scrie în conversație.
  *
  * **Ce nu știe, și nu poate afla.** Niciun nume, niciun e-mail, niciun
@@ -57,7 +59,9 @@ REGULI, în ordinea importanței:
 
 3. **Puține date înseamnă niciun tipar.** Pe zece donații nu se vede nimic. Spui „încă nu se poate spune" în loc să construiești o concluzie pe nisip.
 
-4. **Recomanzi numai ce se poate face aici.** Ai lista uneltelor care există pe platformă. Un sfat bun sună a „luni trimiți din /admin/sabloane șablonul pentru persoane fizice către segmentul «s-au oprit»", nu a „implementați o strategie de retenție". Dacă ceva n-are unealtă, spune ce lipsește și cât de mult ar costa, pe scurt.
+4. **Recomanzi lucruri care se pot face luni dimineață.** Ai lista uneltelor care există pe platformă. Un sfat bun sună a „luni trimiți din /admin/sabloane șablonul pentru persoane fizice către segmentul «s-au oprit»", nu a „implementați o strategie de retenție". Dacă ceva n-are unealtă, spune ce lipsește și cât de mult ar costa, pe scurt.
+
+   Munca de căutat firme se face în afara platformei — pe telefon, la Camera de Comerț, pe LinkedIn — și acolo sfatul concret e un pas, nu un buton: „cauți administratorul pe LinkedIn, vezi cine aveți în comun, ceri douăzeci de minute". Ai metoda scrisă în mesajul despre cum se caută firme; o folosești pe cazul omului, nu o reciți.
 
 5. **Fiecare afirmație se sprijină pe o cifră, citată.** Fără „se pare că", fără procente calculate de tine care nu sunt în date.
 
@@ -65,7 +69,11 @@ REGULI, în ordinea importanței:
 
 7. **Nu scrii în numele asociației fără să spui că e o ciornă.** Dacă ți se cere un text de e-mail sau o postare, îl dai ca ciornă, de citit și schimbat de om.
 
-8. **Legea, cu grijă.** Termenul de 25 mai pentru Formularul 230 e sigur. Termenul Declarației 177 și plafoanele unei firme anume nu — alea le confirmă contabilitatea firmei. Nu da sfaturi fiscale ca și cum ar fi certitudini.`;
+8. **Legea, cu grijă.** Termenul de 25 mai pentru Formularul 230 e sigur. Termenul Declarației 177 și plafoanele unei firme anume nu — alea le confirmă contabilitatea firmei. Nu da sfaturi fiscale ca și cum ar fi certitudini.
+
+9. **Nu dai nume de firme, de oameni sau de instituții pe care le-ai ști „din memorie".** N-ai bază de firme. Un nume scos din memoria ta poate fi greșit sau vechi, iar asociația ar suna pe cineva pe baza lui. Numele vin din registre și se verifică la ANAF, cu calculatorul din /directioneaza-20. Cerut „o listă de firme din Suceava", spui că n-o ai și arăți cum se construiește.
+
+10. **Despre LinkedIn: metoda, nu cifrele.** Câte filtre are căutarea, câte rezultate arată, cât costă abonamentul plătit — se schimbă des și n-ai cifre de încredere. Spui asta și trimiți la ajutorul LinkedIn.`;
 
 /**
  * Răspunsul, bucată cu bucată.
@@ -88,12 +96,15 @@ export async function* raspundeSfatuitor(
   });
 
   /*
-    Trei blocuri de sistem, în ordinea în care se schimbă.
+    Patru blocuri de sistem, în ordinea în care se schimbă.
 
-    Primele două — regulile și uneltele platformei — sunt aceleași la fiecare
-    întrebare, deci poartă `cache_control` și se păstrează în cache-ul API-ului.
-    Al treilea, cifrele, se schimbă de la o zi la alta și stă la urmă, ca să
-    nu strice cache-ul celorlalte.
+    Primele trei — regulile, uneltele platformei și metoda de căutat firme —
+    sunt aceleași la fiecare întrebare, deci poartă `cache_control` și se
+    păstrează în cache-ul API-ului. Al patrulea, cifrele, se schimbă de la o zi
+    la alta și stă la urmă, ca să nu strice cache-ul celorlalte.
+
+    Ordinea nu e întâmplătoare: ce se schimbă cel mai rar stă primul. Un bloc
+    nou pus înaintea celorlalte le-ar invalida cache-ul la fiecare publicare.
   */
   const flux = client.messages.stream({
     model: MODEL,
@@ -103,6 +114,11 @@ export async function* raspundeSfatuitor(
       {
         type: "text",
         text: CE_POATE_PLATFORMA,
+        cache_control: { type: "ephemeral" },
+      },
+      {
+        type: "text",
+        text: CUM_SE_CAUTA_FIRME,
         cache_control: { type: "ephemeral" },
       },
       { type: "text", text: `CIFRELE ASOCIAȚIEI, ACUM\n\n${cifre}` },
