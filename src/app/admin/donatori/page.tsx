@@ -68,7 +68,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
 
   if (!(await esteAutentificat())) {
     return (
-      <Cadru titlu="Donatori" activ="/admin/donatori">
+      <Cadru titlu="Intră în panou" activ="/admin/donatori">
         <Intrare gresit={Boolean(gresit)} unde="/admin/donatori" />
       </Cadru>
     );

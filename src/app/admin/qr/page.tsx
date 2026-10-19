@@ -68,7 +68,7 @@ async function Continut({
 
   if (!(await esteAutentificat())) {
     return (
-      <Cadru titlu="Cod QR" activ="/admin/qr">
+      <Cadru titlu="Intră în panou" activ="/admin/qr">
         <Intrare gresit={Boolean(gresit)} unde="/admin/qr" />
       </Cadru>
     );

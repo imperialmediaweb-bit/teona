@@ -84,7 +84,7 @@ async function Continut({
 
   if (!(await esteAutentificat())) {
     return (
-      <Cadru titlu="Facebook" activ="/admin/facebook">
+      <Cadru titlu="Intră în panou" activ="/admin/facebook">
         <Intrare gresit={Boolean(gresit)} unde="/admin/facebook" />
       </Cadru>
     );

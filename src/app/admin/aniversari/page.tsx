@@ -68,7 +68,7 @@ async function Continut({
 
   if (!(await esteAutentificat())) {
     return (
-      <Cadru titlu="Aniversări de aprobat" activ="/admin/aniversari">
+      <Cadru titlu="Intră în panou" activ="/admin/aniversari">
         <Intrare gresit={Boolean(gresit)} unde="/admin/aniversari" />
       </Cadru>
     );
