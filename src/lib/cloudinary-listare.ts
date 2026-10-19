@@ -154,7 +154,33 @@ type ResursaBruta = {
   format: string;
   bytes: number;
   created_at: string;
+  /** „image”, „video” sau „raw”. Lipsește la capătul vechi, pe identificator. */
+  resource_type?: string;
 };
+
+/**
+ * E o fotografie, sau altceva nimerit în folder?
+ *
+ * `by_asset_folder` întoarce **tot** ce e în folder, nu doar imagini. În
+ * folderele taberelor au ajuns fișiere `New_Text_Document_….txt`, urcate din
+ * greșeală odată cu pozele. Ele veneau cu `resource_type: "raw"`, treceau mai
+ * departe ca orice poză și ajungeau în galerie — iar fiindcă lista e sortată
+ * cu cea mai nouă prima, fișierul text nimerea tocmai pe locul mare, în capul
+ * galeriei, ca un dreptunghi gol.
+ *
+ * Așa arăta „eroarea la poze” semnalată de asociație la taberele de autism
+ * din septembrie 2025. Aceleași fișiere stau și în folderul taberei de
+ * oncologie.
+ *
+ * Se cer amândouă condițiile, nu doar tipul: un fișier fără lățime și
+ * înălțime nu e o fotografie pe care s-o putem așeza în pagină, oricum ar fi
+ * etichetat. Capătul de rezervă, pe identificator, cere deja numai imagini și
+ * nu trimite `resource_type` — de aceea lipsa lui nu descalifică nimic.
+ */
+function esteFotografie(r: ResursaBruta): boolean {
+  if (r.resource_type && r.resource_type !== "image") return false;
+  return Number(r.width) > 0 && Number(r.height) > 0;
+}
 
 export async function pozeDinDosar(
   cale: string,
@@ -164,12 +190,19 @@ export async function pozeDinDosar(
     `resources/by_asset_folder?asset_folder=${encodeURIComponent(cale)}&max_results=${limita}`,
   );
 
-  let resurse = peFolder?.resources ?? [];
+  /*
+    Se cerne înainte de a hotărî dacă prima cerere a adus ceva.
+
+    Altfel un folder în care au ajuns numai fișiere text ar părea plin —
+    lista brută are rânduri — iar capătul de rezervă, pentru conturile în
+    modul vechi de foldere, n-ar mai fi încercat niciodată.
+  */
+  let resurse = (peFolder?.resources ?? []).filter(esteFotografie);
   if (resurse.length === 0) {
     const peIdentificator = await cere<{ resources?: ResursaBruta[] }>(
       `resources/image?type=upload&prefix=${encodeURIComponent(cale)}&max_results=${limita}`,
     );
-    resurse = peIdentificator?.resources ?? [];
+    resurse = (peIdentificator?.resources ?? []).filter(esteFotografie);
   }
 
   return resurse
