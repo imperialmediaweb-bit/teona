@@ -857,6 +857,38 @@ codul). Ce merge e în `src/proxy.ts`: filtrează slugurile înainte de randare
 
 Proba: `BAZA=http://localhost:3000 node scripts/qa/coduri-404.mjs`.
 
+## Railway construiește cu baza de date pusă, dar nu accesibilă
+
+`DATABASE_URL` există în timpul build-ului, deci `areBazaDeDate()` spune „da".
+Dar rețeaua privată a Railway **nu răspunde la build**: `postgres.railway.internal`
+nici nu se rezolvă. Deci orice citire din baza de date făcută la pregenerarea
+unei pagini cade — de fiecare dată, la fiecare publicare, nu din când în când.
+
+Și cade **tot build-ul**: Next numără eroarea ca eroare de pregenerare și se
+oprește („Export encountered an error on /page: /, exiting the build").
+
+S-a întâmplat în octombrie 2026, de două ori la rând, la testimonialele de pe
+prima pagină. Local trecea, fiindcă local `DATABASE_URL` arăta spre un Postgres
+care răspunde — adică exact situația pe care Railway n-o are.
+
+- **O eroare aruncată dintr-o funcție cu `"use cache"` nu se mai poate prinde
+  din afară.** Cu `cacheComponents`, un `.catch()` pe apel arată că acoperă
+  cazul și nu acoperă nimic. Prinderea stă **înăuntru**, în jurul citirii:
+  `return citesteActive().catch(() => []);`. Așa e scris și `dinPanou()` din
+  `date/proiecte.ts`, și de aceea el n-a căzut niciodată.
+- **Degradarea e în regulă, oprirea build-ului nu.** Prinsă, pagina se
+  construiește cu ce are la îndemână (fișierul de sămânță), iar la prima
+  reîmprospătare de la pornire — când baza răspunde — se umple cu ce e în
+  panou. Eticheta de cache o golește oricum la prima salvare din panou.
+- **Proba adevărată nu e `npm run build`**, e:
+  `DATABASE_URL="postgres://postgres:x@postgres.railway.internal:5432/railway" npm run build`
+  Asta reproduce build-ul de pe Railway în câteva secunde. Orice pagină
+  pregenerată care atinge baza se verifică așa **înainte** de publicare.
+- **Jurnalul de build spune adevărul**, nu doar cel de rulare: o publicare
+  „FAILED" nu schimbă nimic pe site, deci site-ul rămâne la versiunea veche
+  și arată perfect sănătos. Un `git push` care a mers nu înseamnă o publicare
+  care a mers — se verifică starea publicării, nu starea depozitului.
+
 ## Schema pleacă într-o singură cerere, deci cade în întregime
 
 `DEFINITIE` din `src/lib/baza.ts` e un bloc mare de SQL trimis ca o singură

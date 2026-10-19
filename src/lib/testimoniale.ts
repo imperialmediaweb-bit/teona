@@ -71,7 +71,10 @@ const COLOANE = "id, citat, semnatura, sursa, activ, ordine";
 function dinFisier(): { citat: string; semnatura: string; sursa?: string }[] {
   try {
     return JSON.parse(
-      readFileSync(join(process.cwd(), "continut", "testimoniale.json"), "utf8"),
+      readFileSync(
+        join(process.cwd(), "continut", "testimoniale.json"),
+        "utf8",
+      ),
     );
   } catch {
     return [];
@@ -111,6 +114,15 @@ export const CUVINTE_MAX = 35;
 /** Eticheta cache-ului prime pagini, golită la fiecare schimbare din panou. */
 export const ETICHETA_TESTIMONIALE = "testimoniale";
 
+/** Citirea goală, fără cache: ea poate arunca, și are unde să fie prinsă. */
+async function citesteActive(): Promise<Testimonial[]> {
+  await pregateste();
+  return intreaba<Rand>(
+    `SELECT ${COLOANE} FROM testimoniale
+      WHERE activ ORDER BY ordine, creat_la`,
+  );
+}
+
 /** Cele care se văd pe site, în ordinea aleasă. */
 export async function testimonialePublice(): Promise<Testimonial[]> {
   /*
@@ -118,16 +130,26 @@ export async function testimonialePublice(): Promise<Testimonial[]> {
     pagină se pregenerează, iar o citire necachată ar opri construirea cu
     „uncached or runtime data during prerendering". Eticheta se golește când
     asociația adaugă sau scoate unul, deci schimbarea se vede pe loc.
+
+    **Prinderea erorii stă aici, înăuntru, nu la locul apelului.** Cu
+    `cacheComponents`, o eroare aruncată dintr-o funcție „use cache" nu se
+    mai poate prinde din afară: Next o numără ca eroare de pregenerare și
+    oprește tot build-ul. Un `.catch()` pe apel arată că acoperă cazul și nu
+    acoperă nimic.
+
+    Și cazul e sigur, nu teoretic: Railway construiește cu `DATABASE_URL`
+    pus, dar **rețeaua lui privată nu răspunde în timpul build-ului** —
+    `postgres.railway.internal` nu se rezolvă. Deci la fiecare publicare,
+    citirea de aici cade. Prinsă, prima pagină se construiește cu
+    testimonialele din fișier, iar la prima reîmprospătare de la pornire —
+    când baza răspunde — se umple cu cele din panou. Ca la `dinPanou()` din
+    `date/proiecte.ts`, unde prinderea e tot înăuntru, din același motiv.
   */
   "use cache";
   cacheLife("hours");
   cacheTag(ETICHETA_TESTIMONIALE);
   if (!areBazaDeDate()) return [];
-  await pregateste();
-  return intreaba<Rand>(
-    `SELECT ${COLOANE} FROM testimoniale
-      WHERE activ ORDER BY ordine, creat_la`,
-  );
+  return citesteActive().catch(() => []);
 }
 
 /** Toate, inclusiv cele oprite: lista din panou. */
