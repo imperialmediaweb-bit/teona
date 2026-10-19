@@ -97,15 +97,41 @@ const api = createServer((cer, raspunde) => {
   if (adresa.pathname.endsWith("/resources/by_asset_folder")) {
     const dosar = adresa.searchParams.get("asset_folder") ?? "";
     return trimite({
-      resources: [1, 2, 3].map((i) => ({
-        public_id: `${dosar}/poza-${i}`,
-        secure_url: `https://res.cloudinary.com/${CONT}/image/upload/${dosar}/poza-${i}.jpg`,
-        width: 2000,
-        height: 1333,
-        format: "jpg",
-        bytes: 900_000,
-        created_at: `2026-10-0${i}T10:00:00Z`,
-      })),
+      resources: [
+        /*
+          Fișierul care nu e o fotografie, pus dinadins primul.
+
+          În folderele adevărate ale taberelor au ajuns fișiere
+          `New_Text_Document_….txt`, urcate din greșeală odată cu pozele.
+          Cloudinary le întoarce ca orice altă resursă, cu
+          `resource_type: "raw"` și fără lățime. Ajungeau în galerie ca un
+          dreptunghi gol — și, fiindcă lista se sortează cu cea mai nouă
+          prima, tocmai pe locul mare din capul ei. Asta era „eroarea la
+          poze" semnalată de asociație la taberele din septembrie 2025.
+
+          Stă primul și e cel mai nou: dacă filtrul dispare, proba cade pe
+          fotografia de copertă, nu pe o numărătoare pe care ar putea-o
+          trece din întâmplare.
+        */
+        {
+          public_id: `New_Text_Document_probă.txt`,
+          secure_url: `https://res.cloudinary.com/${CONT}/raw/upload/New_Text_Document_probă.txt`,
+          resource_type: "raw",
+          format: "txt",
+          bytes: 12,
+          created_at: "2026-10-09T10:00:00Z",
+        },
+        ...[1, 2, 3].map((i) => ({
+          public_id: `${dosar}/poza-${i}`,
+          secure_url: `https://res.cloudinary.com/${CONT}/image/upload/${dosar}/poza-${i}.jpg`,
+          resource_type: "image",
+          width: 2000,
+          height: 1333,
+          format: "jpg",
+          bytes: 900_000,
+          created_at: `2026-10-0${i}T10:00:00Z`,
+        })),
+      ],
     });
   }
 
@@ -215,6 +241,18 @@ try {
     const strainele = DOSARE[an]
       .filter((n) => n !== dosar)
       .filter((n) => html.includes(encodeURI(`${n}/poza-1`)));
+    /*
+      Fișierul care nu e fotografie n-are voie în pagină.
+
+      Serverul de probă îl întoarce primul și cel mai nou, deci fără filtru
+      ar ajunge tocmai pe locul mare din capul galeriei — exact cum s-a
+      întâmplat pe site la taberele din septembrie 2025.
+    */
+    verifica(
+      !html.includes("New_Text_Document"),
+      `${slug}: fișierul care nu e poză nu intră în galerie`,
+    );
+
     verifica(
       strainele.length === 0,
       `${slug}: nicio poză din altă tabără${strainele.length ? ` (a intrat „${strainele[0]}”)` : ""}`,
