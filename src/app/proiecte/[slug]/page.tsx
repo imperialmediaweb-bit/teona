@@ -227,29 +227,20 @@ export default async function PaginaProiect({
             </figure>
           )}
 
-          {/* Locul descrierii, numai la proiectele care încă n-au una.
-              Vizibil, nu ascuns: cine deschide pagina vede că textul e în
-              pregătire, nu că site-ul e gol. La proiectele scrise de asociație
-              descrierea e deja mai sus, deci nota ar fi o minciună. */}
-          {!proiect.descriere?.length && (
-            <div className="granulatie relative mt-12 overflow-hidden colt-b bg-miere-100 px-7 py-7 shadow-[0_24px_50px_-26px_rgba(255,172,0,0.7)] sm:px-9 lg:mt-16">
-              <Decor
-                semn="soare"
-                strokeWidth={0.8}
-                className="absolute -top-10 -right-10 size-40 text-miere-300/80"
-              />
-              <p className="relative flex items-start gap-4 text-amplu text-miere-900">
-                <span className="colt-mic-a flex size-11 shrink-0 items-center justify-center bg-miere-400 text-cerneala">
-                  <Pictograma nume="document" className="size-5" />
-                </span>
-                <span>
-                  Descrierea acestui proiect se scrie împreună cu asociația.
-                  {toatePozele.length > 0 &&
-                    " Până atunci, îl poți vedea în fotografii."}
-                </span>
-              </p>
-            </div>
-          )}
+          {/*
+            Nicio notă pentru proiectele fără descriere.
+
+            Aici stătea o casetă galbenă: „Descrierea acestui proiect se scrie
+            împreună cu asociația". Era scrisă pentru noi, nu pentru omul care
+            deschide pagina. Un donator n-are treabă cu felul în care ne
+            organizăm textele; tot ce afla de acolo era că site-ul e
+            neterminat. Fotografiile sunt conținutul — pagina le arată și
+            tace.
+
+            Ce rămâne de rezolvat e dincolo de pagina asta: un proiect fără
+            text ȘI fără nicio fotografie n-are ce căuta public. Alea se
+            completează sau se scot din listă.
+          */}
         </div>
       </section>
 

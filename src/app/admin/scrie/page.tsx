@@ -6,6 +6,7 @@ import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/adm
 import { areBazaDeDate } from "@/lib/baza";
 import { FELURI, esteFel, felul, toateTextele } from "@/lib/texte";
 import { adresaPoza } from "@/lib/poza-urcata";
+import { proiecteAfisate } from "@/date/proiecte";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
@@ -92,6 +93,29 @@ async function Continut({
   const texte = await toateTextele(fel);
   const ciorne = texte.filter((t) => !t.publicat);
   const publicate = texte.filter((t) => t.publicat);
+
+  /*
+    Taberele scrise în cod, cărora nimeni nu le-a scris încă descrierea.
+
+    Până acum, descrierea unei tabere se schimba numai prin mine: textele
+    stau în `proiecte-scrise.ts`. Dar `proiecteleToate()` lasă de mult un
+    text din panou să bată versiunea din cod, pe slug — capacitatea era
+    acolo, îi lipsea butonul. Omul ar fi trebuit să ghicească singur că
+    scriind o „tabără nouă" cu exact același titlu rescrie una veche.
+
+    Lista de jos face legătura: fiecare tabără fără text propriu primește un
+    buton care deschide editorul cu titlul scris și cu slugul ei în mână.
+    Ce apare în listă e doar ce n-a fost încă rescris — o tabără căreia i s-a
+    scris descrierea iese de aici și apare mai sus, între ciorne sau
+    publicate.
+  */
+  const aleLor = new Set(texte.map((t) => t.slug));
+  const faraText =
+    fel === "proiect"
+      ? proiecteAfisate()
+          .filter((p) => !aleLor.has(p.slug))
+          .filter((p) => !p.descriere?.length)
+      : [];
   const acesta = felul(fel);
 
   return (
@@ -156,6 +180,45 @@ async function Continut({
             <Sectiune titlu="Publicate" texte={publicate} cale={acesta.cale} />
           )}
         </div>
+      )}
+
+      {faraText.length > 0 && (
+        <section className="mt-12">
+          <h2 className="font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
+            Fără descriere · {faraText.length}
+          </h2>
+          <p className="mt-2 max-w-2xl text-mic text-cerneala-moale">
+            Taberele astea sunt pe site cu titlul și fotografiile lor, dar fără
+            text. Apasă pe una și scrie-i descrierea — pagina ei de pe site se
+            schimbă, nu se face alta nouă.
+          </p>
+          <ul className="mt-4 grid gap-2">
+            {faraText.map((p) => (
+              <li key={p.slug}>
+                <Link
+                  href={`/admin/scrie/nou?fel=proiect&slug=${encodeURIComponent(
+                    p.slug,
+                  )}&titlu=${encodeURIComponent(p.titlu)}`}
+                  className="flex flex-wrap items-center justify-between gap-3 colt-a border border-hartie-umbra bg-hartie px-4 py-3 transition-colors hover:border-caramiziu-400"
+                >
+                  <span className="min-w-0">
+                    <span className="font-titlu font-bold text-cerneala">
+                      {p.titlu}
+                    </span>
+                    {p.dataCitita && (
+                      <span className="ml-2 text-mic text-cerneala-slab">
+                        {p.dataCitita}
+                      </span>
+                    )}
+                  </span>
+                  <span className="font-titlu text-mic font-semibold text-caramiziu-700">
+                    Scrie descrierea →
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
     </Cadru>
   );

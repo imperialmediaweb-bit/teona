@@ -243,8 +243,40 @@ export type DateText = {
 };
 
 /** Scrie un text nou. Întoarce identificatorul lui. */
-export async function creeazaText(date: DateText): Promise<string> {
-  const slug = await slugLiber(date.fel, date.titlu);
+export async function creeazaText(
+  date: DateText,
+  /**
+   * Slugul cerut, când textul trebuie să înlocuiască o pagină din cod.
+   *
+   * Descrierile taberelor scrise de mine stau în `proiecte-scrise.ts`, iar
+   * `proiecteleToate()` le lasă bătute de un text din panou **cu același
+   * slug**. Ca asociația să rescrie descrierea unei tabere, slugul trebuie
+   * deci să nimerească exact.
+   *
+   * Scos din titlu, ar nimeri de cele mai multe ori — dar „de cele mai multe
+   * ori" înseamnă că o diacritică în plus face o a doua pagină de tabără, cu
+   * același nume, în loc s-o schimbe pe prima. Butonul din panou îl trimite
+   * explicit, luat din proiectul pe care omul tocmai l-a apăsat.
+   *
+   * Dacă slugul e deja luat în `texte`, se cade înapoi pe cel scos din titlu:
+   * altfel inserarea ar pica pe cheia unică, iar omul ar pierde ce a scris.
+   */
+  slugCerut?: string,
+): Promise<string> {
+  const curat = (slugCerut ?? "").trim().toLowerCase();
+  const cerut =
+    /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(curat) && curat.length <= 120
+      ? curat
+      : null;
+  const liber =
+    cerut &&
+    (
+      await intreaba<{ slug: string }>(
+        `SELECT slug FROM texte WHERE fel = $1 AND slug = $2 LIMIT 1`,
+        [date.fel, cerut],
+      )
+    ).length === 0;
+  const slug = liber ? cerut : await slugLiber(date.fel, date.titlu);
   const randuri = await intreaba<{ id: string }>(
     `INSERT INTO texte
        (fel, slug, titlu, rezumat, continut, poza_id, poza_latime,

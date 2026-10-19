@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
+import { ETICHETA_PROIECTE_PANOU } from "@/date/proiecte";
 import { limitaDeRata, raspuns } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import {
@@ -157,6 +159,9 @@ export async function POST(cerere: Request) {
 
   if (/^[0-9a-f-]{36}$/i.test(id)) {
     await schimbaText(id, date);
+    // Descrierile taberelor se citesc dintr-un cache cu etichetă. Fără
+    // golirea asta, omul publică și nu vede nimic schimbat pe site.
+    if (fel === "proiect") revalidateTag(ETICHETA_PROIECTE_PANOU, "max");
     return inapoi(
       cerere,
       fel,
@@ -165,7 +170,16 @@ export async function POST(cerere: Request) {
     );
   }
 
-  const nou = await creeazaText({ ...date, fel });
+  /*
+    Slugul cerut vine dintr-un câmp ascuns, pus de butonul „Scrie descrierea"
+    de pe lista de proiecte. Numai la proiecte: noutățile și campaniile nu
+    înlocuiesc nicio pagină din cod, deci n-au de ce să-și aleagă adresa.
+  */
+  if (fel === "proiect") revalidateTag(ETICHETA_PROIECTE_PANOU, "max");
+  const nou = await creeazaText(
+    { ...date, fel },
+    fel === "proiect" ? camp("slug") : undefined,
+  );
   return inapoi(
     cerere,
     fel,

@@ -5,6 +5,7 @@ import { curataTitlu, faSlug } from "@/lib/slug-proiecte.mjs";
 import { PROIECTE_SCRISE } from "./proiecte-scrise";
 import { CATEGORII as CATEGORIILE } from "./proiecte-tipuri";
 import type { IdCategorie, ProiectAfisat } from "./proiecte-tipuri";
+import { cacheLife, cacheTag } from "next/cache";
 import { areBazaDeDate } from "@/lib/baza";
 import { textePublicate } from "@/lib/texte";
 import { PREFIX_CLOUD } from "@/lib/cloud";
@@ -142,7 +143,23 @@ export function proiectDupaSlug(slug: string): ProiectAfisat | undefined {
  * aceeași pagină, aceeași galerie, același loc în listă. Diferența e numai de
  * unde vine, iar asta nu trebuie să se vadă nicăieri.
  */
+/** Eticheta cache-ului, golită la fiecare salvare din panou. */
+export const ETICHETA_PROIECTE_PANOU = "proiecte-din-panou";
+
 async function dinPanou(): Promise<ProiectAfisat[]> {
+  /*
+    Cachéul nu e aici pentru viteză, ci ca citirea să fie îngăduită la
+    pregenerare: fără el, Next oprește construirea cu „uncached or runtime
+    data during prerendering".
+
+    Dar un cache pe minute înseamnă că omul publică o descriere și n-o vede —
+    adică exact purtarea care îl face să creadă că panoul e stricat. De aceea
+    poartă etichetă, iar ruta care salvează o golește: publicarea se vede pe
+    loc, nu la expirare.
+  */
+  "use cache";
+  cacheLife("hours");
+  cacheTag(ETICHETA_PROIECTE_PANOU);
   if (!areBazaDeDate()) return [];
 
   const texte = await textePublicate("proiect", 300).catch(() => []);
@@ -201,10 +218,25 @@ export async function proiecteleToate(): Promise<ProiectAfisat[]> {
 export async function proiectDupaSlugPeste(
   slug: string,
 ): Promise<ProiectAfisat | undefined> {
-  const dinCod = proiectDupaSlug(slug);
-  if (dinCod) return dinCod;
-  if (!areBazaDeDate()) return undefined;
-  return (await dinPanou()).find((p) => p.slug === slug);
+  /*
+    Panoul bate codul, și aici, nu doar în listă.
+
+    Până acum pagina unei tabere se oprea la prima potrivire din cod, în timp
+    ce `proiecteleToate()` lăsa textul din panou să câștige. Ieșea pe dos:
+    în listă se vedea titlul scris de asociație, iar pagina lui arăta
+    descrierea mea. Pentru cine voia să rescrie descrierea unei tabere, asta
+    însemna că scrie degeaba.
+
+    Întrebarea către baza de date se poate face și la pregenerare de când
+    `dinPanou()` e un „use cache": eroarea de dinainte — „uncached or runtime
+    data during prerendering" — venea din citirea necachată, nu din citirea
+    în sine. Cu cache, Next o pregenerează cu ce era la construire și o
+    împrospătează singur după.
+  */
+  const alLor = areBazaDeDate()
+    ? (await dinPanou()).find((p) => p.slug === slug)
+    : undefined;
+  return alLor ?? proiectDupaSlug(slug);
 }
 
 /**

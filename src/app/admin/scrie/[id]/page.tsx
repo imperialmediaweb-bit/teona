@@ -42,7 +42,14 @@ export default function PaginaEditor({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ fel?: string; gata?: string; gresit?: string }>;
+  searchParams: Promise<{
+    fel?: string;
+    gata?: string;
+    gresit?: string;
+    /** Proiectul din cod pe care îl rescrie: slugul și titlul lui. */
+    slug?: string;
+    titlu?: string;
+  }>;
 }) {
   return (
     <Suspense fallback={<Cadru titlu="Scrie">Se încarcă…</Cadru>}>
@@ -56,11 +63,24 @@ async function Continut({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ fel?: string; gata?: string; gresit?: string }>;
+  searchParams: Promise<{
+    fel?: string;
+    gata?: string;
+    gresit?: string;
+    /** Proiectul din cod pe care îl rescrie: slugul și titlul lui. */
+    slug?: string;
+    titlu?: string;
+  }>;
 }) {
   await connection();
   const { id } = await params;
-  const { fel: felCerut, gata, gresit } = await searchParams;
+  const {
+    fel: felCerut,
+    gata,
+    gresit,
+    slug: slugCerut,
+    titlu: titluCerut,
+  } = await searchParams;
 
   if (!areParolaConfigurata()) {
     return (
@@ -162,6 +182,14 @@ async function Continut({
       >
         <input type="hidden" name="fel" value={fel} />
         {!nou && <input type="hidden" name="id" value={text!.id} />}
+        {/*
+          Slugul taberei pe care o rescrie. Fără el, adresa s-ar scoate din
+          titlu și ar nimeri „de cele mai multe ori" — iar când n-ar nimeri,
+          ar apărea o a doua pagină de tabără în loc să se schimbe prima.
+        */}
+        {nou && slugCerut && (
+          <input type="hidden" name="slug" value={slugCerut} />
+        )}
 
         <label className="grid gap-1.5">
           <span className="font-titlu text-mic font-bold text-cerneala">
@@ -171,7 +199,7 @@ async function Continut({
             name="titlu"
             required
             maxLength={200}
-            defaultValue={text?.titlu ?? ""}
+            defaultValue={text?.titlu ?? titluCerut ?? ""}
             className={camp}
           />
         </label>
