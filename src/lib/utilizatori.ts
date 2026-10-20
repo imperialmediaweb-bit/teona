@@ -176,6 +176,8 @@ export type Utilizator = {
   creatLa: Date;
   intratLa: Date | null;
   areParola: boolean;
+  /** Clipa invitației în aer, sau `null` dacă nu e niciuna. */
+  invitatLa: Date | null;
 };
 
 /*
@@ -281,6 +283,20 @@ const DEFINITIE = `
     schimbat_la  timestamptz NOT NULL DEFAULT now()
   );
   CREATE INDEX IF NOT EXISTS utilizatori_activi ON utilizatori (activ, nume);
+
+  /*
+    Când i s-a trimis invitația.
+
+    Ține loc de tabel de invitații, fiindcă e tot ce trebuie: clipa asta intră
+    în semnătura linkului. O invitație nouă o schimbă, deci linkul vechi moare
+    pe loc; iar după ce omul își pune parola se face NULL, deci linkul folosit
+    nu mai deschide nimic a doua oară.
+
+    NULL înseamnă „nicio invitație în aer", nu „n-a fost invitat niciodată":
+    și contul care tocmai și-a pus parola arată la fel. Ce s-a întâmplat se
+    vede din coloanele parola și intrat_la, nu de aici.
+  */
+  ALTER TABLE utilizatori ADD COLUMN IF NOT EXISTS invitat_la timestamptz;
 `;
 
 let gata: Promise<void> | null = null;
@@ -311,6 +327,7 @@ type Rand = {
   activ: boolean;
   creat_la: Date;
   intrat_la: Date | null;
+  invitat_la: Date | null;
 };
 
 /**
@@ -330,10 +347,12 @@ function cites(rand: Rand): Utilizator {
     creatLa: rand.creat_la,
     intratLa: rand.intrat_la,
     areParola: Boolean(rand.parola),
+    invitatLa: rand.invitat_la,
   };
 }
 
-const COLOANE = "id, email, nume, rol, parola, activ, creat_la, intrat_la";
+const COLOANE =
+  "id, email, nume, rol, parola, activ, creat_la, intrat_la, invitat_la";
 
 export async function utilizatorDupaId(id: string): Promise<Utilizator | null> {
   if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
@@ -401,14 +420,22 @@ const MOMEALA =
   "scrypt$16384$8$1$AAAAAAAAAAAAAAAAAAAAAA==$" +
   "cGFyb2xhIGNhcmUgbnUgZXhpc3RhIG5pY2kgbnUgdHJlYnVpZSBzYSBleGlzdGUgdmUyMDI2";
 
+/**
+ * Face un cont.
+ *
+ * `parola` poate lipsi: atunci contul se naște fără una, iar omul și-o pune
+ * singur din invitația primită pe e-mail. Un cont fără parolă **nu poate
+ * intra** — `intraCuParola` cere o amprentă ca s-o compare —, deci nu e o ușă
+ * deschisă, e o ușă care încă n-are cheie, iar cheia și-o taie omul.
+ */
 export async function faceUtilizator(date: {
   email: string;
   nume: string;
   rol: Rol;
-  parola: string;
+  parola?: string;
 }): Promise<Utilizator | null> {
   await pregateste();
-  const parola = await pregatesteParola(date.parola);
+  const parola = date.parola ? await pregatesteParola(date.parola) : null;
   const randuri = await intreaba<Rand>(
     `INSERT INTO utilizatori (email, nume, rol, parola)
      VALUES ($1, $2, $3, $4)
@@ -486,6 +513,68 @@ export async function schimbaStarea(
     `UPDATE utilizatori SET activ = $2, schimbat_la = now()
       WHERE id = $1 RETURNING id`,
     [id, activ],
+  );
+  return randuri.length > 0;
+}
+
+/**
+ * Pune o invitație în aer pentru contul ăsta.
+ *
+ * Întoarce clipa, fiindcă ea intră în semnătura linkului: o invitație nouă o
+ * schimbă, deci cea trimisă acum trei zile moare pe loc. Dacă s-ar trimite a
+ * doua oară fără pasul ăsta, ar fi două linkuri valabile deodată — iar unul
+ * dintre ele într-o cutie poștală la care nu se mai uită nimeni.
+ */
+export async function pregatesteInvitatia(id: string): Promise<Date | null> {
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
+  await pregateste();
+  const randuri = await intreaba<{ invitat_la: Date }>(
+    `UPDATE utilizatori SET invitat_la = now(), schimbat_la = now()
+      WHERE id = $1 AND activ RETURNING invitat_la`,
+    [id],
+  );
+  return randuri[0]?.invitat_la ?? null;
+}
+
+/**
+ * Omul își pune parola din invitație.
+ *
+ * **Cele trei condiții se cer împreună, într-o singură cerere.** Contul
+ * trebuie să fie activ, invitația trebuie să fie exact cea din link, iar
+ * `invitat_la` se face NULL în aceeași mișcare. Verificate pe rând, între
+ * citire și scriere ar încăpea o a doua apăsare — iar linkul ar putea pune
+ * parola de două ori.
+ *
+ * Nu cere parola de dinainte, spre deosebire de `/admin/parola`: omul invitat
+ * n-are una. Ce ține loc de dovadă e linkul, semnat și cu viață scurtă.
+ */
+export async function puneParolaDinInvitatie(
+  id: string,
+  invitatLaMs: number,
+  parola: string,
+): Promise<boolean> {
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return false;
+  if (!Number.isFinite(invitatLaMs)) return false;
+  await pregateste();
+  const amprenta = await pregatesteParola(parola);
+  /*
+    Clipa se compară în **milisecunde**, nu ca dată.
+
+    Postgres ține `timestamptz` cu microsecunde; linkul duce milisecunde,
+    fiindcă atât are `Date` în JavaScript. Comparate ca date, nu se potriveau
+    niciodată: invitația pleca, omul deschidea linkul, își scria parola de
+    două ori și primea „linkul a fost deja folosit". Nimic în jurnal, nicio
+    eroare — doar un om care nu poate intra. **Proba a prins-o**, citirea
+    codului nu.
+  */
+  const randuri = await intreaba<{ id: string }>(
+    `UPDATE utilizatori
+        SET parola = $3, invitat_la = NULL, schimbat_la = now()
+      WHERE id = $1 AND activ
+        AND invitat_la IS NOT NULL
+        AND floor(extract(epoch FROM invitat_la) * 1000) = $2
+      RETURNING id`,
+    [id, Math.floor(invitatLaMs), amprenta],
   );
   return randuri.length > 0;
 }

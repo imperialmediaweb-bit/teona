@@ -51,6 +51,16 @@ export const metadata: Metadata = {
 
 const STARI: Record<string, { text: string; bun?: boolean }> = {
   facut: { text: "Contul a fost făcut.", bun: true },
+  invitat: {
+    text: "Contul e făcut și invitația a plecat. Omul își pune singur parola.",
+    bun: true,
+  },
+  "fara-email": {
+    text: "Contul e făcut, dar e-mailul cu invitația n-a plecat. Încearcă „Trimite din nou”, sau scrie-i tu o parolă.",
+  },
+  "fara-cheie": {
+    text: "Contul e făcut, dar linkul nu s-a putut semna. Lipsește SECRET_SESIUNE. Scrie-i o parolă de mână până se pune.",
+  },
   exista: { text: "Există deja un cont cu adresa asta." },
   email: { text: "Scrie o adresă de e-mail." },
   nume: { text: "Scrie numele omului." },
@@ -159,9 +169,9 @@ async function Continut({
 
       {cine?.fel === "cheie" && (
         <p className="mb-6 colt-mic-a bg-hartie-umbra px-4 py-3 text-mic text-cerneala-moale">
-          Ești înăuntru cu <strong>parola asociației</strong>, nu cu un cont.
-          Ea deschide tot și nu lasă urmă în jurnal — e bună ca să faci primul
-          cont și ca să intri când s-a încurcat ceva, nu pentru munca de zi.
+          Ești înăuntru cu <strong>parola asociației</strong>, nu cu un cont. Ea
+          deschide tot și nu lasă urmă în jurnal — e bună ca să faci primul cont
+          și ca să intri când s-a încurcat ceva, nu pentru munca de zi.
         </p>
       )}
 
@@ -192,8 +202,9 @@ async function Continut({
             Fă un cont
           </h2>
           <p className="mt-1 text-nota text-cerneala-slab">
-            Parola o scrii tu și i-o spui omului. El o schimbă din „Parola
-            mea”, și după aia n-o mai știe nimeni altcineva.
+            Cel mai bine: trimiți invitația și omul își pune singur parola. Așa
+            n-o știe nimeni altcineva, nici tu — iar parola nu mai trece prin
+            WhatsApp, unde rămâne scrisă.
           </p>
         </div>
 
@@ -202,7 +213,6 @@ async function Continut({
           action="/api/admin/utilizatori"
           className="grid max-w-2xl gap-3 colt-a border border-hartie-umbra bg-hartie p-5"
         >
-          <input type="hidden" name="fel" value="adauga" />
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="grid gap-1">
               <span className="font-titlu text-nota font-bold text-cerneala">
@@ -254,31 +264,54 @@ async function Continut({
             ))}
           </fieldset>
 
+          {/*
+            Parola nu mai e obligatorie.
+
+            Calea bună e invitația: contul se naște fără parolă și omul și-o
+            pune singur. Câmpul rămâne pentru cazul în care e-mailul nu pleacă
+            — o adresă greșită, Resend căzut — fiindcă atunci un cont care nu
+            se poate deschide nu ajută pe nimeni.
+          */}
           <label className="grid max-w-sm gap-1">
             <span className="font-titlu text-nota font-bold text-cerneala">
-              Parola de început
+              Parola de început{" "}
+              <span className="font-normal text-cerneala-slab">
+                — numai dacă nu trimiți invitație
+              </span>
             </span>
             <input
               name="parola"
               type="password"
               minLength={MINIM_PAROLA}
-              required
               autoComplete="new-password"
               className={CLASA_CAMP}
             />
             <span className="text-nota text-cerneala-slab">
-              Cel puțin {MINIM_PAROLA} semne.
+              Cel puțin {MINIM_PAROLA} semne. Lasă gol dacă trimiți invitația.
             </span>
           </label>
 
-          <div>
+          <div className="flex flex-wrap items-center gap-3">
             <button
               type="submit"
+              name="fel"
+              value="invita"
               className="inline-flex min-h-11 items-center justify-center rounded-full bg-caramiziu-700 px-5 font-titlu font-bold text-hartie transition-colors hover:bg-caramiziu-600"
             >
-              Fă contul
+              Trimite invitația
+            </button>
+            <button
+              type="submit"
+              name="fel"
+              value="adauga"
+              className="inline-flex min-h-11 items-center justify-center rounded-full border-2 border-hartie-umbra px-5 font-titlu font-bold text-cerneala-moale transition-colors hover:border-caramiziu-400"
+            >
+              Fac eu parola
             </button>
           </div>
+          <p className="text-nota text-cerneala-slab">
+            Invitația ține <strong>șapte zile</strong> și merge o singură dată.
+          </p>
         </form>
       </section>
 
@@ -320,7 +353,38 @@ function Rand({ om, eu }: { om: Utilizator; eu: boolean }) {
           ? `a intrat ultima dată ${CAND.format(om.intratLa)}`
           : "n-a intrat încă niciodată"}
         {om.areParola ? "" : " · n-are parolă pusă"}
+        {om.invitatLa ? " · are o invitație în aer" : ""}
       </p>
+
+      {/*
+        Retrimiterea apare numai la cine n-a apucat să-și pună parola.
+
+        La cineva care intră de luni de zile, butonul ăsta n-ar face decât rău:
+        o invitație nouă nu-i șterge parola, dar un administrator grăbit ar
+        crede că i-a resetat-o. Cine chiar trebuie resetat are câmpul de
+        „Parolă nouă" chiar dedesubt.
+      */}
+      {!om.areParola && om.activ && (
+        <form
+          method="post"
+          action="/api/admin/utilizatori"
+          className="mt-3 flex flex-wrap items-center gap-3"
+        >
+          <input type="hidden" name="fel" value="reinvita" />
+          <input type="hidden" name="id" value={om.id} />
+          <button
+            type="submit"
+            className="inline-flex min-h-10 items-center justify-center rounded-full bg-turcoaz-600 px-4 font-titlu text-mic font-bold text-hartie transition-colors hover:bg-turcoaz-700"
+          >
+            {om.invitatLa ? "Trimite din nou" : "Trimite invitația"}
+          </button>
+          <span className="text-nota text-cerneala-slab">
+            {om.invitatLa
+              ? "Linkul de dinainte se stinge pe loc."
+              : "Își pune singur parola, din e-mail."}
+          </span>
+        </form>
+      )}
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <form
