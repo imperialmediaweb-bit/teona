@@ -52,8 +52,20 @@ export async function trimiteEmail(mesaj: {
   const cheie = process.env.RESEND_API_KEY;
   if (!cheie) return false;
 
+  /*
+    `EMAIL_API` mută trimiterea pe un server de probă.
+
+    Aceeași convenție ca `ANTHROPIC_API`, `CLOUDINARY_API`, `GA_API`,
+    `META_API`: fără ea, singurul fel de a verifica un e-mail de la un capăt
+    la altul ar fi să-l trimiți cuiva adevărat. Nu e o ușă: fără
+    `RESEND_API_KEY` nu pleacă nimic nicăieri, iar în Railway variabila asta
+    nu există.
+  */
+  const adresa =
+    process.env.EMAIL_API?.replace(/\/+$/, "") ?? "https://api.resend.com";
+
   try {
-    const raspuns = await fetch("https://api.resend.com/emails", {
+    const raspuns = await fetch(`${adresa}/emails`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${cheie}`,

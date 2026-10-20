@@ -553,10 +553,38 @@ Cum merge, punct cu punct:
 - **Exportul CSV cere dreptul listei cerute**, nu unul pentru toată ruta: cele
   patru liste sunt exact patru pagini, iar fișierul are în el aceleași nume și
   adrese.
+- **Contul se face cu o invitație, nu cu o parolă scrisă de altcineva.**
+  Varianta de dinainte — administratorul scrie parola și i-o trimite omului —
+  are trei găuri deodată: parola rămâne scrisă într-o conversație de WhatsApp
+  pe care n-o șterge nimeni, administratorul o știe până când (dacă) o schimbă
+  omul, iar omul n-are niciun motiv s-o schimbe, fiindcă merge. Acum butonul
+  dintâi e **„Trimite invitația"**: contul se naște **fără parolă**, iar omul
+  și-o pune singur din linkul primit pe e-mail. Un cont fără parolă nu poate
+  intra — `intraCuParola` cere o amprentă ca s-o compare — deci nu e o ușă
+  deschisă, e o ușă care încă n-are cheie.
+  „Fac eu parola" rămâne, pentru când e-mailul nu pleacă: un cont care nu se
+  poate deschide nu ajută pe nimeni.
+  Linkul ține **șapte zile**, merge **o singură dată**, și moare la: folosire,
+  o invitație nouă, oprirea contului. Clipa invitației (`utilizatori.invitat_la`)
+  **intră în semnătură**, nu doar lângă ea — altfel cine are linkul ar putea
+  încerca alte clipe. Pagina publică `/invitatie` **nu scrie numele, adresa sau
+  rolul**: linkul poate ajunge greșit, iar „Bună, Mihaela" i-ar spune
+  străinului pe cine a nimerit.
+  Probă, cu un server de e-mail de mențiune care prinde linkul și merge pe tot
+  drumul — face contul, pune parola, **intră cu ea**, apoi verifică că linkul
+  nu mai merge a doua oară:
+  `BAZA=… PAROLA_ADMIN=… node scripts/qa/invitatie.mjs` (serverul se pornește
+  cu `EMAIL_API=http://127.0.0.1:4390 RESEND_API_KEY=probă`).
+  **Două bug-uri le-a prins proba, nu cititul codului:** `invitat_la` e
+  `timestamptz` cu microsecunde iar linkul duce milisecunde, deci comparate ca
+  date nu se potriveau niciodată — omul primea „linkul a fost deja folosit",
+  fără nimic în jurnal; și o cădere a bazei de date era raportată în panou ca
+  „există deja un cont cu adresa asta", deci administratorul încerca altă
+  adresă și primea același mesaj.
 - **Parola nu trece niciodată prin adresă** și nu se arată nicăieri — nici cea
-  pusă de administrator la facerea contului. El o scrie, deci o știe; i-o spune
-  omului cum vrea, iar omul o schimbă din `/admin/parola`, unde se cere și
-  parola de acum (un laptop lăsat deschis nu e de ajuns ca să iei contul
+  pusă de administrator, când alege calea aia. El o scrie, deci o știe; i-o
+  spune omului cum vrea, iar omul o schimbă din `/admin/parola`, unde se cere
+  și parola de acum (un laptop lăsat deschis nu e de ajuns ca să iei contul
   definitiv). După asta n-o mai știe nimeni altcineva.
 - **Nimeni nu se oprește singur** și nu-și scade singur rolul: butoanele stau
   pe același rând la toți, iar al tău e primul pe care îl nimerești.
