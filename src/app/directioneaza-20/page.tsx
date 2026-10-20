@@ -18,6 +18,7 @@ import CalculatorSponsorizare from "@/componente/pagina/CalculatorSponsorizare";
 import FormularSponsorizare from "@/componente/formular/FormularSponsorizare";
 import AntetPagina from "@/componente/pagina/AntetPagina";
 import { textelePaginilor } from "@/lib/texte-pagini";
+import { documenteGata } from "@/lib/documente-gata";
 import DeCopiat from "@/componente/pagina/DeCopiat";
 import DocumentDeDescarcat from "@/componente/pagina/DocumentDeDescarcat";
 import Intrebari, { type Intrebare } from "@/componente/pagina/Intrebari";
@@ -155,6 +156,7 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
 
 export default async function Directioneaza20() {
   const texte = await textelePaginilor();
+  const gata = await documenteGata();
   return (
     <>
       <JsonLd
@@ -351,6 +353,22 @@ export default async function Directioneaza20() {
                   <DocumentDeDescarcat
                     titlu="Declarația 177"
                     descriere="Modelul declarației, completat cu datele asociației."
+                    /*
+                      Formularul ANAF în sine, nu contractul pentru el.
+
+                      Asociația a trimis contractul (16 octombrie 2026), care
+                      se descarcă mai jos și merge. Formularul precompletat nu
+                      a venit încă, deci cardul rămâne inactiv — cum cere
+                      caietul la 7.5: „fără ele, butoanele de descărcare rămân
+                      inactive". Din ziua în care îl urcă cineva la
+                      /admin/documente, cardul devine link, fără nicio
+                      modificare de cod.
+                    */
+                    fisier={
+                      gata.includes("declaratia-177")
+                        ? "/documente/declaratia-177"
+                        : undefined
+                    }
                     format="PDF"
                     colt="b"
                   />

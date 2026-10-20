@@ -96,6 +96,15 @@ export const DOCUMENTE: ReadonlyArray<Document> = [
     rezerva: "documente/contract-de-sponsorizare.pdf",
   },
   {
+    slug: "declaratia-177",
+    titlu: "Declarația 177",
+    descriere:
+      "Formularul ANAF în sine, completat cu datele asociației — nu contractul. Cerut de caiet la 8.3; încă nu l-am primit.",
+    cheie: "public/declaratia-177.pdf",
+    fisier: "Declaratia-177-Teona-Ariana.pdf",
+    unde: "/directioneaza-20",
+  },
+  {
     slug: "contract-declaratia-177",
     titlu: "Contractul pentru Declarația 177",
     descriere:

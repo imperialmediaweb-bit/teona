@@ -297,6 +297,41 @@ Ce înseamnă asta în practică:
 - proba `node scripts/qa/poze-cloud.mjs` verifică potrivirea fără cheile
   adevărate, cu un server care imită Cloudinary.
 
+## O fotografie nouă trebuie urcată și în Cloudinary
+
+Cu `CLOUDINARY_CLOUD_NAME` setat, `next.config.ts` montează un încărcător
+propriu, iar el traduce **orice** cale `/poze/an/luna/nume.jpg` într-o adresă
+Cloudinary: `Teona/an/luna/nume`. Cele 389 de fotografii moștenite din
+WordPress au fost urcate odată, în bloc, deci traducerea nimerea mereu — și
+nimeni nu s-a mai gândit la ea.
+
+**O fotografie pusă numai în `public/poze/` nu există în Cloudinary**: adresa dă
+404 și pe pagină rămâne un dreptunghi gol. Nimic nu cade, nimic nu intră în
+jurnal, `npm run build` trece, pagina se randează perfect.
+
+S-a întâmplat pe 19 octombrie 2026: cele unsprezece fotografii primite de la
+asociație pe Drive au stat o zi rupte — Casa Teona, Donează, „Scrisoarea pentru
+Moș Crăciun" și siglele instituțiilor de pe Despre noi. Le-a văzut clientul, nu
+eu.
+
+- **Se urcă cu** `CLOUDINARY_CLOUD_NAME=… CLOUDINARY_API_KEY=…
+  CLOUDINARY_API_SECRET=… node scripts/urca-poze-cloudinary.mjs public/poze`.
+  Sare peste ce e deja acolo, deci se poate rula oricând. **Cheile se dau din
+  mediu, niciodată scrise într-un fișier.**
+- **Urcarea pune `public_id` cu bare în el, nu `folder`.** Contul e pe „dynamic
+  folders", unde folderul e un câmp separat; dar încărcătorul construiește
+  adresa din cale, iar aia e identificatorul. Urcate cu `folder`, pozele ar
+  ajunge în locul potrivit din panoul Cloudinary și adresa de pe site ar da tot
+  404.
+- **Probă, fără chei secrete** (numele contului e public, apare în fiecare
+  adresă de poză): `CLOUDINARY_CLOUD_NAME=… node scripts/qa/poze-lipsa.mjs`.
+  Verifică numai căile care **există și în depozit** — regexul prinde și
+  exemplele din comentarii, iar o probă care strigă la patru lucruri
+  inexistente nu se mai citește după a treia rulare.
+- Pozele urcate din panou (`/admin/scrie`, siglele sponsorilor) **nu** trec pe
+  aici: ele pleacă direct în Cloudinary și se scriu `/cloud/<identificator>`.
+  Capcana e numai pentru fișierele puse de mână în depozit.
+
 ## De unde vin donatorii
 
 Fiecare donație începută de pe site păstrează **canalul** din care a venit
