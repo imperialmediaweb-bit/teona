@@ -53,6 +53,15 @@ function semneaza(parametri: Record<string, string>, secret: string): string {
     .digest("hex");
 }
 
+/** Un nume stabil, luat din chiar octeții pozei: aceeași poză, același nume. */
+export function numeDupaContinut(octeti: Uint8Array, prefix: string): string {
+  const amprenta = createHash("sha1")
+    .update(Buffer.from(octeti))
+    .digest("hex")
+    .slice(0, 16);
+  return `${prefix}-${amprenta}`;
+}
+
 export function areCloudinary(): boolean {
   return Boolean(
     process.env.CLOUDINARY_CLOUD_NAME &&
@@ -78,6 +87,17 @@ export async function urcaPoza(
   tip: string,
   /** Subfolderul din Cloudinary. Pozele de la vizitatori stau separat de ale asociației. */
   subdosar = "aniversari",
+  /**
+   * Numele sub care se urcă, când e nevoie ca aceeași poză să nu se dubleze.
+   *
+   * La șablonul de e-mail, omul apasă pe rând „vezi cum arată", „descarcă
+   * HTML-ul", „trimite-ți o probă" și „fă ciorna" — patru trimiteri ale
+   * aceluiași formular. Fără un nume dat de noi, Cloudinary ar face patru
+   * copii ale aceleiași fotografii, cu patru adrese, și depozitul ar crește
+   * cu fiecare previzualizare. Cu numele luat din octeții pozei, a doua
+   * urcare scrie peste prima și adresa rămâne aceeași.
+   */
+  numeDat?: string,
 ): Promise<PozaUrcata | null> {
   const cont = process.env.CLOUDINARY_CLOUD_NAME;
   const cheie = process.env.CLOUDINARY_API_KEY;
@@ -92,6 +112,12 @@ export async function urcaPoza(
     // ca să nu ținem fișiere de 6 MB pentru o poză de previzualizare.
     transformation: "c_limit,w_1600,h_1600,q_auto",
   };
+  if (numeDat) {
+    parametri.public_id = numeDat;
+    parametri.overwrite = "true";
+    // Fără asta, adresa veche ar rămâne în cache-ul Cloudinary după înlocuire.
+    parametri.invalidate = "true";
+  }
 
   const corp = new FormData();
   for (const [k, v] of Object.entries(parametri)) corp.append(k, v);

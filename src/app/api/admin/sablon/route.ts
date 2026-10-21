@@ -7,6 +7,13 @@ import { pozaPentruEmail } from "@/lib/cloudinary-listare";
 import { creeazaCiorna } from "@/lib/email/mailerlite";
 import { areEmail, trimiteEmail } from "@/lib/email/trimite";
 import {
+  POZA_MAXIM,
+  areCloudinary,
+  numeDupaContinut,
+  pareImagine,
+  urcaPoza,
+} from "@/lib/poza-urcata";
+import {
   esteFelSablon,
   sablonCampanie,
   textSimpluCampanie,
@@ -37,7 +44,49 @@ const EXEMPLU: ContinutCampanie = {
   poza: null,
 };
 
-function citeste(formular: FormData): {
+/**
+ * Urcă fotografia aleasă din formular și întoarce identificatorul ei.
+ *
+ * `null` înseamnă „n-a ales niciun fișier"; un șir de eroare înseamnă că a
+ * ales unul și n-a mers, iar omul trebuie să afle de ce — altfel ar trimite
+ * campania crezând că are poză în ea.
+ *
+ * Numele e luat din octeții pozei, deci cele patru butoane ale formularului
+ * („vezi", „descarcă", „probă", „ciornă") urcă de fiecare dată peste aceeași
+ * fotografie, nu fac patru copii în depozit.
+ */
+async function pozaDinFormular(
+  formular: FormData,
+): Promise<{ id: string } | { eroare: string } | null> {
+  const fisier = formular.get("poza_fisier");
+  if (!(fisier instanceof File) || fisier.size === 0) return null;
+  /*
+    Întâi fișierul, apoi configurarea.
+
+    Invers, cineva care alege din greșeală un PDF pe un site fără chei de
+    Cloudinary ar primi „urcarea nu e configurată" și ar suna degeaba
+    dezvoltatorul, când de fapt greșise fișierul.
+  */
+  if (fisier.size > POZA_MAXIM) return { eroare: "poza-mare" };
+
+  const octeti = new Uint8Array(await fisier.arrayBuffer());
+  if (!pareImagine(fisier.type, octeti)) return { eroare: "poza-tip" };
+  if (!areCloudinary()) return { eroare: "fara-cloudinary" };
+
+  const urcata = await urcaPoza(
+    octeti,
+    fisier.type,
+    "campanii-email",
+    numeDupaContinut(octeti, "campanie"),
+  ).catch(() => null);
+  return urcata ? { id: urcata.id } : { eroare: "poza-urcare" };
+}
+
+function citeste(
+  formular: FormData,
+  /** Identificatorul fotografiei urcate acum; bate câmpul scris de mână. */
+  pozaUrcata?: string,
+): {
   fel: FelSablon;
   continut: ContinutCampanie;
   eroare?: string;
@@ -47,7 +96,7 @@ function citeste(formular: FormData): {
   const fel = camp("fel");
   const titlu = curataText(camp("titlu"), 160) ?? "";
   const corp = camp("text");
-  const pozaId = camp("poza");
+  const pozaId = pozaUrcata ?? camp("poza");
   const pozaAlt = curataText(camp("poza_alt"), 200) ?? "";
   const campanie = camp("campanie");
 
@@ -114,7 +163,17 @@ export async function POST(cerere: Request) {
   const formular = await cerere.formData().catch(() => null);
   if (!formular) return raspuns("Cerere invalidă.", 400);
 
-  const { fel, continut, eroare } = citeste(formular);
+  const felCerut = String(formular.get("fel") ?? "");
+  const felSigur = esteFelSablon(felCerut) ? felCerut : "persoane";
+
+  const poza = await pozaDinFormular(formular);
+  if (poza && "eroare" in poza)
+    return inapoi(cerere, { ratat: poza.eroare, fel: felSigur });
+
+  const { fel, continut, eroare } = citeste(
+    formular,
+    poza ? poza.id : undefined,
+  );
   if (eroare) return inapoi(cerere, { ratat: eroare, fel });
 
   const fac = String(formular.get("fac") ?? "vezi");

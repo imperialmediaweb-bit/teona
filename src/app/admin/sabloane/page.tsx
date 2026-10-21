@@ -50,6 +50,14 @@ const RATAT: Record<string, string> = {
     "Lipsește RESEND_API_KEY din Railway, deci proba nu poate pleca. Descarcă HTML-ul și încarcă-l direct în MailerLite.",
   mailerlite: "MailerLite n-a primit ciorna.",
   fel: "Alege pentru cine e e-mailul.",
+  "poza-mare":
+    "Fotografia e prea mare. Alege una mai mică de 6 MB sau micșoreaz-o întâi.",
+  "poza-tip":
+    "Fișierul ăla nu e o fotografie. Merg JPG, PNG și WebP — nu și PDF sau document.",
+  "poza-urcare":
+    "Fotografia n-a ajuns în depozit. Mai încearcă o dată; dacă nici a doua oară nu merge, spune-i dezvoltatorului.",
+  "fara-cloudinary":
+    "Urcarea fotografiilor nu e configurată. Până se rezolvă, poți folosi identificatorul unei fotografii care e deja pe site.",
 };
 
 const FACUT: Record<string, string> = {
@@ -178,6 +186,7 @@ async function Continut({
         <form
           action="/api/admin/sablon"
           method="post"
+          encType="multipart/form-data"
           target="_blank"
           className="grid gap-5"
         >
@@ -249,18 +258,30 @@ async function Continut({
             />
           </div>
 
+          {/*
+            Poza se alege de aici, ca la scrisul pe site.
+
+            Înainte, câmpul cerea identificatorul din Cloudinary, copiat de la
+            Poze. Adică: deschide altă pagină, caută fotografia, copiază un șir
+            de semne, întoarce-te. Pentru o campanie pe lună, pasul ăla e tot
+            ce trebuie ca să nu se mai pună poză deloc — iar un e-mail fără
+            fotografie, despre copii, e un e-mail mai slab.
+
+            Identificatorul rămâne dedesubt, pentru o fotografie care e deja în
+            Cloudinary și n-are rost urcată a doua oară.
+          */}
           <div className="grid gap-2 sm:grid-cols-2">
             <div className="grid gap-2">
               <Eticheta
-                htmlFor="poza"
-                copii="Poza (identificator Cloudinary)"
-                nota="Se copiază din Poze."
+                htmlFor="poza_fisier"
+                copii="Poza"
+                nota="O alegi de pe calculator sau de pe telefon."
               />
               <input
-                id="poza"
-                name="poza"
-                type="text"
-                placeholder="Teona/2025/TABĂRĂ…/poza-1"
+                id="poza_fisier"
+                name="poza_fisier"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
                 className={CLASA_CAMP}
               />
             </div>
@@ -280,16 +301,35 @@ async function Continut({
               />
             </div>
           </div>
-          <p className="-mt-2 text-nota text-cerneala-slab">
-            Identificatorul se ia de la{" "}
-            <Link
-              href="/admin/poze"
-              className="font-semibold text-caramiziu-700 underline underline-offset-2"
-            >
-              Poze
-            </Link>
-            , unde e un buton de copiat sub fiecare fotografie.
-          </p>
+          <details className="-mt-2">
+            <summary className="cursor-pointer font-titlu text-nota font-bold text-cerneala-moale">
+              Sau o fotografie care e deja pe site
+            </summary>
+            <div className="mt-3 grid gap-2">
+              <Eticheta
+                htmlFor="poza"
+                copii="Identificatorul din Cloudinary"
+                nota="Se folosește numai dacă n-ai ales un fișier mai sus."
+              />
+              <input
+                id="poza"
+                name="poza"
+                type="text"
+                placeholder="Teona/2025/TABĂRĂ…/poza-1"
+                className={CLASA_CAMP}
+              />
+              <p className="text-nota text-cerneala-slab">
+                Se ia de la{" "}
+                <Link
+                  href="/admin/poze"
+                  className="font-semibold text-caramiziu-700 underline underline-offset-2"
+                >
+                  Poze
+                </Link>
+                , unde e un buton de copiat sub fiecare fotografie.
+              </p>
+            </div>
+          </details>
 
           {campanii.length > 0 && (
             <div className="grid gap-2">
