@@ -34,7 +34,13 @@ function Redare({ className }: { className?: string }) {
  * unde să se ducă.
  *
  * Mărimea: `aspect-video` ține locul dinainte de încărcare, deci pagina nu
- * sare când apare iframe-ul — aceeași grijă ca la bara de anunț.
+ * sare când apare iframe-ul — aceeași grijă ca la bara de anunț. **Lățimea o
+ * dă cardul care o cuprinde**, nu componenta: cât timp și-o alegea singură,
+ * placa ieșea mai îngustă decât cardul de deasupra și arăta ca o bucată
+ * rămasă pe dinafară.
+ *
+ * Titlul nu se mai scrie pe placă: e scris pe cardul de deasupra, la doi
+ * centimetri, iar de două ori nu spune nimic în plus.
  */
 export default function VideoIncorporat({
   adresa,
@@ -56,7 +62,7 @@ export default function VideoIncorporat({
       <button
         type="button"
         onClick={() => setPornit(true)}
-        className="group relative grid aspect-video w-full max-w-2xl place-items-center overflow-hidden colt-mic-a border-t-4 border-turcoaz-600 bg-cerneala text-hartie transition-colors hover:bg-cerneala-moale"
+        className="group relative grid aspect-video w-full place-items-center overflow-hidden colt-mic-a border-t-4 border-turcoaz-600 bg-cerneala text-hartie transition-colors hover:bg-cerneala-moale"
       >
         <span className="flex flex-col items-center gap-3 px-6 text-center">
           <span className="grid size-14 place-items-center rounded-full bg-hartie/15 transition-transform duration-500 ease-cald group-hover:scale-110 motion-reduce:group-hover:scale-100">
@@ -65,10 +71,7 @@ export default function VideoIncorporat({
           <span className="font-titlu text-corp font-bold">
             Vezi filmarea pe Facebook
           </span>
-          <span className="text-nota text-hartie/70">
-            {titlu}
-          </span>
-          <span className="text-nota text-hartie/50">
+          <span className="text-nota text-hartie/60">
             Se încarcă de la Facebook, care poate pune cookie-uri.
           </span>
         </span>
@@ -80,7 +83,7 @@ export default function VideoIncorporat({
     <iframe
       src={player}
       title={titlu}
-      className="aspect-video w-full max-w-2xl colt-mic-a border-t-4 border-turcoaz-600"
+      className="aspect-video w-full colt-mic-a border-t-4 border-turcoaz-600"
       style={{ border: "none", overflow: "hidden" }}
       scrolling="no"
       allowFullScreen

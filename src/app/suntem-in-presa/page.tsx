@@ -367,23 +367,32 @@ export default function SuntemInPresa() {
                           Link în curs de actualizare
                         </span>
                       )}
+                      {/*
+                        Filmarea, în card, pe toată lățimea lui.
+
+                        Stătea sub card, într-un bloc al ei, mai îngust și
+                        fără chenar: arăta ca o bucată rămasă pe dinafară,
+                        lipită la stânga sub un card care ținea toată lățimea.
+                        O apariție în presă e un singur lucru, deci un singur
+                        card.
+
+                        `lg:col-span-3` fiindcă articolul e pe trei coloane de
+                        la `lg` în sus — siglă, text, buton; fără el, filmarea
+                        ar intra în coloana siglei, de zece rem.
+
+                        Se încarcă abia la apăsare: vezi `VideoIncorporat`. Pe
+                        card rămâne și butonul către postare, pentru cine nu
+                        vrea player deloc.
+                      */}
+                      {aparitie.incorporare && (
+                        <div className="lg:col-span-3">
+                          <VideoIncorporat
+                            adresa={aparitie.incorporare}
+                            titlu={aparitie.titlu}
+                          />
+                        </div>
+                      )}
                     </article>
-
-                    {/*
-                      Filmarea, sub card, pe toată lățimea.
-
-                      Se încarcă abia la apăsare: vezi `VideoIncorporat`. Pe
-                      card rămâne și butonul către postare, pentru cine nu
-                      vrea player deloc.
-                    */}
-                    {aparitie.incorporare && (
-                      <div className="mt-4">
-                        <VideoIncorporat
-                          adresa={aparitie.incorporare}
-                          titlu={aparitie.titlu}
-                        />
-                      </div>
-                    )}
                   </Aparitie>
                 </li>
               );
