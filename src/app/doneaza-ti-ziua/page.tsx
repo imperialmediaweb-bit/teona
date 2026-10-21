@@ -65,9 +65,8 @@ const INTREBARI = [
     intrebare: "Trebuie să fie neapărat ziua mea de naștere?",
     raspuns: (
       <>
-        Nu. Merge la fel de bine pentru un botez, o nuntă, o aniversare sau
-        orice altă ocazie la care primești cadouri și ai prefera să nu le
-        primești.
+        Poți dedica ziua ta de naștere sau ziua de naștere a copilului tău.
+        Alegi varianta potrivită în formularul de creare a paginii.
       </>
     ),
   },
@@ -192,7 +191,7 @@ export default function DoneazaTiZiua() {
       <Val culoare="text-hartie-calda" className={VAL_PESTE} />
       <section
         id="creeaza"
-        className="scroll-mt-40 bg-hartie-calda pt-6 pb-24 lg:pt-10 lg:pb-32"
+        className="scroll-mt-44 bg-hartie-calda pt-12 pb-20 lg:pt-16 lg:pb-28"
       >
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <TitluSectiune
@@ -200,7 +199,7 @@ export default function DoneazaTiZiua() {
             titlu="Creează pagina ta"
             culoare="caramiziu"
           />
-          <div className="mt-12">
+          <div className="mt-8">
             <FormularAniversare areAsistent={areAsistent()} />
           </div>
         </div>

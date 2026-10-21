@@ -16,10 +16,6 @@
 export const OCAZII = [
   { id: "zi-de-nastere", eticheta: "Ziua mea de naștere" },
   { id: "zi-de-nastere-copil", eticheta: "Ziua copilului meu" },
-  { id: "botez", eticheta: "Botez" },
-  { id: "nunta", eticheta: "Nuntă" },
-  { id: "aniversare", eticheta: "O aniversare" },
-  { id: "altceva", eticheta: "Altă ocazie" },
 ] as const;
 
 export type IdOcazie = (typeof OCAZII)[number]["id"];
@@ -61,12 +57,6 @@ export function textGataFacut(ocazie: string, numeIntreg: string): string {
       return `${eu} îmi sărbătoresc ziua de naștere.\n\n${final}`.trim();
     case "zi-de-nastere-copil":
       return `${eu} sărbătoresc ziua copilului meu.\n\nNe-am gândit că cel mai frumos cadou ar fi unul care ajunge la alți copii.\n\n${final}`.trim();
-    case "botez":
-      return `${eu} sărbătoresc botezul copilului nostru.\n\nE o zi de bucurie, iar bucuria e mai mare când o împărțim.\n\n${final}`.trim();
-    case "nunta":
-      return `${eu} ne căsătorim.\n\nAvem tot ce ne trebuie, așa că ne-am gândit să ne bucurăm altfel în ziua asta.\n\n${final}`.trim();
-    case "aniversare":
-      return `${eu} sărbătoresc o zi importantă pentru mine.\n\n${final}`.trim();
     default:
       return `${eu} am o ocazie specială și vreau s-o sărbătoresc altfel.\n\n${final}`.trim();
   }
