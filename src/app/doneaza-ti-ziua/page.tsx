@@ -35,9 +35,9 @@ const INTREBARI = [
     intrebare: "Unde ajung banii?",
     raspuns: (
       <>
-        La asociație, prin Galantom — platforma pe care o folosim pentru
-        donații online. Pagina de aici nu încasează bani. Ea spune de ce o faci
-        și trimite mai departe la Galantom.
+        La asociație. Butonul de pe pagina ta duce la formularul de donație al
+        site-ului, iar banii intră direct în contul asociației. Nu treci prin
+        altă platformă și nu-ți trebuie cont nicăieri.
       </>
     ),
   },
@@ -45,10 +45,9 @@ const INTREBARI = [
     intrebare: "Pot vedea cât am strâns?",
     raspuns: (
       <>
-        Da, dacă îți faci întâi o pagină personală pe Galantom și ne dai linkul
-        în formular. Atunci butonul „Donează” duce la pagina ta și totalul se
-        vede acolo. Dacă nu, butonul duce la proiectul asociației și donațiile
-        intră la general. Atunci nu putem spune care sunt ale tale.
+        Da. Fiecare donație făcută de pe pagina ta poartă numele campaniei
+        tale, deci totalul e al tău, nu se amestecă. Scrie-ne și îți spunem
+        unde a ajuns.
       </>
     ),
   },
@@ -143,7 +142,16 @@ export default function DoneazaTiZiua() {
             />
           </div>
 
-          {/* Partea cu Galantom, scrisă pe față. */}
+          {/*
+            Cardul spunea, până în octombrie 2026, „fă-ți întâi o pagină pe
+            Galantom, altfel nu se vede cât ai strâns". Era adevărat când
+            butonul de donație ducea acolo. De când pagina de campanie duce la
+            formularul nostru (`ziua-ta/[slug]`, cu slugul în adresă),
+            donațiile poartă numele campaniei și totalul se vede oricum — deci
+            textul cerea omului un cont în plus, pe altă platformă, pentru
+            ceva ce primea deja. Galantom rămâne ca altă cale de a dona, cum
+            cere caietul la 2.3, dar nu ca pas obligatoriu.
+          */}
           <Aparitie intarziere={0.1}>
             <div className="granulatie relative mt-10 overflow-hidden colt-b border border-turcoaz-100 bg-turcoaz-50 p-7 shadow-[0_24px_50px_-26px_rgba(42,159,163,0.6)] sm:p-9">
               <Decor
@@ -155,21 +163,25 @@ export default function DoneazaTiZiua() {
                 <Pictograma nume="inima" className="size-6" />
               </span>
               <h3 className="relative mt-5 text-h3 text-cerneala">
-                Vrei să vezi cât ai strâns?
+                Nu-ți trebuie cont nicăieri
               </h3>
               <p className="relative mt-3 max-w-3xl text-amplu text-cerneala-moale">
-                Fă-ți întâi o pagină personală pe Galantom și pune linkul ei în
-                formular. Atunci butonul „Donează” de pe pagina ta duce acolo,
-                iar totalul se vede în timp real, pe numele tău. Fără link,
-                butonul duce la proiectul asociației și donațiile intră la
-                general.
+                Pagina ta stă pe site-ul asociației, iar butonul „Donează” de
+                pe ea duce la formularul nostru. Fiecare donație făcută de
+                acolo poartă numele campaniei tale, deci totalul e al tău și nu
+                se amestecă. Prietenii tăi donează cu cardul, dintr-un singur
+                loc.
+              </p>
+              <p className="relative mt-3 max-w-3xl text-mic text-cerneala-moale">
+                Dacă preferi să donezi pe Galantom, se poate și așa — proiectul
+                asociației e acolo.
               </p>
               <Buton
-                href={LINKURI_EXTERNE.galantomZiuaTa}
+                href={LINKURI_EXTERNE.galantom}
                 varianta="contur"
                 className="relative mt-7"
               >
-                Fă-ți pagina pe Galantom
+                Deschide Galantom
               </Buton>
             </div>
           </Aparitie>
