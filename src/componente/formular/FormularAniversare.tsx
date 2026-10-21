@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import { LIMITE, OCAZII, POZA_MAXIM, textGataFacut } from "@/date/aniversari";
 import { RUTE } from "@/date/asociatie";
 import Pictograma from "@/componente/Pictograma";
@@ -56,6 +57,23 @@ export default function FormularAniversare({
   const [trimisa, setTrimisa] = useState<Trimisa | null>(null);
   const [numePoza, setNumePoza] = useState<string | null>(null);
   const [lungimeMesaj, setLungimeMesaj] = useState(0);
+  const [previzualizare, setPrevizualizare] = useState({ titlu: "", nume: "", mesaj: "" });
+  const [pozaPreview, setPozaPreview] = useState<string | null>(null);
+  useEffect(() => {
+    return () => {
+      if (pozaPreview) URL.revokeObjectURL(pozaPreview);
+    };
+  }, [pozaPreview]);
+
+  function actualizeazaPrevizualizarea(form: HTMLFormElement) {
+    const date = new FormData(form);
+    setPrevizualizare({
+      titlu: String(date.get("titlu") ?? ""),
+      nume: String(date.get("nume_public") ?? ""),
+      mesaj: String(date.get("mesaj") ?? ""),
+    });
+  }
+
   const formular = useRef<HTMLFormElement>(null);
   const mesaj = useRef<HTMLTextAreaElement>(null);
   const [indrept, setIndrept] = useState(false);
@@ -73,6 +91,7 @@ export default function FormularAniversare({
     ).slice(0, LIMITE.mesaj);
     el.value = text;
     setLungimeMesaj(text.length);
+    actualizeazaPrevizualizarea(form);
     setNotaMesaj("Gata — schimbă-l cum vrei, e doar un punct de plecare.");
     el.focus();
   }
@@ -107,6 +126,7 @@ export default function FormularAniversare({
       }
       el.value = corp.text.slice(0, LIMITE.mesaj);
       setLungimeMesaj(el.value.length);
+      if (formular.current) actualizeazaPrevizualizarea(formular.current);
       setNotaMesaj(
         "Îndreptat. Citește-l — dacă ți-a schimbat înțelesul, scrie-l tu.",
       );
@@ -216,11 +236,12 @@ export default function FormularAniversare({
     <form
       ref={formular}
       onSubmit={trimite}
+      onChange={(ev) => actualizeazaPrevizualizarea(ev.currentTarget)}
       action="/api/campanii"
       method="post"
       encType="multipart/form-data"
       noValidate
-      className="granulatie colt-a border border-hartie-umbra bg-hartie p-6 shadow-[0_26px_60px_-30px_rgba(35,35,35,0.4)] sm:p-8"
+      className="granulatie colt-a border border-hartie-umbra bg-hartie p-5 shadow-[0_26px_60px_-30px_rgba(35,35,35,0.4)] sm:p-8 [&_p.text-nota]:text-sm [&_p.text-nota]:text-cerneala-moale"
     >
       {/* Capcana pentru roboți: ascunsă și de ochi, și de cititoarele de ecran. */}
       <p className="hidden" aria-hidden="true">
@@ -362,9 +383,13 @@ export default function FormularAniversare({
           name="poza"
           type="file"
           accept="image/jpeg,image/png,image/webp"
-          onChange={(ev) =>
-            setNumePoza(ev.currentTarget.files?.[0]?.name ?? null)
-          }
+          onChange={(ev) => {
+            const file = ev.currentTarget.files?.[0] ?? null;
+            setNumePoza(file?.name ?? null);
+            const valida = file && file.size <= POZA_MAXIM &&
+              ["image/jpeg", "image/png", "image/webp"].includes(file.type);
+            setPozaPreview(valida ? URL.createObjectURL(file) : null);
+          }}
           aria-invalid={erori.poza ? "true" : undefined}
           className="block w-full cursor-pointer font-titlu text-mic text-cerneala-moale file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-tenta-cald file:px-5 file:py-3 file:font-titlu file:text-mic file:font-bold file:text-caramiziu-700 hover:file:bg-caramiziu-100"
         />
@@ -406,6 +431,33 @@ export default function FormularAniversare({
           />
         </Camp>
       </div>
+
+      <details className="mt-7 rounded-2xl border border-hartie-umbra bg-hartie-calda p-5">
+        <summary className="cursor-pointer font-titlu font-bold text-caramiziu-800">
+          Vezi cum va arăta pagina ta
+        </summary>
+        <p className="mt-2 text-sm text-cerneala-moale">
+          O previzualizare a conținutului. Pagina va fi publicată după verificarea asociației.
+        </p>
+        <article className="mt-4 overflow-hidden rounded-2xl border border-hartie-umbra bg-hartie">
+          {pozaPreview && (
+            <Image src={pozaPreview} alt="Poza aleasă pentru campanie" width={800} height={500}
+              unoptimized className="max-h-80 w-full object-contain bg-hartie-calda" />
+          )}
+          <div className="p-5 sm:p-7">
+            <p className="text-sm font-semibold text-caramiziu-800">Donează-ți ziua de naștere</p>
+            <h3 className="mt-3 break-words font-titlu text-2xl font-bold text-cerneala">
+              {previzualizare.titlu.trim() || "Titlul paginii tale"}
+            </h3>
+            <p className="mt-2 break-words text-sm text-cerneala-moale">
+              {previzualizare.nume.trim() || "Numele tău"}
+            </p>
+            <p className="mt-5 whitespace-pre-wrap break-words text-corp text-cerneala">
+              {previzualizare.mesaj.trim() || "Mesajul tău pentru prieteni va apărea aici."}
+            </p>
+          </div>
+        </article>
+      </details>
 
       <div className="mt-7 border-t border-hartie-umbra pt-6">
         <label className="flex cursor-pointer items-start gap-3">
