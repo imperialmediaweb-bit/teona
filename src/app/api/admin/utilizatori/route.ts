@@ -31,9 +31,20 @@ import {
 /** Unde se întoarce omul. O singură pagină, deci nu e nimic de validat. */
 const INAPOI = "/admin/utilizatori";
 
+/*
+  Răspunsul se întoarce cu `#stare` în adresă.
+
+  Mesajul de confirmare stă în capul paginii, iar formularul de făcut conturi
+  e la câteva ecrane sub el. După trimitere, browserul păstrează locul în
+  care era omul — deci confirmarea apărea deasupra, nevăzută, iar pagina
+  arăta exact ca înainte. Omul apăsa a doua oară, apoi dădea refresh și
+  descoperea că de fapt se făcuse.
+
+  Fragmentul duce browserul la mesaj, oricum ar hotărî el cu derularea.
+*/
 function gata(cerere: Request, cod: string) {
   return NextResponse.redirect(
-    new URL(`${INAPOI}?stare=${encodeURIComponent(cod)}`, cerere.url),
+    new URL(`${INAPOI}?stare=${encodeURIComponent(cod)}#stare`, cerere.url),
     { status: 303 },
   );
 }

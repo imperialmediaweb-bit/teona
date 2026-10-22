@@ -156,8 +156,10 @@ async function Continut({
     >
       {mesaj && (
         <p
+          id="stare"
           role="alert"
-          className={`mb-6 colt-mic-a px-4 py-3 text-mic font-semibold ${
+          tabIndex={-1}
+          className={`mb-6 scroll-mt-24 colt-mic-a px-4 py-3 text-mic font-semibold ${
             mesaj.bun
               ? "bg-turcoaz-50 text-cerneala"
               : "bg-caramiziu-50 text-caramiziu-900"

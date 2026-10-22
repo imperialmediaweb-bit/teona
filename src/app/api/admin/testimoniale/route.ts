@@ -22,7 +22,7 @@ const INAPOI = "/admin/testimoniale";
 
 function gata(cerere: Request, cod: string) {
   return NextResponse.redirect(
-    new URL(`${INAPOI}?stare=${encodeURIComponent(cod)}`, cerere.url),
+    new URL(`${INAPOI}?stare=${encodeURIComponent(cod)}#stare`, cerere.url),
     { status: 303 },
   );
 }

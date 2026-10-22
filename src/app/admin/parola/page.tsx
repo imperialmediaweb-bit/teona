@@ -96,8 +96,10 @@ async function Continut({
     <Cadru titlu="Parola mea" activ="/admin/parola">
       {mesaj && (
         <p
+          id="stare"
+          tabIndex={-1}
           role="alert"
-          className={`mb-6 max-w-2xl colt-mic-a px-4 py-3 text-mic font-semibold ${
+          className={`scroll-mt-24 mb-6 max-w-2xl colt-mic-a px-4 py-3 text-mic font-semibold ${
             mesaj.bun
               ? "bg-turcoaz-50 text-cerneala"
               : "bg-caramiziu-50 text-caramiziu-900"
