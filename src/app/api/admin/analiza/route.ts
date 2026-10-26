@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns } from "@/lib/api";
+import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 
 import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
@@ -35,7 +34,7 @@ import { areReclame, reclame } from "@/lib/reclame/meta";
 function inapoi(cerere: Request, motiv: string | null) {
   const unde = new URL("/admin/analiza", cerere.url);
   if (motiv) unde.searchParams.set("ratat", motiv);
-  return NextResponse.redirect(unde, { status: 303 });
+  return trimiteLa(unde);
 }
 export async function POST(cerere: Request) {
   const prea = limitaDeRata(cerere, {

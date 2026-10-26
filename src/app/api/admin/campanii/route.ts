@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns } from "@/lib/api";
+import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { hotaraste } from "@/lib/campanii";
 import { campanieHotarata } from "@/lib/email/campanie";
@@ -38,7 +37,5 @@ export async function POST(cerere: Request) {
       motiv,
     }).catch(() => undefined);
   }
-  return NextResponse.redirect(new URL("/admin/aniversari", cerere.url), {
-    status: 303,
-  });
+  return trimiteLa("/admin/aniversari");
 }

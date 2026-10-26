@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns } from "@/lib/api";
+import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import { donatorulConectat } from "@/lib/sesiune";
 import { schimbaAcordul, uitaDonatorul } from "@/lib/plati/donatori";
 import { daJosDinBuletin, laBuletin } from "@/lib/buletin";
@@ -38,10 +37,7 @@ export async function POST(cerere: Request) {
     // primește în continuare.
     if (vrea) await laBuletin(email).catch(() => undefined);
     else await daJosDinBuletin(email).catch(() => undefined);
-    return NextResponse.redirect(
-      new URL(`/contul-meu?gata=${vrea ? "abonat" : "dezabonat"}`, cerere.url),
-      { status: 303 },
-    );
+    return trimiteLa(`/contul-meu?gata=${vrea ? "abonat" : "dezabonat"}`);
   }
 
   if (ce === "opreste-lunara") {
@@ -59,19 +55,10 @@ export async function POST(cerere: Request) {
     */
     const id = String(formular.get("abonament") ?? "");
     if (!/^sub_[A-Za-z0-9]+$/.test(id)) {
-      return NextResponse.redirect(
-        new URL("/contul-meu?eroare=abonament", cerere.url),
-        { status: 303 },
-      );
+      return trimiteLa("/contul-meu?eroare=abonament");
     }
     const oprit = await opresteAbonamentul(email, id).catch(() => false);
-    return NextResponse.redirect(
-      new URL(
-        `/contul-meu?${oprit ? "gata=oprita" : "eroare=abonament"}`,
-        cerere.url,
-      ),
-      { status: 303 },
-    );
+    return trimiteLa(`/contul-meu?${oprit ? "gata=oprita" : "eroare=abonament"}`);
   }
 
   if (ce === "stergere") {
@@ -82,17 +69,12 @@ export async function POST(cerere: Request) {
         .trim()
         .toUpperCase() !== "ȘTERGE"
     ) {
-      return NextResponse.redirect(
-        new URL("/contul-meu?eroare=confirmare", cerere.url),
-        { status: 303 },
-      );
+      return trimiteLa("/contul-meu?eroare=confirmare");
     }
     await daJosDinBuletin(email).catch(() => undefined);
     await uitaDonatorul(email);
     await inchideSesiunea();
-    return NextResponse.redirect(new URL("/?sters=1", cerere.url), {
-      status: 303,
-    });
+    return trimiteLa("/?sters=1");
   }
 
   return raspuns("Cerere invalidă.", 400);

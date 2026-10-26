@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns } from "@/lib/api";
+import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areR2, urcaInR2 } from "@/lib/r2";
 import { CHEIE_FORMULAR } from "@/lib/documente";
@@ -56,8 +55,5 @@ export async function POST(cerere: Request) {
 }
 
 function inapoi(cerere: Request, ce: string) {
-  return NextResponse.redirect(
-    new URL(`/admin/formulare?gata=${ce}`, cerere.url),
-    { status: 303 },
-  );
+  return trimiteLa(`/admin/formulare?gata=${ce}`);
 }

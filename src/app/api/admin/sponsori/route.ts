@@ -1,6 +1,5 @@
-import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
-import { limitaDeRata, raspuns, text } from "@/lib/api";
+import { limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { POZA_MAXIM, pareImagine, urcaPoza } from "@/lib/poza-urcata";
 import {
@@ -22,10 +21,7 @@ import {
 const INAPOI = "/admin/sponsori";
 
 function gata(cerere: Request, cod: string) {
-  return NextResponse.redirect(
-    new URL(`${INAPOI}?stare=${encodeURIComponent(cod)}#stare`, cerere.url),
-    { status: 303 },
-  );
+  return trimiteLa(`${INAPOI}?stare=${encodeURIComponent(cod)}#stare`);
 }
 
 export async function POST(cerere: Request) {

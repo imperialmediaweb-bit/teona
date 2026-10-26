@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns } from "@/lib/api";
+import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { scrieNotita, uitaDonatorul } from "@/lib/plati/donatori";
 
@@ -29,7 +28,5 @@ export async function POST(cerere: Request) {
     return raspuns("Acțiune necunoscută.", 400);
   }
 
-  return NextResponse.redirect(new URL("/admin/donatori", cerere.url), {
-    status: 303,
-  });
+  return trimiteLa("/admin/donatori");
 }

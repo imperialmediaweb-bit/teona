@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns } from "@/lib/api";
+import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { esteStadiuFirma, schimbaStadiulFirmei } from "@/lib/crm";
 import { citesteSuma } from "@/lib/suma";
@@ -37,13 +36,7 @@ export async function POST(cerere: Request) {
   const citita = brut ? citesteSuma(brut) : { suma: null, eroare: undefined };
 
   if (brut && (citita.eroare || citita.suma === null)) {
-    return NextResponse.redirect(
-      new URL(
-        `/admin/firme?eroare=${encodeURIComponent(citita.eroare ?? "Nu am înțeles suma.")}#${id}`,
-        cerere.url,
-      ),
-      { status: 303 },
-    );
+    return trimiteLa(`/admin/firme?eroare=${encodeURIComponent(citita.eroare ?? "Nu am înțeles suma.")}#${id}`);
   }
 
   await schimbaStadiulFirmei(
@@ -52,7 +45,5 @@ export async function POST(cerere: Request) {
     citita.suma === null ? null : inBani(citita.suma),
   );
 
-  return NextResponse.redirect(new URL(`/admin/firme#${id}`, cerere.url), {
-    status: 303,
-  });
+  return trimiteLa(`/admin/firme#${id}`);
 }

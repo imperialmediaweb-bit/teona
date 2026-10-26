@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { ETICHETA_PROIECTE_PANOU } from "@/date/proiecte";
-import { limitaDeRata, raspuns } from "@/lib/api";
+import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import {
   creeazaText,
@@ -197,5 +197,5 @@ function inapoi(
   const unde = id
     ? `/admin/scrie/${id}?gata=${ce}`
     : `/admin/scrie?fel=${fel}&gata=${ce}`;
-  return NextResponse.redirect(new URL(unde, cerere.url), { status: 303 });
+  return trimiteLa(unde);
 }

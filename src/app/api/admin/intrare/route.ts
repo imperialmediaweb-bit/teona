@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns } from "@/lib/api";
+import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import {
   COOKIE_ADMIN,
   parolaCorecta,
@@ -74,14 +73,10 @@ export async function POST(cerere: Request) {
       parolă greșită. Altfel formularul de intrare devine un instrument de
       aflat cine lucrează la asociație.
     */
-    return NextResponse.redirect(new URL(`${pagina}?gresit=1`, cerere.url), {
-      status: 303,
-    });
+    return trimiteLa(`${pagina}?gresit=1`);
   }
 
-  const raspunsul = NextResponse.redirect(new URL(pagina, cerere.url), {
-    status: 303,
-  });
+  const raspunsul = trimiteLa(pagina);
   raspunsul.cookies.set(COOKIE_ADMIN, valoare, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

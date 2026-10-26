@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { raspuns } from "@/lib/api";
+import { raspuns, trimiteLa } from "@/lib/api";
 import { COOKIE_ADMIN } from "@/lib/admin";
 
 /**
@@ -18,9 +17,7 @@ import { COOKIE_ADMIN } from "@/lib/admin";
  * alt sit nu l-ar trimite; POST-ul ține la distanță și restul.
  */
 export async function POST(cerere: Request) {
-  const raspunsul = NextResponse.redirect(new URL("/admin", cerere.url), {
-    status: 303,
-  });
+  const raspunsul = trimiteLa("/admin");
   /*
     Ștersul se face pe aceeași cale pe care a fost pus (`/`). Cu altă cale,
     browserul păstrează cookie-ul original și omul rămâne înăuntru, deși

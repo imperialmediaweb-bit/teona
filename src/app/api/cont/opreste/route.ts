@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns } from "@/lib/api";
+import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import { abonamentulDinLink } from "@/lib/oprire-lunara";
 import { areStripe, opresteAbonamentulDupaId } from "@/lib/plati/stripe";
 
@@ -36,9 +35,7 @@ export async function POST(cerere: Request) {
   const abonament = abonamentulDinLink(dovada);
 
   const inapoi = (coada: string) =>
-    NextResponse.redirect(new URL(`/opreste-donatia${coada}`, cerere.url), {
-      status: 303,
-    });
+    trimiteLa(`/opreste-donatia${coada}`);
 
   if (!abonament) return inapoi("");
   if (!areStripe()) {
@@ -49,5 +46,5 @@ export async function POST(cerere: Request) {
   if (!oprit) {
     return inapoi(`?a=${dovada.a}&p=${dovada.p}&s=${dovada.s}&eroare=1`);
   }
-  return NextResponse.redirect(new URL("/oprit", cerere.url), { status: 303 });
+  return trimiteLa("/oprit");
 }

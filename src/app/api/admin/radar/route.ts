@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns } from "@/lib/api";
+import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { hotaraste, scaneaza } from "@/lib/radar";
@@ -15,10 +14,7 @@ import { hotaraste, scaneaza } from "@/lib/radar";
 const INAPOI = "/admin/radar";
 
 function gata(cerere: Request, cod: string) {
-  return NextResponse.redirect(
-    new URL(`${INAPOI}?stare=${encodeURIComponent(cod)}#stare`, cerere.url),
-    { status: 303 },
-  );
+  return trimiteLa(`${INAPOI}?stare=${encodeURIComponent(cod)}#stare`);
 }
 
 export async function POST(cerere: Request) {

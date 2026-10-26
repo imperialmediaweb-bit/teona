@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata } from "@/lib/api";
+import { limitaDeRata, trimiteLa } from "@/lib/api";
 import { foloseșteJeton } from "@/lib/cont";
 import { deschideSesiunea } from "@/lib/sesiune";
 
@@ -25,14 +24,9 @@ export async function GET(cerere: Request) {
   const email = await foloseșteJeton(jeton).catch(() => null);
 
   if (!email) {
-    return NextResponse.redirect(
-      new URL("/contul-meu?expirat=1", cerere.url),
-      { status: 303 },
-    );
+    return trimiteLa("/contul-meu?expirat=1");
   }
 
   await deschideSesiunea(email);
-  return NextResponse.redirect(new URL("/contul-meu", cerere.url), {
-    status: 303,
-  });
+  return trimiteLa("/contul-meu");
 }

@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns } from "@/lib/api";
+import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { planificaText } from "@/lib/texte";
@@ -34,5 +33,5 @@ export async function POST(cerere: Request) {
   const luna = String(formular.get("luna") ?? "");
   const unde = new URL("/admin/calendar", cerere.url);
   if (/^\d{4}-\d{2}$/.test(luna)) unde.searchParams.set("luna", luna);
-  return NextResponse.redirect(unde, 303);
+  return trimiteLa(unde);
 }

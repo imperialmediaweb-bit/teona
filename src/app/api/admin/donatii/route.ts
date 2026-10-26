@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { email as citesteEmail, limitaDeRata, raspuns, text } from "@/lib/api";
+import { email as citesteEmail, limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { adaugaDonatieManuala, esteMetodaManuala } from "@/lib/plati/donatori";
 import { citesteSuma } from "@/lib/suma";
@@ -28,10 +27,7 @@ export async function POST(cerere: Request) {
   if (!formular) return raspuns("Cerere invalidă.", 400);
 
   const inapoi = (mesaj: string) =>
-    NextResponse.redirect(
-      new URL(`/admin/donatii?eroare=${encodeURIComponent(mesaj)}`, cerere.url),
-      { status: 303 },
-    );
+    trimiteLa(`/admin/donatii?eroare=${encodeURIComponent(mesaj)}`);
 
   const metoda = formular.get("metoda");
   if (!esteMetodaManuala(metoda)) return inapoi("Alege metoda.");
@@ -86,7 +82,5 @@ export async function POST(cerere: Request) {
     );
   }
 
-  return NextResponse.redirect(new URL("/admin/donatii?gata=1", cerere.url), {
-    status: 303,
-  });
+  return trimiteLa("/admin/donatii?gata=1");
 }

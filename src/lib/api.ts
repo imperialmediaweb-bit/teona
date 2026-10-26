@@ -27,6 +27,40 @@ import { NextResponse } from "next/server";
 export const LIMITA_CORP = 16 * 1024;
 
 /** Un răspuns JSON cu un mesaj pentru om, niciodată pus în cache. */
+/**
+ * Trimite browserul la o pagină de pe site, după un formular.
+ *
+ * Cu `Location` **relativ**, dinadins. Felul obișnuit —
+ * `NextResponse.redirect(new URL(cale, cerere.url))` — scrie o adresă
+ * absolută, construită din adresa cererii. Pe Railway adresa cererii nu e
+ * `https://teona-ariana.ro/…`, ci `https://localhost:8080/…`: ce vede
+ * serverul în spatele proxy-ului, nu ce a scris omul în browser. Browserul
+ * primea „du-te la localhost:8080”, refuza, și rămânea pe pagină fără niciun
+ * semn: formularul se salva, dar „butonul nu făcea nimic”, iar la refresh
+ * apărea. Ăsta a fost defectul semnalat în octombrie 2026 la intrarea în
+ * panou și la conturi — prima explicație (mesajul rămas în capul paginii)
+ * era adevărată, dar nu era cauza. Local nu se vede: acolo adresa cererii
+ * chiar e cea din browser, deci nicio probă n-a prins-o; a prins-o un
+ * `curl -D -` pe site-ul publicat.
+ *
+ * Un `Location` relativ îl rezolvă browserul singur, față de adresa pe care
+ * a trimis formularul. Merge oriunde ar sta serverul, fără să știe numele
+ * site-ului. Se construiește de mână, fiindcă `NextResponse.redirect()`
+ * refuză adresele relative.
+ *
+ * Numai cărări de pe site: o valoare care nu începe cu un singur `/` (un
+ * `inapoi=https://…` scris de mână în formular) duce la prima pagină, nu
+ * afară.
+ */
+export function trimiteLa(unde: string | URL, status = 303): NextResponse {
+  const cale =
+    typeof unde === "string" ? unde : unde.pathname + unde.search + unde.hash;
+  return new NextResponse(null, {
+    status,
+    headers: { Location: /^\/(?!\/)/.test(cale) ? cale : "/" },
+  });
+}
+
 export function raspuns(mesaj: string, status: number, antete?: HeadersInit) {
   return NextResponse.json(
     { mesaj },

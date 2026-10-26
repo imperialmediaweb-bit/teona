@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns, text as curataText } from "@/lib/api";
+import { limitaDeRata, raspuns, text as curataText, trimiteLa } from "@/lib/api";
 import { email as emailValid } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { ASOCIATIA, EMAIL } from "@/date/asociatie";
@@ -20,6 +19,7 @@ import {
   type ContinutCampanie,
   type FelSablon,
 } from "@/lib/email/campanie-sabloane";
+import { ADRESA_SITE } from "@/app/seo";
 
 /**
  * Șablonul de campanie: de văzut, de descărcat, de probat, de dus în MailerLite.
@@ -130,7 +130,7 @@ function inapoi(cerere: Request, parametri: Record<string, string>) {
   for (const [cheie, valoare] of Object.entries(parametri)) {
     unde.searchParams.set(cheie, valoare);
   }
-  return NextResponse.redirect(unde, { status: 303 });
+  return trimiteLa(unde);
 }
 
 function paginaHtml(html: string) {
@@ -205,7 +205,10 @@ export async function POST(cerere: Request) {
     */
     const deProba: ContinutCampanie = {
       ...continut,
-      dezabonare: `${new URL(cerere.url).origin}/politica-de-confidentialitate`,
+      // Adresa site-ului, nu a cererii: pe Railway cererea vine de la
+      // `localhost:8080`, iar un link de dezabonare către localhost într-un
+      // e-mail trimis la sute de oameni e mai rău decât niciunul.
+      dezabonare: `${ADRESA_SITE}/politica-de-confidentialitate`,
     };
     const trimis = await trimiteEmail({
       catre,

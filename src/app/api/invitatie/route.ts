@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns, text } from "@/lib/api";
+import { limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
 import { dinLinkulDeInvitatie } from "@/lib/invitatie";
 import { MINIM_PAROLA, puneParolaDinInvitatie } from "@/lib/utilizatori";
 
@@ -19,9 +18,7 @@ import { MINIM_PAROLA, puneParolaDinInvitatie } from "@/lib/utilizatori";
 function inapoi(cerere: Request, d: Record<string, string>, gresit?: string) {
   const cauta = new URLSearchParams(d);
   if (gresit) cauta.set("gresit", gresit);
-  return NextResponse.redirect(new URL(`/invitatie?${cauta}`, cerere.url), {
-    status: 303,
-  });
+  return trimiteLa(`/invitatie?${cauta}`);
 }
 
 export async function POST(cerere: Request) {
@@ -71,9 +68,7 @@ export async function POST(cerere: Request) {
   if (!pusa) return inapoi(cerere, dovada, "folosit");
 
   /* Gata. Intră cu parola lui, ca oricine altcineva. */
-  return NextResponse.redirect(new URL("/admin?parola=pusa", cerere.url), {
-    status: 303,
-  });
+  return trimiteLa("/admin?parola=pusa");
 }
 
 export const GET = () => raspuns("Metodă nepermisă.", 405);

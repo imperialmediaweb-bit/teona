@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns, text } from "@/lib/api";
+import { limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { esteStadiuContract, schimbaContract } from "@/lib/contracte";
@@ -57,5 +56,5 @@ function inapoi(cerere: Request, formular: FormData, gresit?: string) {
   const an = String(formular.get("an") ?? "");
   if (/^\d{4}$/.test(an)) unde.searchParams.set("an", an);
   if (gresit) unde.searchParams.set("ratat", gresit);
-  return NextResponse.redirect(unde, 303);
+  return trimiteLa(unde);
 }

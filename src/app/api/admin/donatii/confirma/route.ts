@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns } from "@/lib/api";
+import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { hotarasteTransfer } from "@/lib/plati/donatori";
 import { trimiteMultumirea } from "@/lib/email/donatie";
@@ -29,9 +28,7 @@ export async function POST(cerere: Request) {
   if (!formular) return raspuns("Cerere invalidă.", 400);
 
   const inapoi = (parametru: string) =>
-    NextResponse.redirect(new URL(`/admin/donatii?${parametru}`, cerere.url), {
-      status: 303,
-    });
+    trimiteLa(`/admin/donatii?${parametru}`);
 
   const id = String(formular.get("id") ?? "");
   if (!/^[0-9a-f-]{36}$/i.test(id)) {

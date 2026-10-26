@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns, text } from "@/lib/api";
+import { limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
 import { arePermisiune, numeleConectat } from "@/lib/admin";
 import { esteFelInteractiune, scrieInteractiune } from "@/lib/crm";
 
@@ -75,11 +74,5 @@ export async function POST(cerere: Request) {
   const cheie = firmaId ?? email ?? "";
   const separator = inapoi.includes("?") ? "&" : "?";
 
-  return NextResponse.redirect(
-    new URL(
-      `${inapoi}${separator}deschis=${encodeURIComponent(cheie)}${firmaId ? `#${firmaId}` : ""}`,
-      cerere.url,
-    ),
-    { status: 303 },
-  );
+  return trimiteLa(`${inapoi}${separator}deschis=${encodeURIComponent(cheie)}${firmaId ? `#${firmaId}` : ""}`);
 }

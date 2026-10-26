@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns } from "@/lib/api";
+import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import {
   esteFelCerere,
@@ -68,10 +67,7 @@ export async function POST(cerere: Request) {
       },
     });
 
-    return NextResponse.redirect(
-      new URL(camp("inapoi") || "/admin/cereri", cerere.url),
-      { status: 303 },
-    );
+    return trimiteLa(camp("inapoi") || "/admin/cereri");
   }
 
   const id = String(formular.get("id") ?? "");
@@ -83,11 +79,5 @@ export async function POST(cerere: Request) {
   await schimbaStadiulCererii(id, stadiu);
 
   const fel = String(formular.get("fel") ?? "");
-  return NextResponse.redirect(
-    new URL(
-      `/admin/cereri${/^\w+$/.test(fel) ? `?fel=${fel}` : ""}`,
-      cerere.url,
-    ),
-    { status: 303 },
-  );
+  return trimiteLa(`/admin/cereri${/^\w+$/.test(fel) ? `?fel=${fel}` : ""}`);
 }

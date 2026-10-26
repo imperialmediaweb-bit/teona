@@ -1109,6 +1109,36 @@ codul). Ce merge e în `src/proxy.ts`: filtrează slugurile înainte de randare
 
 Proba: `BAZA=http://localhost:3000 node scripts/qa/coduri-404.mjs`.
 
+## Pe Railway, adresa cererii e `localhost:8080`, nu site-ul
+
+Clientul a scris în octombrie 2026: „de ce nu reacționează butonul? nu se
+întâmplă nimic; dacă dau refresh, arată” — la intrarea în panou și la
+conturi. Prima explicație (mesajul de confirmare rămânea în capul paginii,
+nevăzut) era adevărată, dar nu era cauza. Cauza: `NextResponse.redirect(new
+URL(cale, cerere.url))` scrie un `Location` absolut, din adresa cererii, iar
+în spatele proxy-ului Railway adresa cererii e `https://localhost:8080/…`.
+Browserul primea „du-te la localhost:8080”, refuza, și rămânea pe loc, fără
+niciun semn. **Formularul se salva.** De aceea la refresh apărea.
+
+- **Nicio probă n-a prins-o.** Local, adresa cererii chiar e cea din browser,
+  deci toate redirecționările mergeau. A prins-o un `curl -D -` pe site-ul
+  publicat: `location: https://localhost:8080/admin/sponsori?stare=schimbat`.
+  Un `303` pe care curl îl urmează fericit și browserul nu.
+- **Toate redirecționările trec prin `trimiteLa()`** (`src/lib/api.ts`), cu
+  `Location` **relativ**, pe care browserul îl rezolvă singur față de adresa
+  pe care a trimis formularul. Se construiește de mână:
+  `NextResponse.redirect()` refuză adresele relative. Singura rămasă pe
+  `NextResponse.redirect` e cea spre linkul de plată Revolut, o adresă din
+  afară — acolo așa trebuie.
+- **Nici `new URL(cerere.url).origin` nu e site-ul.** Linkul de dezabonare din
+  șablonul de campanie se construia așa și ar fi plecat în e-mailuri ca
+  `https://localhost:8080/politica-de-confidentialitate`. Adresa site-ului e
+  `ADRESA_SITE` din `src/app/seo.tsx`, de acolo o iau și Stripe, și
+  e-mailurile.
+- Verificare locală care imită Railway:
+  `curl -D - -H "Host: localhost:8080" -X POST …/api/admin/intrare -d …` —
+  `Location` trebuie să înceapă cu `/`.
+
 ## Railway construiește cu baza de date pusă, dar nu accesibilă
 
 `DATABASE_URL` există în timpul build-ului, deci `areBazaDeDate()` spune „da".

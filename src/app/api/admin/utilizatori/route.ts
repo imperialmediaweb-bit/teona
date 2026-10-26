@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns, text } from "@/lib/api";
+import { limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
 import { arePermisiune, cineEsteConectat } from "@/lib/admin";
 import { ADRESA_SITE } from "@/app/seo";
 import { linkInvitatie } from "@/lib/invitatie";
@@ -43,10 +42,7 @@ const INAPOI = "/admin/utilizatori";
   Fragmentul duce browserul la mesaj, oricum ar hotărî el cu derularea.
 */
 function gata(cerere: Request, cod: string) {
-  return NextResponse.redirect(
-    new URL(`${INAPOI}?stare=${encodeURIComponent(cod)}#stare`, cerere.url),
-    { status: 303 },
-  );
+  return trimiteLa(`${INAPOI}?stare=${encodeURIComponent(cod)}#stare`);
 }
 
 /**

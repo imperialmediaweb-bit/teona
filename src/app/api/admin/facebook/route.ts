@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns, text } from "@/lib/api";
+import { limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { marcheazaFacebook, textDupaId, felul } from "@/lib/texte";
@@ -66,5 +65,5 @@ function inapoi(cerere: Request, gresit: string | null, motiv?: string) {
   const unde = new URL("/admin/facebook", cerere.url);
   if (gresit) unde.searchParams.set("ratat", gresit);
   if (motiv) unde.searchParams.set("motiv", motiv.slice(0, 200));
-  return NextResponse.redirect(unde, 303);
+  return trimiteLa(unde);
 }

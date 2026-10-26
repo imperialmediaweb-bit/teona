@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { limitaDeRata, raspuns } from "@/lib/api";
+import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune, cineEsteConectat } from "@/lib/admin";
 import { MINIM_PAROLA, schimbaParolaProprie } from "@/lib/utilizatori";
 
@@ -16,10 +15,7 @@ import { MINIM_PAROLA, schimbaParolaProprie } from "@/lib/utilizatori";
 const INAPOI = "/admin/parola";
 
 function gata(cerere: Request, cod: string) {
-  return NextResponse.redirect(
-    new URL(`${INAPOI}?stare=${encodeURIComponent(cod)}#stare`, cerere.url),
-    { status: 303 },
-  );
+  return trimiteLa(`${INAPOI}?stare=${encodeURIComponent(cod)}#stare`);
 }
 
 export async function POST(cerere: Request) {
