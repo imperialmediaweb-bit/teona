@@ -61,23 +61,76 @@ const TESTIMONIALE_SPONSORI = [
 const TENTE = [
   {
     panza: "bg-tenta-cald",
-    linie: "border-t-caramiziu-400",
     pioneza: "bg-caramiziu-400",
     lumina: "group-hover:shadow-[0_30px_50px_-18px_rgba(247,79,34,0.5)]",
   },
   {
     panza: "bg-tenta-miere",
-    linie: "border-t-miere-400",
     pioneza: "bg-miere-400",
     lumina: "group-hover:shadow-[0_30px_50px_-18px_rgba(255,172,0,0.5)]",
   },
   {
     panza: "bg-tenta-turcoaz",
-    linie: "border-t-turcoaz-400",
     pioneza: "bg-turcoaz-400",
     lumina: "group-hover:shadow-[0_30px_50px_-18px_rgba(42,159,163,0.5)]",
   },
 ] as const;
+
+/**
+ * Înclinarea fiecărui bilet, ca lipite de mână: nu două la fel una lângă
+ * alta, nici pe rând, nici pe coloană (opt valori, patru coloane). La hover
+ * biletul se îndreaptă și iese în față — ca atunci când îl iei de pe perete
+ * să-l citești.
+ */
+const INCLINARI = [
+  "-rotate-2",
+  "rotate-1",
+  "-rotate-1",
+  "rotate-2",
+  "-rotate-3",
+  "rotate-[1.5deg]",
+  "-rotate-[1.5deg]",
+  "rotate-3",
+] as const;
+
+/**
+ * O bucată de scoci: galben-pai, pe jumătate străvezie, cu dungile fine
+ * ale benzii și capetele rupte (masca). Nu e o poză, e un `span`: zero
+ * octeți de descărcat, și se lipește pe orice culoare de bilet.
+ */
+function Scoci({ className = "" }: { className?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`pointer-events-none absolute h-6 w-20 bg-miere-100/75 bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.35)_0_2px,transparent_2px_5px)] shadow-[0_1px_2px_rgba(35,35,35,0.18)] [mask-image:linear-gradient(90deg,transparent_0,black_7%,black_93%,transparent_100%)] sm:h-7 sm:w-24 ${className}`}
+    />
+  );
+}
+
+/**
+ * Cum e prins biletul de perete, pe rând: o bucată de scoci sus, două
+ * bucăți în colțuri opuse, sau o pioneză. Trei feluri, ca pe un perete
+ * adevărat — pe care nimeni nu lipește toate biletele la fel.
+ */
+function Prindere({ fel, pioneza }: { fel: number; pioneza: string }) {
+  if (fel === 0) {
+    return <Scoci className="-top-3 left-1/2 -translate-x-1/2 -rotate-[4deg]" />;
+  }
+  if (fel === 1) {
+    return (
+      <>
+        <Scoci className="-top-2.5 -left-6 -rotate-45" />
+        <Scoci className="-right-6 -bottom-2.5 -rotate-45" />
+      </>
+    );
+  }
+  return (
+    <span
+      aria-hidden="true"
+      className={`absolute -top-2 left-1/2 size-4 -translate-x-1/2 rounded-full ${pioneza} shadow-[0_3px_5px_-1px_rgba(35,35,35,0.45),inset_0_-2px_3px_rgba(0,0,0,0.3),inset_0_2px_2px_rgba(255,255,255,0.5)]`}
+    />
+  );
+}
 
 /** „54 de firme”, „19 firme”, „o firmă” — numărul vine din listă, nu e scris. */
 function firme(n: number): string {
@@ -191,20 +244,23 @@ export default async function SponsoriSiParteneri() {
 
       {/* 6.3 — Ne-au fost alături */}
       <Val culoare="text-hartie-calda" className={VAL_PESTE} />
-      <section className="granulatie relative overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-10 lg:pb-32">
+      <section className="granulatie relative overflow-hidden bg-hartie-umbra pt-6 pb-24 lg:pt-10 lg:pb-32">
         {/*
-          Fundalul: trei pete mari de culoare, radiale, în cele trei culori —
-          secțiunea cu cele mai multe elemente de pe site primește cel mai
-          mult aer colorat. Gradient radial, nu `blur`: un blur de 500 px pe
-          trei elemente costă la derulare pe telefon, un gradient nu.
+          Peretele: tencuială caldă (`hartie-umbra`, cu granulația de peste
+          tot), luminată dinspre mijloc și mai întunecată spre margini, ca un
+          perete adevărat sub o lampă; dedesubt, trei pete slabe de culoare.
+          Gradient radial, nu `blur`: un blur de 500 px pe trei elemente
+          costă la derulare pe telefon, un gradient nu.
         */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
         >
-          <div className="absolute -top-40 -left-40 size-[34rem] rounded-full bg-[radial-gradient(closest-side,var(--color-miere-200),transparent)] opacity-70" />
-          <div className="absolute top-1/4 -right-48 size-[38rem] rounded-full bg-[radial-gradient(closest-side,var(--color-turcoaz-200),transparent)] opacity-60" />
-          <div className="absolute -bottom-48 left-1/4 size-[40rem] rounded-full bg-[radial-gradient(closest-side,var(--color-caramiziu-200),transparent)] opacity-60" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(255,255,255,0.55),transparent_65%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_55%,rgba(120,34,15,0.07)_100%)]" />
+          <div className="absolute -top-40 -left-40 size-[34rem] rounded-full bg-[radial-gradient(closest-side,var(--color-miere-200),transparent)] opacity-50" />
+          <div className="absolute top-1/4 -right-48 size-[38rem] rounded-full bg-[radial-gradient(closest-side,var(--color-turcoaz-200),transparent)] opacity-40" />
+          <div className="absolute -bottom-48 left-1/4 size-[40rem] rounded-full bg-[radial-gradient(closest-side,var(--color-caramiziu-200),transparent)] opacity-40" />
           {/*
             Filigranul: cuvântul peretelui, scris de mână, cât secțiunea.
             Fără semn de exclamare — așa scrie asociația.
@@ -235,7 +291,7 @@ export default async function SponsoriSiParteneri() {
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <TitluSectiune
-            scris="Firmele care ne sunt alături"
+            scris="Peretele mulțumirii"
             titlu="Ne-au fost alături"
             text={`${firme(sigle.length)} au sprijinit taberele, Casa Teona și cazurile umanitare. Lista crește pe măsură ce ni se alătură alte companii.`}
           />
@@ -254,9 +310,11 @@ export default async function SponsoriSiParteneri() {
               fără el, ar fi o grilă de sigle; cu el, e un perete de
               mulțumire.
             */}
-            <li className="group">
+            <li className="group relative">
               <Aparitie className="h-full">
-                <div className="granulatie relative flex h-full min-h-[13rem] flex-col items-center justify-center gap-2 colt-mic-b overflow-hidden bg-gradient-to-br from-caramiziu-500 via-caramiziu-600 to-caramiziu-800 p-5 text-center text-hartie shadow-[0_18px_40px_-18px_rgba(184,43,9,0.6)] transition-transform duration-500 ease-cald group-hover:-translate-y-2.5 group-hover:rotate-1 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0 motion-reduce:group-hover:rotate-0 sm:p-6 lg:p-7">
+                <div className="granulatie relative flex h-full min-h-[13rem] -rotate-2 flex-col items-center justify-center gap-2 rounded-md bg-gradient-to-br from-caramiziu-500 via-caramiziu-600 to-caramiziu-800 p-5 text-center text-hartie shadow-[3px_10px_24px_-8px_rgba(120,34,15,0.55)] transition-transform duration-500 ease-cald group-hover:z-10 group-hover:scale-[1.04] group-hover:rotate-0 motion-reduce:transition-none motion-reduce:group-hover:scale-100 motion-reduce:group-hover:-rotate-2 sm:p-6 lg:p-7">
+                  <Scoci className="-top-2.5 -left-6 -rotate-45" />
+                  <Scoci className="-right-6 -bottom-2.5 -rotate-45" />
                   <Decor
                     semn="inima"
                     aria-hidden="true"
@@ -284,18 +342,25 @@ export default async function SponsoriSiParteneri() {
               const t = TENTE[i % 3];
               const card = (
                 <div
-                  className={`relative flex h-full flex-col items-center justify-center gap-4 ${
-                    i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"
-                  } border-t-[6px] ${t.linie} ${t.panza} p-5 shadow-[0_16px_34px_-20px_rgba(35,35,35,0.45)] transition-all duration-500 ease-cald group-hover:-translate-y-2.5 ${
-                    i % 2 === 0 ? "group-hover:-rotate-1" : "group-hover:rotate-1"
-                  } ${t.lumina} motion-reduce:transition-none motion-reduce:group-hover:translate-y-0 motion-reduce:group-hover:rotate-0 sm:p-6 lg:p-7`}
+                  className={`relative flex h-full flex-col items-center justify-center gap-4 rounded-md ${t.panza} ${
+                    INCLINARI[i % INCLINARI.length]
+                  } p-5 pt-7 shadow-[3px_10px_22px_-10px_rgba(35,35,35,0.5)] transition-all duration-500 ease-cald group-hover:z-10 group-hover:scale-[1.05] group-hover:rotate-0 ${t.lumina} motion-reduce:transition-none motion-reduce:group-hover:scale-100 sm:p-6 sm:pt-8 lg:p-7 lg:pt-8`}
                 >
-                  {/* pioneza din colț */}
-                  <span
-                    aria-hidden="true"
-                    className={`absolute top-3.5 right-3.5 size-3 rounded-full ${t.pioneza} shadow-[inset_0_-1px_2px_rgba(0,0,0,0.25)] transition-transform duration-500 ease-cald group-hover:scale-125`}
+                  {/*
+                    Felul prinderii se decalează cu rândul (patru pe rând):
+                    altfel, cu același rest la 3 ca și culoarea, pioneza ar
+                    cădea mereu pe biletele turcoaz.
+                  */}
+                  <Prindere
+                    fel={(i + Math.floor(i / 4)) % 3}
+                    pioneza={t.pioneza}
                   />
-                  <div className="flex h-24 w-full items-center justify-center rounded-2xl bg-hartie px-4 py-3 shadow-[inset_0_0_0_1px_rgba(35,35,35,0.06)] lg:h-28">
+                  {/*
+                    Sigla, ca o poză lipită pe bilet: placă albă, ușor
+                    ridicată. Siglele cu fundalul lor alb sau închis nu-și
+                    arată marginile pe hârtia colorată.
+                  */}
+                  <div className="flex h-24 w-full items-center justify-center rounded-lg bg-hartie px-4 py-3 shadow-[0_2px_6px_-2px_rgba(35,35,35,0.3),inset_0_0_0_1px_rgba(35,35,35,0.05)] lg:h-28">
                     <Image
                       src={sigla.cale}
                       alt={`Sigla ${sigla.nume}`}
@@ -311,7 +376,7 @@ export default async function SponsoriSiParteneri() {
                 </div>
               );
               return (
-                <li key={sigla.nume} className="group">
+                <li key={sigla.nume} className="group relative">
                   <Aparitie intarziere={(i % 4) * 0.04} className="h-full">
                     {/*
                       Când asociația a scris adresa firmei în panou, cardul
