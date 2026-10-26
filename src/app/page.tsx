@@ -75,6 +75,7 @@ async function citesteTestimoniale(): Promise<Testimonial[]> {
       citat: t.citat,
       semnatura: t.semnatura,
       sursa: t.sursa ?? undefined,
+      textLung: t.textLung ?? undefined,
     }));
   }
   try {

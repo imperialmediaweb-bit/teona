@@ -16,6 +16,17 @@ export type Testimonial = {
    * un text cules de noi. La testimonialele date direct asociației lipsește.
    */
   sursa?: string;
+  /**
+   * Scrisoarea întreagă, când omul a scris mai mult decât încape în citat.
+   *
+   * Citatul rămâne scurt, cum cere caietul — un paragraf lung într-un carusel
+   * nu se citește, se sare. Dar ce trimite o familie după o tabără vine
+   * întreg, iar tăiat la o frază se pierde tocmai partea pentru care cineva
+   * stă pe pagină. Deci se deschide la apăsare, de sub citat.
+   *
+   * Lipsește când n-a venit decât citatul: atunci nu se arată niciun buton.
+   */
+  textLung?: string;
 };
 
 /**
@@ -35,12 +46,22 @@ export default function Testimoniale({
 }) {
   const [activ, setActiv] = useState(0);
   const [directie, setDirectie] = useState(1);
+  /*
+    Deschis se ține pe carusel, nu pe testimonial.
+
+    Lăsat pornit la schimbarea testimonialului, următorul s-ar deschide
+    singur, cu un buton pe care scrie „Închide" fără ca omul să fi apăsat
+    nimic — iar cel fără text lung ar sări înapoi, fiindcă la el nu e nimic de
+    arătat. Deci se închide la fiecare mutare.
+  */
+  const [deschis, setDeschis] = useState(false);
   const fara_miscare = useReducedMotion();
 
   if (testimoniale.length === 0) return null;
 
   function muta(pas: number) {
     setDirectie(pas);
+    setDeschis(false);
     setActiv((i) => (i + pas + testimoniale.length) % testimoniale.length);
   }
 
@@ -94,6 +115,34 @@ export default function Testimoniale({
               <blockquote className="mx-auto mt-5 max-w-2xl font-titlu text-amplu leading-relaxed text-cerneala sm:text-h4 sm:leading-snug">
                 „{curent.citat}”
               </blockquote>
+              {curent.textLung && (
+                <>
+                  {deschis && (
+                    <div
+                      id={`testimonial-intreg-${activ}`}
+                      className="mx-auto mt-6 grid max-w-2xl gap-3 text-left text-corp leading-relaxed text-cerneala-moale"
+                    >
+                      {/* Rând gol = paragraf nou, ca peste tot în panou. */}
+                      {curent.textLung
+                        .split(/\n{2,}/)
+                        .map((bucata) => bucata.trim())
+                        .filter(Boolean)
+                        .map((bucata, i) => (
+                          <p key={i}>{bucata}</p>
+                        ))}
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setDeschis((d) => !d)}
+                    aria-expanded={deschis}
+                    aria-controls={`testimonial-intreg-${activ}`}
+                    className="mt-5 font-titlu text-mic font-semibold text-caramiziu-700 underline decoration-caramiziu-300 decoration-2 underline-offset-4 transition hover:decoration-caramiziu-600"
+                  >
+                    {deschis ? "Închide" : "Citește tot"}
+                  </button>
+                </>
+              )}
               <figcaption className="mt-6">
                 <span className="font-titlu font-semibold text-caramiziu-700">
                   {curent.semnatura}

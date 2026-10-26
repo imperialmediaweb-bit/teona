@@ -24,6 +24,16 @@ export type IdCategorie = (typeof CATEGORII)[number]["id"];
 export type ProiectAfisat = {
   slug: string;
   titlu: string;
+  /**
+   * Îl scoate în fața listei, indiferent de dată.
+   *
+   * Ordinea obișnuită e cronologică, cea mai nouă prima — și e bună pentru
+   * aproape tot. Dar asociația poate avea o tabără pe care vrea s-o vadă
+   * lumea întâi, chiar dacă a fost cu o săptămână înaintea alteia. Fără
+   * câmpul ăsta, singurul fel de a o urca ar fi să-i schimbe data, adică să
+   * mintă pe pagină ca să câștige un loc în listă.
+   */
+  inFata?: boolean;
   /** `2023-09-04`, pentru `<time dateTime>`. */
   data: string;
   /**

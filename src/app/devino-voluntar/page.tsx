@@ -212,7 +212,7 @@ export default async function DevinoVoluntar() {
                     // dă 2,52:1 pe alb.
                     className="relative mt-5 font-titlu text-[3.4rem] leading-none font-extrabold tracking-tight text-miere-700"
                   >
-                    18+
+                    16+
                   </p>
                   <h3 className="relative mt-3 text-h4 text-cerneala">
                     Cine poate fi voluntar

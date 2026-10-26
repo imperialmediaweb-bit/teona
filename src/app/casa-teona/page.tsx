@@ -195,8 +195,9 @@ export default async function CasaTeona() {
             </span>
             <p className="mt-5 max-w-3xl font-titlu text-h4 leading-snug font-bold text-cerneala lg:mt-0">
               Casa Teona este o familie extinsă pentru copiii cu nevoi speciale
-              și pentru părinții lor. Aici nu există ritm greșit: copiii se
-              joacă și învață în felul lor, iar noi mergem alături de ei.
+              și pentru părinții lor. Aici fiecare copil are ritmul lui: se
+              joacă, învață și crește în felul său, iar noi mergem alături de
+              el.
             </p>
           </div>
 

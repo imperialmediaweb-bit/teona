@@ -75,7 +75,7 @@ const POVESTE: ReadonlyArray<{
     umbra: "turcoaz",
   },
   {
-    titlu: "Anul acesta",
+    titlu: "Respiro Împreună",
     numar: "text-miere-100",
     cheie: "despre.poveste.3",
     poza: {
@@ -176,6 +176,8 @@ const ECHIPA: ReadonlyArray<{
   {
     nume: "Mihaela Sfichi",
     rol: "Manager fundraising",
+    descriere:
+      "Cu idei noi și multă energie, construiește parteneriate cu firme și cu oamenii din comunitate, pentru ca tot mai mulți copii să se bucure de sprijinul asociației.",
   },
   {
     nume: "Eudochia Pîțu",
@@ -188,7 +190,7 @@ const ECHIPA: ReadonlyArray<{
     nume: "Daniel Strîmbu",
     rol: "Asistent social, terapeut",
     descriere:
-      "Capta atenția publicului și transmite mesajele esențiale ale asociației, într-un mod atractiv și eficient.",
+      "Îmbină asistența socială cu terapia, pentru ca fiecare copil să primească ajutorul de care are nevoie.",
     poza: "/poze/2023/12/Strimbu-Daniel-1.jpeg",
   },
 ];

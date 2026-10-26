@@ -40,6 +40,10 @@ const STARI: Record<string, { text: string; bun: boolean }> = {
   stare: { text: "Schimbat.", bun: true },
   citat: { text: "Citatul e prea scurt.", bun: false },
   semnatura: { text: "Scrie semnătura: prenumele și rolul.", bun: false },
+  lung: {
+    text: "Textul întreg e prea lung. Peste atât, mai bine o noutate.",
+    bun: false,
+  },
   necunoscut: { text: "N-a mers. Încearcă din nou.", bun: false },
 };
 
@@ -144,6 +148,11 @@ async function Continut({
             Dacă e o recenzie publică de pe Facebook, scrie asta la „De unde”:
             cine citește trebuie să știe că n-am cules-o noi.
           </li>
+          <li>
+            A scris mai mult? Pune fraza cea mai bună la „Citatul” și
+            scrisoarea întreagă la <strong>„Textul întreg”</strong>. Pe prima
+            pagină se vede citatul, cu un buton „Citește tot” sub el.
+          </li>
         </ul>
       </div>
 
@@ -183,6 +192,22 @@ async function Continut({
                     required
                     maxLength={1200}
                     defaultValue={t.citat}
+                    className={camp}
+                  />
+                </label>
+
+                <label className="grid gap-1.5">
+                  <span className="font-titlu text-mic font-bold text-cerneala">
+                    Textul întreg{" "}
+                    <span className="font-normal text-cerneala-slab">
+                      — gol, dacă n-a scris mai mult decât citatul
+                    </span>
+                  </span>
+                  <textarea
+                    name="text_lung"
+                    rows={5}
+                    maxLength={6000}
+                    defaultValue={t.textLung ?? ""}
                     className={camp}
                   />
                 </label>
@@ -257,6 +282,21 @@ async function Continut({
               required
               maxLength={1200}
               placeholder="Ce a spus omul, cu cuvintele lui."
+              className={camp}
+            />
+          </label>
+          <label className="grid gap-1.5">
+            <span className="font-titlu text-mic font-bold text-cerneala">
+              Textul întreg{" "}
+              <span className="font-normal text-cerneala-slab">
+                — numai dacă a scris mai mult
+              </span>
+            </span>
+            <textarea
+              name="text_lung"
+              rows={5}
+              maxLength={6000}
+              placeholder="Scrisoarea întreagă. Rând gol = paragraf nou."
               className={camp}
             />
           </label>

@@ -102,8 +102,8 @@ Pe drum, ne-am dorit să ajungem și la alți copii. Am început să sprijinim c
   {
     cheie: "despre.poveste.3",
     pagina: "Despre noi",
-    titlu: "Povestea: „Anul acesta”",
-    implicit: `Anul acesta am organizat prima tabără RESPIRO pentru copii care au trecut prin cancer și pentru familiile lor, un pas pe care ni l-am dorit de mult și care ne-a arătat cât de mult mai putem face.
+    titlu: "Povestea: „Respiro Împreună”",
+    implicit: `În 2026 am organizat prima tabără pentru copiii care au trecut prin cancer și pentru familiile lor, Respiro Împreună, un pas pe care ni l-am dorit de mult și care ne-a arătat cât de mult mai putem face.
 
 Motto-ul nostru, „Nimic fără Dumnezeu”, ne amintește că tot ce am realizat s-a născut din încredere, din bunătate și din faptul că am fost împreună.
 
@@ -177,11 +177,11 @@ Casa Teona înseamnă, în același timp, joacă, încredere, sprijin și aparte
     pagina: "Redirecționează 3,5%",
     titlu: "„De ce Asociația Teona Ariana”",
     ajutor: "Aici sunt locuri de completat cu cifre — vezi mai sus.",
-    implicit: `În tabere vin și copiii, și părinții. Copiii se joacă, își fac prieteni și descoperă că pot mai mult decât credeau; părinții se odihnesc cu adevărat, poate pentru prima dată în anul acela, și stau de vorbă cu oameni care trec prin același lucru. Până acum s-au făcut {tabere} de tabere, cu peste {participanti} de participanți.
+    implicit: `În zilele de tabără, copiii se joacă, își fac prieteni și prind curaj, înconjurați de oameni care îi înțeleg și îi încurajează. Până acum, cele {tabere} de tabere au adunat peste {participanti} de participanți.
 
-Pe urmă vine restul anului, și pe el îl ține Casa Teona: peste {copii} de copii care au unde să meargă la ateliere și la jocuri, părinți care au unde să ceară un sfat.
+În restul anului, Casa Teona este locul în care peste {copii} de copii vin la ateliere și jocuri, iar familiile lor primesc sfaturi și sprijin.
 
-Acolo ajung cei 3,5% din impozitul tău: în săptămâna de tabără și în zilele de după ea.`,
+Redirecționarea ta ajunge exact aici: în zilele de tabără și în fiecare zi de după ele.`,
   },
   {
     cheie: "firme.antet",

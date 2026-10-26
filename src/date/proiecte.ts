@@ -82,14 +82,35 @@ function pozaCareExista(cale: string | null): string | null {
 }
 
 /** Proiectele preluate, curățate și cu slug unic. */
+/** Cele cu `inFata` stau primele; restul, cronologic, cea mai nouă prima. */
+function inOrdine(a: ProiectAfisat, b: ProiectAfisat): number {
+  if (Boolean(a.inFata) !== Boolean(b.inFata)) return a.inFata ? -1 : 1;
+  return b.data.localeCompare(a.data);
+}
+
 export function proiecteAfisate(): ProiectAfisat[] {
   // Slugurile scrise de mână se rezervă primele: dacă vreodată un proiect din
   // export ar genera același slug, el primește sufixul cu data, nu invers.
   // Altfel o adresă deja trimisă într-un e-mail ar ajunge pe alt proiect.
   const folosite = new Set<string>(PROIECTE_SCRISE.map((p) => p.slug));
 
+  /*
+    Un proiect scris de mână îl înlocuiește pe cel din export, nu i se adaugă.
+
+    „Prima tabără Respiro" exista deja din exportul WordPress, cu titlu, dată
+    și o fotografie, dar fără descriere. Când asociația a trimis textul, el a
+    intrat în `PROIECTE_SCRISE` cu același slug — iar fără rândul de mai jos,
+    cel din export ar fi rămas în listă cu slugul plus data, deci aceeași
+    tabără ar fi apărut de două ori, o dată cu text și o dată fără.
+
+    Potrivirea se face pe titlul curățat, nu pe slug: slugul export-ului se
+    schimbă singur când se ciocnește, titlul nu.
+  */
+  const titluriScrise = new Set(PROIECTE_SCRISE.map((p) => p.titlu));
+
   const dinExport = proiecteBrute()
-    .map((proiect) => {
+    .filter((proiect) => !titluriScrise.has(curataTitlu(proiect.titlu)))
+    .map((proiect): ProiectAfisat => {
       const titlu = curataTitlu(proiect.titlu);
       const data = proiect.data.slice(0, 10);
       const an = Number(data.slice(0, 4));
@@ -127,9 +148,7 @@ export function proiecteAfisate(): ProiectAfisat[] {
       };
     });
 
-  return [...PROIECTE_SCRISE, ...dinExport].sort((a, b) =>
-    b.data.localeCompare(a.data),
-  );
+  return [...PROIECTE_SCRISE, ...dinExport].sort(inOrdine);
 }
 
 export function proiectDupaSlug(slug: string): ProiectAfisat | undefined {
@@ -194,8 +213,11 @@ export async function proiecteleToate(): Promise<ProiectAfisat[]> {
   // Un slug scris din panou îl bate pe cel din cod: dacă asociația rescrie o
   // tabără, versiunea ei e cea bună.
   const ale = new Set(panou.map((p) => p.slug));
+  // Aceeași ordine ca în `proiecteAfisate`: cele cu `inFata` primele, restul
+  // cronologic. Sortarea era scrisă de două ori, iar a doua rămăsese fără
+  // `inFata` — pagina Proiecte, care trece pe aici, nu-l asculta deloc.
   return [...panou, ...proiecteAfisate().filter((p) => !ale.has(p.slug))].sort(
-    (a, b) => b.data.localeCompare(a.data),
+    inOrdine,
   );
 }
 

@@ -63,7 +63,7 @@ export const SIGLE_SPONSORI: ReadonlyArray<Sigla> = [
   { nume: "IT Cont Group", cale: "/poze/2024/11/IT-CONT-GROUP.png" },
   { nume: "Estrella Nord", cale: "/poze/2024/11/logo-estrella-nord.png" },
   {
-    nume: "Eve și Cran",
+    nume: "EVESICRAN",
     cale: "/poze/2024/11/logo-evesicran-final-transparent.png",
   },
   // Citite de pe siglă: pe site-ul vechi, fișierele se numeau
@@ -77,7 +77,7 @@ export const SIGLE_SPONSORI: ReadonlyArray<Sigla> = [
     cale: "/poze/2024/11/Captura-de-ecran-2024-10-25-111639.png",
   },
   {
-    nume: "Thermo Deluxe",
+    nume: "Deluxe Thermo",
     cale: "/poze/2024/11/Captura-de-ecran-2024-10-25-105859.png",
   },
   {

@@ -20,6 +20,14 @@ import {
 
 const INAPOI = "/admin/testimoniale";
 
+/**
+ * Cât încape în textul lung.
+ *
+ * O scrisoare de la o familie are câteva mii de semne; peste atât e altceva
+ * și merită o pagină de noutate, nu un testimonial.
+ */
+const LUNG_MAXIM = 6000;
+
 function gata(cerere: Request, cod: string) {
   return NextResponse.redirect(
     new URL(`${INAPOI}?stare=${encodeURIComponent(cod)}#stare`, cerere.url),
@@ -57,6 +65,19 @@ export async function POST(cerere: Request) {
   const sursa = text(formular.get("sursa"), 80) ?? null;
 
   /*
+    Textul lung e opțional, dar dacă e prea lung se spune, nu se taie.
+
+    `text()` întoarce `null` și când textul depășește limita, nu doar când
+    lipsește. Scris ca `text(...) ?? null`, un text de 7000 de semne s-ar fi
+    salvat ca „niciun text lung": omul apasă Salvează, primește „Schimbat", și
+    scrisoarea pe care a lipit-o nu e nicăieri. Deci se compară cu ce a venit
+    din formular: dacă a scris ceva și n-a trecut, se întoarce cu mesaj.
+  */
+  const lungBrut = String(formular.get("text_lung") ?? "").trim();
+  const textLung = lungBrut ? text(lungBrut, LUNG_MAXIM) : null;
+  if (lungBrut && !textLung) return gata(cerere, "lung");
+
+  /*
     Se verifică doar ce se poate verifica.
 
     Caietul cere 20–35 de cuvinte, prenume și rol, fără nume de familie. Din
@@ -73,14 +94,18 @@ export async function POST(cerere: Request) {
       citat,
       semnatura,
       sursa,
+      textLung,
     }).catch(() => false);
     if (schimbat) revalidateTag(ETICHETA_TESTIMONIALE, "max");
     return gata(cerere, schimbat ? "schimbat" : "necunoscut");
   }
 
-  const facut = await faceTestimonial({ citat, semnatura, sursa }).catch(
-    () => false,
-  );
+  const facut = await faceTestimonial({
+    citat,
+    semnatura,
+    sursa,
+    textLung,
+  }).catch(() => false);
   if (facut) revalidateTag(ETICHETA_TESTIMONIALE, "max");
   return gata(cerere, facut ? "facut" : "necunoscut");
 }

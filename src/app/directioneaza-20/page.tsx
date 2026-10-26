@@ -17,7 +17,8 @@ import Val, { VAL_PESTE } from "@/componente/Val";
 import CalculatorSponsorizare from "@/componente/pagina/CalculatorSponsorizare";
 import FormularSponsorizare from "@/componente/formular/FormularSponsorizare";
 import AntetPagina from "@/componente/pagina/AntetPagina";
-import { textelePaginilor } from "@/lib/texte-pagini";
+import { completeazaCifrele, textelePaginilor } from "@/lib/texte-pagini";
+import { cifreSite } from "@/lib/cifre";
 import { documenteGata } from "@/lib/documente-gata";
 import DeCopiat from "@/componente/pagina/DeCopiat";
 import DocumentDeDescarcat from "@/componente/pagina/DocumentDeDescarcat";
@@ -154,8 +155,31 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
   },
 ];
 
+/**
+ * „De ce Asociația Teona Ariana" — textul de pe pagina firmelor.
+ *
+ * Stă aici, nu în JSX, ca să poată trece prin `completeazaCifrele`: `{tabere}`,
+ * `{participanti}` și `{copii}` se iau din panou. Rând gol = paragraf nou,
+ * aceeași convenție ca la textele din `/admin/texte`.
+ */
+const DE_CE = `Taberele sunt partea cea mai costisitoare din activitatea noastră: cazare, transport, masă, materiale și oameni pregătiți să fie alături de copii pe toată durata taberei — voluntari, terapeuți, cadre didactice. Am ajuns la {tabere} de tabere și peste {participanti} de participanți.
+
+Pe lângă taberele pentru copiii cu autism, sindrom Down sau alte nevoi speciale, din 2026 organizăm și tabere pentru copiii care au trecut prin cancer și pentru familiile lor. Pentru acești copii, câteva zile de joacă, liniște și prietenie, după luni sau ani de spitale și tratamente, înseamnă enorm. Vrem ca prima ediție, Respiro Împreună, să fie doar începutul, iar numărul taberelor depinde direct de sponsorizări.
+
+Între tabere, Casa Teona din strada Zamca rămâne deschisă. Peste {copii} de copii vin aici la ateliere și jocuri, iar familiile lor la consiliere și întâlniri de grup. Un centru deschis tot anul are cheltuieli în fiecare lună.
+
+Aici ajunge sponsorizarea firmei tale: în tabere și în lunile în care Casa Teona își continuă activitatea.`;
+
+function paragrafe(text: string, cifre: Parameters<typeof completeazaCifrele>[1]) {
+  return completeazaCifrele(text, cifre)
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+}
+
 export default async function Directioneaza20() {
   const texte = await textelePaginilor();
+  const cifre = await cifreSite();
   const gata = await documenteGata();
   return (
     <>
@@ -522,24 +546,18 @@ export default async function Directioneaza20() {
               titlu="De ce Asociația Teona Ariana"
             />
             <div className="mt-6 grid gap-4 text-amplu text-cerneala-moale">
-              <p>
-                Taberele sunt partea cea mai scumpă din ce facem: cazare,
-                transport, masă, materiale și oameni care știu să stea lângă un
-                copil cu autism sau cu sindrom Down o săptămână întreagă —
-                voluntari, terapeuți, cadre didactice. Am ajuns la 33 de tabere
-                și peste 1.500 de participanți.
-              </p>
-              <p>
-                Între tabere rămâne Casa Teona, pe strada Zamca. Peste 80 de
-                copii vin acolo la ateliere și la jocuri, iar părinții la
-                consiliere și la întâlniri de grup. Un centru deschis tot anul
-                are cheltuieli tot anul, inclusiv în lunile în care nu e nicio
-                tabără de povestit.
-              </p>
-              <p>
-                Aici intră o sponsorizare: în taberele de la vară și în lunile
-                în care casa trebuie să rămână deschisă.
-              </p>
+              {/*
+                Cifrele vin din panou, nu scrise de mână.
+
+                Textul e al asociației (precizările din 26 octombrie 2026), dar
+                avea „33 de tabere" și „1.500 de participanți" scrise în el. Alea
+                se învechesc în ziua în care se face a 34-a tabără, fără să
+                observe nimeni — exact greșeala reparată o dată la pagina de
+                3,5%. Locurile se completează din `/admin/cifre`.
+              */}
+              {paragrafe(DE_CE, cifre).map((text, i) => (
+                <p key={i}>{text}</p>
+              ))}
             </div>
 
             <Buton href={RUTE.sponsori} varianta="contur" className="mt-8">

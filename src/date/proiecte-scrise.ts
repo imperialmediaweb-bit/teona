@@ -57,6 +57,31 @@ export type ProiectScris = ProiectAfisat & { descriere: readonly string[] };
 
 export const PROIECTE_SCRISE: readonly ProiectScris[] = [
   {
+    /*
+      Prima tabără, din mai 2021.
+
+      Exista deja, din exportul WordPress, dar cu titlu, dată și o singură
+      fotografie — fără nicio descriere. Textul e al asociației (precizările
+      din 26 octombrie 2026). Slugul e același pe care îl genera exportul,
+      deci adresa nu se schimbă: un link trimis cândva duce tot aici.
+
+      `inFata` nu e pus: tabăra asta stă la locul ei în ordinea anilor.
+    */
+    slug: "prima-tabara-respiro",
+    titlu: "Prima tabără Respiro",
+    data: "2021-05-14",
+    dataCitita: "mai 2021",
+    categorie: "2021-2024",
+    coperta: "/poze/2024/11/187237065_421931795715633_9201685103559954658_n.jpg",
+    poze: [],
+    descriere: [
+      "În mai 2021 am organizat prima tabără Respiro, începutul unui drum pe care îl continuăm și astăzi.",
+      "Am pornit de la un gând simplu: copiii cu nevoi speciale și familiile lor au nevoie, din când în când, de câteva zile în care să respire. Fără grijile de zi cu zi, fără drumuri între terapii și programări, doar timp petrecut împreună, în natură, alături de oameni care îi înțeleg.",
+      "Au fost zile cu joacă, ateliere, plimbări și multe zâmbete. Pentru copii, o aventură. Pentru părinți, o pauză de care aveau mare nevoie și sentimentul că nu sunt singuri.",
+      "De atunci au urmat peste 30 de tabere, iar Respiro a ajuns să însemne, pentru multe familii, câteva zile pe an așteptate cu drag. Totul a început aici, cu această primă tabără și cu oamenii care au crezut în ea.",
+    ],
+  },
+  {
     slug: "tabara-respiro-sustinem-performanta-iulie-2026",
     titlu: "Tabăra RESPIRO — Susținem performanța",
     data: "2026-07-06",
@@ -74,6 +99,10 @@ export const PROIECTE_SCRISE: readonly ProiectScris[] = [
   {
     slug: "respiro-impreuna-a-32-a-tabara-septembrie-2026",
     titlu: "Respiro. Împreună — a 32-a tabără",
+    // Cerută în față pe pagina Proiecte (precizările din 26 octombrie 2026):
+    // e prima tabără din Moldova pentru copii după cancer, iar numărul
+    // edițiilor următoare depinde de cine o vede. Vezi `inFata` în tipuri.
+    inFata: true,
     data: "2026-08-31",
     dataCitita: "31 august – 4 septembrie 2026",
     categorie: "2026",

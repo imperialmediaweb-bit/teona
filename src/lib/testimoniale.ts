@@ -36,6 +36,19 @@ export type Testimonial = {
    * citește trebuie să știe că e o recenzie publică, nu un text cules de noi.
    */
   sursa: string | null;
+  /**
+   * Scrisoarea întreagă, când omul a scris mai mult decât încape în carusel.
+   *
+   * Caietul cere citate de 20–35 de cuvinte, și bine cere: un paragraf lung
+   * într-un carusel nu se citește, se sare. Dar ce trimite o familie după o
+   * tabără vine întreg, iar tăiat la o frază se pierde tocmai partea pentru
+   * care omul care citește stă pe pagină.
+   *
+   * Deci citatul rămâne scurt, cât cere caietul, și textul lung se deschide
+   * la apăsare. `null` când n-a venit decât citatul — atunci nu e nimic de
+   * deschis și nu se arată niciun buton.
+   */
+  textLung: string | null;
   activ: boolean;
   ordine: number;
 };
@@ -53,6 +66,20 @@ const DEFINITIE = `
   );
   CREATE INDEX IF NOT EXISTS testimoniale_afisate
     ON testimoniale (activ, ordine, creat_la);
+  /*
+    Adăugată după ce tabelul exista deja pe site, deci stă separat.
+
+    CREATE TABLE IF NOT EXISTS nu se uită la coloane: pe baza de pe Railway
+    tabelul e creat de luna trecută, deci instrucțiunea de mai sus trece tăcut
+    și coloana n-ar apărea niciodată — iar prima citire care o cere ar răspunde
+    cu „column «text_lung» does not exist". Vezi CLAUDE.md, „Schema pleacă
+    într-o singură cerere". ALTER ... ADD COLUMN IF NOT EXISTS merge pe
+    amândouă: pe tabelul vechi o adaugă, pe unul făcut acum nu face nimic.
+
+    (Fără accente grave în comentariul ăsta, dinadins: blocul e un template
+    literal, iar un accent grav îl încheie în mijlocul SQL-ului.)
+  */
+  ALTER TABLE testimoniale ADD COLUMN IF NOT EXISTS text_lung text;
 `;
 
 let gata: Promise<void> | null = null;
@@ -62,11 +89,13 @@ type Rand = {
   citat: string;
   semnatura: string;
   sursa: string | null;
+  textLung: string | null;
   activ: boolean;
   ordine: number;
 };
 
-const COLOANE = "id, citat, semnatura, sursa, activ, ordine";
+const COLOANE =
+  'id, citat, semnatura, sursa, text_lung AS "textLung", activ, ordine';
 
 /** Cele cinci din fișier, pentru prima pornire. */
 function dinFisier(): { citat: string; semnatura: string; sursa?: string }[] {
@@ -167,29 +196,47 @@ export async function faceTestimonial(date: {
   citat: string;
   semnatura: string;
   sursa?: string | null;
+  textLung?: string | null;
 }): Promise<boolean> {
   await pregateste();
   const randuri = await intreaba<{ id: string }>(
-    `INSERT INTO testimoniale (citat, semnatura, sursa, ordine)
-     VALUES ($1, $2, $3,
+    `INSERT INTO testimoniale (citat, semnatura, sursa, text_lung, ordine)
+     VALUES ($1, $2, $3, $4,
        COALESCE((SELECT max(ordine) + 1 FROM testimoniale), 0))
      RETURNING id`,
-    [date.citat.trim(), date.semnatura.trim(), date.sursa?.trim() || null],
+    [
+      date.citat.trim(),
+      date.semnatura.trim(),
+      date.sursa?.trim() || null,
+      date.textLung?.trim() || null,
+    ],
   );
   return randuri.length > 0;
 }
 
 export async function schimbaTestimonial(
   id: string,
-  date: { citat: string; semnatura: string; sursa?: string | null },
+  date: {
+    citat: string;
+    semnatura: string;
+    sursa?: string | null;
+    textLung?: string | null;
+  },
 ): Promise<boolean> {
   if (!/^[0-9a-f-]{36}$/i.test(id)) return false;
   await pregateste();
   const randuri = await intreaba<{ id: string }>(
     `UPDATE testimoniale
-        SET citat = $2, semnatura = $3, sursa = $4, schimbat_la = now()
+        SET citat = $2, semnatura = $3, sursa = $4, text_lung = $5,
+            schimbat_la = now()
       WHERE id = $1 RETURNING id`,
-    [id, date.citat.trim(), date.semnatura.trim(), date.sursa?.trim() || null],
+    [
+      id,
+      date.citat.trim(),
+      date.semnatura.trim(),
+      date.sursa?.trim() || null,
+      date.textLung?.trim() || null,
+    ],
   );
   return randuri.length > 0;
 }

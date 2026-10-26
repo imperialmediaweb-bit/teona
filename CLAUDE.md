@@ -225,6 +225,39 @@ lui dispărea pentru o oră. Acum fereastra e de cinci minute. **Probele care
 citesc o pagină publică după o salvare trebuie să aștepte**, sau să golească
 întâi eticheta cu o salvare care nu schimbă nimic.
 
+## Testimonialele: citat scurt, scrisoarea întreagă dedesubt
+
+Caietul cere la 1.8 citate de 20–35 de cuvinte, și bine cere: un paragraf lung
+într-un carusel nu se citește, se sare. Dar ce trimite o familie după o tabără
+vine întreg, iar tăiat la o frază se pierde tocmai partea pentru care cineva
+stă pe pagină.
+
+Deci la `/admin/testimoniale` sunt două câmpuri: **citatul**, scurt, cel care
+se vede, și **textul întreg**, care se deschide sub el la „Citește tot".
+Rând gol = paragraf nou. Gol, nu apare niciun buton.
+
+- **Coloana se adaugă separat, cu `ALTER TABLE ... ADD COLUMN IF NOT EXISTS`.**
+  Tabelul e făcut cu `CREATE TABLE IF NOT EXISTS`, iar ăla nu se uită la
+  coloane: pe baza de pe Railway, unde tabelul exista deja, instrucțiunea trece
+  tăcut și coloana n-ar apărea niciodată — iar prima citire care o cere ar
+  răspunde „column «text_lung» does not exist", deci **prima pagină** ar da
+  500, nu doar panoul. Aceeași lecție ca la tabelul `contracte`.
+- **Comentariul din blocul de SQL n-are accente grave.** Blocul e un template
+  literal; un accent grav îl încheie în mijlocul schemei. Verificarea de tipuri
+  o prinde, dar abia după ce o cauți.
+- **Un text prea lung e refuzat, nu tăiat.** `text()` din `lib/api.ts` întoarce
+  `null` și când textul depășește limita, nu doar când lipsește. Scris ca
+  `text(...) ?? null`, o scrisoare de 7000 de semne s-ar fi salvat ca „niciun
+  text lung": omul apasă Salvează, primește „Schimbat", și ce a lipit nu e
+  nicăieri. Limita e 6000 de semne; peste atât e o noutate, nu un testimonial.
+- **Deschis se ține pe carusel, nu pe testimonial.** Lăsat pornit la mutare,
+  următorul s-ar deschide singur, cu un buton pe care scrie „Închide" fără ca
+  omul să fi apăsat nimic.
+- Probă: `BAZA=… PAROLA_ADMIN=… DATABASE_URL=… node scripts/qa/testimoniale.mjs`
+  — 15 verificări. Își face singură testimonialul de probă și îl șterge la
+  final: unul rămas în tabel ar ajunge pe prima pagină, între cuvintele unor
+  oameni adevărați.
+
 ## Date reale, verificate (nu le reinventa)
 
 - Denumire: **Asociația Teona Ariana Suceava**, CIF **43533953**
