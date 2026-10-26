@@ -136,8 +136,15 @@ export default async function CasaTeona() {
       <JsonLd
         date={jsonLdFir([{ nume: "Casa Teona", cale: RUTE.casaTeona }])}
       />
+      {/*
+        Rândul scris de mână e luat din fraza lor de prezentare, cea de la
+        „Casa Teona" din /admin/texte. Când asociația a rescris-o, în
+        octombrie 2026, a scos tocmai „ritm greșit" și a pus „fiecare copil
+        are ritmul lui" — deci rândul de deasupra titlului nu putea rămâne cu
+        formularea pe care ei au înlocuit-o.
+      */}
       <AntetPagina
-        scris="Aici nu există ritm greșit"
+        scris="Fiecare copil are ritmul lui"
         titlu="Casa Teona"
         subtitlu={texte["casa.antet"]}
         accent="turcoaz"
