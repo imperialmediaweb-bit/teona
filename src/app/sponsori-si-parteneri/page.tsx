@@ -46,91 +46,34 @@ const TESTIMONIALE_SPONSORI = [
 ] as const;
 
 /**
- * Cele trei culori ale asociației, pe rând, pe fiecare card de siglă.
+ * Cele trei culori ale asociației, pe rând, pe fiecare card: linia subțire
+ * de sus, și la hover marginea și lumina. Atât — cardul rămâne alb, ca
+ * sigla să fie singurul lucru colorat de pe el.
  *
- * Peretele de sigle e un perete de mulțumire, nu un tabel: fiecare firmă
- * stă pe un afiș prins pe o pânză caldă — pânza în tenta culorii, linia
- * groasă de sus, pioneza din colț și lumina de la hover, toate din aceeași
- * culoare. Sigla stă pe o placă albă, ca siglele cu fundalul lor alb sau
- * închis să nu-și arate marginile pe pânza colorată.
- *
- * Umbrele de hover sunt scrise cu valorile culorilor (`caramiziu-500`,
- * `miere-400`, `turcoaz-500`), fiindcă Tailwind nu știe să coloreze o
- * umbră cu o variabilă de temă din clasa arbitrară.
+ * Prima variantă avea carduri pe hârtie colorată, apoi bilete strâmbe cu
+ * scoci pe tencuială; asociația le-a găsit îngrămădite. Avea dreptate:
+ * 55 de sigle, fiecare cu culorile ei, au nevoie de liniște în jur, nu de
+ * încă un strat de culoare și de unghiuri. Umbrele de hover sunt scrise cu
+ * valorile culorilor, fiindcă Tailwind nu colorează o umbră cu o variabilă
+ * de temă din clasa arbitrară.
  */
-const TENTE = [
+const ACCENTE = [
   {
-    panza: "bg-tenta-cald",
-    pioneza: "bg-caramiziu-400",
-    lumina: "group-hover:shadow-[0_30px_50px_-18px_rgba(247,79,34,0.5)]",
+    linie: "border-t-caramiziu-400",
+    margine: "group-hover:border-caramiziu-300",
+    lumina: "group-hover:shadow-[0_24px_48px_-20px_rgba(247,79,34,0.35)]",
   },
   {
-    panza: "bg-tenta-miere",
-    pioneza: "bg-miere-400",
-    lumina: "group-hover:shadow-[0_30px_50px_-18px_rgba(255,172,0,0.5)]",
+    linie: "border-t-miere-400",
+    margine: "group-hover:border-miere-300",
+    lumina: "group-hover:shadow-[0_24px_48px_-20px_rgba(255,172,0,0.35)]",
   },
   {
-    panza: "bg-tenta-turcoaz",
-    pioneza: "bg-turcoaz-400",
-    lumina: "group-hover:shadow-[0_30px_50px_-18px_rgba(42,159,163,0.5)]",
+    linie: "border-t-turcoaz-400",
+    margine: "group-hover:border-turcoaz-300",
+    lumina: "group-hover:shadow-[0_24px_48px_-20px_rgba(42,159,163,0.35)]",
   },
 ] as const;
-
-/**
- * Înclinarea fiecărui bilet, ca lipite de mână: nu două la fel una lângă
- * alta, nici pe rând, nici pe coloană (opt valori, patru coloane). La hover
- * biletul se îndreaptă și iese în față — ca atunci când îl iei de pe perete
- * să-l citești.
- */
-const INCLINARI = [
-  "-rotate-2",
-  "rotate-1",
-  "-rotate-1",
-  "rotate-2",
-  "-rotate-3",
-  "rotate-[1.5deg]",
-  "-rotate-[1.5deg]",
-  "rotate-3",
-] as const;
-
-/**
- * O bucată de scoci: galben-pai, pe jumătate străvezie, cu dungile fine
- * ale benzii și capetele rupte (masca). Nu e o poză, e un `span`: zero
- * octeți de descărcat, și se lipește pe orice culoare de bilet.
- */
-function Scoci({ className = "" }: { className?: string }) {
-  return (
-    <span
-      aria-hidden="true"
-      className={`pointer-events-none absolute h-6 w-20 bg-miere-100/75 bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.35)_0_2px,transparent_2px_5px)] shadow-[0_1px_2px_rgba(35,35,35,0.18)] [mask-image:linear-gradient(90deg,transparent_0,black_7%,black_93%,transparent_100%)] sm:h-7 sm:w-24 ${className}`}
-    />
-  );
-}
-
-/**
- * Cum e prins biletul de perete, pe rând: o bucată de scoci sus, două
- * bucăți în colțuri opuse, sau o pioneză. Trei feluri, ca pe un perete
- * adevărat — pe care nimeni nu lipește toate biletele la fel.
- */
-function Prindere({ fel, pioneza }: { fel: number; pioneza: string }) {
-  if (fel === 0) {
-    return <Scoci className="-top-3 left-1/2 -translate-x-1/2 -rotate-[4deg]" />;
-  }
-  if (fel === 1) {
-    return (
-      <>
-        <Scoci className="-top-2.5 -left-6 -rotate-45" />
-        <Scoci className="-right-6 -bottom-2.5 -rotate-45" />
-      </>
-    );
-  }
-  return (
-    <span
-      aria-hidden="true"
-      className={`absolute -top-2 left-1/2 size-4 -translate-x-1/2 rounded-full ${pioneza} shadow-[0_3px_5px_-1px_rgba(35,35,35,0.45),inset_0_-2px_3px_rgba(0,0,0,0.3),inset_0_2px_2px_rgba(255,255,255,0.5)]`}
-    />
-  );
-}
 
 /** „54 de firme”, „19 firme”, „o firmă” — numărul vine din listă, nu e scris. */
 function firme(n: number): string {
@@ -244,140 +187,58 @@ export default async function SponsoriSiParteneri() {
 
       {/* 6.3 — Ne-au fost alături */}
       <Val culoare="text-hartie-calda" className={VAL_PESTE} />
-      <section className="granulatie relative overflow-hidden bg-hartie-umbra pt-6 pb-24 lg:pt-10 lg:pb-32">
-        {/*
-          Peretele: tencuială caldă (`hartie-umbra`, cu granulația de peste
-          tot), luminată dinspre mijloc și mai întunecată spre margini, ca un
-          perete adevărat sub o lampă; dedesubt, trei pete slabe de culoare.
-          Gradient radial, nu `blur`: un blur de 500 px pe trei elemente
-          costă la derulare pe telefon, un gradient nu.
-        */}
+      <section className="relative overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-10 lg:pb-32">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
         >
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(255,255,255,0.55),transparent_65%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_55%,rgba(120,34,15,0.07)_100%)]" />
-          <div className="absolute -top-40 -left-40 size-[34rem] rounded-full bg-[radial-gradient(closest-side,var(--color-miere-200),transparent)] opacity-50" />
-          <div className="absolute top-1/4 -right-48 size-[38rem] rounded-full bg-[radial-gradient(closest-side,var(--color-turcoaz-200),transparent)] opacity-40" />
-          <div className="absolute -bottom-48 left-1/4 size-[40rem] rounded-full bg-[radial-gradient(closest-side,var(--color-caramiziu-200),transparent)] opacity-40" />
-          {/*
-            Filigranul: cuvântul peretelui, scris de mână, cât secțiunea.
-            Fără semn de exclamare — așa scrie asociația.
-          */}
-          <span className="scris absolute top-[48%] left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-6 text-[clamp(7rem,24vw,22rem)] leading-none whitespace-nowrap text-miere-300/40 select-none">
-            Mulțumim
-          </span>
           <Decor
             semn="soare"
-            className="pluteste-lent absolute top-10 right-[5%] size-12 text-miere-300 lg:size-16"
-          />
-          <Decor
-            semn="stea"
-            className="pluteste-lent absolute top-1/3 left-[4%] size-8 text-caramiziu-300 lg:size-10"
-          />
-          <Decor
-            semn="inima"
-            className="pluteste-lent absolute top-2/3 right-[3%] size-9 text-caramiziu-300 lg:size-12"
+            className="pluteste-lent absolute top-10 right-[5%] size-10 text-miere-300 lg:size-14"
           />
           <Decor
             semn="spirala"
-            className="pluteste-lent absolute bottom-24 left-[3%] size-10 text-turcoaz-300 lg:size-14"
-          />
-          <Decor
-            semn="unda"
-            className="pluteste-lent absolute bottom-10 right-[12%] size-10 text-turcoaz-300 lg:size-14"
+            className="pluteste-lent absolute bottom-24 left-[3%] size-9 text-turcoaz-200 lg:size-12"
           />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <TitluSectiune
-            scris="Peretele mulțumirii"
+            scris="Mulțumim"
             titlu="Ne-au fost alături"
             text={`${firme(sigle.length)} au sprijinit taberele, Casa Teona și cazurile umanitare. Lista crește pe măsură ce ni se alătură alte companii.`}
           />
 
           {/*
-            Patru pe rând, nu cinci: cardul e mai mare, sigla are loc să se
-            vadă. Pe telefon două pe rând, cu sigla pe toată lățimea plăcii.
-
-            Întârzierea apariției merge pe coloană (i % 4), deci un rând
-            întreg apare ca o undă de la stânga la dreapta, nu toate deodată.
+            O galerie, nu un perete: carduri albe, drepte, cu aer între ele.
+            Patru pe rând pe laptop, cinci pe ecran lat; pe telefon două.
+            Întârzierea apariției merge pe coloană, deci rândul apare ca o
+            undă de la stânga la dreapta.
           */}
-          <ul className="mt-14 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 lg:gap-7">
-            {/*
-              Primul card e al asociației: mulțumirea, în culoarea ei, cu
-              aceeași formă și mărime ca ale firmelor. E ancora peretelui —
-              fără el, ar fi o grilă de sigle; cu el, e un perete de
-              mulțumire.
-            */}
-            <li className="group relative">
-              <Aparitie className="h-full">
-                <div className="granulatie relative flex h-full min-h-[13rem] -rotate-2 flex-col items-center justify-center gap-2 rounded-md bg-gradient-to-br from-caramiziu-500 via-caramiziu-600 to-caramiziu-800 p-5 text-center text-hartie shadow-[3px_10px_24px_-8px_rgba(120,34,15,0.55)] transition-transform duration-500 ease-cald group-hover:z-10 group-hover:scale-[1.04] group-hover:rotate-0 motion-reduce:transition-none motion-reduce:group-hover:scale-100 motion-reduce:group-hover:-rotate-2 sm:p-6 lg:p-7">
-                  <Scoci className="-top-2.5 -left-6 -rotate-45" />
-                  <Scoci className="-right-6 -bottom-2.5 -rotate-45" />
-                  <Decor
-                    semn="inima"
-                    aria-hidden="true"
-                    className="absolute -top-4 -right-4 size-24 text-hartie/15 transition-transform duration-700 ease-cald group-hover:scale-125 group-hover:rotate-12"
-                  />
-                  {/*
-                    Mărimea cuvântului urmează lățimea cardului, treaptă cu
-                    treaptă: două coloane pe telefon (card de ~155 px la 360),
-                    trei de la 640 (~185 px), patru de la 1024 (~220 px) și
-                    tot patru, late, de la 1280 (~280 px). La 3,25 rem peste
-                    tot, „Mulțumim” ieșea din card și `overflow-hidden` îl
-                    tăia — se vedea „Mulțumin”. Măsurat, nu ghicit: proba
-                    din scratchpad numără cuvintele mai late decât cardul.
-                  */}
-                  <span className="scris relative text-[2rem] leading-none text-miere-200 sm:text-[2.5rem] lg:text-[2.9rem] xl:text-[3.5rem]">
-                    Mulțumim
-                  </span>
-                  <span className="relative font-titlu text-mic leading-tight font-bold text-hartie/90">
-                    fiecărei firme de aici
-                  </span>
-                </div>
-              </Aparitie>
-            </li>
+          <ul className="mt-14 grid grid-cols-2 gap-5 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4 lg:gap-8 xl:grid-cols-5">
             {sigle.map((sigla, i) => {
-              const t = TENTE[i % 3];
+              const a = ACCENTE[i % 3];
               const card = (
                 <div
-                  className={`relative flex h-full flex-col items-center justify-center gap-4 rounded-md ${t.panza} ${
-                    INCLINARI[i % INCLINARI.length]
-                  } p-5 pt-7 shadow-[3px_10px_22px_-10px_rgba(35,35,35,0.5)] transition-all duration-500 ease-cald group-hover:z-10 group-hover:scale-[1.05] group-hover:rotate-0 ${t.lumina} motion-reduce:transition-none motion-reduce:group-hover:scale-100 sm:p-6 sm:pt-8 lg:p-7 lg:pt-8`}
+                  className={`flex h-full flex-col items-center justify-center gap-5 rounded-2xl border border-cerneala/8 border-t-[3px] ${a.linie} bg-hartie px-5 py-7 shadow-[0_1px_2px_rgba(35,35,35,0.04),0_10px_30px_-18px_rgba(35,35,35,0.25)] transition-all duration-500 ease-cald group-hover:-translate-y-1.5 ${a.margine} ${a.lumina} motion-reduce:transition-none motion-reduce:group-hover:translate-y-0 sm:px-6 sm:py-8 lg:py-9`}
                 >
-                  {/*
-                    Felul prinderii se decalează cu rândul (patru pe rând):
-                    altfel, cu același rest la 3 ca și culoarea, pioneza ar
-                    cădea mereu pe biletele turcoaz.
-                  */}
-                  <Prindere
-                    fel={(i + Math.floor(i / 4)) % 3}
-                    pioneza={t.pioneza}
-                  />
-                  {/*
-                    Sigla, ca o poză lipită pe bilet: placă albă, ușor
-                    ridicată. Siglele cu fundalul lor alb sau închis nu-și
-                    arată marginile pe hârtia colorată.
-                  */}
-                  <div className="flex h-24 w-full items-center justify-center rounded-lg bg-hartie px-4 py-3 shadow-[0_2px_6px_-2px_rgba(35,35,35,0.3),inset_0_0_0_1px_rgba(35,35,35,0.05)] lg:h-28">
+                  <div className="flex h-20 w-full items-center justify-center lg:h-24">
                     <Image
                       src={sigla.cale}
                       alt={`Sigla ${sigla.nume}`}
                       width={320}
                       height={160}
-                      sizes="(min-width: 1024px) 280px, (min-width: 640px) 30vw, 45vw"
-                      className="max-h-[4.5rem] w-auto object-contain transition-transform duration-500 ease-cald group-hover:scale-110 motion-reduce:group-hover:scale-100 lg:max-h-[5.5rem]"
+                      sizes="(min-width: 1280px) 220px, (min-width: 1024px) 260px, (min-width: 640px) 30vw, 45vw"
+                      className="max-h-20 w-auto object-contain transition-transform duration-500 ease-cald group-hover:scale-[1.07] motion-reduce:group-hover:scale-100 lg:max-h-24"
                     />
                   </div>
-                  <span className="text-center font-titlu text-mic leading-snug font-bold text-cerneala">
+                  <span className="text-center font-titlu text-mic leading-snug font-bold text-cerneala-moale transition-colors duration-500 group-hover:text-cerneala">
                     {sigla.nume}
                   </span>
                 </div>
               );
               return (
-                <li key={sigla.nume} className="group relative">
-                  <Aparitie intarziere={(i % 4) * 0.04} className="h-full">
+                <li key={sigla.nume} className="group">
+                  <Aparitie intarziere={(i % 5) * 0.03} className="h-full">
                     {/*
                       Când asociația a scris adresa firmei în panou, cardul
                       e link — așa cere caietul; fără adresă e doar card, nu
@@ -388,7 +249,7 @@ export default async function SponsoriSiParteneri() {
                         href={sigla.adresa}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block h-full rounded-[inherit] outline-none focus-visible:ring-4 focus-visible:ring-turcoaz-300"
+                        className="block h-full rounded-2xl outline-none focus-visible:ring-4 focus-visible:ring-turcoaz-300"
                         aria-label={`${sigla.nume} — site-ul firmei, se deschide în altă filă`}
                       >
                         {card}
