@@ -1,5 +1,5 @@
 import { cacheTag } from "next/cache";
-import { cachePanou } from "./cache-panou";
+import { cachePanou, cacheRezerva } from "./cache-panou";
 import { areR2, legaturaSemnata } from "@/lib/r2";
 import { DOCUMENTE } from "@/lib/documente";
 
@@ -71,7 +71,11 @@ export async function documenteGata(): Promise<ReadonlyArray<string>> {
       async (d): Promise<string | null> =>
         d.rezerva || (await exista(d.cheie)) ? d.slug : null,
     ),
-  ).catch((): Array<string | null> => []);
+  ).catch((): Array<string | null> => {
+    // Rezerva nu se ține: după publicare, primul vizitator să vadă panoul.
+    cacheRezerva();
+    return [];
+  });
 
   const gata = verificate.filter((s): s is string => s !== null);
   return gata.length > 0 ? gata : cuRezerva;

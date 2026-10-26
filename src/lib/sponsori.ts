@@ -1,5 +1,5 @@
 import { cacheTag } from "next/cache";
-import { cachePanou } from "./cache-panou";
+import { cachePanou, cacheRezerva } from "./cache-panou";
 import { PREFIX_CLOUD } from "./cloud";
 import { PE_PRIMA_PAGINA, SIGLE_SPONSORI, type Sigla } from "@/date/sponsori";
 import { areBazaDeDate, intreaba } from "./baza";
@@ -122,7 +122,10 @@ export async function sigleSponsori(): Promise<ReadonlyArray<Sigla>> {
   cacheTag(ETICHETA_SPONSORI);
   if (!areBazaDeDate()) return SIGLE_SPONSORI;
   const ale = await citesteActive().catch(() => []);
-  return ale.length > 0 ? ale : SIGLE_SPONSORI;
+  if (ale.length > 0) return ale;
+  // Rezerva nu se ține: după publicare, primul vizitator să vadă panoul.
+  cacheRezerva();
+  return SIGLE_SPONSORI;
 }
 
 /** Cele care intră în banda de pe prima pagină. */

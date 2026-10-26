@@ -1,5 +1,5 @@
 import { cacheTag } from "next/cache";
-import { cachePanou } from "./cache-panou";
+import { cachePanou, cacheRezerva } from "./cache-panou";
 import type { Cifra } from "@/date/asociatie";
 import { areBazaDeDate, intreaba } from "./baza";
 
@@ -269,7 +269,11 @@ export async function textelePaginilor(): Promise<
   cachePanou();
   cacheTag(ETICHETA_TEXTE_PAGINI);
   if (!areBazaDeDate()) return DIN_COD;
-  return citeste().catch(() => DIN_COD);
+  return citeste().catch(() => {
+    // Rezerva nu se ține: după publicare, primul vizitator să vadă panoul.
+    cacheRezerva();
+    return DIN_COD;
+  });
 }
 
 /** Lista pentru panou: textul de acum și dacă e schimbat sau cel din cod. */

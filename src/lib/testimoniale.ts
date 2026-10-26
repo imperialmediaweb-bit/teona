@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { cacheTag } from "next/cache";
-import { cachePanou } from "./cache-panou";
+import { cachePanou, cacheRezerva } from "./cache-panou";
 import { areBazaDeDate, intreaba } from "./baza";
 
 /**
@@ -179,7 +179,11 @@ export async function testimonialePublice(): Promise<Testimonial[]> {
   cachePanou();
   cacheTag(ETICHETA_TESTIMONIALE);
   if (!areBazaDeDate()) return [];
-  return citesteActive().catch(() => []);
+  return citesteActive().catch(() => {
+    // Rezerva nu se ține: după publicare, primul vizitator să vadă panoul.
+    cacheRezerva();
+    return [];
+  });
 }
 
 /** Toate, inclusiv cele oprite: lista din panou. */

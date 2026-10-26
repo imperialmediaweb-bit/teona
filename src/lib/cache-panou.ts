@@ -18,6 +18,34 @@ import { cacheLife } from "next/cache";
  * randarea paginilor celor mai citite. Scrise ca numere, nu ca nume de profil,
  * ca să se vadă cât e fără să caute nimeni ce înseamnă „minutes".
  */
+/**
+ * Cât ține **rezerva din cod**, când baza n-a răspuns.
+ *
+ * Fereastra de cinci minute de mai sus e bună pentru ce vine din baza de
+ * date. Dar la build, pe Railway, baza nu răspunde, și în cache intră rezerva
+ * — cu aceleași cinci minute. După fiecare publicare, primul vizitator vedea
+ * cele 30 de sigle de la lansare, nu cele 54 din panou, și la fel cifrele și
+ * textele. Clientul a numărat: „acolo sunt 30 de firme, și eu am 55?”.
+ *
+ * O valoare despre care codul *știe* că e rezerva nu merită ținută: zece
+ * secunde, apoi se reîncearcă pe fundal la prima cerere — deci cel mult un
+ * vizitator o mai vede, al doilea primește baza de date. Cu baza căzută
+ * de-adevăratelea, rezerva se servește în continuare, doar că se reîncearcă
+ * des; e un preț mic pentru ca panoul să se vadă pe loc.
+ *
+ * `expire` rămâne la 300: e `MIN_PRERENDERABLE_EXPIRE` din Next
+ * (`use-cache/constants.js`) — o intrare cu expirare mai scurtă e socotită
+ * „date dinamice” și build-ul cade cu „uncached or runtime data during
+ * prerendering”. Încercat cu 120: a căzut exact așa.
+ *
+ * Se cheamă **pe lângă** `cachePanou()`, din ramura de rezervă: Next ia
+ * minimul dintre toate apelurile `cacheLife` din aceeași funcție
+ * (`use-cache/cache-life.js`), deci nu trebuie restructurat nimic.
+ */
+export function cacheRezerva() {
+  cacheLife({ revalidate: 10, expire: 300 });
+}
+
 export function cachePanou() {
   cacheLife({
     /** Cât se servește fără nicio verificare. */

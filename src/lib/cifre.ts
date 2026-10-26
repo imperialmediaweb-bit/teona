@@ -1,5 +1,5 @@
 import { cacheTag } from "next/cache";
-import { cachePanou } from "./cache-panou";
+import { cachePanou, cacheRezerva } from "./cache-panou";
 import { CIFRE, type Cifra } from "@/date/asociatie";
 import { areBazaDeDate, intreaba } from "./baza";
 
@@ -101,7 +101,10 @@ export async function cifreSite(): Promise<ReadonlyArray<Cifra>> {
   cacheTag(ETICHETA_CIFRE);
   if (!areBazaDeDate()) return CIFRE_DIN_COD;
   const ale = await citeste().catch(() => []);
-  return ale.length === CIFRE_DIN_COD.length ? ale : CIFRE_DIN_COD;
+  if (ale.length === CIFRE_DIN_COD.length) return ale;
+  // Rezerva nu se ține: după publicare, primul vizitator să vadă panoul.
+  cacheRezerva();
+  return CIFRE_DIN_COD;
 }
 
 /** Lista pentru panou. Aici lipsa bazei de date se vede, nu se acoperă. */

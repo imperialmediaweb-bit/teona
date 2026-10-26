@@ -221,9 +221,15 @@ se vede la citit codul: **Railway construiește fără acces la baza de date**,
 deci la build în cache intră rezerva din cod. Cu profilul `"hours"`, site-ul
 arăta o oră întreagă după fiecare publicare cifrele și textele de la lansare,
 nu pe ale asociației — omul schimba o cifră luni, eu publicam marți, iar cifra
-lui dispărea pentru o oră. Acum fereastra e de cinci minute. **Probele care
-citesc o pagină publică după o salvare trebuie să aștepte**, sau să golească
-întâi eticheta cu o salvare care nu schimbă nimic.
+lui dispărea pentru o oră. Fereastra a fost scurtată la cinci minute, și tot
+s-a văzut: clientul a numărat 30 de sigle în loc de 54 chiar după o
+publicare. Acum **rezerva nu se ține**: ramura care întoarce rezerva cheamă
+și `cacheRezerva()` (reîmprospătare la 10 secunde; `expire` rămâne 300, sub
+atât Next o socotește dinamică și build-ul cade), iar Next ia minimul dintre
+apelurile `cacheLife` din aceeași funcție. Deci cel mult primul vizitator de
+după publicare mai vede rezerva; cererea lui o reîmprospătează. **Probele care citesc o pagină publică
+după o salvare trebuie să aștepte**, sau să golească întâi eticheta cu o
+salvare care nu schimbă nimic.
 
 ## Testimonialele: citat scurt, scrisoarea întreagă dedesubt
 
