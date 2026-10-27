@@ -13,6 +13,7 @@ import {
 import { numarPentruContract } from "@/lib/contracte";
 import { citesteSuma } from "@/lib/suma";
 import { inBani } from "@/date/plati";
+import { contractWord } from "@/lib/contract-word";
 
 /**
  * Contractul de sponsorizare, ca fișier PDF.
@@ -91,8 +92,17 @@ export async function POST(cerere: Request) {
       dintâi contract, nu o eroare. Un buton nou în panou n-are voie să
       schimbe clauzele dacă cineva trimite o valoare inventată.
     */
-    fel: formular.get("contract") === "declaratia177" ? "declaratia177" : "direct",
+    fel: String(formular.get("contract") ?? "").startsWith("declaratia177")
+      ? "declaratia177"
+      : "direct",
   };
+  /*
+    Word sau PDF, tot din valoarea butonului apăsat („direct-word”,
+    „declaratia177-word”): manualul spune „Descarci în Word (dacă mai schimbi
+    ceva) sau în PDF (dacă e gata)”, iar panoul dădea doar PDF. Generatorul de
+    Word e același cu cel de pe pagina publică pentru firme.
+  */
+  const word = String(formular.get("contract") ?? "").endsWith("-word");
 
   // Lungimile sunt generoase pentru o denumire de firmă și strâmte cât să nu
   // intre un roman într-un câmp care ajunge într-un PDF.
@@ -102,7 +112,7 @@ export async function POST(cerere: Request) {
     return nuTrece("Un câmp e prea lung.");
   }
 
-  const pdf = await contractDeSponsorizare(date);
+  const pdf = word ? await contractWord(date) : await contractDeSponsorizare(date);
 
   /*
     Urma din istoric se scrie înainte de a trimite fișierul, și nu oprește
@@ -128,8 +138,10 @@ export async function POST(cerere: Request) {
 
   return new Response(new Uint8Array(pdf), {
     headers: {
-      "content-type": "application/pdf",
-      "content-disposition": `attachment; filename="${numeleFisierului(date)}"`,
+      "content-type": word
+        ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        : "application/pdf",
+      "content-disposition": `attachment; filename="${numeleFisierului(date).replace(/\.pdf$/i, word ? ".docx" : ".pdf")}"`,
       "cache-control": "no-store",
     },
   });

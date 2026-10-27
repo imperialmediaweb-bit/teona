@@ -25,14 +25,14 @@ export const FELURI = [
     id: "noutate",
     eticheta: "Noutate",
     plural: "Noutăți",
-    butonNou: "Scrie o noutate",
+    butonNou: "Scrie ceva nou",
     cale: "/noutati",
   },
   {
     id: "campanie",
     eticheta: "Campanie",
     plural: "Campanii",
-    butonNou: "Scrie o campanie",
+    butonNou: "Scrie ceva nou",
     cale: "/campanii",
   },
   {

@@ -72,12 +72,11 @@ await sectiune("Donatorii", async () => {
   let t = await text();
   ok(t.includes("Popescu"), "lista are donatori");
   ok(/s-au oprit/i.test(t) && /donatori mari/i.test(t), "are segmentele „s-au oprit” și „donatori mari”");
-  await p.locator('select[name="filtru"]').selectOption("mari");
-  await apasa(p.locator('button:has-text("Arată")'));
+  await apasa(p.locator('nav[aria-label="Segmente"] a', { hasText: "Donatori mari" }));
   t = await text();
   ok(t.includes("Radu") && !t.includes("Popescu"), "segmentul „donatori mari” strânge lista (Vlad Radu, 1.000 lei)", t.slice(0, 0));
   await merg("/admin/donatori");
-  await apasa(p.locator('a[href*="deschis=maria.popescu"]').first());
+  await apasa(p.locator("td a", { hasText: "Maria Popescu" }).first());
   t = await text();
   ok(/donați/i.test(t) && t.includes("maria.popescu@example.com"), "fișa donatorului se deschide, cu donațiile");
   const jf = p.locator('form[action="/api/admin/jurnal"]').first();
@@ -138,6 +137,7 @@ await sectiune("Pâlnia firmelor și contractul", async () => {
   await merg("/admin/firme");
   let t = await text();
   ok(t.includes("Firma de Probă SRL") && t.includes("Transport Nordic"), "lista firmelor, cu stadiul fiecăreia");
+  ok(await p.locator("a", { hasText: "Generează contractul" }).count() > 0, "linkul se cheamă „Generează contractul”, ca în manual");
   await p.fill('input[name="cauta"]', "lemnul");
   await apasa(p.locator('button:has-text("Caută")'));
   ok((await text()).includes("Lemnul Bucovinei") && !(await text()).includes("Transport Nordic"), "căutarea după denumire");
@@ -163,7 +163,13 @@ await sectiune("Pâlnia firmelor și contractul", async () => {
   ok(bytesPdf.slice(0, 4).toString() === "%PDF", "contractul iese în PDF", `${bytesPdf.length} octeți`);
   const pdfTxt = bytesPdf.toString("latin1");
   ok(/12[.\s]?500/.test(pdfTxt) || bytesPdf.length > 20000, "contractul poartă suma scrisă de ea");
-  ok(!(await p.locator('button:has-text("Word"), a:has-text("Word")').count()), "în panou contractul iese doar PDF (Word e pe pagina publică a firmelor)");
+  await merg(`/admin/firme/${idFirma}/contract`);
+  await p.fill('[name="valoare"]', "12500");
+  await p.fill('[name="reprezentant"]', "Radu Călin");
+  await p.fill('[name="calitate"]', "Administrator");
+  const [doc] = await Promise.all([p.waitForEvent("download", { timeout: 20000 }), p.locator('button:has-text("Descarcă în Word")').click()]);
+  const bytesDoc = fs.readFileSync(await doc.path());
+  ok(bytesDoc.slice(0, 2).toString() === "PK" && doc.suggestedFilename().endsWith(".docx"), "contractul iese și în Word", doc.suggestedFilename());
   await merg("/admin/firme");
   ok(/contract trimis/i.test(await text()), "firma a trecut la „contract trimis”");
 });
@@ -207,7 +213,7 @@ await sectiune("Șabloanele de e-mail și MailerLite", async () => {
   await titlu.fill("Tabăra de iarnă are nevoie de tine");
   await p.locator('textarea[name="text"]').fill("Copiii de la Casa Teona pleacă la munte în februarie.\n\nFiecare leu ajunge la ei.");
   await golesteJurnal();
-  await apasa(p.locator('button:has-text("Fă doar ciorna")'));
+  await apasa(p.locator('button:has-text("Fă ciorna în MailerLite")'));
   let j = await jurnal();
   ok(j.some((x) => x.metoda === "POST" && x.cale === "/campaigns"), "„Fă doar ciorna” creează campania în MailerLite");
   ok(!j.some((x) => x.cale.includes("/schedule")), "…și nu o trimite");
@@ -258,7 +264,9 @@ await sectiune("Șabloanele de e-mail și MailerLite", async () => {
 // ─── 7. Scrie pe site ─────────────────────────────────────────────────────
 await sectiune("Noutăți și campanii pe site", async () => {
   const titluN = "Probă noutate " + Date.now().toString(36);
-  await merg("/admin/scrie/nou?fel=noutate");
+  await merg("/admin/scrie?fel=noutate");
+  await apasa(p.locator("a", { hasText: "Scrie ceva nou" }).first());
+  ok(p.url().includes("/admin/scrie/nou"), "„Scrie ceva nou” deschide formularul");
   await p.fill('[name="titlu"]', titluN);
   await p.fill('[name="rezumat"]', "Un rezumat scurt pentru listă.");
   await p.fill('[name="continut"]', "Primul paragraf al noutății de probă.\n\n## Un subtitlu\n\n- un punct\n- alt punct");
@@ -368,7 +376,8 @@ await sectiune("Campaniile de ziua cuiva", async () => {
   await merg("/admin/aniversari");
   ok((await text()).includes("Împlinesc 30 de ani"), "campania în așteptare se vede, cu titlul și mesajul");
   const fa = p.locator("form").filter({ has: p.locator('input[name="hotarare"][value="publicata"]') }).first();
-  await apasa(fa.locator("button").first());
+  ok(await fa.locator('button:has-text("Aprobă")').count() === 1, "butonul se cheamă „Aprobă”, ca în manual");
+  await apasa(fa.locator('button:has-text("Aprobă")'));
   const pag = await p.request.get(S + "/ziua-ta/ziua-anei");
   ok((await pag.text()).includes("Împlinesc 30 de ani"), "„Publică” o pune la /ziua-ta/ziua-anei");
   ok((await jurnal()).some((x) => JSON.stringify(x.corp).includes("ana.marin@example.com")), "omul primește vestea pe e-mail");

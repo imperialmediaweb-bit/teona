@@ -120,7 +120,33 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
         <Cifra eticheta="Donatori lunari" valoare={String(cifre.lunari)} />
       </div>
 
-      <form method="get" className="mt-8 flex flex-wrap items-end gap-3">
+      {/*
+        Segmentele de lucru, ca butoane: manualul spune „Apeși pe unul și
+        lista se strânge la ei”. Lista completă de filtre rămâne mai jos.
+      */}
+      <nav aria-label="Segmente" className="mt-8 flex flex-wrap items-center gap-2">
+        <span className="font-titlu text-mic font-bold text-cerneala">Segmente:</span>
+        {[
+          { id: "opriti", eticheta: "S-au oprit" },
+          { id: "mari", eticheta: "Donatori mari" },
+          { id: "toti", eticheta: "Toți" },
+        ].map((sg) => (
+          <a
+            key={sg.id}
+            href={sg.id === "toti" ? "/admin/donatori" : `/admin/donatori?filtru=${sg.id}`}
+            aria-current={filtru === sg.id ? "page" : undefined}
+            className={`rounded-full border px-4 py-1.5 font-titlu text-mic font-bold transition-colors ${
+              filtru === sg.id
+                ? "border-caramiziu-700 bg-caramiziu-700 text-hartie"
+                : "border-hartie-umbra bg-hartie text-cerneala-moale hover:text-cerneala"
+            }`}
+          >
+            {sg.eticheta}
+          </a>
+        ))}
+      </nav>
+
+      <form method="get" className="mt-4 flex flex-wrap items-end gap-3">
         <label className="grow">
           <span className="mb-1 block font-titlu text-mic font-bold">
             Caută
@@ -178,9 +204,17 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
               {lista.map((d) => (
                 <tr key={d.email} className="border-b border-hartie-umbra/60">
                   <td className="py-3 pr-4 align-top">
-                    <span className="block font-titlu font-bold text-cerneala">
+                    {/*
+                      Numele deschide fișa — jurnalul, notițele —, cum spune
+                      manualul („Apeși pe un nume și intri în fișa lui”).
+                      Același link ca „Discuții și notițe” de dedesubt.
+                    */}
+                    <a
+                      href={`${inapoiLa}${inapoiLa.includes("?") ? "&" : "?"}deschis=${encodeURIComponent(d.email)}`}
+                      className="block font-titlu font-bold text-cerneala underline-offset-4 hover:text-caramiziu-700 hover:underline"
+                    >
                       {d.nume || "(fără nume)"}
-                    </span>
+                    </a>
                     <span className="block text-cerneala-moale">{d.email}</span>
                     {d.telefon && (
                       <a

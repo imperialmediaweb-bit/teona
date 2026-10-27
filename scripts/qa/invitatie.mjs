@@ -217,6 +217,14 @@ try {
     `parola se pune (${pusa.status} → ${dupa})`,
   );
 
+  // După „Salvează parola” e deja înăuntru: nu i se mai cere încă o dată.
+  const sesiune = (pusa.headers.getSetCookie?.() ?? []).find((c) => c.startsWith("teona_verificare="));
+  verifica(Boolean(sesiune) && !dupa.includes("parola=pusa"), "după parolă intră direct, fără s-o mai scrie");
+  if (sesiune) {
+    const panou = await fetch(BAZA + "/admin", { headers: { cookie: sesiune.split(";")[0], "x-forwarded-for": "198.51.100.9" } });
+    verifica(/De făcut acum|Tabloul de bord/i.test(await panou.text()), "…și tabloul de bord i se deschide");
+  }
+
   // ─── 6. Acum intră cu ea ────────────────────────────────────────────────
   const intra = await faraSesiune("/api/admin/intrare", {
     method: "POST",

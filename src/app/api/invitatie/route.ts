@@ -1,6 +1,7 @@
 import { limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
 import { dinLinkulDeInvitatie } from "@/lib/invitatie";
 import { MINIM_PAROLA, puneParolaDinInvitatie } from "@/lib/utilizatori";
+import { COOKIE_ADMIN, valoareaCookieuluiUtilizator } from "@/lib/admin";
 
 /**
  * Parola pusă din invitație.
@@ -67,8 +68,27 @@ export async function POST(cerere: Request) {
   */
   if (!pusa) return inapoi(cerere, dovada, "folosit");
 
-  /* Gata. Intră cu parola lui, ca oricine altcineva. */
-  return trimiteLa("/admin?parola=pusa");
+  /*
+    Gata, și e deja înăuntru.
+
+    Înainte, după „Salvează parola”, omul ajungea la pagina de intrare și
+    trebuia să scrie din nou adresa și parola pe care tocmai le pusese —
+    „m-a împins să bag email și parola iar”. Linkul semnat și parola nouă
+    sunt deja dovada că e el, deci i se deschide sesiunea pe loc, exact ca
+    la intrarea cu parola (același cookie, aceleași reguli).
+  */
+  const sesiune = valoareaCookieuluiUtilizator(invitatie.id);
+  // Fără cheie de semnat nu se poate face sesiunea; atunci rămâne intrarea obișnuită.
+  if (!sesiune) return trimiteLa("/admin?parola=pusa");
+  const raspunsul = trimiteLa("/admin");
+  raspunsul.cookies.set(COOKIE_ADMIN, sesiune, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: 12 * 60 * 60,
+  });
+  return raspunsul;
 }
 
 export const GET = () => raspuns("Metodă nepermisă.", 405);

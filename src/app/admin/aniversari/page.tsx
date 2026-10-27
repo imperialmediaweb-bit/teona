@@ -195,7 +195,7 @@ async function Continut({
                   type="submit"
                   className="rounded-full bg-turcoaz-600 px-6 py-3 font-titlu font-bold text-hartie"
                 >
-                  Publică
+                  Aprobă
                 </button>
               </form>
               <form

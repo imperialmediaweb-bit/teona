@@ -346,6 +346,25 @@ async function Continut({
               Contract pentru Declarația 177 (PDF)
             </button>
           </div>
+          {/* Aceleași două contracte, în Word: pentru când mai schimbi ceva. */}
+          <div className="mt-3 flex flex-wrap gap-3">
+            <button
+              type="submit"
+              name="contract"
+              value="direct-word"
+              className="colt-mic-b border-2 border-hartie-umbra px-6 py-3 font-titlu font-bold text-cerneala transition-colors hover:border-caramiziu-400"
+            >
+              Descarcă în Word
+            </button>
+            <button
+              type="submit"
+              name="contract"
+              value="declaratia177-word"
+              className="colt-mic-b border-2 border-hartie-umbra px-6 py-3 font-titlu font-bold text-cerneala transition-colors hover:border-caramiziu-400"
+            >
+              Declarația 177, în Word
+            </button>
+          </div>
           <p className="mt-2 text-nota text-cerneala-slab">
             Se deschide în fila asta ca fișier. Textul clauzelor e cel din
             contractul asociației, neschimbat.

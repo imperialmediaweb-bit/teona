@@ -400,7 +400,7 @@ async function Continut({
                 disabled={!areEmail()}
                 className="rounded-full bg-cerneala px-5 py-2.5 font-titlu text-mic font-bold text-hartie transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:bg-cerneala-slab"
               >
-                Trimite proba
+                Trimite-ți o probă
               </button>
             </div>
             {!areEmail() && (
@@ -475,7 +475,7 @@ async function Continut({
                 disabled={!areCampanii()}
                 className="rounded-full border-2 border-cerneala/15 px-5 py-2 font-titlu text-mic font-bold text-cerneala transition-colors hover:border-caramiziu-400 disabled:cursor-not-allowed disabled:text-cerneala-slab"
               >
-                Fă doar ciorna
+                Fă ciorna în MailerLite
               </button>
             </div>
             {/*

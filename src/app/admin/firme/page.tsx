@@ -223,7 +223,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                       href={`/admin/firme/${f.id}/contract`}
                       className="font-titlu font-semibold text-caramiziu-700 underline underline-offset-2"
                     >
-                      Fă contractul de sponsorizare →
+                      Generează contractul →
                     </Link>
                   </p>
                 </div>
