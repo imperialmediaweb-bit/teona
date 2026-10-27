@@ -152,9 +152,16 @@ export async function GET(cerere: Request) {
 }
 
 export async function POST(cerere: Request) {
+  /*
+    Previzualizarea de lângă formular cere un desen la fiecare pauză de
+    scris, deci are limita ei, mai largă: cu limita de 40 a trimiterilor,
+    un text scris în zece minute ar fi blocat butoanele adevărate.
+  */
+  const previzualizare =
+    new URL(cerere.url).searchParams.get("previzualizare") === "1";
   const prea = limitaDeRata(cerere, {
-    cheie: "admin-sablon",
-    maxim: 40,
+    cheie: previzualizare ? "admin-sablon-vezi" : "admin-sablon",
+    maxim: previzualizare ? 600 : 40,
     fereastraMs: 15 * 60 * 1000,
   });
   if (prea) return prea;
@@ -162,6 +169,24 @@ export async function POST(cerere: Request) {
 
   const formular = await cerere.formData().catch(() => null);
   if (!formular) return nuTrece("Cerere invalidă.");
+
+  if (previzualizare) {
+    /*
+      Numai desenul: nimic nu se urcă și nimic nu pleacă. Poza aleasă de pe
+      calculator vine ca adresă `blob:` din browserul omului, care o poate
+      arăta numai el; lipsa descrierii nu oprește desenul.
+    */
+    formular.delete("poza_fisier");
+    const { fel, continut } = citeste(formular);
+    const locala = String(formular.get("poza_locala") ?? "");
+    if (locala.startsWith("blob:")) {
+      continut.poza = {
+        adresa: locala,
+        alt: String(formular.get("poza_alt") ?? ""),
+      };
+    }
+    return paginaHtml(sablonCampanie(fel, continut));
+  }
 
   const felCerut = String(formular.get("fel") ?? "");
   const felSigur = esteFelSablon(felCerut) ? felCerut : "persoane";

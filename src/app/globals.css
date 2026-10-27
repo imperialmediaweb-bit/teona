@@ -261,6 +261,16 @@
     outline-offset: 1px;
   }
 
+  /*
+    Casetele cu dungă colorată sus (border-t-4): cu colțurile rotunjite,
+    dunga groasă se subția spre margini și arăta ca un arc strâmb. Sus
+    rămân drepte, jos rotunde.
+  */
+  #panou-admin [class~="border-t-4"] {
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+  }
+
   #panou-admin .granulatie::before {
     display: none;
   }
