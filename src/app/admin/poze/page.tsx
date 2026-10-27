@@ -137,14 +137,27 @@ async function Continut({
     );
   }
 
-  const cale = dosar?.replace(/^\/+|\/+$/g, "") || "";
+  /*
+    Panoul pornește din folderul asociației și nu iese din el.
+
+    Contul Cloudinary e al agenției, cu folderele altor clienți la rădăcină.
+    Prima versiune lista rădăcina: asociația vedea „imperial”, „happy”,
+    „clinicasf”, toate „nelegate de niciun proiect”, și a întrebat ce sunt.
+    N-are ce căuta printre ele — nici ca să le vadă, nici ca să ajungă la ele
+    scriind `?dosar=imperial` în adresă. Deci orice cale din afara
+    rădăcinii cade înapoi pe rădăcină.
+  */
+  const RADACINA = (process.env.CLOUDINARY_FOLDER ?? "Teona").trim() || "Teona";
+  const ceruta = dosar?.replace(/^\/+|\/+$/g, "") || "";
+  const cale =
+    ceruta === RADACINA || ceruta.startsWith(`${RADACINA}/`) ? ceruta : RADACINA;
   const [subdosare, poze] = await Promise.all([
-    dosare(cale || undefined),
-    cale ? pozeDinDosar(cale) : Promise.resolve<PozaCloud[]>([]),
+    dosare(cale),
+    pozeDinDosar(cale),
   ]);
 
-  /** Firimiturile de navigare: Teona / 2026 / tabara-respiro. */
-  const bucati = cale ? cale.split("/") : [];
+  /** Firimiturile de navigare, sub rădăcină: 2026 / tabara-respiro. */
+  const bucati = cale.split("/").slice(1);
 
   /*
     Ce folder a ajuns la ce proiect.
@@ -179,10 +192,10 @@ async function Continut({
           href="/admin/poze"
           className="font-semibold text-caramiziu-700 hover:underline"
         >
-          Toate folderele
+          {RADACINA}
         </Link>
         {bucati.map((bucata, i) => {
-          const pana = bucati.slice(0, i + 1).join("/");
+          const pana = [RADACINA, ...bucati.slice(0, i + 1)].join("/");
           const ultim = i === bucati.length - 1;
           return (
             <span key={pana} className="flex items-center gap-2">
