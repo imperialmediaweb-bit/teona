@@ -136,9 +136,8 @@ async function Continut({
 
         {publicate.length === 0 ? (
           <p className="max-w-2xl text-amplu text-cerneala-moale">
-            Nu e nimic publicat încă. Scrie o noutate la{" "}
-            <code className="rounded bg-hartie-umbra px-1.5">/admin/scrie</code>{" "}
-            și publică-o; de-acolo ajunge aici.
+            Nu e nimic publicat încă. Scrie o noutate la „Scrie pe site” și
+            publică-o; de-acolo ajunge aici.
           </p>
         ) : (
           <ul className="grid gap-3">
@@ -300,42 +299,24 @@ function Cifrele({ p }: { p: Pagina }) {
   );
 }
 
-/** Pașii, pentru cine n-a mai intrat în Business Manager. */
+/**
+ * Pagina nelegată.
+ *
+ * Aici stăteau cei cinci pași din Business Manager (utilizator de sistem,
+ * jeton, variabile în Railway). Asociația: „scoate, zi că dacă asociația va
+ * dori, vom conecta pagina de Facebook la site în viitor”. Pașii sunt în
+ * CLAUDE.md, la „Pagina de Facebook”.
+ */
 function CumSeLeaga() {
-  const pasi = [
-    "Intră în business.facebook.com cu contul care administrează pagina. Dacă pagina nu e într-un Business Manager, fă unul — e gratuit — și adaug-o.",
-    "În Settings → Users → System users, apasă Add și fă un utilizator de sistem cu rolul Admin. E un cont tehnic, nu un om — există ca să-l folosească programele.",
-    "La Assigned assets, dă-i pagina asociației, cu dreptul Full control (ca să poată și publica), și contul de reclame, cu drept de citire.",
-    "Apasă Generate new token, alege aplicația, și bifează drepturile: pages_read_engagement, pages_manage_posts, read_insights, ads_read. Copiază jetonul — se vede o singură dată.",
-    "În Railway, pune META_PAGE_ID (numărul paginii, din Settings → Page transparency sau din adresa paginii), META_PAGE_TOKEN (jetonul) și, pentru reclame, META_AD_ACCOUNT_ID și META_TOKEN.",
-  ];
   return (
     <div className="colt-a border border-hartie-umbra bg-hartie p-5 sm:p-6">
       <h2 className="font-titlu text-amplu font-bold text-cerneala">
-        Pagina nu e legată încă
+        Pagina de Facebook nu e legată încă de site
       </h2>
       <p className="mt-2 max-w-3xl text-amplu text-cerneala-moale">
-        Nu există buton „Conectează cu Facebook". Ca un site să
-        publice în numele unei pagini, Meta cere o aplicație aprobată, cu
-        verificare de business — săptămâni de așteptare pentru ceva ce
-        asociația face de câteva ori pe lună. Calea scurtă e un jeton generat
-        o dată, care nu expiră. Cinci pași:
-      </p>
-      <ol className="mt-4 grid gap-3">
-        {pasi.map((p, i) => (
-          <li key={p} className="flex gap-3">
-            <span className="font-titlu font-bold text-caramiziu-700">
-              {i + 1}.
-            </span>
-            <span className="max-w-3xl text-mic text-cerneala-moale">{p}</span>
-          </li>
-        ))}
-      </ol>
-      <p className="mt-4 max-w-3xl text-nota text-cerneala-slab">
-        Dacă pasul cu Business Manager e prea mult acum: panoul merge și fără
-        el. Donațiile venite de pe Facebook se văd oricum la Analiză, din
-        etichetele linkurilor — doar cifrele paginii și butonul de publicat
-        lipsesc.
+        Dacă asociația va dori, vom conecta pagina de Facebook la site în
+        viitor. Atunci se vor vedea aici cifrele paginii și se vor putea
+        trimite noutățile pe ea dintr-un buton.
       </p>
     </div>
   );
