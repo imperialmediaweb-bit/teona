@@ -191,8 +191,10 @@ async function Continut({
             <strong className="text-cerneala">
               Buletinele și campaniile de e-mail.
             </strong>{" "}
-            Se trimit din MailerLite, de un om. Aici sunt doar mesajele care
-            răspund la un gest al cuiva. Șabloanele de campanie sunt la{" "}
+            Nu pleacă singure: le trimite un om, din panou, la
+            „Trimite campania acum” (prin contul MailerLite al asociației).
+            Aici sunt doar mesajele care răspund la un gest al cuiva.
+            Șabloanele de campanie sunt la{" "}
             <Link
               href="/admin/sabloane"
               className="font-semibold text-caramiziu-700 underline underline-offset-2"

@@ -23,6 +23,42 @@ import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 
+/**
+ * Numele paginilor din tabelul de roluri, cum apar în meniu. Înainte se
+ * vedeau adresele („/admin/rapoarte”), care nu-i spun nimic omului care dă
+ * un cont. O pagină nouă fără nume aici apare cu adresa, nu dispare.
+ */
+const NUME_PAGINA: Record<string, string> = {
+  "/admin": "Tablou de bord",
+  "/admin/rapoarte": "Rapoarte",
+  "/admin/analiza": "Analiză",
+  "/admin/radar": "Radar finanțări",
+  "/admin/donatii": "Donații",
+  "/admin/donatori": "Donatori",
+  "/admin/firme": "Firme",
+  "/admin/contracte": "Contracte",
+  "/admin/cereri": "Cereri",
+  "/admin/aniversari": "Aniversări de aprobat",
+  "/admin/sabloane": "Șabloane de e-mail",
+  "/admin/emailuri": "Mesajele trimise",
+  "/admin/qr": "Cod QR",
+  "/admin/presa": "Presă",
+  "/admin/calendar": "Calendar",
+  "/admin/cauta": "Căutare",
+  "/admin/parola": "Parola mea",
+  "/admin/formulare": "Formulare 230",
+  "/admin/scrie": "Blog, campanii, tabere",
+  "/admin/poze": "Poze",
+  "/admin/testimoniale": "Testimoniale",
+  "/admin/cifre": "Cifrele",
+  "/admin/documente": "Documente",
+  "/admin/sponsori": "Sponsori",
+  "/admin/texte": "Textele paginilor",
+  "/admin/pagini": "Pagini",
+  "/admin/facebook": "Facebook",
+  "/admin/utilizatori": "Utilizatori",
+};
+
 export const metadata: Metadata = {
   title: "Utilizatori",
   robots: { index: false, follow: false },
@@ -517,7 +553,7 @@ function CeVedeFiecare() {
             {PAGINI.map((p) => (
               <tr key={p.cale} className="border-b border-hartie-umbra/60">
                 <td className="px-4 py-2 text-cerneala-moale">
-                  <code>{p.cale}</code>
+                  {NUME_PAGINA[p.cale] ?? p.cale}
                 </td>
                 {ROLURI.map((rol: Rol) => (
                   <td key={rol} className="px-4 py-2">

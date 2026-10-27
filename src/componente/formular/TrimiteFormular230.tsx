@@ -44,7 +44,16 @@ type Stare =
   | { fel: "reusit"; mesaj: string }
   | { fel: "eroare"; mesaj: string };
 
-export default function TrimiteFormular230() {
+export default function TrimiteFormular230({
+  descarcabil = true,
+}: {
+  /**
+   * Fals cât timp Formularul 230 nu e urcat. Caietul (7.5): fără fișier,
+   * butonul de descărcare rămâne inactiv — nu duce la o pagină care spune
+   * că lipsește.
+   */
+  descarcabil?: boolean;
+} = {}) {
   const id = useId();
   const [erori, setErori] = useState<Erori>({});
   const [stare, setStare] = useState<Stare>({ fel: "gol" });
@@ -152,13 +161,20 @@ export default function TrimiteFormular230() {
         ))}
       </ol>
 
-      <a
-        href="/formular-230"
-        className="mt-6 inline-flex items-center gap-2 colt-mic-a bg-caramiziu-700 px-6 py-3 font-titlu font-bold text-hartie transition-colors hover:bg-caramiziu-800"
-      >
-        <Pictograma nume="document" aria-hidden="true" className="size-5" />
-        Descarcă formularul
-      </a>
+      {descarcabil ? (
+        <a
+          href="/formular-230"
+          className="mt-6 inline-flex items-center gap-2 colt-mic-a bg-caramiziu-700 px-6 py-3 font-titlu font-bold text-hartie transition-colors hover:bg-caramiziu-800"
+        >
+          <Pictograma nume="document" aria-hidden="true" className="size-5" />
+          Descarcă formularul
+        </a>
+      ) : (
+        <p className="mt-6 inline-flex items-center gap-2 colt-mic-a bg-hartie-umbra px-6 py-3 font-titlu font-bold text-cerneala-slab">
+          <Pictograma nume="document" aria-hidden="true" className="size-5" />
+          Formularul va fi disponibil aici în curând
+        </p>
+      )}
 
       <form
         onSubmit={trimite}

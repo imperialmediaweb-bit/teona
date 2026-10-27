@@ -446,7 +446,9 @@ export default async function Redirectioneaza35() {
               culoare="caramiziu"
             />
             <div className="mt-10">
-              <TrimiteFormular230 />
+              <TrimiteFormular230
+                descarcabil={gata.includes("formular-230")}
+              />
             </div>
           </div>
 

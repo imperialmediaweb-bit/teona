@@ -703,36 +703,18 @@ function Reclamele({ r, c }: { r: Reclame; c: Canalul | null }) {
 
 /** Ce trebuie pus în Railway ca să se vadă reclamele. */
 function FaraReclame() {
+  /*
+    Fără pașii tehnici (variabile, jeton, Business Manager): ca la pagina de
+    Facebook, asociația a cerut o frază, nu o instrucțiune pentru dezvoltator.
+    Pașii sunt în CLAUDE.md, la „Reclamele Meta”.
+  */
   return (
     <div className="colt-a border border-hartie-umbra bg-hartie p-5 sm:p-6">
       <p className="max-w-3xl text-amplu text-cerneala-moale">
-        Donațiile venite din reclame se văd în tabelul de mai sus și fără asta.
-        Ca să apară și <strong>cât s-a cheltuit</strong> pe ele — adică dacă
-        banii dați s-au întors — e nevoie în Railway de:
-      </p>
-      <ul className="mt-3 grid gap-1.5 text-mic text-cerneala-moale">
-        {[
-          [
-            "META_AD_ACCOUNT_ID",
-            "numărul contului de reclame, din Meta Ads Manager (începe cu „act_”)",
-          ],
-          [
-            "META_TOKEN",
-            "un jeton de acces cu dreptul „ads_read” pe contul acela",
-          ],
-        ].map(([cheie, ce]) => (
-          <li key={cheie}>
-            <code className="rounded bg-hartie-umbra px-1.5 py-0.5">
-              {cheie}
-            </code>{" "}
-            — {ce}
-          </li>
-        ))}
-      </ul>
-      <p className="mt-3 max-w-3xl text-nota text-cerneala-slab">
-        Jetonul se face în business.facebook.com, la System Users, și se dă
-        numai dreptul de citire: panoul nu pornește, nu oprește și nu schimbă
-        nicio reclamă.
+        Contul de reclame de pe Facebook nu e legat încă de site. Donațiile
+        venite din reclame se văd oricum, la „Vizite și canale”. Dacă asociația
+        va dori, vom lega și contul de reclame, ca să se vadă aici și cât s-a
+        cheltuit pe ele.
       </p>
     </div>
   );
@@ -1164,8 +1146,10 @@ async function Continut({
           <Usa
             fila="vizite"
             titlu="Vizite și canale"
-            cifra="28 de zile"
-            nota="Câți au intrat pe site, de unde au venit și ce i-a adus să doneze."
+            cifra={
+              deVizite ? deVizite.utilizatori.toLocaleString("ro-RO") : "—"
+            }
+            nota="Oameni intrați pe site în ultimele 28 de zile, de unde au venit și ce i-a adus să doneze."
           />
         </div>
       )}
