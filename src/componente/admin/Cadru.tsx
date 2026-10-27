@@ -158,7 +158,11 @@ const AFARA: ReadonlyArray<{ href: string; eticheta: string }> = [
     href: "https://dashboard.mailerlite.com/campaigns",
     eticheta: "MailerLite",
   },
-  { href: "https://console.cloudinary.com/", eticheta: "Cloudinary" },
+  /*
+    Fără link spre Cloudinary, dinadins. Contul e al agenției, cu folderele
+    altor clienți la rădăcină: consola lor le arată pe toate. Pozele
+    asociației se văd la „Poze”, din panou, care nu iese din folderul Teona.
+  */
 ];
 
 /**
