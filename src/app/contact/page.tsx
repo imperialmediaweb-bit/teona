@@ -95,8 +95,12 @@ export default function Contact() {
           legenda: "Echipa noastră",
         }}
         pozaMica={{
-          cale: "/poze/2025/03/WhatsApp-Image-2025-03-18-at-15.19.13.jpeg",
-          alt: "O voluntară și o fetiță, amândouă în tricourile albe ale asociației, în sala cu pictura din junglă de la Casa Teona",
+          // Asociația a spus în octombrie 2026 că poza de dinainte (cu
+          // pictura din junglă) e făcută în altă parte, nu la Casa Teona.
+          // Asta e de pe site-ul vechi, etichetată de ei „Casa Teona”, și
+          // nu mai apare nicăieri pe site — cea cu tabla e deja în trei locuri.
+          cale: "/poze/2024/11/resizedimage.webp",
+          alt: "O voluntară ajută un băiețel să deseneze, la masă, în sala cu tavan de lemn de la Casa Teona",
         }}
       />
 

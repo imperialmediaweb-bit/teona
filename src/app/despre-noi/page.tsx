@@ -79,9 +79,15 @@ const POVESTE: ReadonlyArray<{
     numar: "text-miere-100",
     cheie: "despre.poveste.3",
     poza: {
-      cale: "/poze/2024/11/449597800_497189906214686_1996782188503194582_n.jpg",
-      alt: "Mâna unui voluntar îi întinde o minge portocalie unei fetițe, pe o alee din tabără",
-      legenda: "Prima zi de tabără",
+      /*
+        Poza e din tabăra Respiro Împreună, cum a cerut asociația în
+        octombrie 2026: cea de dinainte era de la altă tabără. Vine din
+        Cloudinary (folderul „TABĂRĂ ONCOLOGIE 2026”), nu din depozit — e
+        singura fotografie urcată acolo până acum, deci nu e de ales.
+      */
+      cale: "/cloud/475B1184_qymxzq",
+      alt: "Șapte copii, în grup, lângă un autocar, pe o pajiște de munte, la tabăra Respiro Împreună",
+      legenda: "Respiro Împreună",
     },
     umbra: "miere",
   },

@@ -122,8 +122,10 @@ const GALERIE = [
     alt: "Opt tineri cu căști portocalii de escaladă și hamuri, în grup, sub un brad, în parcul de aventură",
   },
   {
-    cale: "/poze/2024/11/449597800_497189906214686_1996782188503194582_n.jpg",
-    alt: "Mâna unui voluntar îi întinde o minge portocalie unei fetițe, pe o alee din tabără",
+    // Asociația a cerut aici voluntari, nu fetița cu mingea. Poza e din
+    // Cloudinary, din taberele din 2026.
+    cale: "/cloud/B_tsznqv",
+    alt: "Un grup de voluntari tineri, în vestele albe cu sigla asociației, într-o sală din tabără",
   },
   {
     cale: "/poze/2024/11/413839128_386434587290219_1905121098743660996_n.jpg",
