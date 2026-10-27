@@ -126,26 +126,6 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
   },
 ];
 
-/**
- * Lucruri care se fac în altă parte.
- *
- * Buletinele și campaniile de e-mail se scriu în MailerLite, nu aici: panoul
- * avea o pagină care lăsa o ciornă acolo, dar trecea pe lângă tot ce face un
- * instrument de e-mail — șabloane, segmente, probe, statistici de deschidere.
- * Un buton care te duce la unealta potrivită e mai cinstit decât o copie
- * săracă a ei.
- */
-const AFARA: ReadonlyArray<{ href: string; eticheta: string }> = [
-  {
-    href: "https://dashboard.mailerlite.com/campaigns",
-    eticheta: "MailerLite",
-  },
-  /*
-    Fără link spre Cloudinary, dinadins. Contul e al agenției, cu folderele
-    altor clienți la rădăcină: consola lor le arată pe toate. Pozele
-    asociației se văd la „Poze”, din panou, care nu iese din folderul Teona.
-  */
-];
 
 /**
  * Cât așteaptă pe fiecare pagină, ca să se vadă din meniu.
@@ -439,30 +419,6 @@ export default function Cadru({
                 <Nav activ={activ} />
               </Suspense>
 
-              <div className="hidden lg:mt-6 lg:block">
-                <p className="px-3 pb-2 font-titlu text-nota font-bold tracking-wide text-hartie/45 uppercase">
-                  În altă parte
-                </p>
-                <ul className="grid gap-1">
-                  {AFARA.map((loc) => (
-                    <li key={loc.href}>
-                      <a
-                        href={loc.href}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 font-titlu text-mic font-semibold text-hartie/60 transition-colors hover:bg-hartie/10 hover:text-hartie"
-                      >
-                        <Pictograma
-                          nume="sageata"
-                          aria-hidden="true"
-                          className="size-4 shrink-0 -rotate-45"
-                        />
-                        {loc.eticheta}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
             </nav>
 
             {/*
