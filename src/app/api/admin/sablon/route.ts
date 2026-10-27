@@ -1,4 +1,10 @@
-import { limitaDeRata, nuTrece, raspuns, text as curataText, trimiteLa } from "@/lib/api";
+import {
+  limitaDeRata,
+  nuTrece,
+  raspuns,
+  text as curataText,
+  trimiteLa,
+} from "@/lib/api";
 import { email as emailValid } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { ASOCIATIA, EMAIL } from "@/date/asociatie";
@@ -144,7 +150,8 @@ function paginaHtml(html: string) {
 
 /** Previzualizarea din panou, pentru cadrul care arată șablonul gol. */
 export async function GET(cerere: Request) {
-  if (!(await arePermisiune("/admin/sabloane"))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/sabloane")))
+    return raspuns("Nu ai acces.", 403);
   const fel = new URL(cerere.url).searchParams.get("fel");
   return paginaHtml(
     sablonCampanie(esteFelSablon(fel) ? fel : "persoane", EXEMPLU),
@@ -165,7 +172,8 @@ export async function POST(cerere: Request) {
     fereastraMs: 15 * 60 * 1000,
   });
   if (prea) return prea;
-  if (!(await arePermisiune("/admin/sabloane"))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/sabloane")))
+    return raspuns("Nu ai acces.", 403);
 
   const formular = await cerere.formData().catch(() => null);
   if (!formular) return nuTrece("Cerere invalidă.");
@@ -218,8 +226,26 @@ export async function POST(cerere: Request) {
   }
 
   if (fac === "proba") {
-    const catre = String(formular.get("catre") ?? "").trim();
-    if (!emailValid(catre)) return inapoi(cerere, { ratat: "adresa", fel });
+    /*
+      Mai multe adrese, despărțite prin virgulă, spațiu sau rând nou — ca
+      proba s-o vadă deodată și colegii. Fiecare primește mesajul separat:
+      la o probă, nimeni n-are de ce să vadă adresele celorlalți. Cel mult
+      zece, altfel nu mai e probă, e o listă.
+    */
+    const adrese = [
+      ...new Set(
+        String(formular.get("catre") ?? "")
+          .split(/[\s,;]+/)
+          .map((a) => a.trim().toLowerCase())
+          .filter(Boolean),
+      ),
+    ];
+    if (
+      !adrese.length ||
+      adrese.length > 10 ||
+      !adrese.every((a) => emailValid(a))
+    )
+      return inapoi(cerere, { ratat: "adresa", fel });
     if (!areEmail()) return inapoi(cerere, { ratat: "fara-resend", fel });
     /*
       Proba pleacă cu dezabonarea înlocuită.
@@ -235,14 +261,23 @@ export async function POST(cerere: Request) {
       // e-mail trimis la sute de oameni e mai rău decât niciunul.
       dezabonare: `${ADRESA_SITE}/politica-de-confidentialitate`,
     };
-    const trimis = await trimiteEmail({
-      catre,
-      subiect: `[probă] ${continut.titlu}`,
-      html: sablonCampanie(fel, deProba),
-      text: textSimpluCampanie(fel, deProba),
-      raspundeLa: EMAIL.contact,
+    const html = sablonCampanie(fel, deProba);
+    const text = textSimpluCampanie(fel, deProba);
+    let plecate = 0;
+    for (const catre of adrese) {
+      const trimis = await trimiteEmail({
+        catre,
+        subiect: `[probă] ${continut.titlu}`,
+        html,
+        text,
+        raspundeLa: EMAIL.contact,
+      }).catch(() => false);
+      if (trimis) plecate++;
+    }
+    return inapoi(cerere, {
+      facut: plecate === adrese.length ? "proba" : "proba-nu",
+      fel,
     });
-    return inapoi(cerere, { facut: trimis ? "proba" : "proba-nu", fel });
   }
 
   if (fac === "ciorna" || fac === "trimite") {
@@ -270,7 +305,11 @@ export async function POST(cerere: Request) {
     });
 
     if (!raspunsul.ok)
-      return inapoi(cerere, { ratat: "mailerlite", mesaj: raspunsul.mesaj, fel });
+      return inapoi(cerere, {
+        ratat: "mailerlite",
+        mesaj: raspunsul.mesaj,
+        fel,
+      });
     if (fac === "ciorna") return inapoi(cerere, { facut: "ciorna", fel });
 
     /*

@@ -46,7 +46,8 @@ export const metadata: Metadata = {
 
 const RATAT: Record<string, string> = {
   poza: "Poza are nevoie de o descriere. Fără ea, cine nu vede imaginea nu află ce era în ea.",
-  adresa: "Adresa de e-mail pentru probă nu e scrisă corect.",
+  adresa:
+    "O adresă de e-mail pentru probă nu e scrisă corect. Pune cel mult zece, despărțite prin virgulă.",
   "fara-resend":
     "Lipsește RESEND_API_KEY din Railway, deci proba nu poate pleca. Descarcă HTML-ul și încarcă-l direct în MailerLite.",
   mailerlite: "MailerLite n-a primit campania.",
@@ -386,15 +387,16 @@ async function Continut({
               <Eticheta
                 htmlFor="catre"
                 copii="Trimite-ți o probă"
-                nota="Uită-te la ea pe telefon, nu doar pe calculator."
+                nota="Poți pune mai multe adrese, despărțite prin virgulă. Fiecare o primește separat."
               />
               <div className="flex flex-wrap gap-2.5">
                 <input
                   id="catre"
                   name="catre"
-                  type="email"
-                  placeholder="adresa ta"
-                  className={`${CLASA_CAMP} sm:max-w-xs`}
+                  type="text"
+                  placeholder="adresa ta, a colegei, …"
+                  autoComplete="email"
+                  className={`${CLASA_CAMP} sm:max-w-md`}
                 />
                 <button
                   type="submit"
