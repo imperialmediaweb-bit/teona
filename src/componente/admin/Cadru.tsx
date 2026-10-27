@@ -86,17 +86,6 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
     ],
   },
   {
-    titlu: "Panoul",
-    pagini: [
-      {
-        href: "/admin/utilizatori",
-        eticheta: "Utilizatori",
-        pictograma: "familie",
-      },
-      { href: "/admin/parola", eticheta: "Parola mea", pictograma: "stea" },
-    ],
-  },
-  {
     titlu: "Site",
     pagini: [
       {
@@ -121,6 +110,12 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
         eticheta: "Textele paginilor",
         pictograma: "document",
       },
+      { href: "/admin/poze", eticheta: "Poze", pictograma: "arta" },
+    ],
+  },
+  {
+    titlu: "Comunicare",
+    pagini: [
       {
         href: "/admin/sabloane",
         eticheta: "Șabloane de e-mail",
@@ -131,7 +126,6 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
         eticheta: "Mesajele trimise",
         pictograma: "plic",
       },
-      { href: "/admin/poze", eticheta: "Poze", pictograma: "arta" },
       { href: "/admin/qr", eticheta: "Cod QR", pictograma: "panou" },
       {
         href: "/admin/facebook",
@@ -140,6 +134,17 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
       },
       { href: "/admin/presa", eticheta: "Presă", pictograma: "document" },
       { href: "/admin/calendar", eticheta: "Calendar", pictograma: "harta" },
+    ],
+  },
+  {
+    titlu: "Panoul",
+    pagini: [
+      {
+        href: "/admin/utilizatori",
+        eticheta: "Utilizatori",
+        pictograma: "familie",
+      },
+      { href: "/admin/parola", eticheta: "Parola mea", pictograma: "stea" },
     ],
   },
 ];
@@ -347,14 +352,13 @@ async function Iesirea() {
 
 export default function Cadru({
   titlu,
-  descriere,
   activ,
   actiuni,
   faraMeniu,
   children,
 }: {
   titlu: string;
-  /** O frază sub titlu: ce e pagina asta și la ce folosește. */
+  /** Nu se mai arată: panoul rămâne la titlu, date și butoane. */
   descriere?: string;
   activ?: string;
   /** Butoane sau filtre, în dreapta titlului. */
@@ -509,9 +513,6 @@ export default function Cadru({
           <div className="mx-auto flex max-w-[1500px] flex-wrap items-end justify-between gap-4 px-4 py-6 sm:px-8">
             <div>
               <h1 className="text-h3 text-cerneala">{titlu}</h1>
-              {descriere && (
-                <p className="mt-1 text-mic text-cerneala-moale">{descriere}</p>
-              )}
             </div>
             {actiuni}
           </div>
