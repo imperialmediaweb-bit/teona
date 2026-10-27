@@ -23,7 +23,14 @@ import { construieste, textSimplu, type ContinutEmail } from "./sablon";
  *    creează oricum, goală, și se umple din editorul lor.
  */
 
-const BAZA = "https://connect.mailerlite.com/api";
+/**
+ * Adresa API-ului. `MAILERLITE_API` o schimbă numai pentru probe, ca
+ * `EMAIL_API` la Resend: o probă care apasă „Trimite campania" n-are voie să
+ * ajungă la abonații adevărați.
+ */
+const BAZA =
+  process.env.MAILERLITE_API?.replace(/\/+$/, "") ??
+  "https://connect.mailerlite.com/api";
 
 export function areCampanii(): boolean {
   return Boolean(process.env.MAILERLITE_API_KEY);

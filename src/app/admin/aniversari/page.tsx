@@ -181,7 +181,14 @@ async function Continut({
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3 border-t border-hartie-umbra pt-5">
-              <form action="/api/admin/aniversari" method="post">
+              {/*
+                Ruta a rămas la `/api/admin/campanii` când pagina s-a mutat la
+                `/admin/aniversari`. Formularele trimiteau la
+                `/api/admin/aniversari`, care nu există: „Publică" și
+                „Respinge" dădeau 404 și nu se întâmpla nimic. Prins de proba
+                care parcurge manualul ca un om, în octombrie 2026.
+              */}
+              <form action="/api/admin/campanii" method="post">
                 <input type="hidden" name="id" value={c.id} />
                 <input type="hidden" name="hotarare" value="publicata" />
                 <button
@@ -191,9 +198,21 @@ async function Continut({
                   Publică
                 </button>
               </form>
-              <form action="/api/admin/aniversari" method="post">
+              <form
+                action="/api/admin/campanii"
+                method="post"
+                className="flex flex-wrap items-center gap-2"
+              >
                 <input type="hidden" name="id" value={c.id} />
                 <input type="hidden" name="hotarare" value="respinsa" />
+                {/* Motivul pleacă la om în e-mailul de refuz; fără el află doar „nu". */}
+                <input
+                  name="motiv"
+                  maxLength={300}
+                  placeholder="De ce? (îl primește pe e-mail)"
+                  aria-label="Motivul refuzului"
+                  className="min-w-64 rounded-full border border-hartie-umbra bg-hartie px-4 py-2.5 text-mic"
+                />
                 <button
                   type="submit"
                   className="rounded-full border border-hartie-umbra px-6 py-3 font-titlu font-bold text-cerneala"
