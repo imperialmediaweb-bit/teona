@@ -7,6 +7,11 @@ import { useState } from "react";
  *
  * Bifate toate la deschidere — de obicei comunicatul pleacă la toată lista;
  * „Niciuna” e pentru când vrei să-l trimiți la două-trei redacții anume.
+ *
+ * Fără `required` în browser, dinadins: bula de validare a browserului apare
+ * lângă un câmp pe care omul poate să nu-l vadă, iar el rămâne cu impresia că
+ * „nu trimite nimic”. Serverul verifică tot și întoarce o pagină care spune
+ * pe față ce lipsește, cu „Înapoi” și textul păstrat.
  */
 export default function TrimiteComunicat({
   contacte,
@@ -101,7 +106,6 @@ export default function TrimiteComunicat({
         </span>
         <input
           name="subiect"
-          required
           maxLength={200}
           placeholder="Comunicat de presă: …"
           className={camp}
@@ -118,8 +122,6 @@ export default function TrimiteComunicat({
         </span>
         <textarea
           name="text"
-          required
-          minLength={40}
           rows={12}
           className={camp}
         />
@@ -148,7 +150,6 @@ export default function TrimiteComunicat({
             type="checkbox"
             name="confirm"
             value="da"
-            required
             className="mt-0.5 size-4 shrink-0 accent-caramiziu-700"
           />
           Am citit comunicatul. Fiecare redacție bifată îl primește separat, de
