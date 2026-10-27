@@ -7,6 +7,8 @@ import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 import CopiazaAdrese from "@/componente/admin/CopiazaAdrese";
+import TrimiteComunicat from "@/componente/admin/TrimiteComunicat";
+import { areEmail } from "@/lib/email/trimite";
 import {
   contactePresa,
   FELURI_PRESA,
@@ -33,7 +35,9 @@ export const metadata: Metadata = {
  * la telefon, deci fiecare rând are loc pentru un nume și o notiță: „a scris
  * despre tabăra din iunie", „preferă să primească poze separat".
  *
- * **Comunicatul nu pleacă de aici**, dinadins — vezi `CopiazaAdrese`.
+ * **Comunicatul pleacă de aici, la cererea asociației**, câte un e-mail
+ * pentru fiecare redacție (`/api/admin/presa/trimite`). Copierea adreselor
+ * pentru Gmail rămâne dedesubt, pentru cine preferă așa.
  */
 
 const RATAT: Record<string, string> = {
@@ -43,7 +47,12 @@ const RATAT: Record<string, string> = {
 export default function PaginaPresa({
   searchParams,
 }: {
-  searchParams: Promise<{ gresit?: string; ratat?: string }>;
+  searchParams: Promise<{
+    gresit?: string;
+    ratat?: string;
+    trimis?: string;
+    ratate?: string;
+  }>;
 }) {
   return (
     <Suspense fallback={<Cadru titlu="Presă">Se încarcă…</Cadru>}>
@@ -55,10 +64,15 @@ export default function PaginaPresa({
 async function Continut({
   searchParams,
 }: {
-  searchParams: Promise<{ gresit?: string; ratat?: string }>;
+  searchParams: Promise<{
+    gresit?: string;
+    ratat?: string;
+    trimis?: string;
+    ratate?: string;
+  }>;
 }) {
   await connection();
-  const { gresit, ratat } = await searchParams;
+  const { gresit, ratat, trimis, ratate } = await searchParams;
 
   if (!areParolaConfigurata()) {
     return (
@@ -118,19 +132,49 @@ async function Continut({
         </p>
       )}
 
-      <section className="colt-a border border-hartie-umbra bg-hartie p-5 sm:p-6">
+      <section
+        id="trimite"
+        className="scroll-mt-6 colt-a border border-hartie-umbra bg-hartie p-5 sm:p-6"
+      >
         <h2 className="font-titlu text-amplu font-bold text-cerneala">
           Trimite comunicatul
         </h2>
         <p className="mt-2 max-w-3xl text-mic text-cerneala-moale">
-          Copiezi adresele, le pui la <strong>Bcc</strong> în Gmail-ul
-          asociației și trimiți de acolo. Nu de pe server: un mesaj plecat
-          dintr-un program necunoscut, către opt redacții deodată, ajunge în
-          spam exact la cei pe care vrei să-i prinzi.
+          Bifezi redacțiile, scrii comunicatul și apeși butonul. Fiecare
+          redacție primește un e-mail separat, cu adresa ei la „Către”, nu o
+          listă la grămadă — așa nu ajunge în spam și nimeni nu vede cui i s-a
+          mai trimis.
         </p>
-        <div className="mt-4">
-          <CopiazaAdrese adrese={adrese} />
-        </div>
+        {trimis !== undefined && (
+          <p
+            role="status"
+            className={`mt-4 rounded-lg px-4 py-3 text-mic font-semibold ${
+              ratate
+                ? "bg-caramiziu-50 text-caramiziu-900"
+                : "bg-turcoaz-50 text-turcoaz-900"
+            }`}
+          >
+            {`Trimis la ${trimis} ${trimis === "1" ? "redacție" : "redacții"}.`}
+            {ratate ? ` N-a plecat la: ${ratate}. Încearcă din nou pentru ele sau sună-le.` : ""}
+          </p>
+        )}
+        {active.some((c) => c.email) ? (
+          <TrimiteComunicat
+            poate={areEmail()}
+            contacte={active
+              .filter((c) => c.email)
+              .map((c) => ({
+                id: c.id,
+                publicatie: c.publicatie,
+                email: c.email!,
+                persoana: c.persoana,
+              }))}
+          />
+        ) : (
+          <p className="mt-4 text-mic text-cerneala-moale">
+            Nicio redacție n-are încă adresă de e-mail. Adaug-o mai jos.
+          </p>
+        )}
         {fara.length > 0 && (
           <p className="mt-3 text-nota text-cerneala-slab">
             {fara.length === 1
@@ -140,6 +184,14 @@ async function Continut({
             și se scrie mai jos.
           </p>
         )}
+        <details className="mt-5 border-t border-hartie-umbra pt-4">
+          <summary className="cursor-pointer font-titlu text-mic font-semibold text-cerneala-moale">
+            Sau copiază adresele și trimite din Gmail
+          </summary>
+          <div className="mt-3">
+            <CopiazaAdrese adrese={adrese} />
+          </div>
+        </details>
       </section>
 
       <Sablon />

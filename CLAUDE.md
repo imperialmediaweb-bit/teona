@@ -431,12 +431,19 @@ acolo unde site-ul n-a răspuns (Cloudflare) rândul rămâne fără adresă,
 dinadins — se vede ce lipsește. Se pune o singură dată, la prima deschidere,
 și numai dacă tabelul e gol: altfel un contact șters ar învia singur.
 
-Comunicatul **nu pleacă din panou**: adresele se copiază și se pun la Bcc în
-Gmail-ul asociației. Un mesaj trimis de serverul nostru către opt redacții
-deodată ajunge în spam exact la cei pe care vrei să-i prinzi. Pagina ține și
-forma unui comunicat pe care o redacție îl publică (titlu, primul paragraf
-care spune tot, citat cu nume, contact) și amintește de acordul părinților
-pentru pozele cu copii.
+Comunicatul **pleacă din panou**, la cererea asociației (octombrie 2026):
+bifezi redacțiile („Toate” / „Niciuna”), scrii subiectul și textul, pui cel
+mult trei atașamente (10 MB), confirmi și apeși
+(`/api/admin/presa/trimite`). **Fiecare redacție primește e-mailul ei**, cu
+adresa ei la „Către”, nu o listă la Bcc — un mesaj către opt redacții
+deodată, de la un server, ajunge în spam. Răspunsul merge la
+contact@teona-ariana.ro. Adresele nu vin din formular, ci din baza de date
+după identificatorii bifați: altfel serverul asociației ar trimite la orice
+adresă scrisă de mână. E-mailul e simplu, fără bandă și butoane: ziaristul
+vrea textul. Copierea adreselor pentru Gmail rămâne, strânsă dedesubt.
+Pagina ține și forma unui comunicat pe care o redacție îl publică (titlu,
+primul paragraf care spune tot, citat cu nume, contact) și amintește de
+acordul părinților pentru pozele cu copii.
 
 ### Calendarul de publicare
 
