@@ -9,6 +9,7 @@ import {
   schimbaSponsor,
   schimbaStareaSponsorului,
 } from "@/lib/sponsori";
+import { pareSvg, potrivesteSigla } from "@/lib/sigla-potrivita";
 
 /**
  * Siglele sponsorilor: adăugate, schimbate, scoase, mutate.
@@ -86,9 +87,15 @@ export async function POST(cerere: Request) {
     Se verifică octeții, nu extensia: un fișier oarecare redenumit în .png ar
     ajunge pe prima pagină ca o imagine ruptă, lângă sigle adevărate.
   */
-  if (!pareImagine(fisier.type, octeti)) return gata(cerere, "imagine");
+  if (!pareImagine(fisier.type, octeti) && !pareSvg(fisier.type, octeti)) {
+    return gata(cerere, "imagine");
+  }
 
-  const urcata = await urcaPoza(octeti, fisier.type, "sigle").catch(() => null);
+  // Oricum vine — cu margini, în SVG, albă pe transparent —, iese potrivită.
+  const sigla = await potrivesteSigla(octeti, fisier.type).catch(() => null);
+  if (!sigla) return gata(cerere, "imagine");
+
+  const urcata = await urcaPoza(sigla.octeti, sigla.tip, "sigle").catch(() => null);
   if (!urcata) return gata(cerere, "depozit");
 
   const facut = await faceSponsor({

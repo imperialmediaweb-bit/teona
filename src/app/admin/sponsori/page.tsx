@@ -42,7 +42,7 @@ const STARI: Record<string, { text: string; bun: boolean }> = {
     bun: false,
   },
   poza: { text: "Alege fișierul siglei.", bun: false },
-  imagine: { text: "Fișierul nu e o imagine.", bun: false },
+  imagine: { text: "Fișierul nu e o imagine. Merg PNG, JPG, WebP și SVG.", bun: false },
   mare: { text: "Fișierul e prea mare.", bun: false },
   depozit: {
     text: "Locul pozelor nu e pornit. Cere-i dezvoltatorului.",
@@ -146,8 +146,10 @@ async function Continut({
             ↓.
           </li>
           <li>
-            Cel mai bine arată o siglă pe <strong>fundal transparent</strong>
-            (PNG) sau pe alb, lată, nu înaltă. Se așază singură în căsuța ei.
+            Urc-o <strong>cum o ai</strong>: PNG, JPG, WebP sau SVG. Marginile
+            goale se taie singure, mărimea se potrivește singură, iar o siglă
+            albă pe fundal transparent se pune singură pe o plăcuță închisă, ca
+            să se vadă.
           </li>
           <li>
             Nimic nu se șterge: „Scoate de pe site” o ascunde, iar dacă firma
@@ -155,6 +157,72 @@ async function Continut({
           </li>
         </ul>
       </div>
+
+      <section className="mb-12">
+        <h2 className="font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
+          Adaugă o siglă
+        </h2>
+
+        {!poze ? (
+          <p className="mt-4 max-w-2xl colt-mic-a border border-caramiziu-200 bg-caramiziu-50 px-5 py-4 text-mic text-caramiziu-900">
+            Locul în care se păstrează pozele nu e pornit, deci nu se poate urca
+            nimic acum. Cere-i dezvoltatorului.
+          </p>
+        ) : (
+          <form
+            method="post"
+            action="/api/admin/sponsori"
+            encType="multipart/form-data"
+            className="mt-4 grid max-w-3xl gap-3 colt-a border border-hartie-umbra bg-hartie p-5"
+          >
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="grid gap-1.5">
+                <span className="font-titlu text-mic font-bold text-cerneala">
+                  Numele firmei
+                </span>
+                <input
+                  name="nume"
+                  required
+                  maxLength={120}
+                  placeholder="EGGER"
+                  className={camp}
+                />
+              </label>
+              <label className="grid gap-1.5">
+                <span className="font-titlu text-mic font-bold text-cerneala">
+                  Site-ul firmei
+                </span>
+                <input
+                  name="adresa"
+                  maxLength={200}
+                  placeholder="https://"
+                  className={camp}
+                />
+              </label>
+            </div>
+            <label className="grid gap-1.5">
+              <span className="font-titlu text-mic font-bold text-cerneala">
+                Sigla
+              </span>
+              <input
+                type="file"
+                name="poza"
+                accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                required
+                className="colt-mic-a border-2 border-hartie-umbra bg-hartie px-3 py-2 text-mic file:mr-3 file:border-0 file:bg-transparent file:font-titlu file:font-bold file:text-caramiziu-700"
+              />
+            </label>
+            <div>
+              <button
+                type="submit"
+                className="colt-mic-a bg-caramiziu-700 px-6 py-3 font-titlu font-bold text-hartie transition-colors hover:bg-caramiziu-800"
+              >
+                Adaugă
+              </button>
+            </div>
+          </form>
+        )}
+      </section>
 
       <section>
         <h2 className="font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
@@ -270,72 +338,6 @@ async function Continut({
             </li>
           ))}
         </ul>
-      </section>
-
-      <section className="mt-12">
-        <h2 className="font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
-          Adaugă o siglă
-        </h2>
-
-        {!poze ? (
-          <p className="mt-4 max-w-2xl colt-mic-a border border-caramiziu-200 bg-caramiziu-50 px-5 py-4 text-mic text-caramiziu-900">
-            Locul în care se păstrează pozele nu e pornit, deci nu se poate urca
-            nimic acum. Cere-i dezvoltatorului.
-          </p>
-        ) : (
-          <form
-            method="post"
-            action="/api/admin/sponsori"
-            encType="multipart/form-data"
-            className="mt-4 grid max-w-3xl gap-3 colt-a border border-hartie-umbra bg-hartie p-5"
-          >
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="grid gap-1.5">
-                <span className="font-titlu text-mic font-bold text-cerneala">
-                  Numele firmei
-                </span>
-                <input
-                  name="nume"
-                  required
-                  maxLength={120}
-                  placeholder="EGGER"
-                  className={camp}
-                />
-              </label>
-              <label className="grid gap-1.5">
-                <span className="font-titlu text-mic font-bold text-cerneala">
-                  Site-ul firmei
-                </span>
-                <input
-                  name="adresa"
-                  maxLength={200}
-                  placeholder="https://"
-                  className={camp}
-                />
-              </label>
-            </div>
-            <label className="grid gap-1.5">
-              <span className="font-titlu text-mic font-bold text-cerneala">
-                Sigla
-              </span>
-              <input
-                type="file"
-                name="poza"
-                accept="image/*"
-                required
-                className="colt-mic-a border-2 border-hartie-umbra bg-hartie px-3 py-2 text-mic file:mr-3 file:border-0 file:bg-transparent file:font-titlu file:font-bold file:text-caramiziu-700"
-              />
-            </label>
-            <div>
-              <button
-                type="submit"
-                className="colt-mic-a bg-caramiziu-700 px-6 py-3 font-titlu font-bold text-hartie transition-colors hover:bg-caramiziu-800"
-              >
-                Adaugă
-              </button>
-            </div>
-          </form>
-        )}
       </section>
     </Cadru>
   );
