@@ -3,7 +3,7 @@ import { email as emailValid } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { ASOCIATIA, EMAIL } from "@/date/asociatie";
 import { pozaPentruEmail } from "@/lib/cloudinary-listare";
-import { creeazaCiorna } from "@/lib/email/mailerlite";
+import { creeazaCiorna, trimiteCampania } from "@/lib/email/mailerlite";
 import { areEmail, trimiteEmail } from "@/lib/email/trimite";
 import {
   POZA_MAXIM,
@@ -220,7 +220,7 @@ export async function POST(cerere: Request) {
     return inapoi(cerere, { facut: trimis ? "proba" : "proba-nu", fel });
   }
 
-  if (fac === "ciorna") {
+  if (fac === "ciorna" || fac === "trimite") {
     const grupuri = formular
       .getAll("grup")
       .map((g) => String(g))
@@ -244,9 +244,24 @@ export async function POST(cerere: Request) {
       textSimplu: textSimpluCampanie(fel, continut),
     });
 
-    return raspunsul.ok
-      ? inapoi(cerere, { facut: "ciorna", fel })
-      : inapoi(cerere, { ratat: "mailerlite", mesaj: raspunsul.mesaj, fel });
+    if (!raspunsul.ok)
+      return inapoi(cerere, { ratat: "mailerlite", mesaj: raspunsul.mesaj, fel });
+    if (fac === "ciorna") return inapoi(cerere, { facut: "ciorna", fel });
+
+    /*
+      Trimiterea: ciorna de mai sus, apoi „trimite acum". Două condiții, și
+      amândouă se verifică aici, nu doar în pagină: o listă aleasă (fără ea,
+      MailerLite n-are cui) și bifa de confirmare. Lângă fiecare listă scrie
+      câți abonați are, citit din MailerLite la deschiderea paginii.
+    */
+    if (!grupuri.length) return inapoi(cerere, { ratat: "fara-lista", fel });
+    if (formular.get("confirm") !== "da")
+      return inapoi(cerere, { ratat: "neconfirmat", fel });
+
+    const plecat = await trimiteCampania(raspunsul.id);
+    return plecat.ok
+      ? inapoi(cerere, { facut: "trimisa", fel })
+      : inapoi(cerere, { ratat: "mailerlite", mesaj: plecat.mesaj, fel });
   }
 
   return raspuns("Nu știu ce să fac.", 400);

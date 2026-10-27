@@ -3,14 +3,15 @@ import { construieste, textSimplu, type ContinutEmail } from "./sablon";
 /**
  * Campaniile de e-mail, prin MailerLite.
  *
- * Panoul compune mesajul și îl trimite aici ca **ciornă**. Nu îl expediază.
+ * Panoul compune mesajul și îl duce aici: ca **ciornă**, sau, din octombrie
+ * 2026, **trimis** de-a dreptul, cerut de asociație („să nu mai intru prin
+ * MailerLite"). Trimiterea pleacă tot de pe serverele MailerLite — livrarea,
+ * dezabonarea și statisticile rămân ale lor —, panoul doar apasă butonul.
  *
- * Motivul nu e tehnic — endpointul de trimitere există și e o linie în plus.
  * Un e-mail plecat spre toată lista nu se mai poate opri, nu se mai poate
- * corecta și nu se mai poate retrage. Un om trebuie să-l vadă în MailerLite,
- * să dea o trimitere de probă către el însuși și abia apoi să apese. Pentru o
- * asociație de copii, un mesaj greșit plecat la mii de oameni costă mai mult
- * decât cele două minute economisite.
+ * corecta și nu se mai poate retrage. De aceea trimiterea cere o listă aleasă
+ * (fără ea, MailerLite n-ar ști cui) și o bifă de confirmare care scrie
+ * câți oameni o primesc — numărul citit chiar atunci din MailerLite.
  *
  * Două lucruri de știut despre MailerLite, aflate pe pielea noastră:
  *
@@ -96,8 +97,49 @@ export async function creeazaCiorna(date: {
   return { ok: true, id: String(id) };
 }
 
-/** Grupurile din cont, pentru lista de ales în panou. */
-export async function grupuri(): Promise<Array<{ id: string; nume: string }>> {
+/**
+ * Pornește trimiterea unei campanii deja create, acum.
+ *
+ * MailerLite o pune în coadă și o expediază de pe serverele lor. Răspunsul
+ * bun înseamnă „a intrat în coadă", nu „a ajuns la toți": asta se vede în
+ * MailerLite, la statistici.
+ */
+export async function trimiteCampania(id: string): Promise<Raspuns> {
+  const cheie = process.env.MAILERLITE_API_KEY;
+  if (!cheie) return { ok: false, mesaj: "Cheia MailerLite lipsește." };
+  const raspuns = await fetch(
+    `${BAZA}/campaigns/${encodeURIComponent(id)}/schedule`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${cheie}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({ delivery: "instant" }),
+    },
+  );
+  if (raspuns.ok) return { ok: true, id };
+  const corp = (await raspuns.json().catch(() => ({}))) as {
+    message?: string;
+    errors?: Record<string, string[]>;
+  };
+  const prima = corp.errors ? Object.entries(corp.errors)[0] : undefined;
+  return {
+    ok: false,
+    mesaj:
+      (prima ? `${prima[0]}: ${prima[1][0]}` : corp.message) ??
+      `MailerLite a răspuns ${raspuns.status}.`,
+  };
+}
+
+/**
+ * Grupurile din cont, pentru lista de ales în panou, cu câți abonați activi
+ * are fiecare — numărul pe care îl scrie confirmarea de trimitere.
+ */
+export async function grupuri(): Promise<
+  Array<{ id: string; nume: string; activi: number }>
+> {
   const cheie = process.env.MAILERLITE_API_KEY;
   if (!cheie) return [];
 
@@ -107,9 +149,13 @@ export async function grupuri(): Promise<Array<{ id: string; nume: string }>> {
   if (!raspuns.ok) return [];
 
   const corp = (await raspuns.json().catch(() => ({}))) as {
-    data?: Array<{ id?: string | number; name?: string }>;
+    data?: Array<{ id?: string | number; name?: string; active_count?: number }>;
   };
   return (corp.data ?? [])
     .filter((g) => g.id && g.name)
-    .map((g) => ({ id: String(g.id), nume: String(g.name) }));
+    .map((g) => ({
+      id: String(g.id),
+      nume: String(g.name),
+      activi: Number(g.active_count ?? 0),
+    }));
 }

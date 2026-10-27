@@ -48,7 +48,9 @@ const RATAT: Record<string, string> = {
   adresa: "Adresa de e-mail pentru probă nu e scrisă corect.",
   "fara-resend":
     "Lipsește RESEND_API_KEY din Railway, deci proba nu poate pleca. Descarcă HTML-ul și încarcă-l direct în MailerLite.",
-  mailerlite: "MailerLite n-a primit ciorna.",
+  mailerlite: "MailerLite n-a primit campania.",
+  "fara-lista": "Alege cel puțin o listă din MailerLite, altfel campania n-are cui să plece.",
+  neconfirmat: "Bifează confirmarea de sub buton. Fără ea nu pleacă nimic.",
   fel: "Alege pentru cine e e-mailul.",
   "poza-mare":
     "Fotografia e prea mare. Alege una mai mică de 6 MB sau micșoreaz-o întâi.",
@@ -65,6 +67,8 @@ const FACUT: Record<string, string> = {
   "proba-nu": "Proba n-a putut pleca. Verifică adresa și cheia Resend.",
   ciorna:
     "Ciorna e în MailerLite. Deschide-o acolo, trimite-ți o probă de la ei și abia apoi apasă pe trimitere.",
+  trimisa:
+    "Campania a plecat. O trimite MailerLite, de pe serverele lor; cine a deschis-o și cine a apăsat se vede acolo, la statistici.",
 };
 
 export default function PaginaSabloane({
@@ -409,8 +413,8 @@ async function Continut({
           <div className="grid gap-3 colt-a border border-hartie-umbra bg-hartie p-5">
             <Eticheta
               htmlFor="subiect"
-              copii="Du-l în MailerLite, ca ciornă"
-              nota="Nu se trimite nimic. Ciorna se deschide acolo și se trimite de acolo."
+              copii="Trimite-l prin MailerLite"
+              nota="Pleacă de pe serverele MailerLite, la lista aleasă. Sau fă doar ciorna și trimite-o de acolo."
             />
             <input
               id="subiect"
@@ -434,9 +438,24 @@ async function Continut({
                       type="checkbox"
                       name="grup"
                       value={g.id}
+                      /*
+                        Lista potrivită șablonului vine bifată: firmele pentru
+                        șablonul de firme, persoanele pentru celălalt. Un
+                        e-mail către firme plecat la persoane fizice (sau
+                        invers) e greșeala cea mai ușor de făcut aici.
+                      */
+                      defaultChecked={
+                        g.id ===
+                        (ales === "firme"
+                          ? process.env.MAILERLITE_GROUP_FIRME
+                          : process.env.MAILERLITE_GROUP_ID)
+                      }
                       className="size-4 accent-caramiziu-700"
                     />
                     {g.nume}
+                    <span className="text-cerneala-slab tabular-nums">
+                      · {g.activi.toLocaleString("ro-RO")} abonați
+                    </span>
                   </label>
                 ))}
               </fieldset>
@@ -454,10 +473,39 @@ async function Continut({
                 value="ciorna"
                 formTarget="_self"
                 disabled={!areCampanii()}
-                className="rounded-full bg-caramiziu-700 px-5 py-2.5 font-titlu text-mic font-bold text-hartie transition-colors hover:bg-caramiziu-800 disabled:cursor-not-allowed disabled:bg-cerneala-slab"
+                className="rounded-full border-2 border-cerneala/15 px-5 py-2 font-titlu text-mic font-bold text-cerneala transition-colors hover:border-caramiziu-400 disabled:cursor-not-allowed disabled:text-cerneala-slab"
               >
-                Fă ciorna în MailerLite
+                Fă doar ciorna
               </button>
+            </div>
+            {/*
+              Trimiterea, despărțită de ciornă printr-o linie și o bifă. Bifa
+              e verificată și pe server: fără ea nu pleacă nimic, oricum ar
+              fi trimis formularul.
+            */}
+            <div className="mt-2 grid gap-3 border-t border-hartie-umbra pt-4">
+              <label className="flex items-start gap-2.5 text-mic text-cerneala">
+                <input
+                  type="checkbox"
+                  name="confirm"
+                  value="da"
+                  className="mt-0.5 size-4 shrink-0 accent-caramiziu-700"
+                />
+                Mi-am trimis proba și am citit-o. Știu că mesajul pleacă acum la
+                toți abonații listelor bifate și nu se mai poate opri.
+              </label>
+              <div>
+                <button
+                  type="submit"
+                  name="fac"
+                  value="trimite"
+                  formTarget="_self"
+                  disabled={!areCampanii() || liste.length === 0}
+                  className="rounded-full bg-caramiziu-700 px-5 py-2.5 font-titlu text-mic font-bold text-hartie transition-colors hover:bg-caramiziu-800 disabled:cursor-not-allowed disabled:bg-cerneala-slab"
+                >
+                  Trimite campania acum
+                </button>
+              </div>
             </div>
           </div>
         </form>

@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
@@ -39,9 +40,20 @@ export async function POST(cerere: Request) {
     });
     if (prea) return prea;
 
-    const r = await scaneaza();
-    if (r.eroare) return gata(cerere, `eroare:${r.eroare.slice(0, 120)}`);
-    return gata(cerere, `gata:${r.gasite}:${r.noi}:${r.aruncate}`);
+    /*
+      Scanarea rulează după ce răspunsul a plecat, nu în timpul lui.
+
+      Ia câteva minute — zeci de căutări, cu reluări la `pause_turn`. Ținută
+      în cerere, conexiunea se închidea înainte (proxy-ul Railway răspundea
+      502), iar scanarea murea odată cu ea, fără să lase vreun rând în
+      `radar_scanari`: omul apăsa, aștepta, primea o pagină de eroare și nu
+      rămânea nicio urmă. Acum butonul răspunde pe loc, iar rezultatul — sau
+      eroarea — se scrie în tabel când e gata și se vede la „Ultimele scanări".
+    */
+    after(async () => {
+      await scaneaza().catch(() => undefined);
+    });
+    return gata(cerere, "pornit");
   }
 
   const id = String(formular.get("id") ?? "").trim();

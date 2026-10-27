@@ -69,6 +69,11 @@ function mesajul(stare: string | undefined): { text: string; bun?: boolean } | n
       bun: true,
     };
   }
+  if (fel === "pornit")
+    return {
+      text: "Scanarea a pornit. Durează câteva minute; reîncarcă pagina și rezultatul apare la „Ultimele scanări”.",
+      bun: true,
+    };
   if (fel === "eroare") return { text: `Scanarea n-a mers: ${restul.join(":")}` };
   if (fel === "urmarit") return { text: "Pista a trecut la urmărite.", bun: true };
   if (fel === "respins") return { text: "Pista a fost respinsă.", bun: true };

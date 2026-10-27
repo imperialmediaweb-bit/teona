@@ -256,14 +256,15 @@ async function Continut({
         </div>
         {ciorne.length === 0 ? (
           <p className="max-w-2xl text-amplu text-cerneala-moale">
-            Nicio ciornă. Se scriu la{" "}
+            Nicio ciornă încă. Scrie textul la{" "}
             <Link
               href="/admin/scrie"
               className="font-titlu font-semibold text-caramiziu-700 underline underline-offset-2"
             >
               Scrie pe site
-            </Link>
-            .
+            </Link>{" "}
+            și salvează-l ca ciornă, fără să-l publici. Apare aici, cu ziua de
+            ales și butonul „Pune în calendar”.
           </p>
         ) : (
           <ul className="grid gap-3">

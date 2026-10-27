@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { limitaDeRata, raspuns } from "@/lib/api";
 import { egale } from "@/lib/comparatie";
 import { areBazaDeDate } from "@/lib/baza";
@@ -53,18 +54,17 @@ export async function POST(cerere: Request) {
 
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
 
-  const r = await scaneaza();
   /*
-    Răspunsul spune ce s-a întâmplat, ca să se vadă în jurnalul serviciului de
-    cron fără să intre nimeni în panou. O scanare cu eroare întoarce 502: altfel
-    cron-ul ar raporta succes săptămâni la rând peste un radar mort.
+    Scanarea rulează după răspuns, ca la butonul din panou: ținută în cerere,
+    proxy-ul Railway închidea conexiunea înainte să termine (502), și scanarea
+    murea fără urmă. Rezultatul, cu eroarea lui dacă are, se scrie în
+    `radar_scanari` și se vede în panou; panoul spune și când ultima scanare e
+    mai veche de 10 zile, deci un radar mort tot nu trece neobservat.
   */
-  return raspuns(
-    r.eroare
-      ? `Scanare cu probleme: ${r.eroare}`
-      : `Am găsit ${r.gasite}, din care ${r.noi} noi.`,
-    r.eroare ? 502 : 200,
-  );
+  after(async () => {
+    await scaneaza().catch(() => undefined);
+  });
+  return raspuns("Scanarea a pornit.", 202);
 }
 
 export const GET = () => raspuns("Metodă nepermisă.", 405);
