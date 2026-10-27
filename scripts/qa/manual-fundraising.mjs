@@ -21,7 +21,10 @@ const jurnal = async () => (await (await fetch(`${M}/__jurnal`)).json());
 const golesteJurnal = () => fetch(`${M}/__goleste`);
 const peste = (t, re) => re.test(t);
 
-const b = await chromium.launch({ args: ["--no-sandbox"] });
+const b = await chromium.launch({
+  args: ["--no-sandbox"],
+  ...(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {}),
+});
 const ctx = await b.newContext({ viewport: { width: 1280, height: 900 }, acceptDownloads: true, extraHTTPHeaders: { "x-forwarded-for": IP } });
 const p = await ctx.newPage();
 const erori = [];
