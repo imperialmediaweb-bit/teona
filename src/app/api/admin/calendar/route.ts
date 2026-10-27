@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
+import { limitaDeRata, nuTrece, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { planificaText } from "@/lib/texte";
@@ -16,16 +16,16 @@ export async function POST(cerere: Request) {
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
 
   const formular = await cerere.formData().catch(() => null);
-  if (!formular) return raspuns("Cerere invalidă.", 400);
+  if (!formular) return nuTrece("Cerere invalidă.");
 
   const id = String(formular.get("id") ?? "");
-  if (!/^[0-9a-f-]{36}$/i.test(id)) return raspuns("Text necunoscut.", 400);
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return nuTrece("Text necunoscut.");
 
   const zi = String(formular.get("zi") ?? "").trim();
   // Ziua goală scoate planificarea. Orice altceva trebuie să fie o zi scrisă
   // cum o scrie browserul: `2026-11-03`.
   if (zi && !/^\d{4}-\d{2}-\d{2}$/.test(zi)) {
-    return raspuns("Ziua nu e scrisă corect.", 400);
+    return nuTrece("Ziua nu e scrisă corect.");
   }
 
   await planificaText(id, zi || null);

@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
+import { limitaDeRata, nuTrece, text, trimiteLa } from "@/lib/api";
 import { arePermisiune, numeleConectat } from "@/lib/admin";
 import { esteFelInteractiune, scrieInteractiune } from "@/lib/crm";
 
@@ -27,31 +27,31 @@ export async function POST(cerere: Request) {
   if (prea) return prea;
 
   const formular = await cerere.formData().catch(() => null);
-  if (!formular) return raspuns("Cerere invalidă.", 400);
+  if (!formular) return nuTrece("Cerere invalidă.");
 
   const cerut = String(formular.get("inapoi") ?? "");
   const potrivit = INAPOI.exec(cerut);
   // Fără o cale cunoscută nu știm nici unde se întoarce omul, nici ce drept
   // să cerem. Mai bine un refuz decât un drept ghicit.
-  if (!potrivit) return raspuns("Cerere invalidă.", 400);
+  if (!potrivit) return nuTrece("Cerere invalidă.");
   const inapoi = cerut;
 
   if (!(await arePermisiune(`/admin/${potrivit[1]}`))) {
-    return raspuns("Nu ai acces.", 403);
+    return nuTrece("Nu ai acces.", 403);
   }
 
   const fel = formular.get("fel");
-  if (!esteFelInteractiune(fel)) return raspuns("Fel necunoscut.", 400);
+  if (!esteFelInteractiune(fel)) return nuTrece("Fel necunoscut.");
 
   const rezumat = text(formular.get("rezumat"), 2_000);
-  if (!rezumat) return raspuns("Scrie ce s-a vorbit.", 400);
+  if (!rezumat) return nuTrece("Scrie ce s-a vorbit.");
 
   const email = String(formular.get("email") ?? "").trim() || undefined;
   const firmaId = String(formular.get("firma_id") ?? "").trim() || undefined;
   if (firmaId && !/^[0-9a-f-]{36}$/i.test(firmaId)) {
-    return raspuns("Firmă necunoscută.", 400);
+    return nuTrece("Firmă necunoscută.");
   }
-  if (!email && !firmaId) return raspuns("Cerere invalidă.", 400);
+  if (!email && !firmaId) return nuTrece("Cerere invalidă.");
 
   /*
     Cine a scris rândul.
@@ -69,7 +69,7 @@ export async function POST(cerere: Request) {
     rezumat,
     scrisDe: (await numeleConectat()) ?? undefined,
   });
-  if (!scris) return raspuns("Nu am putut salva.", 502);
+  if (!scris) return nuTrece("Nu am putut salva.", 502);
 
   const cheie = firmaId ?? email ?? "";
   const separator = inapoi.includes("?") ? "&" : "?";

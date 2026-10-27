@@ -205,6 +205,7 @@ async function Continut({
           <input
             name="titlu"
             required
+            minLength={3}
             maxLength={200}
             defaultValue={text?.titlu ?? titluCerut ?? ""}
             className={camp}
@@ -239,6 +240,7 @@ async function Continut({
           <textarea
             name="continut"
             required
+            minLength={20}
             rows={16}
             defaultValue={text?.continut ?? ""}
             className={`${camp} resize-y font-mono text-mic`}

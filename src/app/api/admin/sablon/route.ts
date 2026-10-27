@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns, text as curataText, trimiteLa } from "@/lib/api";
+import { limitaDeRata, nuTrece, raspuns, text as curataText, trimiteLa } from "@/lib/api";
 import { email as emailValid } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { ASOCIATIA, EMAIL } from "@/date/asociatie";
@@ -161,7 +161,7 @@ export async function POST(cerere: Request) {
   if (!(await arePermisiune("/admin/sabloane"))) return raspuns("Nu ai acces.", 403);
 
   const formular = await cerere.formData().catch(() => null);
-  if (!formular) return raspuns("Cerere invalidă.", 400);
+  if (!formular) return nuTrece("Cerere invalidă.");
 
   const felCerut = String(formular.get("fel") ?? "");
   const felSigur = esteFelSablon(felCerut) ? felCerut : "persoane";
@@ -264,5 +264,5 @@ export async function POST(cerere: Request) {
       : inapoi(cerere, { ratat: "mailerlite", mesaj: plecat.mesaj, fel });
   }
 
-  return raspuns("Nu știu ce să fac.", 400);
+  return nuTrece("Nu știu ce să fac.");
 }

@@ -61,6 +61,31 @@ export function trimiteLa(unde: string | URL, status = 303): NextResponse {
   });
 }
 
+/**
+ * Răspunsul unui formular din panou care nu trece: o pagină cu mesajul și un
+ * buton „Înapoi”, nu un JSON.
+ *
+ * Formularele din panou se trimit ca formulare obișnuite, deci ce răspunde
+ * ruta e exact ce vede omul. Până în octombrie 2026, un text prea scurt sau o
+ * poză prea mare duceau la o pagină albă cu `{"mesaj":"…"}` — asociația a
+ * raportat-o ca „a trimis și nu merge”. Butonul face `history.back()`:
+ * browserul întoarce formularul cu tot ce era scris în el, deci nu se pierde
+ * nimic. `raspuns()` rămâne pentru rutele chemate din cod, nu din formulare.
+ */
+export function nuTrece(mesaj: string, status = 400) {
+  const sigur = mesaj.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
+  return new Response(
+    `<!doctype html><html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nu s-a salvat</title></head><body style="font-family:system-ui,sans-serif;background:#f9f5f2;color:#232323;margin:0;padding:48px 20px"><main style="max-width:560px;margin:auto;background:#fff;border-radius:16px;padding:28px;border-top:6px solid #f74f22"><h1 style="margin:0 0 12px;font-size:22px">Nu s-a salvat încă</h1><p style="font-size:17px;line-height:1.5;margin:0 0 24px">${sigur}</p><a href="javascript:history.back()" style="display:inline-block;background:#b82b09;color:#fff;text-decoration:none;font-weight:700;padding:12px 22px;border-radius:999px">Înapoi</a><p style="font-size:14px;color:#666;margin:18px 0 0">Ce ai completat e tot acolo.</p></main></body></html>`,
+    {
+      status,
+      headers: {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "no-store",
+      },
+    },
+  );
+}
+
 export function raspuns(mesaj: string, status: number, antete?: HeadersInit) {
   return NextResponse.json(
     { mesaj },

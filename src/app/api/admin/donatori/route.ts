@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
+import { limitaDeRata, nuTrece, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { scrieNotita, uitaDonatorul } from "@/lib/plati/donatori";
 
@@ -14,18 +14,18 @@ export async function POST(cerere: Request) {
   if (!(await arePermisiune("/admin/donatori"))) return raspuns("Nu ai acces.", 403);
 
   const formular = await cerere.formData().catch(() => null);
-  if (!formular) return raspuns("Cerere invalidă.", 400);
+  if (!formular) return nuTrece("Cerere invalidă.");
 
   const email = String(formular.get("email") ?? "").trim();
   const fapta = String(formular.get("fapta") ?? "");
-  if (!email) return raspuns("Lipsește adresa.", 400);
+  if (!email) return nuTrece("Lipsește adresa.");
 
   if (fapta === "uita") {
     await uitaDonatorul(email);
   } else if (fapta === "notita") {
     await scrieNotita(email, String(formular.get("text") ?? "").slice(0, 2000));
   } else {
-    return raspuns("Acțiune necunoscută.", 400);
+    return nuTrece("Acțiune necunoscută.");
   }
 
   return trimiteLa("/admin/donatori");

@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
+import { limitaDeRata, nuTrece, raspuns, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import {
@@ -21,14 +21,14 @@ export async function POST(cerere: Request) {
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
 
   const formular = await cerere.formData().catch(() => null);
-  if (!formular) return raspuns("Cerere invalidă.", 400);
+  if (!formular) return nuTrece("Cerere invalidă.");
 
   const camp = (nume: string) => text(formular.get(nume), 300);
   const ce = String(formular.get("ce") ?? "");
   const id = String(formular.get("id") ?? "");
 
   if (ce === "sterge") {
-    if (!/^[0-9a-f-]{36}$/i.test(id)) return raspuns("Contact necunoscut.", 400);
+    if (!/^[0-9a-f-]{36}$/i.test(id)) return nuTrece("Contact necunoscut.");
     await stergeContactPresa(id);
     return inapoi(cerere);
   }
@@ -48,7 +48,7 @@ export async function POST(cerere: Request) {
   };
 
   if (ce === "schimba") {
-    if (!/^[0-9a-f-]{36}$/i.test(id)) return raspuns("Contact necunoscut.", 400);
+    if (!/^[0-9a-f-]{36}$/i.test(id)) return nuTrece("Contact necunoscut.");
     await schimbaContactPresa(id, {
       ...date,
       activ: formular.get("activ") === "da",

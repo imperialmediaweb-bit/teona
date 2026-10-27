@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
+import { limitaDeRata, nuTrece, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import {
   esteFelCerere,
@@ -25,7 +25,7 @@ export async function POST(cerere: Request) {
   if (!(await arePermisiune("/admin/cereri"))) return raspuns("Nu ai acces.", 403);
 
   const formular = await cerere.formData().catch(() => null);
-  if (!formular) return raspuns("Cerere invalidă.", 400);
+  if (!formular) return nuTrece("Cerere invalidă.");
 
   const camp = (nume: string) => String(formular.get(nume) ?? "").trim();
 
@@ -42,13 +42,13 @@ export async function POST(cerere: Request) {
   */
   if (camp("actiune") === "adauga") {
     const nume = camp("nume");
-    if (nume.length < 2) return raspuns("Scrie numele.", 400);
+    if (nume.length < 2) return nuTrece("Scrie numele.");
     if (!camp("email") && !camp("telefon")) {
-      return raspuns("Scrie măcar un telefon sau un e-mail.", 400);
+      return nuTrece("Scrie măcar un telefon sau un e-mail.");
     }
 
     const felNou = camp("fel");
-    if (!esteFelCerere(felNou)) return raspuns("Fel necunoscut.", 400);
+    if (!esteFelCerere(felNou)) return nuTrece("Fel necunoscut.");
 
     const ani = camp("ani");
     const deUnde = camp("deUnde");
@@ -71,10 +71,10 @@ export async function POST(cerere: Request) {
   }
 
   const id = String(formular.get("id") ?? "");
-  if (!/^[0-9a-f-]{36}$/i.test(id)) return raspuns("Cerere necunoscută.", 400);
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return nuTrece("Cerere necunoscută.");
 
   const stadiu = formular.get("stadiu");
-  if (!esteStadiuCerere(stadiu)) return raspuns("Stadiu necunoscut.", 400);
+  if (!esteStadiuCerere(stadiu)) return nuTrece("Stadiu necunoscut.");
 
   await schimbaStadiulCererii(id, stadiu);
 

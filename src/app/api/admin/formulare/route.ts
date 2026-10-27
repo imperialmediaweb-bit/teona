@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
+import { limitaDeRata, nuTrece, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areR2, urcaInR2 } from "@/lib/r2";
 import { CHEIE_FORMULAR } from "@/lib/documente";
@@ -24,7 +24,7 @@ export async function POST(cerere: Request) {
   if (!(await arePermisiune("/admin/formulare"))) return raspuns("Nu ai acces.", 403);
 
   const formular = await cerere.formData().catch(() => null);
-  if (!formular) return raspuns("Cerere invalidă.", 400);
+  if (!formular) return nuTrece("Cerere invalidă.");
 
   const camp = (nume: string) => String(formular.get(nume) ?? "").trim();
   const actiune = camp("actiune");
@@ -32,10 +32,10 @@ export async function POST(cerere: Request) {
   if (actiune === "urca-gol") {
     const fisier = formular.get("fisier");
     if (!(fisier instanceof File) || fisier.size === 0) {
-      return raspuns("Alege fișierul PDF al formularului.", 400);
+      return nuTrece("Alege fișierul PDF al formularului.");
     }
     if (fisier.size > 10 * 1024 * 1024) {
-      return raspuns("Fișierul e prea mare.", 400);
+      return nuTrece("Fișierul e prea mare.");
     }
     const octeti = new Uint8Array(await fisier.arrayBuffer());
     const estePdf =
@@ -43,15 +43,15 @@ export async function POST(cerere: Request) {
       octeti[1] === 0x50 &&
       octeti[2] === 0x44 &&
       octeti[3] === 0x46;
-    if (!estePdf) return raspuns("Fișierul nu e un PDF.", 400);
-    if (!areR2()) return raspuns("Depozitul de fișiere nu e configurat.", 503);
+    if (!estePdf) return nuTrece("Fișierul nu e un PDF.");
+    if (!areR2()) return nuTrece("Depozitul de fișiere nu e configurat.", 503);
 
     const urcat = await urcaInR2(CHEIE_FORMULAR, octeti, "application/pdf");
-    if (!urcat) return raspuns("N-am putut urca fișierul.", 502);
+    if (!urcat) return nuTrece("N-am putut urca fișierul.", 502);
     return inapoi(cerere, "urcat");
   }
 
-  return raspuns("Acțiune necunoscută.", 400);
+  return nuTrece("Acțiune necunoscută.");
 }
 
 function inapoi(cerere: Request, ce: string) {

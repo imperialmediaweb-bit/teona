@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns } from "@/lib/api";
+import { limitaDeRata, nuTrece, raspuns } from "@/lib/api";
 import { arePermisiune, numeleConectat } from "@/lib/admin";
 import {
   firma as iaFirma,
@@ -34,14 +34,14 @@ export async function POST(cerere: Request) {
   if (!(await arePermisiune("/admin/firme"))) return raspuns("Nu ai acces.", 403);
 
   const formular = await cerere.formData().catch(() => null);
-  if (!formular) return raspuns("Cerere invalidă.", 400);
+  if (!formular) return nuTrece("Cerere invalidă.");
 
   const camp = (nume: string) => String(formular.get(nume) ?? "").trim();
   const id = camp("id");
-  if (!/^[0-9a-f-]{36}$/i.test(id)) return raspuns("Firmă necunoscută.", 400);
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return nuTrece("Firmă necunoscută.");
 
   const firma = await iaFirma(id);
-  if (!firma) return raspuns("Firmă necunoscută.", 400);
+  if (!firma) return nuTrece("Firmă necunoscută.");
 
   /*
     Numărul vine din registru, nu din capul omului.
@@ -99,7 +99,7 @@ export async function POST(cerere: Request) {
   if (
     Object.values(date).some((v) => typeof v === "string" && v.length > 300)
   ) {
-    return raspuns("Un câmp e prea lung.", 400);
+    return nuTrece("Un câmp e prea lung.");
   }
 
   const pdf = await contractDeSponsorizare(date);

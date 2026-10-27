@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
+import { limitaDeRata, nuTrece, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { hotaraste } from "@/lib/campanii";
 import { campanieHotarata } from "@/lib/email/campanie";
@@ -15,14 +15,14 @@ export async function POST(cerere: Request) {
   if (!(await arePermisiune("/admin/aniversari"))) return raspuns("Nu ai acces.", 403);
 
   const formular = await cerere.formData().catch(() => null);
-  if (!formular) return raspuns("Cerere invalidă.", 400);
+  if (!formular) return nuTrece("Cerere invalidă.");
 
   const id = String(formular.get("id") ?? "");
   const hotarare = String(formular.get("hotarare") ?? "");
   if (!/^[0-9a-f-]{36}$/i.test(id))
-    return raspuns("Campanie necunoscută.", 400);
+    return nuTrece("Campanie necunoscută.");
   if (hotarare !== "publicata" && hotarare !== "respinsa") {
-    return raspuns("Hotărâre necunoscută.", 400);
+    return nuTrece("Hotărâre necunoscută.");
   }
 
   const motiv = String(formular.get("motiv") ?? "") || undefined;

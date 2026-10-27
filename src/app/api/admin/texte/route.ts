@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { ETICHETA_PROIECTE_PANOU } from "@/date/proiecte";
-import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
+import { limitaDeRata, nuTrece, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import {
   creeazaText,
@@ -35,35 +35,35 @@ export async function POST(cerere: Request) {
   if (!(await arePermisiune("/admin/scrie"))) return raspuns("Nu ai acces.", 403);
 
   const formular = await cerere.formData().catch(() => null);
-  if (!formular) return raspuns("Cerere invalidă.", 400);
+  if (!formular) return nuTrece("Cerere invalidă.");
 
   const camp = (nume: string) => String(formular.get(nume) ?? "").trim();
   const actiune = camp("actiune");
   const id = camp("id");
 
   if (actiune === "sterge") {
-    if (!/^[0-9a-f-]{36}$/i.test(id)) return raspuns("Text necunoscut.", 400);
+    if (!/^[0-9a-f-]{36}$/i.test(id)) return nuTrece("Text necunoscut.");
     const text = await textDupaId(id);
     await stergeText(id);
     return inapoi(cerere, text?.fel ?? "noutate", "sters");
   }
 
   const fel = camp("fel");
-  if (!esteFel(fel)) return raspuns("Fel necunoscut.", 400);
+  if (!esteFel(fel)) return nuTrece("Fel necunoscut.");
 
   const titlu = camp("titlu");
   if (titlu.length < 3) {
-    return raspuns("Scrie un titlu de cel puțin trei litere.", 400);
+    return nuTrece("Scrie un titlu de cel puțin trei litere.");
   }
   const continut = camp("continut");
   if (continut.length < 20) {
-    return raspuns("Scrie textul: cel puțin câteva fraze.", 400);
+    return nuTrece("Scrie textul: cel puțin câteva fraze.");
   }
   if (titlu.length > 200 || camp("rezumat").length > 400) {
-    return raspuns("Titlul sau rezumatul e prea lung.", 400);
+    return nuTrece("Titlul sau rezumatul e prea lung.");
   }
   if (continut.length > 40_000) {
-    return raspuns("Textul e prea lung.", 400);
+    return nuTrece("Textul e prea lung.");
   }
 
   /*
@@ -75,7 +75,7 @@ export async function POST(cerere: Request) {
   if (fel === "campanie" && camp("tinta")) {
     const suma = citesteSuma(camp("tinta"));
     if (suma.suma === null) {
-      return raspuns("Ținta campaniei nu pare o sumă în lei.", 400);
+      return nuTrece("Ținta campaniei nu pare o sumă în lei.");
     }
     // În bani, ca `donatii.suma_bani`: o singură unitate în toată baza de
     // date înseamnă o grijă mai puțin la fiecare comparație.
@@ -94,22 +94,19 @@ export async function POST(cerere: Request) {
   const fisier = formular.get("poza");
   if (fisier instanceof File && fisier.size > 0) {
     if (fisier.size > POZA_MAXIM) {
-      return raspuns("Poza e prea mare.", 400);
+      return nuTrece("Poza e prea mare.");
     }
     const alt = camp("poza_alt");
     if (alt.length < 5) {
-      return raspuns(
-        "Scrie ce se vede în poză. Fără descriere, poza nu există pentru cineva care nu vede.",
-        400,
-      );
+      return nuTrece("Scrie ce se vede în poză. Fără descriere, poza nu există pentru cineva care nu vede.");
     }
     const octeti = new Uint8Array(await fisier.arrayBuffer());
     if (!pareImagine(fisier.type, octeti)) {
-      return raspuns("Fișierul nu pare o fotografie (JPG, PNG sau WebP).", 400);
+      return nuTrece("Fișierul nu pare o fotografie (JPG, PNG sau WebP).");
     }
     const urcata = await urcaPoza(octeti, fisier.type, "noutati");
     if (!urcata)
-      return raspuns("Nu am putut urca poza. Încearcă din nou.", 502);
+      return nuTrece("Nu am putut urca poza. Încearcă din nou.", 502);
     poza = { ...urcata, alt };
   } else if (camp("poza_alt")) {
     // Fără fișier nou, dar cu descriere schimbată: se păstrează poza și i se
@@ -131,7 +128,7 @@ export async function POST(cerere: Request) {
   */
   const dataInceput = camp("dataInceput") || null;
   if (dataInceput && !/^\d{4}-\d{2}-\d{2}$/.test(dataInceput)) {
-    return raspuns("Data de început trebuie să fie o zi din calendar.", 400);
+    return nuTrece("Data de început trebuie să fie o zi din calendar.");
   }
 
   const categorie =

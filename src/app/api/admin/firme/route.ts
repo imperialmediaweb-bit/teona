@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
+import { limitaDeRata, nuTrece, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { esteStadiuFirma, schimbaStadiulFirmei } from "@/lib/crm";
 import { citesteSuma } from "@/lib/suma";
@@ -16,13 +16,13 @@ export async function POST(cerere: Request) {
   if (!(await arePermisiune("/admin/firme"))) return raspuns("Nu ai acces.", 403);
 
   const formular = await cerere.formData().catch(() => null);
-  if (!formular) return raspuns("Cerere invalidă.", 400);
+  if (!formular) return nuTrece("Cerere invalidă.");
 
   const id = String(formular.get("id") ?? "");
-  if (!/^[0-9a-f-]{36}$/i.test(id)) return raspuns("Firmă necunoscută.", 400);
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return nuTrece("Firmă necunoscută.");
 
   const stadiu = formular.get("stadiu");
-  if (!esteStadiuFirma(stadiu)) return raspuns("Stadiu necunoscut.", 400);
+  if (!esteStadiuFirma(stadiu)) return nuTrece("Stadiu necunoscut.");
 
   /*
     Suma e opțională: de obicei se completează abia la „bani încasați".
