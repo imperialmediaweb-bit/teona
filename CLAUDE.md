@@ -701,8 +701,13 @@ fiecare publicare, poate rula mai multe copii ale aplicației deodată — deci
 scanarea ar pleca de două ori — și un container adormit nu numără nimic.
 
 Cron-ul de pe Railway pornește un serviciu care **se încheie**; aplicația web
-nu se încheie niciodată, deci nu i se poate pune un orar. Se face un al doilea
-serviciu, mic, care cheamă o dată adresa și iese:
+nu se încheie niciodată, deci nu i se poate pune un orar. Al doilea serviciu e
+**`radar-luni`, o funcție Railway (Bun)**, cu `RADAR_SECRET` luat prin
+referință (`${{site.RADAR_SECRET}}`), care face un `fetch` și iese. Prima
+variantă a fost imaginea `curlimages/curl` cu comanda în „Start Command”: n-a
+mers niciodată — Railway îi dădea argumentele într-un fel pe care curl nu-l
+înțelegea („try 'curl --help'”) și serviciul stătea „Running” zeci de ore.
+Echivalentul ei, pentru referință:
 
 ```
 curl -fsS -X POST https://<site>/api/radar -H "x-radar: $RADAR_SECRET"
@@ -713,6 +718,11 @@ pe Railway e în UTC, nu ora României). Granularitatea minimă e 5 minute, iar
 dacă o rulare mai e în curs când vine următoarea, Railway o sare — nu le
 stivuiește. Pașii sunt scriși și pe pagină, ca la Facebook: omul care se
 întreabă „de ce n-a mai scanat nimic?" e în panou, nu în depozitul de cod.
+
+**Scanarea rulează după răspuns** (`after()` din `next/server`), atât din
+butonul din panou cât și din cron: durează minute, iar ținută în cerere era
+tăiată de proxy-ul Railway (502) fără să lase vreun rând în `radar_scanari`.
+Cron-ul primește deci 202 „a pornit”; rezultatul și eroarea se văd în panou.
 
 **Secretul nu e opțional.** Adresa cheltuiește bani la fiecare apel — cheamă un
 model și plătește căutări. Fără `RADAR_SECRET` configurat, ruta refuză de tot

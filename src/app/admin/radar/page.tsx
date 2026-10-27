@@ -328,60 +328,33 @@ function Rand({ p, nou }: { p: Pista; nou?: boolean }) {
 }
 
 /**
- * Cum se pune orarul săptămânal. Scris pe pagină, ca pașii de la Facebook.
+ * Cum lucrează radarul și de unde vin pistele — pe scurt, pentru cine îl
+ * folosește.
  *
- * Nu într-un fișier README pe care nu-l deschide nimeni: omul care se întreabă
- * „de ce n-a mai scanat nimic?" e pe pagina asta, nu în depozitul de cod.
+ * Aici stăteau pașii de configurare (variabila din Railway, serviciul de cron,
+ * comanda curl). Asociația a cerut să rămână doar ce o privește pe ea: când
+ * caută și unde. Configurarea e în CLAUDE.md, „Radarul de finanțări”.
  */
 function Orarul() {
-  const are = Boolean(process.env.RADAR_SECRET);
   return (
     <section className="mt-10">
       <div className="mb-4 border-b border-hartie-umbra pb-2">
         <h2 className="font-titlu text-amplu font-extrabold text-cerneala">
-          Cum rulează săptămânal
+          Cum funcționează
         </h2>
       </div>
-      <div className="max-w-3xl colt-a border border-hartie-umbra bg-hartie p-5 text-mic text-cerneala-moale">
+      <div className="max-w-3xl colt-a border border-hartie-umbra bg-hartie p-5 text-cerneala-moale sm:p-6">
         <p>
-          Butonul „Scanează acum” e pentru când vrei să vezi pe loc ce e nou.
-          Pentru săptămânal e nevoie de un ceas din afara aplicației: un server
-          web nu se încheie niciodată, deci nu i se poate pune un orar, iar un
-          cronometru pus în cod ar porni de două ori dacă rulează două copii ale
-          site-ului și n-ar porni deloc cât timp containerul doarme.
+          Caută singur, <strong className="text-cerneala">în fiecare luni
+          dimineață</strong>. Dacă vrei să vezi pe loc ce e nou, apeși
+          „Scanează acum”.
         </p>
-        <ol className="mt-3 grid list-decimal gap-2 pl-5">
-          <li>
-            În Railway, pune{" "}
-            <code className="rounded bg-hartie-umbra px-1.5">RADAR_SECRET</code>{" "}
-            — un șir lung, inventat.{" "}
-            {are ? (
-              <strong className="text-cerneala">E pus.</strong>
-            ) : (
-              <strong className="text-caramiziu-700">Încă nu e pus.</strong>
-            )}
-          </li>
-          <li>
-            Fă un al doilea serviciu, mic, care rulează o singură comandă și
-            iese:
-            <code className="mt-1 block overflow-x-auto rounded bg-hartie-umbra px-2 py-1.5">
-              curl -fsS -X POST https://&lt;site&gt;/api/radar -H
-              &quot;x-radar: $RADAR_SECRET&quot;
-            </code>
-          </li>
-          <li>
-            Pune-i orarul{" "}
-            <code className="rounded bg-hartie-umbra px-1.5">0 6 * * 1</code> —
-            luni la 6:00. <strong className="text-cerneala">În UTC</strong>,
-            nu ora României: cron-ul de pe Railway e în UTC, deci vara asta
-            înseamnă 9:00 la noi, iarna 8:00.
-          </li>
-        </ol>
         <p className="mt-3">
-          Dacă o scanare mai e în curs când vine ora următoare, Railway o sare —
-          nu le pune una peste alta. Iar dacă scanarea dă eroare, adresa
-          răspunde cu cod de eroare, deci se vede în jurnalul serviciului, nu
-          numai aici.
+          Pistele vin din <strong className="text-cerneala">pagini publice de
+          pe internet</strong>: fonduri europene, programe ale Guvernului,
+          Consiliul Județean și Primăria Suceava, fundații și programele de
+          sponsorizare ale firmelor. Fiecare pistă are linkul paginii din care
+          a fost luată — deschide-l înainte să te bazezi pe ea.
         </p>
       </div>
     </section>
