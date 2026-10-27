@@ -150,7 +150,7 @@ async function Continut({
             ? `Publicat. Se vede la ${acesta.cale}/${text!.slug}`
             : "Ciornă. Nu se vede pe site."
       }
-      activ="/admin/scrie"
+      activ={`/admin/scrie?fel=${fel}`}
       actiuni={
         <Link
           href={`/admin/scrie?fel=${fel}`}

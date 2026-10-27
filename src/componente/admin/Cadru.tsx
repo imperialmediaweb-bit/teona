@@ -33,6 +33,8 @@ type Intrare = {
   href: string;
   eticheta: string;
   pictograma: NumePictograma;
+  /** Alte adrese pe care intrarea asta e „aici” (paginile strânse sub ea). */
+  si?: readonly string[];
 };
 
 /**
@@ -49,11 +51,7 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
       { href: "/admin", eticheta: "Tablou de bord", pictograma: "panou" },
       { href: "/admin/rapoarte", eticheta: "Rapoarte", pictograma: "grafic" },
       { href: "/admin/analiza", eticheta: "Analiză", pictograma: "stea" },
-      {
-        href: "/admin/radar",
-        eticheta: "Radar finanțări",
-        pictograma: "harta",
-      },
+      { href: "/admin/radar", eticheta: "Radar finanțări", pictograma: "harta" },
     ],
   },
   {
@@ -62,84 +60,68 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
       { href: "/admin/donatii", eticheta: "Donații", pictograma: "inima" },
       { href: "/admin/donatori", eticheta: "Donatori", pictograma: "familie" },
       { href: "/admin/firme", eticheta: "Firme", pictograma: "cladire" },
-      {
-        href: "/admin/contracte",
-        eticheta: "Contracte",
-        pictograma: "document",
-      },
+      { href: "/admin/contracte", eticheta: "Contracte", pictograma: "document" },
     ],
   },
   {
     titlu: "Oameni care așteaptă",
     pagini: [
       { href: "/admin/cereri", eticheta: "Cereri", pictograma: "plic" },
-      {
-        href: "/admin/formulare",
-        eticheta: "Formulare 230",
-        pictograma: "document",
-      },
-      {
-        href: "/admin/aniversari",
-        eticheta: "Aniversări de aprobat",
-        pictograma: "maini",
-      },
+      { href: "/admin/formulare", eticheta: "Formulare 230", pictograma: "document" },
+      { href: "/admin/aniversari", eticheta: "Aniversări de aprobat", pictograma: "maini" },
     ],
   },
-  {
-    titlu: "Panoul",
-    pagini: [
-      {
-        href: "/admin/utilizatori",
-        eticheta: "Utilizatori",
-        pictograma: "familie",
-      },
-      { href: "/admin/parola", eticheta: "Parola mea", pictograma: "stea" },
-    ],
-  },
+  /*
+    Ce se schimbă pe site, pe nume: blogul, campaniile, taberele, paginile.
+
+    Înainte era o listă de treisprezece intrări sub „Site”, cu „Scrie pe
+    site” (trei file înăuntru) lângă „Textele paginilor”, „Cifrele”,
+    „Documente”, „Sponsori”, „Testimoniale” — omul nu știa unde să caute.
+    Acum ce ține de o pagină anume e sub „Pagini”, pe cardul paginii.
+    Adresele vechi merg mai departe.
+  */
   {
     titlu: "Site",
     pagini: [
       {
-        href: "/admin/scrie",
-        eticheta: "Scrie pe site",
+        href: "/admin/scrie?fel=noutate",
+        eticheta: "Blog",
         pictograma: "document",
+        si: ["/admin/scrie"],
       },
+      { href: "/admin/scrie?fel=campanie", eticheta: "Campanii", pictograma: "inima" },
+      { href: "/admin/scrie?fel=proiect", eticheta: "Tabere și proiecte", pictograma: "harta" },
       {
-        href: "/admin/testimoniale",
-        eticheta: "Testimoniale",
-        pictograma: "inima",
-      },
-      { href: "/admin/cifre", eticheta: "Cifrele", pictograma: "grafic" },
-      {
-        href: "/admin/documente",
-        eticheta: "Documente",
-        pictograma: "document",
-      },
-      { href: "/admin/sponsori", eticheta: "Sponsori", pictograma: "cladire" },
-      {
-        href: "/admin/texte",
-        eticheta: "Textele paginilor",
-        pictograma: "document",
-      },
-      {
-        href: "/admin/sabloane",
-        eticheta: "Șabloane de e-mail",
-        pictograma: "plic",
-      },
-      {
-        href: "/admin/emailuri",
-        eticheta: "Mesajele trimise",
-        pictograma: "plic",
+        href: "/admin/pagini",
+        eticheta: "Pagini",
+        pictograma: "panou",
+        si: [
+          "/admin/texte",
+          "/admin/cifre",
+          "/admin/documente",
+          "/admin/sponsori",
+          "/admin/testimoniale",
+        ],
       },
       { href: "/admin/poze", eticheta: "Poze", pictograma: "arta" },
-      { href: "/admin/qr", eticheta: "Cod QR", pictograma: "panou" },
-      {
-        href: "/admin/facebook",
-        eticheta: "Facebook",
-        pictograma: "comunicare",
-      },
+    ],
+  },
+  {
+    titlu: "E-mail și promovare",
+    pagini: [
+      { href: "/admin/sabloane", eticheta: "Șabloane de e-mail", pictograma: "plic" },
+      { href: "/admin/emailuri", eticheta: "Mesajele trimise", pictograma: "plic" },
+      { href: "/admin/facebook", eticheta: "Facebook", pictograma: "comunicare" },
       { href: "/admin/presa", eticheta: "Presă", pictograma: "document" },
       { href: "/admin/calendar", eticheta: "Calendar", pictograma: "harta" },
+      { href: "/admin/qr", eticheta: "Cod QR", pictograma: "panou" },
+    ],
+  },
+  {
+    titlu: "Contul",
+    pagini: [
+      { href: "/admin/utilizatori", eticheta: "Utilizatori", pictograma: "familie" },
+      { href: "/admin/parola", eticheta: "Parola mea", pictograma: "stea" },
     ],
   },
 ];
@@ -192,7 +174,7 @@ const semne = cache(async (): Promise<ReadonlyMap<string, number>> => {
 
 /** Pastila cu cifra, lângă numele paginii. Lipsește de tot când nu e nimic. */
 async function Semn({ href, aici }: { href: string; aici: boolean }) {
-  const nr = (await semne()).get(href) ?? 0;
+  const nr = href.includes("?") ? 0 : ((await semne()).get(href) ?? 0);
   if (nr === 0) return null;
   return (
     /*
@@ -235,71 +217,90 @@ async function Nav({ activ }: { activ?: string }) {
   const grupuri = rol
     ? GRUPURI.map((grup) => ({
         ...grup,
-        pagini: grup.pagini.filter((p) => poateVedea(rol, p.href)),
+        pagini: grup.pagini.filter((p) =>
+          poateVedea(rol, p.href.split("?")[0]),
+        ),
       })).filter((grup) => grup.pagini.length > 0)
     : GRUPURI;
+  const eAici = (p: Intrare) =>
+    activ === p.href || Boolean(activ && p.si?.includes(activ));
+
+  /*
+    Grupele se strâng: deschisă e numai cea în care ești. Douăzeci și cinci de
+    linkuri unul sub altul erau „un cârnaț” în care nu găsea nimeni nimic;
+    șase titluri se citesc dintr-o privire. Pe tabloul de bord, unde nu ești
+    în nicio grupă, se deschide prima.
+  */
+  const areActiv = grupuri.some((g) => g.pagini.some(eAici));
 
   return (
-    <>
-      {grupuri.map((grup) => (
-        <div key={grup.titlu} className="lg:mt-5 lg:first:mt-0">
-          <p className="hidden px-3 pb-2 font-titlu text-nota font-bold tracking-wide text-hartie/45 uppercase lg:block">
-            {grup.titlu}
-          </p>
-          <ul className="flex gap-1 lg:flex-col">
-            {grup.pagini.map((p) => {
-              const aici = activ === p.href;
-              return (
-                <li key={p.href}>
-                  <Link
-                    href={p.href}
-                    /*
-                      Fără preîncărcare.
+    <div className="grid gap-1">
+      {grupuri.map((grup, i) => {
+        const deschis = grup.pagini.some(eAici) || (!areActiv && i === 0);
+        return (
+          <details key={grup.titlu} open={deschis} className="group/grupa">
+            <summary className="flex cursor-pointer list-none items-center gap-2 rounded-lg px-3 py-2 font-titlu text-mic font-bold text-hartie/85 transition-colors hover:bg-hartie/10 hover:text-hartie [&::-webkit-details-marker]:hidden">
+              <span
+                aria-hidden="true"
+                className="text-hartie/50 transition-transform group-open/grupa:rotate-90"
+              >
+                ›
+              </span>
+              {grup.titlu}
+              <Suspense fallback={null}>
+                <SemnGrupa hrefuri={grup.pagini.map((p) => p.href)} />
+              </Suspense>
+            </summary>
+            <ul className="mt-0.5 mb-2 grid gap-0.5 pl-3">
+              {grup.pagini.map((p) => {
+                const aici = eAici(p);
+                return (
+                  <li key={p.href}>
+                    <Link
+                      href={p.href}
+                      /* Fără preîncărcare: fiecare pagină de panou interoghează baza. */
+                      prefetch={false}
+                      aria-current={aici ? "page" : undefined}
+                      className={`flex items-center gap-2.5 rounded-lg px-3 py-1.5 font-titlu text-mic font-semibold whitespace-nowrap transition-colors ${
+                        aici
+                          ? "bg-caramiziu-600 text-hartie"
+                          : "text-hartie/70 hover:bg-hartie/10 hover:text-hartie"
+                      }`}
+                    >
+                      <Pictograma
+                        nume={p.pictograma}
+                        aria-hidden="true"
+                        className="size-4 shrink-0"
+                      />
+                      {p.eticheta}
+                      <Suspense fallback={null}>
+                        <Semn href={p.href} aici={aici} />
+                      </Suspense>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </details>
+        );
+      })}
+    </div>
+  );
+}
 
-                      Next cere din vreme pagina fiecărui link din bară, ca
-                      navigarea să pară instantanee. Aici asta înseamnă că
-                      la fiecare deschidere de pagină — și după fiecare
-                      salvare — pleacă nouă cereri deodată, iar fiecare
-                      pagină de panou face interogări în baza de date:
-                      tabloul de bord numără donațiile, rapoartele adună
-                      perioade, analiza citește profilurile. Nouă pagini
-                      interogate ca să se deschidă una.
-
-                      Panoul are câțiva oameni și e în spatele unei parole;
-                      jumătatea de secundă câștigată la navigare nu merită
-                      de nouă ori munca bazei de date la fiecare clic, pe un
-                      Postgres mic de Railway.
-                    */
-                    prefetch={false}
-                    aria-current={aici ? "page" : undefined}
-                    className={`flex items-center gap-2.5 rounded-lg px-3 py-1.5 font-titlu text-mic font-semibold whitespace-nowrap transition-colors ${
-                      aici
-                        ? "bg-caramiziu-600 text-hartie"
-                        : "text-hartie/75 hover:bg-hartie/10 hover:text-hartie"
-                    }`}
-                  >
-                    <Pictograma
-                      nume={p.pictograma}
-                      aria-hidden="true"
-                      className="size-4 shrink-0"
-                    />
-                    {p.eticheta}
-                    {/*
-                      Cifra vine din baza de date, deci ar ține meniul în loc
-                      până răspunde. Învelită în `Suspense`, bara apare pe
-                      loc și pastilele se așază în ea când sosesc.
-                    */}
-                    <Suspense fallback={null}>
-                      <Semn href={p.href} aici={aici} />
-                    </Suspense>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      ))}
-    </>
+/** Cât așteaptă într-o grupă strânsă, ca să nu se piardă cererile noi. */
+async function SemnGrupa({ hrefuri }: { hrefuri: readonly string[] }) {
+  const pe = await semne();
+  const nr = hrefuri.reduce((t, h) => t + (pe.get(h) ?? 0), 0);
+  if (nr === 0) return null;
+  return (
+    <span
+      role="img"
+      aria-label={`${nr} de făcut`}
+      className="ml-auto grid min-w-5 place-items-center rounded-full bg-caramiziu-700 px-1.5 py-0.5 font-titlu text-nota font-bold text-hartie group-open/grupa:hidden"
+    >
+      {nr}
+    </span>
   );
 }
 

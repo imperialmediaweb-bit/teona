@@ -43,7 +43,7 @@ const STARI: Record<string, { text: string; bun: boolean }> = {
 export default function Pagina({
   searchParams,
 }: {
-  searchParams: Promise<{ gresit?: string; stare?: string }>;
+  searchParams: Promise<{ gresit?: string; stare?: string; pagina?: string }>;
 }) {
   return (
     <Suspense fallback={<Cadru titlu="Textele paginilor">Se încarcă…</Cadru>}>
@@ -55,10 +55,15 @@ export default function Pagina({
 async function Continut({
   searchParams,
 }: {
-  searchParams: Promise<{ gresit?: string; stare?: string }>;
+  searchParams: Promise<{ gresit?: string; stare?: string; pagina?: string }>;
 }) {
   await connection();
-  const { gresit, stare } = await searchParams;
+  const { gresit, stare, pagina: paginaCeruta } = await searchParams;
+  /*
+    Venit de pe cardul unei pagini din „Pagini”: se arată numai textele ei.
+    Numele se caută în listă, nu se crede pe cuvânt.
+  */
+  const doar = paginiCuTexte().find((p) => p === paginaCeruta) ?? null;
 
   if (!areParolaConfigurata()) {
     return (
@@ -99,9 +104,21 @@ async function Continut({
 
   return (
     <Cadru
-      titlu="Textele paginilor"
-      descriere="Ce scrie pe Despre noi, Casa Teona, Donează și celelalte pagini."
+      titlu={doar ?? "Textele paginilor"}
+      descriere={
+        doar
+          ? "Ce scrie pe pagina asta. Titlurile, pozele și butoanele rămân cum sunt."
+          : "Ce scrie pe Despre noi, Casa Teona, Donează și celelalte pagini."
+      }
       activ="/admin/texte"
+      actiuni={
+        <Link
+          href="/admin/pagini"
+          className="font-titlu text-mic font-semibold text-caramiziu-700 hover:underline"
+        >
+          ← Toate paginile
+        </Link>
+      }
     >
       {mesaj && (
         <p
@@ -159,7 +176,7 @@ async function Continut({
         </p>
       </div>
 
-      {paginiCuTexte().map((pagina) => (
+      {(doar ? [doar] : paginiCuTexte()).map((pagina) => (
         <section key={pagina} className="mb-12">
           <h2 className="font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
             {pagina}
@@ -194,6 +211,9 @@ async function Continut({
                       className="grid gap-3 colt-a border border-hartie-umbra bg-hartie p-5"
                     >
                       <input type="hidden" name="cheie" value={s.cheie} />
+                      {doar && (
+                        <input type="hidden" name="pagina" value={doar} />
+                      )}
 
                       <div className="flex flex-wrap items-baseline justify-between gap-2">
                         <span className="font-titlu text-amplu font-bold text-cerneala">

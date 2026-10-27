@@ -3,6 +3,7 @@ import { limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import {
   ETICHETA_TEXTE_PAGINI,
+  paginiCuTexte,
   readuTextPagina,
   schimbaTextPagina,
 } from "@/lib/texte-pagini";
@@ -21,8 +22,10 @@ import {
 
 const INAPOI = "/admin/texte";
 
-function gata(cerere: Request, cod: string) {
-  return trimiteLa(`${INAPOI}?stare=${encodeURIComponent(cod)}#stare`);
+function gata(cerere: Request, cod: string, pagina = "") {
+  // Înapoi pe aceeași pagină din „Pagini”, nu pe lista tuturor textelor.
+  const pe = pagina ? `&pagina=${encodeURIComponent(pagina)}` : "";
+  return trimiteLa(`${INAPOI}?stare=${encodeURIComponent(cod)}${pe}#stare`);
 }
 
 export async function POST(cerere: Request) {
@@ -39,11 +42,12 @@ export async function POST(cerere: Request) {
   if (!formular) return raspuns("Cerere invalidă.", 400);
 
   const cheie = text(formular.get("cheie"), 80) ?? "";
+  const pagina = paginiCuTexte().find((p) => p === formular.get("pagina")) ?? "";
 
   if (String(formular.get("fel") ?? "") === "inapoi") {
     const readus = await readuTextPagina(cheie).catch(() => false);
     if (readus) revalidateTag(ETICHETA_TEXTE_PAGINI, "max");
-    return gata(cerere, readus ? "readus" : "necunoscut");
+    return gata(cerere, readus ? "readus" : "necunoscut", pagina);
   }
 
   const continut = text(formular.get("continut"), 6000) ?? "";
@@ -53,11 +57,11 @@ export async function POST(cerere: Request) {
     alegere. Cine vrea textul scurtat îl scurtează; cine vrea secțiunea goală
     îmi spune, fiindcă atunci dispare și fotografia de lângă ea.
   */
-  if (continut.trim().length < 3) return gata(cerere, "gol");
+  if (continut.trim().length < 3) return gata(cerere, "gol", pagina);
 
   const schimbat = await schimbaTextPagina(cheie, continut).catch(() => false);
   if (schimbat) revalidateTag(ETICHETA_TEXTE_PAGINI, "max");
-  return gata(cerere, schimbat ? "schimbat" : "necunoscut");
+  return gata(cerere, schimbat ? "schimbat" : "necunoscut", pagina);
 }
 
 export const GET = () => raspuns("Metodă nepermisă.", 405);

@@ -122,7 +122,7 @@ async function Continut({
     <Cadru
       titlu="Scrie pe site"
       descriere="Noutăți și campanii, scrise de aici. Nimic nu se vede public până nu apeși „Publică”."
-      activ="/admin/scrie"
+      activ={`/admin/scrie?fel=${fel}`}
       actiuni={
         <Link
           href={`/admin/scrie/nou?fel=${fel}`}
