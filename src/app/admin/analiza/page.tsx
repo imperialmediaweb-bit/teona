@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
-import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
+import {
+  areParolaConfigurata,
+  arePermisiune,
+  esteAutentificat,
+} from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import {
   analize,
@@ -87,11 +91,11 @@ function Cifra({
   nota?: string;
 }) {
   return (
-    <div className="colt-mic-a border border-hartie-umbra bg-hartie p-4">
+    <div className="rounded-2xl border border-hartie-umbra bg-hartie p-5">
       <p className="font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
         {eticheta}
       </p>
-      <p className="mt-1 font-titlu text-h4 font-extrabold text-cerneala">
+      <p className="mt-2 font-titlu text-h3 leading-none font-extrabold text-cerneala tabular-nums">
         {valoare}
       </p>
       {nota && <p className="mt-1 text-nota text-cerneala-moale">{nota}</p>}
@@ -172,6 +176,108 @@ function Sectiune({
       </div>
       {children}
     </section>
+  );
+}
+
+/*
+  Filele paginii.
+
+  Pagina avea peste trei mii de pixeli, o secțiune sub alta: vizite, canale,
+  reclame, donatori, firme, campanii, analiza scrisă, consultantul. Asociația:
+  „lung, neintuitiv”. Acum fiecare lucru e pe fila lui, iar prima filă, „Pe
+  scurt”, arată cifrele mari și duce mai departe. Conținutul fiecărei file e
+  același de dinainte, cu explicațiile lui.
+*/
+const FILE = [
+  { id: "pe-scurt", nume: "Pe scurt" },
+  { id: "donatori", nume: "Donatori" },
+  { id: "firme", nume: "Firme" },
+  { id: "campanii", nume: "Campanii" },
+  { id: "vizite", nume: "Vizite și canale" },
+  { id: "reclame", nume: "Reclame" },
+  { id: "consultant", nume: "Analiză și consultant" },
+] as const;
+type Fila = (typeof FILE)[number]["id"];
+
+function Filele({ aici }: { aici: Fila }) {
+  return (
+    <nav
+      aria-label="Secțiunile analizei"
+      className="-mx-1 mb-8 flex gap-1 overflow-x-auto rounded-2xl border border-hartie-umbra bg-hartie p-1.5"
+    >
+      {FILE.map((f) => (
+        <Link
+          key={f.id}
+          href={
+            f.id === "pe-scurt"
+              ? "/admin/analiza"
+              : `/admin/analiza?fila=${f.id}`
+          }
+          prefetch={false}
+          aria-current={f.id === aici ? "page" : undefined}
+          className={`shrink-0 rounded-xl px-4 py-2 font-titlu text-mic font-bold whitespace-nowrap transition-colors ${
+            f.id === aici
+              ? "bg-cerneala text-hartie"
+              : "text-cerneala-moale hover:bg-hartie-calda hover:text-cerneala"
+          }`}
+        >
+          {f.nume}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
+/** Un card de pe „Pe scurt”: o cifră mare și drumul spre fila ei. */
+function Usa({
+  fila,
+  titlu,
+  cifra,
+  nota,
+  accent,
+}: {
+  fila: Fila;
+  titlu: string;
+  cifra: string;
+  nota: string;
+  accent?: boolean;
+}) {
+  return (
+    <Link
+      href={`/admin/analiza?fila=${fila}`}
+      prefetch={false}
+      className={`group flex flex-col justify-between rounded-2xl border p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg ${
+        accent
+          ? "border-caramiziu-700 bg-caramiziu-700 text-hartie"
+          : "border-hartie-umbra bg-hartie text-cerneala"
+      }`}
+    >
+      <p
+        className={`font-titlu text-nota font-bold tracking-wide uppercase ${
+          accent ? "text-hartie/75" : "text-cerneala-slab"
+        }`}
+      >
+        {titlu}
+      </p>
+      <p className="mt-3 font-titlu text-h2 leading-none font-extrabold tabular-nums">
+        {cifra}
+      </p>
+      <p
+        className={`mt-3 text-mic ${accent ? "text-hartie/85" : "text-cerneala-moale"}`}
+      >
+        {nota}
+      </p>
+      <p
+        className={`mt-4 font-titlu text-mic font-bold ${
+          accent ? "text-hartie" : "text-caramiziu-700"
+        }`}
+      >
+        Vezi detaliile{" "}
+        <span className="inline-block transition-transform group-hover:translate-x-0.5">
+          →
+        </span>
+      </p>
+    </Link>
   );
 }
 
@@ -503,8 +609,8 @@ function Reclamele({ r, c }: { r: Reclame; c: Canalul | null }) {
     <>
       {!r.cont.activ && (
         <p className="mb-4 colt-mic-a bg-caramiziu-50 px-4 py-3 text-mic font-semibold text-caramiziu-900">
-          Contul de reclame nu e activ acum (stare dată de Meta). Cifrele de
-          mai jos sunt cele de până acum; reclame noi nu rulează până nu se
+          Contul de reclame nu e activ acum (stare dată de Meta). Cifrele de mai
+          jos sunt cele de până acum; reclame noi nu rulează până nu se
           limpezește contul.
         </p>
       )}
@@ -582,8 +688,7 @@ function Reclamele({ r, c }: { r: Reclame; c: Canalul | null }) {
       )}
 
       <p className="mt-4 max-w-3xl text-nota text-cerneala-slab">
-        Contul{" "}
-        <strong className="text-cerneala-moale">{r.cont.nume}</strong> (
+        Contul <strong className="text-cerneala-moale">{r.cont.nume}</strong> (
         {r.cont.id}), în {r.cont.moneda}. Cheltuiala o spune Meta, donațiile le
         numără baza noastră;{" "}
         <strong className="text-cerneala-moale">
@@ -868,7 +973,7 @@ function FaraAnalytics() {
 export default function PaginaAnaliza({
   searchParams,
 }: {
-  searchParams: Promise<{ gresit?: string; ratat?: string }>;
+  searchParams: Promise<{ gresit?: string; ratat?: string; fila?: string }>;
 }) {
   return (
     <Suspense fallback={<Cadru titlu="Analiză">Se încarcă…</Cadru>}>
@@ -880,10 +985,13 @@ export default function PaginaAnaliza({
 async function Continut({
   searchParams,
 }: {
-  searchParams: Promise<{ gresit?: string; ratat?: string }>;
+  searchParams: Promise<{ gresit?: string; ratat?: string; fila?: string }>;
 }) {
   await connection();
-  const { gresit, ratat } = await searchParams;
+  const { gresit, ratat, fila: filaCeruta } = await searchParams;
+  const fila: Fila = FILE.some((f) => f.id === filaCeruta)
+    ? (filaCeruta as Fila)
+    : "pe-scurt";
 
   if (!areParolaConfigurata()) {
     return (
@@ -1003,13 +1111,15 @@ async function Continut({
         ca s-o pună. Un rând sus, care sare acolo: ordinea nu se schimbă,
         drumul da.
       */}
-      {areAnaliza() && (
+      <Filele aici={fila} />
+
+      {fila === "pe-scurt" && areAnaliza() && (
         <a
-          href="#consultant"
+          href="/admin/analiza?fila=consultant#consultant"
           className="mb-6 flex flex-wrap items-center gap-x-3 gap-y-1 colt-a border border-caramiziu-200 bg-caramiziu-50 px-5 py-4 transition-colors hover:border-caramiziu-400"
         >
           <span className="font-titlu text-mic font-bold text-caramiziu-900">
-            Ai o întrebare? Întreabă consultantul ↓
+            Ai o întrebare? Întreabă consultantul →
           </span>
           <span className="text-nota text-caramiziu-900/75">
             Vede aceleași cifre, știe ce unelte are site-ul. Nu are nume și nici
@@ -1018,20 +1128,64 @@ async function Continut({
         </a>
       )}
 
-      <Sectiune
-        titlu="Vizitele de pe site"
-        nota="Din Google Analytics, ultimele 28 de zile. Sunt vizite, nu donații."
-      >
-        {areVizite() ? (
-          <Suspense fallback={<SeIncarca />}>
-            <DinAnalytics />
-          </Suspense>
-        ) : (
-          <FaraAnalytics />
-        )}
-      </Sectiune>
+      {fila === "pe-scurt" && (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <Usa
+            fila="donatori"
+            titlu="Donatori"
+            cifra={donatori.donatori.toLocaleString("ro-RO")}
+            nota={`${cate(donatori.donatii, "donație", "donații")}, ${lei(donatori.totalBani)} strânși de la începutul evidenței.`}
+            accent
+          />
+          <Usa
+            fila="donatori"
+            titlu="Vine lunar"
+            cifra={lei(donatori.baniRecurentiPeLuna)}
+            nota={`De la ${cate(donatori.recurentiActivi, "donator", "donatori")} cu donație lunară pornită.`}
+          />
+          <Usa
+            fila="donatori"
+            titlu="S-au oprit"
+            cifra={donatori.sAuOprit.toLocaleString("ro-RO")}
+            nota="Au dat de cel puțin două ori și nimic în ultimele patru luni. Merită un telefon."
+          />
+          <Usa
+            fila="firme"
+            titlu="Firme"
+            cifra={firme.firme.toLocaleString("ro-RO")}
+            nota={`${lei(firme.incasatBani)} încasați din sponsorizări. ${firme.uitate ? `${cate(firme.uitate, "firmă", "firme")} fără răspuns de mult.` : ""}`}
+          />
+          <Usa
+            fila="campanii"
+            titlu="Campanii"
+            cifra={(deCampanii?.lista.length ?? 0).toLocaleString("ro-RO")}
+            nota="Cât a adus fiecare, din câte donații și câte vizite."
+          />
+          <Usa
+            fila="vizite"
+            titlu="Vizite și canale"
+            cifra="28 de zile"
+            nota="Câți au intrat pe site, de unde au venit și ce i-a adus să doneze."
+          />
+        </div>
+      )}
 
-      {deCanale && (
+      {fila === "vizite" && (
+        <Sectiune
+          titlu="Vizitele de pe site"
+          nota="Din Google Analytics, ultimele 28 de zile. Sunt vizite, nu donații."
+        >
+          {areVizite() ? (
+            <Suspense fallback={<SeIncarca />}>
+              <DinAnalytics />
+            </Suspense>
+          ) : (
+            <FaraAnalytics />
+          )}
+        </Sectiune>
+      )}
+
+      {fila === "vizite" && deCanale && (
         <Sectiune
           titlu="De unde vin donatorii"
           nota="E-mail, reclame, căutare, cod QR tipărit. Vizitele de la Google, banii din baza noastră."
@@ -1040,45 +1194,59 @@ async function Continut({
         </Sectiune>
       )}
 
-      <Sectiune
-        titlu="Reclamele de pe Facebook și Instagram"
-        nota="Cât s-a cheltuit, lângă ce au adus."
-      >
-        {deReclame ? (
-          <Reclamele
-            r={deReclame}
-            c={
-              deCanale?.lista.find((x) => x.canal === "facebook-plata") ?? null
-            }
-          />
-        ) : areReclame() ? (
-          <div className="colt-a border border-hartie-umbra bg-hartie p-5 sm:p-6">
-            <p className="text-amplu text-cerneala-moale">
-              Meta n-a răspuns. Dacă jetonul tocmai a fost pus, mai încearcă
-              peste câteva minute; dacă nu, verifică dacă mai e valabil — cele
-              făcute dintr-un cont personal expiră.
-            </p>
-          </div>
-        ) : (
-          <FaraReclame />
+      {fila === "reclame" && (
+        <Sectiune
+          titlu="Reclamele de pe Facebook și Instagram"
+          nota="Cât s-a cheltuit, lângă ce au adus."
+        >
+          {deReclame ? (
+            <Reclamele
+              r={deReclame}
+              c={
+                deCanale?.lista.find((x) => x.canal === "facebook-plata") ??
+                null
+              }
+            />
+          ) : areReclame() ? (
+            <div className="colt-a border border-hartie-umbra bg-hartie p-5 sm:p-6">
+              <p className="text-amplu text-cerneala-moale">
+                Meta n-a răspuns. Dacă jetonul tocmai a fost pus, mai încearcă
+                peste câteva minute; dacă nu, verifică dacă mai e valabil — cele
+                făcute dintr-un cont personal expiră.
+              </p>
+            </div>
+          ) : (
+            <FaraReclame />
+          )}
+        </Sectiune>
+      )}
+
+      {fila === "donatori" && (
+        <Sectiune
+          titlu="Profilul donatorilor"
+          nota="Toți donatorii, de la începutul evidenței."
+        >
+          <Donatori d={donatori} />
+        </Sectiune>
+      )}
+
+      {fila === "firme" && (
+        <Sectiune
+          titlu="Profilul firmelor"
+          nota="Sponsorizările, de la cap la coadă."
+        >
+          <Firme f={firme} />
+        </Sectiune>
+      )}
+
+      {fila === "campanii" &&
+        (!deCampanii || deCampanii.lista.length === 0) && (
+          <p className="rounded-2xl border border-hartie-umbra bg-hartie p-6 text-amplu text-cerneala-moale">
+            Nicio campanie cu donații încă.
+          </p>
         )}
-      </Sectiune>
 
-      <Sectiune
-        titlu="Profilul donatorilor"
-        nota="Toți donatorii, de la începutul evidenței."
-      >
-        <Donatori d={donatori} />
-      </Sectiune>
-
-      <Sectiune
-        titlu="Profilul firmelor"
-        nota="Sponsorizările, de la cap la coadă."
-      >
-        <Firme f={firme} />
-      </Sectiune>
-
-      {deCampanii && deCampanii.lista.length > 0 && (
+      {fila === "campanii" && deCampanii && deCampanii.lista.length > 0 && (
         <Sectiune
           titlu="Ce a adus fiecare campanie"
           nota="Banii din baza noastră, vizitele de la Google. Două surse diferite, puse alături."
@@ -1087,11 +1255,12 @@ async function Continut({
         </Sectiune>
       )}
 
-      <Sectiune
-        titlu="Ce se vede în cifre"
-        nota="Citite de un model, pe cifrele agregate de mai sus."
-      >
-        {/*
+      {fila === "consultant" && (
+        <Sectiune
+          titlu="Ce se vede în cifre"
+          nota="Citite de un model, pe cifrele agregate de mai sus."
+        >
+          {/*
           Ce pleacă din asociație, scris pe pagină.
 
           Modelul rulează pe serverele altcuiva. Omul care apasă butonul are
@@ -1099,89 +1268,89 @@ async function Continut({
           deschis, nu o promisiune într-un comentariu din cod pe care n-o
           poate citi nimeni din panou.
         */}
-        <div className="colt-a border border-hartie-umbra bg-hartie p-5 sm:p-6">
-          <p className="max-w-3xl text-mic text-cerneala-moale">
-            Spre model pleacă numai cifrele de mai sus — numărători, sume și
-            procente. Niciun nume, niciun e-mail, niciun telefon, nicio donație
-            luată separat. I se cere să nu inventeze nicio cifră și să spună
-            când datele sunt prea puține pentru o concluzie.
-          </p>
+          <div className="colt-a border border-hartie-umbra bg-hartie p-5 sm:p-6">
+            <p className="max-w-3xl text-mic text-cerneala-moale">
+              Spre model pleacă numai cifrele de mai sus — numărători, sume și
+              procente. Niciun nume, niciun e-mail, niciun telefon, nicio
+              donație luată separat. I se cere să nu inventeze nicio cifră și să
+              spună când datele sunt prea puține pentru o concluzie.
+            </p>
 
-          {ultima ? (
-            <>
-              <p className="mt-5 font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
-                Analiza din {CAND.format(new Date(ultima.creatLa))}
-              </p>
-              <div className="mt-3 max-w-3xl">
-                {/*
+            {ultima ? (
+              <>
+                <p className="mt-5 font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
+                  Analiza din {CAND.format(new Date(ultima.creatLa))}
+                </p>
+                <div className="mt-3 max-w-3xl">
+                  {/*
                   Modelul numerotează acțiunile; cititorul de text simplu al
                   site-ului știe numai liniuțe. Se schimbă „1." în „- " la
                   afișare, ca lista să nu ajungă un paragraf lipit.
                 */}
-                <TextScris
-                  continut={ultima.text.replace(/^\s*\d+[.)]\s+/gm, "- ")}
-                />
+                  <TextScris
+                    continut={ultima.text.replace(/^\s*\d+[.)]\s+/gm, "- ")}
+                  />
+                </div>
+              </>
+            ) : (
+              <p className="mt-5 text-amplu text-cerneala-moale">
+                Nu s-a făcut încă nicio analiză.
+              </p>
+            )}
+
+            <details className="mt-6" id="ce-se-trimite">
+              <summary className="cursor-pointer font-titlu text-mic font-bold text-caramiziu-700">
+                {ultima
+                  ? "Vezi exact ce s-a trimis"
+                  : "Vezi exact ce s-ar trimite"}
+              </summary>
+              <pre className="mt-3 overflow-x-auto rounded-moale bg-hartie-calda p-4 text-nota whitespace-pre-wrap text-cerneala-moale">
+                {ultima ? ultima.cifre : acum}
+              </pre>
+            </details>
+
+            <form action="/api/admin/analiza" method="post" className="mt-6">
+              <button
+                type="submit"
+                disabled={!areAnaliza()}
+                className="rounded-full bg-caramiziu-700 px-6 py-3 font-titlu text-mic font-bold text-hartie transition-colors hover:bg-caramiziu-800 disabled:cursor-not-allowed disabled:bg-cerneala-slab"
+              >
+                {ultima ? "Fă o analiză nouă" : "Fă prima analiză"}
+              </button>
+              <p className="mt-2 text-nota text-cerneala-slab">
+                {areAnaliza()
+                  ? "Durează câteva secunde. Cel mult trei pe oră — cifrele asociației nu se schimbă de la un minut la altul."
+                  : "Are nevoie de ANTHROPIC_API_KEY în Railway."}
+              </p>
+            </form>
+          </div>
+
+          {vechi.length > 1 && (
+            <details className="mt-5">
+              <summary className="cursor-pointer font-titlu text-mic font-bold text-caramiziu-700">
+                Analizele de dinainte ({vechi.length - 1})
+              </summary>
+              <div className="mt-4 grid gap-5">
+                {vechi.slice(1).map((a) => (
+                  <div
+                    key={a.id}
+                    className="colt-a border border-hartie-umbra bg-hartie p-5"
+                  >
+                    <p className="font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
+                      {CAND.format(new Date(a.creatLa))}
+                    </p>
+                    <div className="mt-3 max-w-3xl">
+                      <TextScris
+                        continut={a.text.replace(/^\s*\d+[.)]\s+/gm, "- ")}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
-            </>
-          ) : (
-            <p className="mt-5 text-amplu text-cerneala-moale">
-              Nu s-a făcut încă nicio analiză.
-            </p>
+            </details>
           )}
 
-          <details className="mt-6" id="ce-se-trimite">
-            <summary className="cursor-pointer font-titlu text-mic font-bold text-caramiziu-700">
-              {ultima
-                ? "Vezi exact ce s-a trimis"
-                : "Vezi exact ce s-ar trimite"}
-            </summary>
-            <pre className="mt-3 overflow-x-auto rounded-moale bg-hartie-calda p-4 text-nota whitespace-pre-wrap text-cerneala-moale">
-              {ultima ? ultima.cifre : acum}
-            </pre>
-          </details>
-
-          <form action="/api/admin/analiza" method="post" className="mt-6">
-            <button
-              type="submit"
-              disabled={!areAnaliza()}
-              className="rounded-full bg-caramiziu-700 px-6 py-3 font-titlu text-mic font-bold text-hartie transition-colors hover:bg-caramiziu-800 disabled:cursor-not-allowed disabled:bg-cerneala-slab"
-            >
-              {ultima ? "Fă o analiză nouă" : "Fă prima analiză"}
-            </button>
-            <p className="mt-2 text-nota text-cerneala-slab">
-              {areAnaliza()
-                ? "Durează câteva secunde. Cel mult trei pe oră — cifrele asociației nu se schimbă de la un minut la altul."
-                : "Are nevoie de ANTHROPIC_API_KEY în Railway."}
-            </p>
-          </form>
-        </div>
-
-        {vechi.length > 1 && (
-          <details className="mt-5">
-            <summary className="cursor-pointer font-titlu text-mic font-bold text-caramiziu-700">
-              Analizele de dinainte ({vechi.length - 1})
-            </summary>
-            <div className="mt-4 grid gap-5">
-              {vechi.slice(1).map((a) => (
-                <div
-                  key={a.id}
-                  className="colt-a border border-hartie-umbra bg-hartie p-5"
-                >
-                  <p className="font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
-                    {CAND.format(new Date(a.creatLa))}
-                  </p>
-                  <div className="mt-3 max-w-3xl">
-                    <TextScris
-                      continut={a.text.replace(/^\s*\d+[.)]\s+/gm, "- ")}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </details>
-        )}
-
-        {/*
+          {/*
           Consultantul, sub analiză.
 
           Analiza de sus răspunde la „cum stăm". Munca începe la întrebarea
@@ -1191,20 +1360,21 @@ async function Continut({
 
           Vede exact aceleași cifre, agregate: le trimite serverul, nu caseta.
         */}
-        {areAnaliza() ? (
-          <div className="mt-6 scroll-mt-6" id="consultant">
-            <Sfatuitor />
-          </div>
-        ) : (
-          <p className="mt-6 colt-a border border-hartie-umbra bg-hartie-calda px-5 py-4 text-mic text-cerneala-moale">
-            Consultantul cu care se poate vorbi are nevoie de aceeași cheie,{" "}
-            <code className="rounded bg-hartie-umbra px-1.5 py-0.5">
-              ANTHROPIC_API_KEY
-            </code>
-            .
-          </p>
-        )}
-      </Sectiune>
+          {areAnaliza() ? (
+            <div className="mt-6 scroll-mt-6" id="consultant">
+              <Sfatuitor />
+            </div>
+          ) : (
+            <p className="mt-6 colt-a border border-hartie-umbra bg-hartie-calda px-5 py-4 text-mic text-cerneala-moale">
+              Consultantul cu care se poate vorbi are nevoie de aceeași cheie,{" "}
+              <code className="rounded bg-hartie-umbra px-1.5 py-0.5">
+                ANTHROPIC_API_KEY
+              </code>
+              .
+            </p>
+          )}
+        </Sectiune>
+      )}
     </Cadru>
   );
 }

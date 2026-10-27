@@ -33,6 +33,8 @@ import { areReclame, reclame } from "@/lib/reclame/meta";
 /** Înapoi la pagină, cu motivul în adresă dacă n-a mers. */
 function inapoi(cerere: Request, motiv: string | null) {
   const unde = new URL("/admin/analiza", cerere.url);
+  // Analiza scrisă stă pe fila ei; omul se întoarce acolo unde a apăsat.
+  unde.searchParams.set("fila", "consultant");
   if (motiv) unde.searchParams.set("ratat", motiv);
   return trimiteLa(unde);
 }
