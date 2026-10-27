@@ -13,6 +13,7 @@ http.createServer((req, res) => {
     const da = (o, s = 200) => { res.writeHead(s, { "content-type": "application/json" }); res.end(JSON.stringify(o)); };
     if (u.startsWith("/emails")) return da({ id: "em_" + jurnal.length });
     if (u.startsWith("/groups")) return da({ data: [{ id: "g-pers", name: "Persoane fizice", active_count: 412 }, { id: "g-firme", name: "Firme", active_count: 57 }] });
+    if (u.startsWith("/subscribers")) return da({ data: { id: "sub_" + jurnal.length } }, 201);
     if (/\/campaigns\/[^/]+\/schedule/.test(u)) return da({ data: { status: "sending" } });
     if (u.startsWith("/campaigns")) return da({ data: { id: "camp_" + jurnal.length } }, 201);
     if (u.startsWith("/v1/messages") && j.stream) {

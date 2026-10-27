@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { EMAIL } from "@/date/asociatie";
 import Decor from "./Decor";
 
@@ -21,6 +21,18 @@ type Stare =
 export default function Newsletter() {
   const id = useId();
   const [stare, setStare] = useState<Stare>({ fel: "gol" });
+  /*
+    Persoană sau firmă: fiecare ajunge în lista ei din MailerLite, iar
+    campania pentru firme pleacă numai la firme. Pe paginile pentru firme
+    varianta „firmă” vine aleasă.
+  */
+  const [fel, setFel] = useState<"persoana" | "firma">("persoana");
+  // Citită după încărcare, nu cu `usePathname`: caseta stă în aranjamentul
+  // tuturor paginilor, iar acolo adresa ar face fiecare pagină dinamică.
+  useEffect(() => {
+    if (/^\/(directioneaza-20|sponsori)/.test(window.location.pathname))
+      setFel("firma");
+  }, []);
 
   async function trimite(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
@@ -34,6 +46,7 @@ export default function Newsletter() {
         body: JSON.stringify({
           email: date.get("email"),
           nume: date.get("nume"),
+          fel: date.get("fel"),
           acord: date.get("acord") === "da",
         }),
       });
@@ -146,6 +159,29 @@ export default function Newsletter() {
                 />
               </div>
             </div>
+
+            <fieldset className="flex flex-wrap items-center gap-2">
+              <legend className="sr-only">Te abonezi ca</legend>
+              {[
+                ["persoana", "Ca persoană"],
+                ["firma", "Ca firmă"],
+              ].map(([val, eticheta]) => (
+                <label
+                  key={val}
+                  className="cursor-pointer rounded-full border-2 border-hartie-umbra px-4 py-1.5 font-titlu text-mic font-semibold text-cerneala-moale transition-colors has-checked:border-turcoaz-500 has-checked:bg-turcoaz-50 has-checked:text-turcoaz-900"
+                >
+                  <input
+                    type="radio"
+                    name="fel"
+                    value={val}
+                    checked={fel === val}
+                    onChange={() => setFel(val as "persoana" | "firma")}
+                    className="sr-only"
+                  />
+                  {eticheta}
+                </label>
+              ))}
+            </fieldset>
 
             <label className="flex items-start gap-3 text-mic text-cerneala-moale">
               <input

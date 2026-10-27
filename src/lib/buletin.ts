@@ -20,13 +20,29 @@ export function areBuletin(): boolean {
   return Boolean(process.env.MAILERLITE_API_KEY);
 }
 
-export async function laBuletin(email: string): Promise<boolean> {
+export async function laBuletin(
+  email: string,
+  /**
+   * În ce listă intră. „firme” pune adresa în lista de firme
+   * (`MAILERLITE_GROUP_FIRME`), cea la care pleacă șablonul de campanie
+   * pentru firme; o firmă se înscrie singură, din caseta de newsletter.
+   */
+  lista: "persoane" | "firme" = "persoane",
+  nume?: string | null,
+): Promise<boolean> {
   const cheie = process.env.MAILERLITE_API_KEY;
   if (!cheie) return false;
 
-  const grup = process.env.MAILERLITE_GROUP_ID;
+  const grup =
+    lista === "firme"
+      ? process.env.MAILERLITE_GROUP_FIRME
+      : process.env.MAILERLITE_GROUP_ID;
 
-  const raspuns = await fetch("https://connect.mailerlite.com/api/subscribers", {
+  // Aceeași adresă ca în `email/mailerlite.ts`, ca probele să poată pune un server de mențiune.
+  const baza =
+    process.env.MAILERLITE_API?.replace(/\/+$/, "") ??
+    "https://connect.mailerlite.com/api";
+  const raspuns = await fetch(`${baza}/subscribers`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${cheie}`,
@@ -35,6 +51,7 @@ export async function laBuletin(email: string): Promise<boolean> {
     },
     body: JSON.stringify({
       email,
+      ...(nume ? { fields: { name: nume } } : {}),
       status: "active",
       ...(grup ? { groups: [grup] } : {}),
     }),

@@ -67,7 +67,13 @@ export async function POST(cerere: Request) {
   const adresa = email(corp.email);
   if (!adresa) return raspuns("Introdu o adresă de e-mail validă.", 400);
 
-  const dus = await laBuletin(adresa);
+  // „firma” vine din alegerea din casetă; orice altceva înseamnă persoană.
+  const lista = corp.fel === "firma" ? "firme" : "persoane";
+  const nume =
+    typeof corp.nume === "string" && corp.nume.trim()
+      ? corp.nume.trim().slice(0, 120)
+      : null;
+  const dus = await laBuletin(adresa, lista, nume);
   if (!dus) {
     return raspuns(
       "Nu am putut finaliza abonarea acum. Încearcă din nou peste câteva minute sau scrie-ne direct:",
