@@ -21,19 +21,25 @@ export default function Proiecte() {
   return (
     <>
       <JsonLd date={jsonLdFir([{ nume: "Proiecte", cale: RUTE.proiecte }])} />
+      {/*
+        Asociația a cerut pe 27 octombrie 2026 ca aici, în prim-plan, să fie
+        Respiro. Împreună — tabăra pe care o pune în față peste tot. Pozele
+        vin din Cloudinary (`/cloud/<id>`), din folderul taberei, urcate de
+        noi din Drive-ul lor; nu există pe disc.
+      */}
       <AntetPagina
         scris="Tabere, ateliere, cazuri umanitare"
         titlu="Proiecte"
         subtitlu="Taberele RESPIRO, activitățile de la Casa Teona și sprijinul pentru familiile aflate în nevoie — pe ani și pe categorii."
         accent="miere"
         poza={{
-          cale: "/poze/2024/11/454844538_521713703762306_4995698762778889688_n-1.jpg",
-          alt: "Copii, părinți și voluntari în tricouri albe, așezați pe iarbă între două bannere ale asociației, în fața pensiunii din tabără",
-          legenda: "Tabăra RESPIRO",
+          cale: "/cloud/475B0336_mai3jm",
+          alt: "Copiii, părinții și echipa taberei Respiro. Împreună, în grup, în fața frescei de la Mănăstirea Voroneț",
+          legenda: "Respiro. Împreună",
         }}
         pozaMica={{
-          cale: "/poze/2024/11/347598753_3647630975458046_6343055552353416081_n.jpg",
-          alt: "O voluntară pictează cu pensula palma unei fete, la un atelier; pe masă, foi cu amprente de palme roșii și albastre și sticluțe de tempera",
+          cale: "/cloud/475B0650_qykfno",
+          alt: "Un bărbat aplecat îi strânge mâna unei fetițe cu șapcă albă, în sala taberei Respiro. Împreună",
         }}
       />
 
