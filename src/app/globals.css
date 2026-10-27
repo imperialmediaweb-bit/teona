@@ -199,6 +199,73 @@
   }
 
   /*
+    Panoul: unealtă, nu pagină de site.
+
+    Site-ul folosește colțuri decupate „cu foarfeca” și fundal de hârtie caldă;
+    pe pagini cu poze de copii merg. În panou, unde omul stă ore în tabele și
+    formulare, același stil arăta „din carton” — așa a spus asociația. Aici
+    colțurile se rotunjesc egal, cardurile sunt albe cu umbră fină, fundalul e
+    gri deschis, iar cardurile-link se ridică puțin sub mouse. Nu se schimbă
+    nimic în pagini: totul se face din clasele pe care le au deja.
+  */
+  body:has(#panou-admin),
+  #panou-admin,
+  #panou-admin .bg-hartie-calda {
+    background-color: #f4f5f7;
+  }
+
+  #panou-admin .colt-a,
+  #panou-admin .colt-b {
+    border-radius: 1rem;
+  }
+
+  #panou-admin .colt-mic-a,
+  #panou-admin .colt-mic-b {
+    border-radius: 0.75rem;
+  }
+
+  #panou-admin [class~="border-hartie-umbra"] {
+    border-color: #e6e8ec;
+  }
+
+  #panou-admin [class~="bg-hartie"][class~="border"] {
+    box-shadow:
+      0 1px 2px rgb(16 24 40 / 0.04),
+      0 2px 8px rgb(16 24 40 / 0.04);
+  }
+
+  #panou-admin a[class~="bg-hartie"][class~="border"] {
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  #panou-admin a[class~="bg-hartie"][class~="border"]:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      0 2px 4px rgb(16 24 40 / 0.06),
+      0 8px 20px rgb(16 24 40 / 0.08);
+  }
+
+  #panou-admin input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  #panou-admin select,
+  #panou-admin textarea {
+    border-radius: 0.6rem;
+  }
+
+  #panou-admin input:focus-visible,
+  #panou-admin select:focus-visible,
+  #panou-admin textarea:focus-visible {
+    outline: 2px solid var(--color-caramiziu-600);
+    outline-offset: 1px;
+  }
+
+  #panou-admin .granulatie::before {
+    display: none;
+  }
+
+  /*
     Hârtie cu granulație.
 
     Fundalurile plate arată a șablon. Un strat foarte fin de zgomot, generat de
