@@ -642,6 +642,33 @@ Cum merge, punct cu punct:
   limita de 5 la 15 minute a rutei de intrare — a doua rulare la rând ia 429,
   ceea ce e limita care funcționează, nu o cădere).
 
+### Panoul ca aplicație, ținut minte, cu cod rapid
+
+Cerut în octombrie 2026: panoul instalat pe telefon și pe calculator, să
+rămână logat și să se intre repede. **Numai panoul**, nu site-ul public.
+
+- **Aplicația** (PWA): manifestul e la `/admin/manifest.webmanifest`, cu
+  `scope: /admin/`, legat numai din `src/app/admin/layout.tsx`. Lucrătorul e
+  la `/admin/sw.js` și **nu păstrează nimic** — panoul are CNP-uri și
+  telefoane, iar o copie în memoria telefonului ar rămâne acolo și după ce
+  contul e oprit. Există doar ca aplicația să se poată instala și ca fără
+  internet să apară o pagină care spune asta. Prinde numai deschideri de
+  pagină (GET); formularele trec pe lângă el. Butonul „Instalează aplicația”
+  stă jos în bară și pe pagina de intrare; pe iPhone arată pașii din Safari.
+- **„Ține-mă minte pe acest dispozitiv”** (bifat din start): sesiune de 30 de
+  zile în loc de 12 ore și un cookie de dispozitiv (`teona_dispozitiv`, 90 de
+  zile, semnat cu alt prefix decât sesiunea). **Numai pentru conturi**:
+  parola asociației rămâne la 12 ore, oricum ar fi bifat. Contul se citește
+  oricum la fiecare cerere, deci un om oprit iese pe loc.
+- **Codul de intrare rapidă** (4–6 cifre, `utilizatori.pin`, prin scrypt):
+  se pune de la `/admin/parola`, cu parola de acum. Pagina de intrare cere
+  codul în locul parolei **numai** pe un dispozitiv ținut minte, al unui cont
+  cu cod. Cinci coduri greșite la rând (`pin_gresit`) îl închid până la o
+  intrare cu parola, iar dispozitivul e uitat; limita de 5 la 15 minute a
+  rutei de intrare se aplică și codului. „Uită acest dispozitiv” e tot acolo.
+- `pregatesteParola` cere 12 semne; codul trece prin `trece()` direct. Cu
+  `pregatesteParola` ruta dădea 500 la orice cod — prins de probă.
+
 ## Radarul de finanțări: caută singur, nu hotărăște nimic
 
 Patru termene mari au trecut pe lângă asociație în 2026 — Fondul SEE (8

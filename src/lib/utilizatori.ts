@@ -298,6 +298,16 @@ const DEFINITIE = `
     vede din coloanele parola și intrat_la, nu de aici.
   */
   ALTER TABLE utilizatori ADD COLUMN IF NOT EXISTS invitat_la timestamptz;
+
+  /*
+    Codul de intrare rapidă (PIN), trecut prin scrypt ca parola. Merge numai
+    pe un dispozitiv pe care omul a intrat deja cu parola (cookie-ul de
+    dispozitiv), iar după CINCI coduri greșite la rând se închide până la
+    următoarea intrare cu parola. Un cod de patru cifre are zece mii de
+    variante; fără plafonul ăsta s-ar ghici.
+  */
+  ALTER TABLE utilizatori ADD COLUMN IF NOT EXISTS pin text;
+  ALTER TABLE utilizatori ADD COLUMN IF NOT EXISTS pin_gresit integer NOT NULL DEFAULT 0;
 `;
 
 let gata: Promise<void> | null = null;
@@ -406,10 +416,82 @@ export async function intraCuParola(
   const bun = await parolaSePotriveste(parola, rand?.parola ?? MOMEALA);
   if (!rand || !rand.activ || !rand.parola || !bun) return null;
 
-  await intreaba("UPDATE utilizatori SET intrat_la = now() WHERE id = $1", [
-    rand.id,
-  ]).catch(() => undefined);
+  // Intrarea cu parola redeschide și codul rapid, dacă fusese închis.
+  await intreaba(
+    "UPDATE utilizatori SET intrat_la = now(), pin_gresit = 0 WHERE id = $1",
+    [rand.id],
+  ).catch(() => undefined);
   return cites(rand);
+}
+
+/** De câte ori poate greși codul rapid înainte să ceară iar parola. */
+export const PIN_INCERCARI = 5;
+
+/** Codul rapid: 4–6 cifre. */
+export function pinValid(pin: string): boolean {
+  return /^[0-9]{4,6}$/.test(pin);
+}
+
+/** Are omul ăsta un cod rapid pe care îl mai poate folosi? */
+export async function areCodRapid(id: string): Promise<boolean> {
+  await pregateste();
+  const r = await intreaba<{ ok: boolean }>(
+    `SELECT (pin IS NOT NULL AND pin_gresit < $2 AND activ) AS ok
+       FROM utilizatori WHERE id = $1`,
+    [id, PIN_INCERCARI],
+  );
+  return Boolean(r[0]?.ok);
+}
+
+/** Pune sau schimbă codul rapid. Cere parola de acum, verificată de cine cheamă. */
+export async function puneCodRapid(id: string, pin: string): Promise<boolean> {
+  if (!pinValid(pin)) return false;
+  await pregateste();
+  // `trece`, nu `pregatesteParola`: aia cere 12 semne, iar un cod are 4–6.
+  // Plafonul de cinci greșeli ține locul lungimii.
+  const amprenta = await trece(pin);
+  const r = await intreaba<{ id: string }>(
+    "UPDATE utilizatori SET pin = $2, pin_gresit = 0 WHERE id = $1 RETURNING id",
+    [id, amprenta],
+  );
+  return r.length === 1;
+}
+
+export async function stergeCodRapid(id: string): Promise<void> {
+  await pregateste();
+  await intreaba("UPDATE utilizatori SET pin = NULL, pin_gresit = 0 WHERE id = $1", [id]);
+}
+
+/**
+ * Intrarea cu codul rapid.
+ *
+ * `blocat` înseamnă că s-au strâns cinci greșeli: codul nu mai merge până la
+ * o intrare cu parola, iar ruta uită dispozitivul.
+ */
+export async function intraCuCodRapid(
+  id: string,
+  pin: string,
+): Promise<Utilizator | "gresit" | "blocat"> {
+  await pregateste();
+  const randuri = await intreaba<Rand & { pin: string | null; pin_gresit: number }>(
+    `SELECT ${COLOANE}, pin, pin_gresit FROM utilizatori WHERE id = $1`,
+    [id],
+  );
+  const rand = randuri[0];
+  if (!rand || !rand.activ || !rand.pin || rand.pin_gresit >= PIN_INCERCARI)
+    return "blocat";
+  if (pinValid(pin) && (await parolaSePotriveste(pin, rand.pin))) {
+    await intreaba(
+      "UPDATE utilizatori SET intrat_la = now(), pin_gresit = 0 WHERE id = $1",
+      [id],
+    ).catch(() => undefined);
+    return cites(rand);
+  }
+  const dupa = await intreaba<{ pin_gresit: number }>(
+    "UPDATE utilizatori SET pin_gresit = pin_gresit + 1 WHERE id = $1 RETURNING pin_gresit",
+    [id],
+  );
+  return (dupa[0]?.pin_gresit ?? PIN_INCERCARI) >= PIN_INCERCARI ? "blocat" : "gresit";
 }
 
 /*

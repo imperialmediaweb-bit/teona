@@ -31,6 +31,20 @@ export const COOKIE_ADMIN = "teona_verificare";
 /** Cât ține sesiunea. Douăsprezece ore: o zi de lucru, nu o săptămână. */
 const VIATA_S = 12 * 60 * 60;
 
+/**
+ * Cu „Ține-mă minte pe acest dispozitiv”: treizeci de zile. Numai pentru
+ * conturi, nu pentru parola asociației — aia n-are nume și deschide tot.
+ * Contul se citește oricum din baza de date la fiecare cerere, deci un om
+ * oprit iese pe loc, oricât ar mai ține cookie-ul.
+ */
+export const VIATA_LUNGA_S = 30 * 24 * 60 * 60;
+
+/** Cât ține minte un dispozitiv, pentru intrarea cu codul rapid. */
+export const VIATA_DISPOZITIV_S = 90 * 24 * 60 * 60;
+
+/** Cookie-ul care spune „pe dispozitivul ăsta a intrat X cu parola”. */
+export const COOKIE_DISPOZITIV = "teona_dispozitiv";
+
 function cheie(): string | null {
   const parola = process.env.PAROLA_ADMIN;
   return parola && parola.length >= 12 ? parola : null;
@@ -89,10 +103,44 @@ function semneazaSesiunea(id: string, expira: number): string | null {
     .digest("hex");
 }
 
-export function valoareaCookieuluiUtilizator(id: string): string | null {
-  const expira = Math.floor(Date.now() / 1000) + VIATA_S;
+export function valoareaCookieuluiUtilizator(
+  id: string,
+  viataS: number = VIATA_S,
+): string | null {
+  const expira = Math.floor(Date.now() / 1000) + viataS;
   const sem = semneazaSesiunea(id, expira);
   return sem ? `u:${id}:${expira}:${sem}` : null;
+}
+
+/*
+  Cookie-ul de dispozitiv: `d:<id>:<expiră>:<semnătură>`, cu alt prefix în
+  semnătură decât sesiunea, ca unul să nu poată fi folosit în locul celuilalt.
+  Singur nu deschide nimic: spune doar cui îi cere pagina de intrare codul.
+*/
+function semneazaDispozitivul(id: string, expira: number): string | null {
+  const c = cheieSesiune();
+  if (!c) return null;
+  return createHmac("sha256", c)
+    .update(`dispozitiv:${id}:${expira}`)
+    .digest("hex");
+}
+
+export function valoareaDispozitivului(id: string): string | null {
+  const expira = Math.floor(Date.now() / 1000) + VIATA_DISPOZITIV_S;
+  const sem = semneazaDispozitivul(id, expira);
+  return sem ? `d:${id}:${expira}:${sem}` : null;
+}
+
+export function cititDispozitivul(brut: string | undefined): string | null {
+  if (!brut || !brut.startsWith("d:")) return null;
+  const parti = brut.split(":");
+  if (parti.length !== 4) return null;
+  const [, id, expiraText, sem] = parti;
+  const expira = Number(expiraText);
+  if (!Number.isInteger(expira) || expira * 1000 <= Date.now()) return null;
+  const asteptat = semneazaDispozitivul(id, expira);
+  if (!asteptat) return null;
+  return egale(sem, asteptat) ? id : null;
 }
 
 /** Cine e conectat: cheia asociației, un cont, sau nimeni. */

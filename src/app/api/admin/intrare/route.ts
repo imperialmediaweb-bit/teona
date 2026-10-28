@@ -1,11 +1,22 @@
 import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import {
   COOKIE_ADMIN,
+  COOKIE_DISPOZITIV,
+  VIATA_DISPOZITIV_S,
+  VIATA_LUNGA_S,
+  cititDispozitivul,
   parolaCorecta,
   valoareaCookieului,
   valoareaCookieuluiUtilizator,
+  valoareaDispozitivului,
 } from "@/lib/admin";
-import { PAGINI, intraCuParola, poateVedea } from "@/lib/utilizatori";
+import { cookies } from "next/headers";
+import {
+  PAGINI,
+  intraCuCodRapid,
+  intraCuParola,
+  poateVedea,
+} from "@/lib/utilizatori";
 import type { Rol } from "@/lib/utilizatori";
 
 /**
@@ -42,7 +53,37 @@ export async function POST(cerere: Request) {
   if (prea) return prea;
 
   const formular = await cerere.formData().catch(() => null);
+
+  /*
+    Intrarea cu codul rapid. Omul nu scrie e-mailul: îl știe cookie-ul de
+    dispozitiv, pus la o intrare cu parola de pe același aparat. Fără el,
+    codul nu duce nicăieri. Cinci coduri greșite la rând închid codul până la
+    următoarea intrare cu parola, iar dispozitivul e uitat.
+  */
+  if (formular?.get("fel") === "cod") {
+    const id = cititDispozitivul((await cookies()).get(COOKIE_DISPOZITIV)?.value);
+    const pagina = unde(formular, "fundraising");
+    if (!id) return trimiteLa(`${pagina}?gresit=1`);
+    const rez = await intraCuCodRapid(
+      id,
+      String(formular.get("cod") ?? "").trim(),
+    ).catch(() => "gresit" as const);
+    if (rez === "gresit") return trimiteLa(`${pagina}?gresit=cod`);
+    if (rez === "blocat") {
+      const r = trimiteLa(`${pagina}?gresit=blocat`);
+      r.cookies.set(COOKIE_DISPOZITIV, "", { path: "/", maxAge: 0 });
+      // Un semn de un minut, ca pagina de intrare să spună de ce cere parola.
+      r.cookies.set("teona_cod_blocat", "1", { ...optiuni(60), httpOnly: true });
+      return r;
+    }
+    const valoare = valoareaCookieuluiUtilizator(rez.id, VIATA_LUNGA_S);
+    const r = trimiteLa(unde(formular, rez.rol));
+    if (valoare) r.cookies.set(COOKIE_ADMIN, valoare, optiuni(VIATA_LUNGA_S));
+    return r;
+  }
+
   const parola = formular ? String(formular.get("parola") ?? "") : "";
+  const tineMinte = formular?.get("tine_minte") === "da";
   const email = formular ? String(formular.get("email") ?? "").trim() : "";
 
   /*
@@ -58,7 +99,10 @@ export async function POST(cerere: Request) {
 
   const valoare = email
     ? intrat
-      ? valoareaCookieuluiUtilizator(intrat.id)
+      ? valoareaCookieuluiUtilizator(
+          intrat.id,
+          tineMinte ? VIATA_LUNGA_S : undefined,
+        )
       : null
     : parolaCorecta(parola)
       ? valoareaCookieului()
@@ -77,6 +121,15 @@ export async function POST(cerere: Request) {
   }
 
   const raspunsul = trimiteLa(pagina);
+  /*
+    „Ține-mă minte”: sesiune de treizeci de zile și dispozitivul ținut minte
+    pentru codul rapid. Numai pentru conturi; parola asociației rămâne la
+    douăsprezece ore, oricum ar fi bifat.
+  */
+  if (intrat && tineMinte) {
+    const d = valoareaDispozitivului(intrat.id);
+    if (d) raspunsul.cookies.set(COOKIE_DISPOZITIV, d, optiuni(VIATA_DISPOZITIV_S));
+  }
   raspunsul.cookies.set(COOKIE_ADMIN, valoare, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -94,9 +147,19 @@ export async function POST(cerere: Request) {
       citi) și `sameSite: strict` (nu pleacă la cereri venite de pe alt sit).
     */
     path: "/",
-    maxAge: 12 * 60 * 60,
+    maxAge: intrat && tineMinte ? VIATA_LUNGA_S : 12 * 60 * 60,
   });
   return raspunsul;
+}
+
+function optiuni(maxAge: number) {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict" as const,
+    path: "/",
+    maxAge,
+  };
 }
 
 export const GET = () => raspuns("Metodă nepermisă.", 405);

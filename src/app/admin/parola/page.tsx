@@ -7,7 +7,11 @@ import {
   cineEsteConectat,
   esteAutentificat,
 } from "@/lib/admin";
-import { MINIM_PAROLA, NUMELE_ROLULUI } from "@/lib/utilizatori";
+import {
+  MINIM_PAROLA,
+  NUMELE_ROLULUI,
+  areCodRapid,
+} from "@/lib/utilizatori";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
@@ -41,7 +45,18 @@ const STARI: Record<string, { text: string; bun?: boolean }> = {
   "fara-cont": {
     text: "Ești înăuntru cu parola asociației, nu cu un cont. Ea nu se schimbă de aici — cere-i dezvoltatorului.",
   },
-  necunoscut: { text: "N-am putut schimba parola." },
+  necunoscut: { text: "N-am putut face schimbarea." },
+  "cod-pus": {
+    text: "Codul rapid e pus. Pe acest dispozitiv intri de acum cu el.",
+    bun: true,
+  },
+  "cod-sters": { text: "Codul rapid a fost șters.", bun: true },
+  "cod-format": { text: "Codul are între 4 și 6 cifre, numai cifre." },
+  "cod-diferit": { text: "Cele două coduri nu sunt la fel." },
+  "dispozitiv-uitat": {
+    text: "Dispozitivul a fost uitat. La următoarea intrare de aici se cere parola.",
+    bun: true,
+  },
 };
 
 const CLASA_CAMP =
@@ -91,6 +106,10 @@ async function Continut({
 
   const cine = await cineEsteConectat();
   const mesaj = stare ? STARI[stare] : undefined;
+  const areCod =
+    cine?.fel === "cont"
+      ? await areCodRapid(cine.utilizator.id).catch(() => false)
+      : false;
 
   return (
     <Cadru titlu="Parola mea" activ="/admin/parola">
@@ -186,6 +205,103 @@ async function Continut({
               </button>
             </div>
           </form>
+
+          {/*
+            Codul de intrare rapidă. Pe telefon sau în aplicația instalată,
+            parola lungă se scrie greu de fiecare dată; codul merge numai pe
+            dispozitivele pe care ai intrat deja cu parola.
+          */}
+          <section className="mt-10 max-w-sm" aria-labelledby="titlu-cod">
+            <h2
+              id="titlu-cod"
+              className="font-titlu text-amplu font-bold text-cerneala"
+            >
+              Codul de intrare rapidă
+            </h2>
+            <p className="mt-1 text-mic text-cerneala-moale">
+              {areCod
+                ? "Ai un cod pus. Îl poți schimba sau șterge."
+                : "4–6 cifre, ca la telefon. Merge numai pe dispozitivele pe care ai intrat deja cu parola. După cinci coduri greșite se cere iar parola."}
+            </p>
+            <form
+              method="post"
+              action="/api/admin/cod-rapid"
+              className="mt-4 grid gap-3 colt-a border border-hartie-umbra bg-hartie p-5"
+            >
+              <label className="grid gap-1">
+                <span className="font-titlu text-nota font-bold text-cerneala">
+                  Codul
+                </span>
+                <input
+                  name="cod"
+                  type="password"
+                  inputMode="numeric"
+                  pattern="[0-9]{4,6}"
+                  maxLength={6}
+                  autoComplete="off"
+                  className={CLASA_CAMP}
+                />
+              </label>
+              <label className="grid gap-1">
+                <span className="font-titlu text-nota font-bold text-cerneala">
+                  Codul, încă o dată
+                </span>
+                <input
+                  name="iar"
+                  type="password"
+                  inputMode="numeric"
+                  pattern="[0-9]{4,6}"
+                  maxLength={6}
+                  autoComplete="off"
+                  className={CLASA_CAMP}
+                />
+              </label>
+              <label className="grid gap-1">
+                <span className="font-titlu text-nota font-bold text-cerneala">
+                  Parola de acum
+                </span>
+                <input
+                  name="parola"
+                  type="password"
+                  autoComplete="current-password"
+                  className={CLASA_CAMP}
+                />
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="submit"
+                  name="ce"
+                  value="pune"
+                  className="inline-flex min-h-11 items-center justify-center rounded-full bg-caramiziu-700 px-5 font-titlu font-bold text-hartie transition-colors hover:bg-caramiziu-600"
+                >
+                  {areCod ? "Schimbă codul" : "Pune codul"}
+                </button>
+                {areCod && (
+                  <button
+                    type="submit"
+                    name="ce"
+                    value="sterge"
+                    className="inline-flex min-h-11 items-center justify-center rounded-full border border-hartie-umbra px-5 font-titlu font-semibold text-cerneala transition-colors hover:border-caramiziu-400"
+                  >
+                    Șterge codul
+                  </button>
+                )}
+              </div>
+            </form>
+            <form method="post" action="/api/admin/cod-rapid" className="mt-3">
+              <button
+                type="submit"
+                name="ce"
+                value="uita"
+                className="font-titlu text-mic font-semibold text-caramiziu-700 hover:underline"
+              >
+                Uită acest dispozitiv
+              </button>
+              <span className="ml-2 text-nota text-cerneala-slab">
+                — de folosit pe un calculator care nu e al tău.
+              </span>
+            </form>
+          </section>
         </>
       )}
     </Cadru>

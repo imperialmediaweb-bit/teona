@@ -2,6 +2,7 @@ import { Suspense, cache } from "react";
 import Link from "next/link";
 import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
 import Sigla from "@/componente/Sigla";
+import InstaleazaAplicatia from "@/componente/admin/InstaleazaAplicatia";
 import { cineEsteConectat, esteAutentificat, rolulConectat } from "@/lib/admin";
 import { NUMELE_ROLULUI, poateVedea } from "@/lib/utilizatori";
 import { areBazaDeDate } from "@/lib/baza";
@@ -420,6 +421,8 @@ export default function Cadru({
               </Suspense>
 
             </nav>
+
+            <InstaleazaAplicatia />
 
             {/*
           Jos: site-ul și ieșirea.
