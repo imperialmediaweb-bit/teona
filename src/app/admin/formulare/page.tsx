@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
+import {
+  areParolaConfigurata,
+  arePermisiune,
+  esteAutentificat,
+  sesiuneProaspata,
+} from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { areR2 } from "@/lib/r2";
 import { STADII_CERERE, cereri } from "@/lib/crm";
@@ -78,6 +83,15 @@ async function Continut({
 
   if (!(await arePermisiune("/admin/formulare"))) {
     return <FaraDrept titlu="Formulare 230" activ="/admin/formulare" />;
+  }
+
+  // Date personale: după 12 ore de la ultima intrare se cere iar codul sau parola.
+  if (!(await sesiuneProaspata())) {
+    return (
+      <Cadru titlu="Formulare 230" activ="/admin/formulare">
+        <Intrare confirmare gresit={Boolean(gresit)} unde="/admin/formulare" />
+      </Cadru>
+    );
   }
 
   /*

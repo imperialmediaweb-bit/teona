@@ -1,5 +1,5 @@
 import { limitaDeRata, raspuns } from "@/lib/api";
-import { arePermisiune } from "@/lib/admin";
+import { arePermisiune, sesiuneProaspata } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import {
   caTabel,
@@ -42,6 +42,14 @@ export async function GET(cerere: Request) {
   */
   if (!(await arePermisiune(`/admin/${lista}`))) {
     return raspuns("Nu ai acces.", 403);
+  }
+
+  // Fișierul pleacă din panou cu nume și adrese: cere o confirmare proaspătă.
+  if (!(await sesiuneProaspata())) {
+    return raspuns(
+      "Pentru descărcare, intră din nou în panou (parola sau codul). Au trecut mai mult de 12 ore de la ultima intrare.",
+      403,
+    );
   }
 
   const { antet, randuri } = await dateleListei(lista);

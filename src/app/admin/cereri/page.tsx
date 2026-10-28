@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
+import {
+  areParolaConfigurata,
+  arePermisiune,
+  esteAutentificat,
+  sesiuneProaspata,
+} from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import {
   FELURI_CERERE,
@@ -70,6 +75,15 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
 
   if (!(await arePermisiune("/admin/cereri"))) {
     return <FaraDrept titlu="Cereri" activ="/admin/cereri" />;
+  }
+
+  // Date personale: după 12 ore de la ultima intrare se cere iar codul sau parola.
+  if (!(await sesiuneProaspata())) {
+    return (
+      <Cadru titlu="Cereri" activ="/admin/cereri">
+        <Intrare confirmare gresit={Boolean(gresit)} unde="/admin/cereri" />
+      </Cadru>
+    );
   }
 
   if (!areBazaDeDate()) {

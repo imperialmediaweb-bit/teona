@@ -668,6 +668,13 @@ rămână logat și să se intre repede. **Numai panoul**, nu site-ul public.
   rutei de intrare se aplică și codului. „Uită acest dispozitiv” e tot acolo.
 - `pregatesteParola` cere 12 semne; codul trece prin `trece()` direct. Cu
   `pregatesteParola` ruta dădea 500 la orice cod — prins de probă.
+- **Datele sensibile cer o confirmare proaspătă.** Formulare 230, Cereri și
+  descărcarea listelor pentru Excel cer din nou codul sau parola dacă au
+  trecut 12 ore de la ultima intrare (`sesiuneProaspata()` din
+  `lib/admin.ts`). Nu e nicio coloană nouă: o sesiune scurtă ține 12 ore,
+  deci e mereu proaspătă, iar vârsta uneia lungi se citește din expirarea
+  semnată. Pusă de acum, fiindcă se poate ca pe viitor să apară CNP-uri în
+  panou; azi nu e niciunul.
 - Probă: `BAZA=… PAROLA_ADMIN=… node scripts/qa/cod-rapid.mjs` — 12
   verificări; își face contul de probă și îl oprește la sfârșit, iar fiecare
   încercare de cod pleacă din alt „loc”, ca limita rutei de intrare să nu

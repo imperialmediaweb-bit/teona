@@ -205,6 +205,31 @@ export const cineEsteConectat = cache(async (): Promise<Conectat | null> => {
   };
 });
 
+/** Cât de proaspătă trebuie să fie confirmarea pentru datele sensibile. */
+const PROASPAT_S = 12 * 60 * 60;
+
+/**
+ * A confirmat omul, cu parola sau cu codul, în ultimele 12 ore?
+ *
+ * Sesiunea de 30 de zile („Ține-mă minte”) e comodă pentru munca de zi cu
+ * zi, dar un telefon găsit deblocat n-are voie să ajungă și la datele
+ * sensibile — Formularele 230, cererile, listele descărcate pentru Excel.
+ * Acolo se cere iar codul sau parola, dacă au trecut 12 ore.
+ *
+ * Fără coloană nouă și fără alt cookie: o sesiune scurtă ține 12 ore, deci e
+ * mereu proaspătă; una lungă a fost dată acum `30 de zile − rămas`, iar asta
+ * se citește din expirarea semnată.
+ */
+export async function sesiuneProaspata(): Promise<boolean> {
+  const brut = (await cookies()).get(COOKIE_ADMIN)?.value;
+  if (!brut) return false;
+  const cheieAsociatiei = valoareaCookieului();
+  if (cheieAsociatiei && egale(brut, cheieAsociatiei)) return true;
+  if (!cititSesiuneaUtilizator(brut)) return false;
+  const ramas = Number(brut.split(":")[2]) - Math.floor(Date.now() / 1000);
+  return ramas <= VIATA_S || ramas >= VIATA_LUNGA_S - PROASPAT_S;
+}
+
 export async function esteAutentificat(): Promise<boolean> {
   return (await cineEsteConectat()) !== null;
 }

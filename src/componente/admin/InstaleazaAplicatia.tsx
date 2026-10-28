@@ -47,21 +47,93 @@ export default function InstaleazaAplicatia({
 
   if (instalata || (!prompt && !ios)) return null;
 
+  const apasa = async () => {
+    if (prompt) {
+      await prompt.prompt();
+      setPrompt(null);
+    } else setPasi((v) => !v);
+  };
+
+  /*
+    Pe pagina de intrare: un card, nu un rând cenușiu care se pierde sub
+    formular. Iconița e chiar cea care va sta pe ecranul telefonului, ca omul
+    să recunoască aplicația după instalare.
+  */
+  if (luminos) {
+    return (
+      <div className="rounded-2xl border border-hartie-umbra bg-hartie p-6 shadow-sm">
+        <div className="flex items-center gap-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/panou/icon-maskable-512.png"
+            alt=""
+            width={72}
+            height={72}
+            className="size-18 shrink-0 rounded-2xl"
+          />
+          <div className="min-w-0">
+            <p className="font-titlu text-h4 font-extrabold text-cerneala">
+              Panoul, ca aplicație
+            </p>
+            <p className="mt-1 text-corp text-cerneala-moale">
+              Pune panoul pe ecranul telefonului sau al calculatorului, cu
+              sigla asociației. Îl deschizi dintr-o atingere, ca pe orice
+              aplicație.
+            </p>
+          </div>
+        </div>
+        <ul className="mt-5 grid gap-2.5 text-corp text-cerneala">
+          {[
+            "Rămâi logat 30 de zile pe dispozitivul tău.",
+            "Intri cu un cod de 4–6 cifre, pe care îl pui la „Parola mea”.",
+            "Paginile cu date personale cer din nou codul după 12 ore.",
+            "Nimic din panou nu rămâne salvat în telefon.",
+            "După 5 coduri greșite se cere din nou parola.",
+          ].map((r) => (
+            <li key={r} className="flex gap-3">
+              <span
+                aria-hidden="true"
+                className="mt-2 size-2 shrink-0 rounded-full bg-caramiziu-600"
+              />
+              {r}
+            </li>
+          ))}
+        </ul>
+        <button
+          type="button"
+          onClick={apasa}
+          className="mt-6 flex w-full items-center justify-center gap-2.5 rounded-full bg-cerneala px-6 py-3.5 font-titlu text-amplu font-bold text-hartie transition-colors hover:bg-cerneala/85"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            className="size-5 shrink-0"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 3.5v11M7.5 10l4.5 4.5 4.5-4.5M4.5 17v2.5h15V17" />
+          </svg>
+          Instalează aplicația
+        </button>
+        {pasi && (
+          <p className="mt-3 rounded-lg bg-hartie-calda px-4 py-3 text-corp text-cerneala-moale">
+            În Safari, apasă butonul de partajare (pătratul cu săgeată), apoi
+            „Adaugă pe ecranul principal”.
+          </p>
+        )}
+      </div>
+    );
+  }
+
   return (
-    <div className={luminos ? "" : "px-3 pb-2"}>
+    <div className="px-3 pb-2">
       <button
         type="button"
-        onClick={async () => {
-          if (prompt) {
-            await prompt.prompt();
-            setPrompt(null);
-          } else setPasi((v) => !v);
-        }}
-        className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 font-titlu text-mic font-semibold transition-colors ${
-          luminos
-            ? "border border-hartie-umbra bg-hartie text-cerneala hover:border-caramiziu-400"
-            : "bg-hartie/10 text-hartie hover:bg-hartie/20"
-        }`}
+        onClick={apasa}
+        className="flex w-full items-center gap-2.5 rounded-lg bg-hartie/10 px-3 py-2 font-titlu text-mic font-semibold text-hartie transition-colors hover:bg-hartie/20"
       >
         <svg
           viewBox="0 0 24 24"
@@ -78,11 +150,7 @@ export default function InstaleazaAplicatia({
         Instalează aplicația
       </button>
       {pasi && (
-        <p
-          className={`mt-2 rounded-lg px-3 py-2 text-nota ${
-            luminos ? "bg-hartie text-cerneala-moale" : "bg-hartie/10 text-hartie/80"
-          }`}
-        >
+        <p className="mt-2 rounded-lg bg-hartie/10 px-3 py-2 text-nota text-hartie/80">
           În Safari, apasă butonul de partajare (pătratul cu săgeată), apoi
           „Adaugă pe ecranul principal”.
         </p>

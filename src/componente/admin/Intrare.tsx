@@ -31,9 +31,12 @@ import InstaleazaAplicatia from "./InstaleazaAplicatia";
 export default async function Intrare({
   gresit,
   unde = "/admin",
+  confirmare = false,
 }: {
   gresit?: boolean;
   unde?: string;
+  /** Omul e înăuntru, dar pagina cere o confirmare proaspătă (date sensibile). */
+  confirmare?: boolean;
 }) {
   /*
     Dispozitivul ținut minte, cu un cod rapid pus: întâi codul. Intrarea cu
@@ -51,8 +54,14 @@ export default async function Intrare({
     return (
       <div className="max-w-sm">
         <p className="font-titlu text-mic font-bold tracking-wider text-caramiziu-700 uppercase">
-          Intră cu codul tău
+          {confirmare ? "Confirmă că ești tu" : "Intră cu codul tău"}
         </p>
+        {confirmare && (
+          <p className="mt-2 text-mic text-cerneala-moale">
+            Pagina asta are date personale. După 12 ore de la ultima intrare
+            se cere din nou codul.
+          </p>
+        )}
         <form action="/api/admin/intrare" method="post" className="mt-4">
           <input type="hidden" name="unde" value={unde} />
           <input type="hidden" name="fel" value="cod" />
@@ -103,9 +112,14 @@ export default async function Intrare({
 
   return (
     <>
-      <FormularParola unde={unde} gresit={gresit} codBlocat={codBlocat} />
+      <FormularParola
+        unde={unde}
+        gresit={gresit}
+        codBlocat={codBlocat}
+        confirmare={confirmare}
+      />
       {/* Pe pagina de intrare bara n-are meniu; instalarea se poate face și de aici. */}
-      <div className="mt-8 max-w-sm">
+      <div className="mt-10 max-w-xl">
         <InstaleazaAplicatia luminos />
       </div>
     </>
@@ -116,10 +130,12 @@ function FormularParola({
   gresit,
   unde,
   codBlocat,
+  confirmare = false,
 }: {
   gresit?: boolean;
   unde: string;
   codBlocat: boolean;
+  confirmare?: boolean;
 }) {
   return (
     <div className="max-w-xl">
@@ -128,8 +144,14 @@ function FormularParola({
         rândul care spune de ce vezi formularul în locul paginii cerute.
       */}
       <p className="font-titlu text-mic font-bold tracking-wider text-caramiziu-700 uppercase">
-        Nu ești autentificat
+        {confirmare ? "Confirmă că ești tu" : "Nu ești autentificat"}
       </p>
+      {confirmare && (
+        <p className="mt-2 text-mic text-cerneala-moale">
+          Pagina asta are date personale. După 12 ore de la ultima intrare se
+          cere din nou parola.
+        </p>
+      )}
 
       <div className="mt-4 grid gap-3 colt-mic-a border-t-4 border-miere-400 bg-hartie-calda p-5">
         <p className="text-mic text-cerneala-moale">
