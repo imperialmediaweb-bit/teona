@@ -245,7 +245,7 @@ export default function TrimiteFormular230({
           </Camp>
         </div>
 
-        <Camp id={`${id}-telefon`} eticheta="Telefon" nota="Opțional.">
+        <Camp id={`${id}-telefon`} eticheta="Telefon">
           <input
             id={`${id}-telefon`}
             name="telefon"

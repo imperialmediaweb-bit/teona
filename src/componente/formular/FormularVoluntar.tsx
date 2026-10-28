@@ -236,7 +236,8 @@ export default function FormularVoluntar() {
           permis: date.get("permis"),
           motiv: date.get("motiv"),
           aflat: date.get("aflat"),
-          acord: true,
+          // Bifa așa cum e, nu „true” scris de mână: serverul o verifică și el.
+          acord: date.get("acord") === "da",
         }),
       });
       const corp = (await raspuns.json().catch(() => ({}))) as {

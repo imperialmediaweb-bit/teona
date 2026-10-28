@@ -404,7 +404,7 @@ export default function FormularAniversare({
         <Camp
           id="an-data"
           eticheta="Data evenimentului"
-          nota="Opțional. Apare pe pagină, ca prietenii tăi să știe până când."
+          nota="Apare pe pagină, ca prietenii tăi să știe până când."
         >
           <input
             id="an-data"
@@ -486,7 +486,10 @@ export default function FormularAniversare({
             >
               politica de confidențialitate
             </Link>
-            .
+            .{" "}
+            <span className="text-caramiziu-700" aria-hidden="true">
+              *
+            </span>
           </span>
         </label>
         <Eroare text={erori.acord} />

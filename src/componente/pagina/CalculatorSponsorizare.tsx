@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { EMAIL, RUTE } from "@/date/asociatie";
+import { RUTE } from "@/date/asociatie";
 import Link from "next/link";
 import Buton from "../Buton";
 import Pictograma from "../Pictograma";
@@ -55,8 +55,6 @@ export default function CalculatorSponsorizare() {
     care scrie a doua oară același CUI.
   */
   const [firma, setFirma] = useState<Firma | null>(null);
-  const [descarc, setDescarc] = useState<"pdf" | "word" | null>(null);
-  const [eroareDescarcare, setEroareDescarcare] = useState("");
   /*
     Suma scrisă în contract.
 
@@ -91,57 +89,7 @@ export default function CalculatorSponsorizare() {
     });
   }
 
-  /**
-   * Scoate contractul completat cu datele firmei și suma calculată.
-   *
-   * Nu trimite nimic și nu salvează nimic: firma ia documentul, îl semnează
-   * cum vrea și ni-l trimite pe e-mail. Câmpurile pe care nu le avem — cine
-   * semnează, în ce calitate — rămân punctate, de completat.
-   */
-  async function descarcaContractul(fel: "pdf" | "word") {
-    if (!firma || !rezultat) return;
-    setDescarc(fel);
-    setEroareDescarcare("");
-    try {
-      const aleasa = { suma: scrisaInContract };
-      const date = new URLSearchParams({
-        fel,
-        denumire: firma.denumire,
-        cui: String(firma.cui),
-        sediu: firma.adresa ?? "",
-        regCom: firma.nrRegCom ?? "",
-        // Suma scrisă de firmă, dacă a scris una; altfel maximul calculat.
-        valoare: scrieCifre(aleasa.suma ?? rezultat.maxim),
-      });
-      const raspuns = await fetch("/api/contract/descarca", {
-        method: "POST",
-        body: date,
-      });
-      if (!raspuns.ok) {
-        const corp = (await raspuns.json().catch(() => ({}))) as {
-          mesaj?: string;
-        };
-        setEroareDescarcare(corp.mesaj ?? "Nu am putut scrie contractul.");
-        return;
-      }
-      const antet = raspuns.headers.get("content-disposition") ?? "";
-      const nume =
-        /filename="([^"]+)"/.exec(antet)?.[1] ??
-        (fel === "word" ? "Contract.docx" : "Contract.pdf");
-      const adresa = URL.createObjectURL(await raspuns.blob());
-      const legatura = document.createElement("a");
-      legatura.href = adresa;
-      legatura.download = nume;
-      document.body.append(legatura);
-      legatura.click();
-      legatura.remove();
-      URL.revokeObjectURL(adresa);
-    } catch {
-      setEroareDescarcare("Nu am putut descărca. Verifică-ți conexiunea.");
-    } finally {
-      setDescarc(null);
-    }
-  }
+
 
   /** Suma scrisă de firmă în câmpul contractului, dacă a scris una bună. */
   const scrisaInContract = citesteSuma(sumaContract).suma;
@@ -470,64 +418,30 @@ export default function CalculatorSponsorizare() {
                     : "Suma asta intră în contract."}
               </span>
             </label>
+            {/*
+              Un singur drum spre contract: formularul complet, cu CUI-ul și
+              suma deja puse. Înainte erau și două butoane de descărcare
+              directă, fără cine semnează și fără e-mail — iar un contract
+              fără e-mail nu ajungea în panou și nu primea copia (Mihaela,
+              octombrie 2026). Acum fiecare contract are omul și adresa lui.
+            */}
             <div className="mt-3 flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={() => descarcaContractul("word")}
-                disabled={descarc !== null}
-                className="inline-flex min-h-12 items-center justify-center rounded-full bg-caramiziu-700 px-6 py-3 font-titlu font-bold text-hartie transition-colors hover:bg-caramiziu-600 disabled:opacity-60"
-              >
-                {descarc === "word"
-                  ? "Se pregătește…"
-                  : "Generează contractul (Word)"}
-              </button>
-              <button
-                type="button"
-                onClick={() => descarcaContractul("pdf")}
-                disabled={descarc !== null}
-                className="inline-flex min-h-12 items-center justify-center rounded-full border-2 border-caramiziu-300 bg-hartie px-6 py-3 font-titlu font-bold text-caramiziu-800 transition-colors hover:border-caramiziu-500 disabled:opacity-60"
-              >
-                {descarc === "pdf"
-                  ? "Se pregătește…"
-                  : "Generează contractul (PDF)"}
-              </button>
-              {/*
-                A treia cale, ca buton, nu ca rând mărunt sub butoane.
-
-                Documentul scos mai sus lasă în alb cine semnează și în ce
-                calitate — datele alea nu sunt la ANAF, le știe numai firma.
-                Cât timp calea spre ele era un link într-un rând de notă, se
-                citea ca o explicație, nu ca ceva de apăsat, iar firma rămânea
-                cu un contract de completat de mână.
-              */}
               <Link
                 href={`${RUTE.directionare20}/contract?cui=${encodeURIComponent(
                   cuiText.trim(),
-                )}&valoare=${encodeURIComponent(scrieCifre(rezultat.maxim))}`}
-                className="inline-flex min-h-12 items-center justify-center rounded-full border-2 border-caramiziu-300 bg-hartie px-6 py-3 font-titlu font-bold text-caramiziu-800 transition-colors hover:border-caramiziu-500"
+                )}&valoare=${encodeURIComponent(
+                  scrieCifre(scrisaInContract ?? rezultat.maxim),
+                )}`}
+                className="inline-flex min-h-12 items-center justify-center rounded-full bg-caramiziu-700 px-6 py-3 font-titlu font-bold text-hartie transition-colors hover:bg-caramiziu-600"
               >
-                Completează și semnează online
+                Generează contractul →
               </Link>
             </div>
             <p className="mt-3 text-nota text-cerneala-moale">
-              În documentul descărcat rămân de completat cine semnează și în ce
-              calitate. Îl semnezi, îl ștampilezi și ni-l trimiți pe e-mail, la{" "}
-              <a
-                href={`mailto:${EMAIL.contact}`}
-                className="font-titlu font-semibold text-caramiziu-700 underline underline-offset-2"
-              >
-                {EMAIL.contact}
-              </a>
-              ; îl contrasemnăm și ți-l trimitem înapoi.
+              Pe pagina următoare scrieți cine semnează, în ce calitate și
+              adresa de e-mail. Contractul se descarcă pe loc, în Word sau PDF,
+              și primiți o copie pe e-mail.
             </p>
-            {eroareDescarcare && (
-              <p
-                role="alert"
-                className="mt-3 font-titlu text-mic font-semibold text-caramiziu-800"
-              >
-                {eroareDescarcare}
-              </p>
-            )}
           </div>
         ) : (
           <div className="relative mt-6">

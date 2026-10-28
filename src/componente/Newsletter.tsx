@@ -37,6 +37,20 @@ export default function Newsletter() {
   async function trimite(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
     const date = new FormData(ev.currentTarget);
+    /*
+      Câmpurile cu steluță se verifică și aici, înainte de trimitere: formularul
+      are `noValidate`, deci `required` singur nu oprește nimic. Serverul le
+      verifică oricum; aici omul află pe loc ce lipsește.
+    */
+    const adresa = String(date.get("email") ?? "").trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(adresa)) {
+      setStare({ fel: "eroare", mesaj: "Introdu o adresă de e-mail validă." });
+      return;
+    }
+    if (date.get("acord") !== "da") {
+      setStare({ fel: "eroare", mesaj: "Bifează acordul pentru a continua." });
+      return;
+    }
     setStare({ fel: "trimite" });
 
     try {

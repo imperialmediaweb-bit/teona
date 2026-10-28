@@ -103,6 +103,14 @@ export async function POST(cerere: Request) {
     return raspuns("Bifează acordul pentru a continua.", 400);
   }
 
+  // Mesajul e marcat obligatoriu pe pagina de contact: se cere și aici.
+  if (
+    corp.fel === "contact" &&
+    (typeof corp.mesaj !== "string" || corp.mesaj.trim().length < 5)
+  ) {
+    return raspuns("Scrie-ne câteva cuvinte despre ce ai nevoie.", 400);
+  }
+
   // Câmpurile opționale pot lipsi, dar nu pot fi oricât de lungi.
   const scurte: Array<[unknown, number]> = [
     [corp.telefon, MAXIM.telefon],

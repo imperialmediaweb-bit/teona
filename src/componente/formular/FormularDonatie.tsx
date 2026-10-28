@@ -218,7 +218,8 @@ function Formular({
           nume: date.get("nume"),
           telefon: date.get("telefon"),
           buletin: date.get("buletin") === "da" ? "da" : "nu",
-          acord: "da",
+          // Bifa așa cum e, nu „da” scris de mână: serverul o verifică și el.
+          acord: date.get("acord") === "da" ? "da" : "nu",
           ...(campania ? { campanie: campania } : {}),
           /*
             De unde a venit omul. Se citește în clipa trimiterii, nu la
