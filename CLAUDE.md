@@ -513,6 +513,17 @@ prin `/api/firma`): denumirea, sediul, numărul de la registrul comerțului, iar
   pentru firmă. Dedesubt, **cine a sponsorizat înainte și anul ăsta nu**: în
   ianuarie, lista aia e cea mai ieftină sursă de bani a asociației.
   Probă: `BAZA=… PAROLA_ADMIN=… DATABASE_URL=… node scripts/qa/contracte.mjs`
+- **Contractul făcut de firmă pe site intră în panou întreg.** Câmpurile cu
+  steluță (cine semnează, e-mailul, suma) se cer în pagină **și** pe server —
+  un contract a ieșit odată fără e-mail și n-a lăsat nicio urmă în panou.
+  Înainte de document, ruta scrie fișa firmei, ia un număr din registru
+  (`numarPentruContract`, deci a doua descărcare refolosește numărul), pune
+  data de azi, mută firma la „contract trimis” și scrie o notiță cu tot ce a
+  completat. Calculatorul nu mai descarcă direct: duce la același formular,
+  cu CUI-ul și suma puse. Word-ul tipărește și el numărul și data (rândul
+  era scris fix, cu puncte — și pentru contractele din panou).
+  Probă: `BAZA=… PAROLA_ADMIN=… node scripts/qa/traseu-contract.mjs` — numai
+  pe o copie locală, fiindcă scrie în registrul de contracte.
 - **Cifra de control a CUI-ului** se verifică în browser înainte de orice
   cerere: cheia e aliniată la dreapta, cu zerouri în față (`src/lib/cui.ts`).
 - Căutarea nu blochează nimic: dacă ANAF nu răspunde, câmpurile se completează

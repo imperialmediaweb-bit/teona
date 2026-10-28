@@ -1,8 +1,10 @@
 import { after } from "next/server";
 import { limitaDeRata, raspuns, text } from "@/lib/api";
 import { email as emailValid } from "@/lib/api";
-import { areBazaDeDate } from "@/lib/baza";
+import { areBazaDeDate, intreaba } from "@/lib/baza";
 import { salveazaFirma, scrieInteractiune } from "@/lib/crm";
+import { numarPentruContract } from "@/lib/contracte";
+import { inBani } from "@/date/plati";
 import {
   anuntaDescarcarea,
   trimiteContractulNesemnat,
@@ -141,6 +143,68 @@ export async function POST(cerere: Request) {
     return raspuns("Format necunoscut.", 400);
   }
 
+  /*
+    Firma intră în panou ÎNAINTE de a primi documentul, nu după.
+
+    Înainte, fișa se scria abia după răspuns, iar contractul ieșea fără număr
+    și fără dată, și nu apărea în registrul de contracte: în panou rămânea cel
+    mult o notiță. Acum, ca la un contract generat din panou: fișa firmei (cu
+    cine semnează și cât), un număr din registru, data de azi, stadiul
+    „contract trimis” și o notiță cu tot ce a completat. Dacă baza nu
+    răspunde, contractul se face oricum, fără număr — o firmă care așteaptă
+    e mai rea decât un contract fără număr.
+  */
+  if (areBazaDeDate()) {
+    const d = citit.date;
+    const firma = await salveazaFirma({
+      cui: d.cui,
+      denumire: d.denumire,
+      persoana: d.reprezentant,
+      email: d.email,
+      telefon: d.telefon || undefined,
+      cale: "Contract de sponsorizare",
+      sumaEstimata: d.valoare || undefined,
+    }).catch(() => null);
+    if (firma) {
+      const { suma } = citesteSuma(d.valoare);
+      const inregistrat = await numarPentruContract({
+        firmaId: firma.id,
+        denumire: d.denumire,
+        cui: d.cui,
+        valoareBani: suma === null ? null : inBani(suma),
+      }).catch(() => null);
+      if (inregistrat) {
+        d.numar = inregistrat.scris;
+        d.data = new Intl.DateTimeFormat("ro-RO", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+          timeZone: "Europe/Bucharest",
+        }).format(new Date());
+      }
+      // O firmă nouă trece la „contract trimis”; una aflată deja mai departe
+      // (semnat, bani încasați) nu se dă înapoi.
+      await intreaba(
+        "UPDATE firme SET stadiu = 'contract_trimis', schimbat_la = now() WHERE id = $1 AND stadiu = 'cerere'",
+        [firma.id],
+      ).catch(() => undefined);
+      await scrieInteractiune({
+        firmaId: firma.id,
+        fel: "email",
+        rezumat:
+          `Și-a generat de pe site contractul de sponsorizare (${fel === "word" ? "Word" : "PDF"})` +
+          (d.numar ? `, nr. ${d.numar}` : "") +
+          `, pentru ${d.valoare} lei. Semnează: ${d.reprezentant}` +
+          (d.calitate ? `, ${d.calitate}` : "") +
+          `. E-mail: ${d.email}` +
+          (d.telefon ? `, telefon: ${d.telefon}` : "") +
+          (d.sediu ? `. Sediu: ${d.sediu}` : "") +
+          (d.regCom ? `. Reg. com.: ${d.regCom}` : "") +
+          ".",
+      }).catch(() => undefined);
+    }
+  }
+
   try {
     const nume =
       fel === "word"
@@ -152,36 +216,13 @@ export async function POST(cerere: Request) {
         : await contractDeSponsorizare(citit.date);
 
     /*
-      Urma din CRM și copia pe e-mail, după ce fișierul a plecat.
-
-      `after` lasă răspunsul să plece întâi: descărcarea nu trebuie să aștepte
-      nici baza de date, nici Resend. Fără e-mail nu se scrie nimic nicăieri —
-      n-am avea cum să ne întoarcem la firma aceea, iar un rând în CRM pe care
-      nu-l poți folosi e doar o colecție de date.
+      Copia pe e-mail și anunțul către asociație, după ce fișierul a plecat:
+      descărcarea nu așteaptă după Resend. Fișa și registrul s-au scris mai
+      sus, înainte de document.
     */
-    if (citit.date.email && areBazaDeDate()) {
+    if (citit.date.email) {
       const date = citit.date;
       after(async () => {
-        const firma = await salveazaFirma({
-          cui: date.cui,
-          denumire: date.denumire,
-          persoana: date.reprezentant || date.denumire,
-          email: date.email,
-          telefon: date.telefon || undefined,
-          cale: "Contract de sponsorizare",
-          sumaEstimata: date.valoare || undefined,
-        }).catch(() => null);
-
-        if (firma) {
-          await scrieInteractiune({
-            firmaId: firma.id,
-            fel: "email",
-            rezumat: `Și-a descărcat de pe site contractul completat (${
-              fel === "word" ? "Word" : "PDF"
-            })${date.valoare ? `, pentru ${date.valoare} lei` : ""}.`,
-          }).catch(() => undefined);
-        }
-
         await Promise.allSettled([
           trimiteContractulNesemnat({
             denumire: date.denumire,

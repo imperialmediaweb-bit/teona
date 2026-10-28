@@ -607,7 +607,12 @@ export async function contractWord(
             spacing: { after: 200 },
             children: [
               new TextRun({
-                text: "Nr. ……………  din data de  ……………………………",
+                // Numărul din registru și data, ca în PDF. Până acum rândul
+                // era scris fix, cu puncte: Word-ul ieșea fără număr, deși
+                // registrul îi dăduse unul (și din panou, și de pe site).
+                text: `Nr. ${date.numar || "……………"}  din data de  ${
+                  date.data || "……………………………"
+                }`,
                 size: CORP,
                 color: MOALE,
               }),
