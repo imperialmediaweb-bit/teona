@@ -50,15 +50,30 @@ function citesteDatele(formular: FormData): Citire {
     return { eroare: "CUI-ul nu e valid. Verificați cifrele." };
   }
 
-  let valoare = "";
-  if (camp("valoare")) {
-    const { suma, eroare } = citesteSuma(camp("valoare"));
-    if (eroare) return { eroare };
-    if (suma !== null && suma > 0) valoare = scrieCifre(suma);
+  /*
+    Câmpurile cu steluță se cer și aici, nu doar în pagină: un formular
+    trimis pe lângă pagină (sau o pagină veche, din cache) ar scoate altfel
+    un contract fără reprezentant, fără sumă și fără o adresă la care
+    asociația să se mai poată întoarce — și fără nicio urmă în panou.
+  */
+  const reprezentant = text(camp("reprezentant"), 120);
+  if (!reprezentant || reprezentant.length < 3) {
+    return { eroare: "Scrieți numele celui care semnează." };
   }
 
+  let valoare = "";
+  const { suma, eroare: eroareSuma } = citesteSuma(camp("valoare"));
+  if (eroareSuma) return { eroare: eroareSuma };
+  if (suma === null || !(suma > 0)) {
+    return { eroare: "Scrieți suma sponsorizării, în lei." };
+  }
+  valoare = scrieCifre(suma);
+
   const adresa = camp("email");
-  if (adresa && !emailValid(adresa)) {
+  if (!adresa) {
+    return { eroare: "Scrieți adresa de e-mail. Pe ea primiți și copia contractului." };
+  }
+  if (!emailValid(adresa)) {
     return { eroare: "Adresa de e-mail nu e scrisă corect." };
   }
 
@@ -71,7 +86,7 @@ function citesteDatele(formular: FormData): Citire {
       judet: text(camp("judet"), 80) ?? "",
       cui: String(numarCui),
       regCom: text(camp("regCom"), 80) ?? "",
-      reprezentant: text(camp("reprezentant"), 120) ?? "",
+      reprezentant,
       calitate: text(camp("calitate"), 80) ?? "",
       telefon: text(camp("telefon"), 40) ?? "",
       email: adresa,

@@ -109,6 +109,20 @@ function Formular() {
       gasite.denumire = "Scrieți denumirea firmei.";
     if (String(date.get("cui") ?? "").replace(/\D/g, "").length < 2)
       gasite.cui = "Scrieți CUI-ul firmei.";
+    /*
+      Tot ce e marcat cu steluță se cere, nu doar se arată. Fără e-mail
+      contractul pleca, dar firma nu intra în panou și nu primea copia —
+      asociația n-avea cum să se mai întoarcă la ea.
+    */
+    if (String(date.get("reprezentant") ?? "").trim().length < 3)
+      gasite.reprezentant = "Scrieți numele celui care semnează.";
+    const adresa = String(date.get("email") ?? "").trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(adresa))
+      gasite.email = adresa
+        ? "Adresa de e-mail nu e scrisă corect."
+        : "Scrieți adresa de e-mail. Pe ea primiți și copia contractului.";
+    if (!/[1-9]/.test(String(date.get("valoare") ?? "")))
+      gasite.valoare = "Scrieți suma sponsorizării, în lei.";
     setErori(gasite);
     if (Object.keys(gasite).length > 0) return;
 
