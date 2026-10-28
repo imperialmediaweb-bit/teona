@@ -668,6 +668,10 @@ rămână logat și să se intre repede. **Numai panoul**, nu site-ul public.
   rutei de intrare se aplică și codului. „Uită acest dispozitiv” e tot acolo.
 - `pregatesteParola` cere 12 semne; codul trece prin `trece()` direct. Cu
   `pregatesteParola` ruta dădea 500 la orice cod — prins de probă.
+- Probă: `BAZA=… PAROLA_ADMIN=… node scripts/qa/cod-rapid.mjs` — 12
+  verificări; își face contul de probă și îl oprește la sfârșit, iar fiecare
+  încercare de cod pleacă din alt „loc”, ca limita rutei de intrare să nu
+  oprească proba înainte de a cincea greșeală.
 
 ## Radarul de finanțări: caută singur, nu hotărăște nimic
 
