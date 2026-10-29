@@ -137,12 +137,28 @@ function taieLaCuvant(text: string, maxim: number): string {
   return `${(spatiu > maxim / 2 ? bucata.slice(0, spatiu) : bucata).replace(/[\s,.;:!?—–-]+$/, "")}…`;
 }
 
+/*
+  Data de la sfârșitul titlului unei tabere: „… 30 septembrie- 04 octombrie
+  2024”, „… 9-13 septembrie 2024 de la Vama”. Ea deosebește o tabără de alta;
+  tăiat de la coadă, „Tabăra Respiro dedicată copiilor cu autism și sindrom
+  Down…” ieșea la fel pentru patru tabere diferite — titlu dublat, adică tot
+  o greșeală de SEO. Deci se scurtează mijlocul, nu data.
+*/
+const DATA_LA_COADA =
+  /\s(\d{1,2}(?:\s*[-–]\s*\d{1,2})?\s+(?:ianuarie|februarie|martie|aprilie|mai|iunie|iulie|august|septembrie|octombrie|noiembrie|decembrie)\b.*\d{4}.*)$/i;
+
 /** Titlul din `<title>`, cel mult 60 de semne. */
 function titluPentruCautare(titlu: string): string {
   const lung = `${titlu} · ${ASOCIATIA.denumire}`;
   if (lung.length <= TITLU_MAXIM) return lung;
   const scurt = `${titlu} · ${SUFIX_SCURT}`;
   if (scurt.length <= TITLU_MAXIM) return scurt;
+  const data = titlu.match(DATA_LA_COADA);
+  if (data && data[1].length <= 34) {
+    const coada = data[1].trim();
+    const cap = titlu.slice(0, data.index).trim();
+    return `${taieLaCuvant(cap, TITLU_MAXIM - coada.length - 1)} ${coada}`;
+  }
   return taieLaCuvant(titlu, TITLU_MAXIM);
 }
 

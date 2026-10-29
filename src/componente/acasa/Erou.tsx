@@ -242,6 +242,12 @@ export default function Erou({
             */}
             <div className="colt-a relative aspect-[4/3] overflow-hidden bg-hartie-umbra shadow-[0_32px_64px_-32px_rgba(247,79,34,0.5)] lg:aspect-[3/2]">
               {FOTOGRAFII.map((f, i) => {
+                // Până pornește caruselul se pune în pagină doar prima poză:
+                // celelalte, aflate tot în ecran (doar transparente), erau
+                // cerute deodată cu ea, cu aceeași prioritate, și îi luau din
+                // bandă pe telefon. Sunt cerute la primul gest, cu șapte
+                // secunde înainte să fie nevoie de ele.
+                if (i > 0 && !pornit) return null;
                 // Poza activă deasupra; cea dinainte rămâne întreagă sub ea
                 // cât timp cea nouă apare — fără clipire gri la mijloc.
                 const stare =
