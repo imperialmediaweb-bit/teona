@@ -1,5 +1,5 @@
 import { after } from "next/server";
-import { limitaDeRata, raspuns, text } from "@/lib/api";
+import { limitaDeRata, raspuns, text, formularCuLimita } from "@/lib/api";
 import { email as emailValid } from "@/lib/api";
 import { areBazaDeDate, intreaba } from "@/lib/baza";
 import { salveazaFirma, scrieInteractiune } from "@/lib/crm";
@@ -130,7 +130,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  const formular = await cerere.formData().catch(() => null);
+  const formular = await formularCuLimita(cerere, 32 * 1024);
   if (!formular) return raspuns("Cerere invalidă.", 400);
 
   const citit = citesteDatele(formular);

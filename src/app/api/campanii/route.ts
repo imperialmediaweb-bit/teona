@@ -1,11 +1,5 @@
 import { NextResponse } from "next/server";
-import {
-  email as citesteEmail,
-  esteRobot,
-  limitaDeRata,
-  raspuns,
-  text,
-} from "@/lib/api";
+import { email as citesteEmail, esteRobot, limitaDeRata, raspuns, text, formularCuLimita } from "@/lib/api";
 import { areBazaDeDate } from "@/lib/baza";
 import { creeazaCampanie } from "@/lib/campanii";
 import { anuntaAsociatia, campanieTrimisa } from "@/lib/email/campanie";
@@ -49,12 +43,10 @@ export async function POST(cerere: Request) {
     return raspuns("Poza e prea mare. Alege una de cel mult 6 MB.", 413);
   }
 
-  let formular: FormData;
-  try {
-    formular = await cerere.formData();
-  } catch {
-    return raspuns("Cerere invalidă.", 400);
-  }
+  // Numărat pe măsură ce vine: `Content-Length` lipsește la un corp `chunked`.
+  const citit = await formularCuLimita(cerere, LIMITA_CERERE);
+  if (!citit) return raspuns("Cerere invalidă sau poză prea mare.", 400);
+  const formular = citit;
 
   const camp = (nume: string) => {
     const v = formular.get(nume);

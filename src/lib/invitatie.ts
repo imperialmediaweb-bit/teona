@@ -1,5 +1,4 @@
-import { createHmac } from "node:crypto";
-import { egale } from "./comparatie";
+import { semnaturaLinkuluiTine, semneazaText } from "./cheie-semnare";
 
 /**
  * Linkul prin care un om nou își pune singur parola de panou.
@@ -37,30 +36,12 @@ import { egale } from "./comparatie";
 const ZI_MS = 24 * 3600 * 1000;
 const VIATA_ZILE = 7;
 
-/**
- * Cheia de semnat.
- *
- * `SECRET_SESIUNE` dacă există, altfel parola asociației — aceeași alegere ca
- * la sesiunile din panou și la linkul de schimbat cardul. Merită știut ce
- * înseamnă a doua variantă: **schimbarea parolei asociației omoară toate
- * invitațiile în aer.** Nu e o pierdere mare (se retrimit), dar e bine de
- * știut de ce „nu merge linkul" chiar în ziua aia.
- */
-function cheie(): string | null {
-  const c = process.env.SECRET_SESIUNE ?? process.env.PAROLA_ADMIN;
-  return c && c.length >= 16 ? c : null;
-}
-
 function semneaza(
   id: string,
   invitatLa: number,
   expira: number,
 ): string | null {
-  const c = cheie();
-  if (!c) return null;
-  return createHmac("sha256", c)
-    .update(`invitatie:${id}:${invitatLa}:${expira}`)
-    .digest("hex");
+  return semneazaText(`invitatie:${id}:${invitatLa}:${expira}`);
 }
 
 /** Adresa de pus în e-mail, sau `null` dacă n-avem cheie. */
@@ -103,13 +84,14 @@ export function dinLinkulDeInvitatie(
   if (!Number.isFinite(clipa) || !Number.isFinite(expira)) return null;
   if (Date.now() > expira) return null;
 
-  const alNostru = semneaza(id, clipa, expira);
   /*
     Comparație în timp constant, ca la toate semnăturile din site: una cu
     `===` se oprește la prima literă care diferă, iar din cât durează
     răspunsul se poate ghici semnătura, literă cu literă.
   */
-  if (!alNostru || !egale(alNostru, semn)) return null;
+  if (!semnaturaLinkuluiTine(`invitatie:${id}:${clipa}:${expira}`, semn)) {
+    return null;
+  }
 
   return { id, invitatLaMs: clipa };
 }

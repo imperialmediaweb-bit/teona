@@ -1,5 +1,4 @@
-import { createHmac } from "node:crypto";
-import { egale } from "./comparatie";
+import { semnaturaLinkuluiTine, semneazaText } from "./cheie-semnare";
 
 /**
  * Linkul cu un singur clic prin care donatorul își oprește donația lunară.
@@ -38,17 +37,8 @@ const ZI_MS = 24 * 3600 * 1000;
  */
 const VIATA_ZILE = 35;
 
-function cheie(): string | null {
-  const c = process.env.SECRET_SESIUNE ?? process.env.PAROLA_ADMIN;
-  return c && c.length >= 16 ? c : null;
-}
-
 function semneaza(abonament: string, expira: number): string | null {
-  const c = cheie();
-  if (!c) return null;
-  return createHmac("sha256", c)
-    .update(`oprire:${abonament}:${expira}`)
-    .digest("hex");
+  return semneazaText(`oprire:${abonament}:${expira}`);
 }
 
 /** Adresa de pus în e-mail, sau `null` dacă n-avem cheie. */
@@ -83,7 +73,6 @@ export function abonamentulDinLink(d: Partial<Dovada>): string | null {
   if (!/^sub_[A-Za-z0-9]+$/.test(abonament)) return null;
   if (!Number.isFinite(expira) || expira < Date.now()) return null;
 
-  const asteptat = semneaza(abonament, expira);
-  if (!asteptat || !egale(semn, asteptat)) return null;
+  if (!semnaturaLinkuluiTine(`oprire:${abonament}:${expira}`, semn)) return null;
   return abonament;
 }

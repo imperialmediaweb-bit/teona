@@ -1,0 +1,6 @@
+# Dacă ai găsit o problemă de securitate pe teona-ariana.ro, scrie-ne aici.
+# Mulțumim că o spui nouă înainte s-o spui altora.
+Contact: mailto:contact@teona-ariana.ro
+Expires: 2027-10-29T00:00:00.000Z
+Preferred-Languages: ro, en
+Canonical: https://teona-ariana.ro/.well-known/security.txt

@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
+import { limitaDeRata, raspuns, trimiteLa, formularCuLimita } from "@/lib/api";
 import { abonamentulDinLink } from "@/lib/oprire-lunara";
 import { areStripe, opresteAbonamentulDupaId } from "@/lib/plati/stripe";
 
@@ -24,7 +24,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  const formular = await cerere.formData().catch(() => null);
+  const formular = await formularCuLimita(cerere, 8 * 1024);
   if (!formular) return raspuns("Cerere invalidă.", 400);
 
   const dovada = {

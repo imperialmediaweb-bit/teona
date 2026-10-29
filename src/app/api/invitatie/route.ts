@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
+import { limitaDeRata, raspuns, text, trimiteLa, formularCuLimita } from "@/lib/api";
 import { dinLinkulDeInvitatie } from "@/lib/invitatie";
 import { MINIM_PAROLA, puneParolaDinInvitatie } from "@/lib/utilizatori";
 import { COOKIE_ADMIN, valoareaCookieuluiUtilizator } from "@/lib/admin";
@@ -30,7 +30,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  const formular = await cerere.formData().catch(() => null);
+  const formular = await formularCuLimita(cerere, 8 * 1024);
   if (!formular) return raspuns("Cerere invalidă.", 400);
 
   const dovada = {

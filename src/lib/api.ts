@@ -1,3 +1,4 @@
+import { BlockList, isIP } from "node:net";
 import { NextResponse } from "next/server";
 
 /**
@@ -57,7 +58,9 @@ export function trimiteLa(unde: string | URL, status = 303): NextResponse {
     typeof unde === "string" ? unde : unde.pathname + unde.search + unde.hash;
   return new NextResponse(null, {
     status,
-    headers: { Location: /^\/(?!\/)/.test(cale) ? cale : "/" },
+    // Nici `/\evil.com`: browserul citește bara inversă ca pe una dreaptă,
+    // deci `/\…` ar fi tot `//…`, adică alt site.
+    headers: { Location: /^\/(?![\/\\])/.test(cale) ? cale : "/" },
   });
 }
 
@@ -154,21 +157,115 @@ export async function citesteJson(
 }
 
 /**
- * Adresa IP a clientului.
+ * Octeții corpului, cel mult `limita`; `null` dacă trec de ea.
  *
- * Railway termină TLS-ul și pune adresa reală în `X-Forwarded-For`; procesul
- * nostru vede doar proxy-ul. Luăm prima adresă din listă — cea pe care a
- * scris-o proxy-ul nostru e ultima, dar lanțul de aici are un singur proxy,
- * iar prima e cea a clientului. Dacă antetul lipsește (rulare locală), toate
- * cererile se numără la un loc, ceea ce e în regulă pentru dezvoltare.
+ * `formData()` și `text()` citesc tot ce trimite clientul, oricât: un singur
+ * corp de câțiva gigaocteți trimis la o rută publică umple memoria
+ * containerului și oprește site-ul pentru toată lumea. Aici se numără pe
+ * măsură ce vin, ca la `citesteJson`, iar `Content-Length` (care poate lipsi
+ * sau minți) e doar prima sită.
+ */
+export async function octetiCuLimita(
+  cerere: Request,
+  limita: number,
+): Promise<Buffer | null> {
+  const anuntat = Number(cerere.headers.get("content-length"));
+  if (Number.isFinite(anuntat) && anuntat > limita) return null;
+  if (!cerere.body) return Buffer.alloc(0);
+  const bucati: Uint8Array[] = [];
+  let citit = 0;
+  const cititor = cerere.body.getReader();
+  for (;;) {
+    const { done, value } = await cititor.read();
+    if (done) break;
+    citit += value.byteLength;
+    if (citit > limita) {
+      await cititor.cancel().catch(() => {});
+      return null;
+    }
+    bucati.push(value);
+  }
+  return Buffer.concat(bucati);
+}
+
+/**
+ * Formularul trimis, citit cu limită. `null` dacă e prea mare sau stricat —
+ * exact ce întorcea și `cerere.formData().catch(() => null)`, deci rutele
+ * nu-și schimbă purtarea.
+ */
+export async function formularCuLimita(
+  cerere: Request,
+  limita: number,
+): Promise<FormData | null> {
+  const octeti = await octetiCuLimita(cerere, limita).catch(() => null);
+  if (!octeti) return null;
+  const tip = cerere.headers.get("content-type") ?? "";
+  return new Response(new Uint8Array(octeti), { headers: { "content-type": tip } })
+    .formData()
+    .catch(() => null);
+}
+
+/*
+  Intervalele Cloudflare, de la https://www.cloudflare.com/ips (octombrie
+  2026). Se schimbă rar; dacă Cloudflare adaugă unul, cererile venite prin el
+  se numără pe adresa Cloudflare, adică limita devine mai strânsă, nu mai
+  largă — greșeala merge în partea sigură.
+*/
+const CLOUDFLARE = new BlockList();
+for (const r of [
+  "173.245.48.0/20", "103.21.244.0/22", "103.22.200.0/22", "103.31.4.0/22",
+  "141.101.64.0/18", "108.162.192.0/18", "190.93.240.0/20", "188.114.96.0/20",
+  "197.234.240.0/22", "198.41.128.0/17", "162.158.0.0/15", "104.16.0.0/13",
+  "104.24.0.0/14", "172.64.0.0/13", "131.0.72.0/22",
+]) {
+  const [ip, lung] = r.split("/");
+  CLOUDFLARE.addSubnet(ip, Number(lung), "ipv4");
+}
+for (const r of [
+  "2400:cb00::/32", "2606:4700::/32", "2803:f800::/32", "2405:b500::/32",
+  "2405:8100::/32", "2a06:98c0::/29", "2c0f:f248::/32",
+]) {
+  const [ip, lung] = r.split("/");
+  CLOUDFLARE.addSubnet(ip, Number(lung), "ipv6");
+}
+
+function eCloudflare(ip: string): boolean {
+  try {
+    return CLOUDFLARE.check(ip, isIP(ip) === 6 ? "ipv6" : "ipv4");
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Adresa IP a clientului, pentru limitele de cereri.
+ *
+ * **Nu din `X-Forwarded-For`.** Până în octombrie 2026 se lua prima adresă
+ * din el, iar pe aia o scrie clientul: cu un antet schimbat la fiecare
+ * cerere, limita de 5 intrări în panou la 15 minute nu mai limita nimic, și
+ * nici cea de la asistent (un API plătit) sau de la formulare.
+ *
+ * Drumul e: om → Cloudflare → marginea Railway → noi. Railway pune în
+ * `X-Real-IP` adresa care s-a legat de el — adică a Cloudflare, nu a omului.
+ * Doar atunci, când adresa e chiar a Cloudflare, se crede `CF-Connecting-IP`,
+ * pe care Cloudflare îl scrie el, peste ce trimite clientul. Cine ocolește
+ * Cloudflare și vine direct la Railway rămâne cu adresa lui reală, oricâte
+ * antete ar scrie.
+ *
+ * Fără `X-Real-IP` nu suntem pe Railway (rulare locală, probe): acolo se ia
+ * `X-Forwarded-For`, ca probele să poată juca mai mulți oameni.
  */
 function adresaClient(cerere: Request): string {
-  const inainte = cerere.headers.get("x-forwarded-for");
-  if (inainte) {
-    const prima = inainte.split(",")[0]?.trim();
-    if (prima) return prima;
+  const real = cerere.headers.get("x-real-ip")?.trim();
+  if (real) {
+    if (eCloudflare(real)) {
+      const cf = cerere.headers.get("cf-connecting-ip")?.trim();
+      if (cf && isIP(cf)) return cf;
+    }
+    return real;
   }
-  return cerere.headers.get("x-real-ip")?.trim() || "necunoscut";
+  const inainte = cerere.headers.get("x-forwarded-for");
+  return inainte?.split(",")[0]?.trim() || "necunoscut";
 }
 
 /**

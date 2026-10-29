@@ -1275,6 +1275,41 @@ De reținut, pentru data viitoare:
 - **Jurnalul Railway spune adevărul mai repede decât orice presupunere.**
   Eroarea era acolo, cu cod cu tot (42703, `ComputeIndexAttrs`), de două zile.
 
+## Auditul de securitate din 29 octombrie 2026
+
+Pornit de la o ofertă trimisă la grămadă („domeniul n-are DMARC") — care
+avea dreptate. Scanerele care trimit oferte de felul ăsta citesc DNS-ul,
+antetele, subdomeniile și versiunile afișate. Ce s-a găsit și ce s-a făcut:
+
+- **`SECRET_SESIUNE` lipsea pe Railway**, deci tot ce semna site-ul (sesiuni,
+  cookie-ul donatorului, linkurile din e-mail) era semnat cu `PAROLA_ADMIN`.
+  Un donator își știe adresa și are cookie-ul semnat, deci putea ghici parola
+  panoului offline, fără limită. Acum cheia e **numai** `SECRET_SESIUNE`
+  (≥32 de semne, `src/lib/cheie-semnare.ts`); fără ea, funcțiile se opresc.
+  Linkurile de oprire, card și invitație trimise înainte se mai **verifică**
+  cu cheia veche până pe 5 decembrie 2026, ca să nu se strice în cutiile
+  oamenilor; nimic nou nu se mai semnează cu ea.
+- **Limitele de cereri se ocoleau** scriind alt `X-Forwarded-For` la fiecare
+  cerere. Acum adresa vine din `X-Real-IP` (pus de Railway) și, numai când
+  acela e o adresă Cloudflare, din `CF-Connecting-IP` (`adresaClient()` din
+  `lib/api.ts`). Local, fără `X-Real-IP`, probele pot juca în continuare mai
+  mulți oameni din `X-Forwarded-For`.
+- **Cookie-urile au expirarea în semnătură**: și cel dat de parola
+  asociației (`k:<expiră>:<semnătură>`, înainte era o valoare fixă, bună
+  pentru totdeauna), și cel al donatorului (`email|expiră|semnătură`).
+- **Corpurile cererilor publice se citesc cu limită** (`formularCuLimita`,
+  `octetiCuLimita` din `lib/api.ts`): `formData()` citea oricât.
+- **`src/proxy.ts` rulează acum pe toate căile**: trimite `www.` și adresa
+  `….up.railway.app` la `teona-ariana.ro` (308), și refuză POST-urile din
+  `/api` cu `Origin` străin (afară de webhook-uri și `/api/radar`).
+- `next` 16.4.0 → **16.4.3** (două execuții de cod de la distanță, publice),
+  `zod` actualizat. `npm audit` dă 0.
+- `/.well-known/security.txt` cu adresa de contact.
+- **Ce nu ține de cod** (DNS în Cloudflare, găzduirea veche) e în raportul din
+  conversație: `ftp.teona-ariana.ro` arăta `phpinfo()`, WordPress-ul vechi se
+  vede pe `mail.teona-ariana.ro` cu GiveWP 3.18.0 (vulnerabilitate critică
+  publică), lipsesc CAA, DNSSEC, MTA-STS.
+
 ## Decizii încă deschise
 
 1. **Donațiile.** Acum merg prin GiveWP + Stripe pe WordPress, în lei, cu plată

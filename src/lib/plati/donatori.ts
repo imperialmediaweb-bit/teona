@@ -86,7 +86,12 @@ export async function donatori(
   cautare = "",
   limita = 200,
 ): Promise<Donator[]> {
-  const conditie = CONDITII[filtru] ?? CONDITII.toti;
+  // `hasOwn`, nu `??`: un `filtru` ca „constructor” ar găsi o proprietate
+  // moștenită și ar pune-o în SQL. Azi pagina filtrează înainte; funcția nu
+  // trebuie să depindă de asta.
+  const conditie = Object.hasOwn(CONDITII, filtru)
+    ? CONDITII[filtru]
+    : CONDITII.toti;
   const randuri = await intreaba<Rand>(
     `SELECT
         d.email,

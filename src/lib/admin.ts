@@ -2,6 +2,7 @@ import { createHmac } from "node:crypto";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { egale } from "./comparatie";
+import { cheiaDeSemnat } from "./cheie-semnare";
 import {
   type Rol,
   type Utilizator,
@@ -50,23 +51,41 @@ function cheie(): string | null {
   return parola && parola.length >= 12 ? parola : null;
 }
 
-/**
- * Cheia cu care se semnează sesiunea unui cont.
- *
- * Aceeași alegere ca la contul donatorului: `SECRET_SESIUNE` dacă există,
- * altfel parola de administrator. Lipsa amândurora nu trece pe o valoare
- * implicită — una implicită e aceeași pe toate instalările, deci publică.
- */
+/** Cheia sesiunilor de cont: numai `SECRET_SESIUNE` (vezi `cheie-semnare.ts`). */
 function cheieSesiune(): string | null {
-  const c = process.env.SECRET_SESIUNE ?? process.env.PAROLA_ADMIN;
-  return c && c.length >= 16 ? c : null;
+  return cheiaDeSemnat();
 }
 
-/** Semnătura pusă în cookie de cheia asociației. */
+/** Amprenta unei parole, pentru comparația în timp constant. */
 function semnatura(parola: string): string {
   return createHmac("sha256", parola)
     .update("verificare-campanii")
     .digest("hex");
+}
+
+/*
+  Cookie-ul dat de parola asociației: `k:<expiră>:<semnătură>`.
+
+  Până în octombrie 2026 era o valoare fixă, aceeași la fiecare intrare și
+  fără nicio expirare în ea: cele 12 ore le respecta numai browserul, iar o
+  valoare copiată o dată mergea până la schimbarea parolei. Acum expirarea e
+  semnată, ca la conturi, și o verifică serverul. Semnat cu parola însăși,
+  deci schimbarea ei în Railway închide pe loc toate sesiunile deschise cu ea.
+*/
+function semneazaCheia(parola: string, expira: number): string {
+  return createHmac("sha256", parola).update(`cheie:${expira}`).digest("hex");
+}
+
+function cookieCheieValid(brut: string): boolean {
+  const parola = cheie();
+  if (!parola || !brut.startsWith("k:")) return false;
+  const parti = brut.split(":");
+  if (parti.length !== 3) return false;
+  const expira = Number(parti[1]);
+  if (!Number.isInteger(expira) || expira * 1000 <= Date.now()) return false;
+  // Nu mai mult decât poate da intrarea: o expirare împinsă în viitor nu trece.
+  if (expira - Math.floor(Date.now() / 1000) > VIATA_S + 60) return false;
+  return egale(parti[2], semneazaCheia(parola, expira));
 }
 
 /** Comparație în timp constant: altfel durata răspunsului trădează parola. */
@@ -78,7 +97,9 @@ export function parolaCorecta(incercare: string): boolean {
 
 export function valoareaCookieului(): string | null {
   const parola = cheie();
-  return parola ? semnatura(parola) : null;
+  if (!parola) return null;
+  const expira = Math.floor(Date.now() / 1000) + VIATA_S;
+  return `k:${expira}:${semneazaCheia(parola, expira)}`;
 }
 
 export function areParolaConfigurata(): boolean {
@@ -186,8 +207,7 @@ export const cineEsteConectat = cache(async (): Promise<Conectat | null> => {
   const gasit = borcan.get(COOKIE_ADMIN)?.value;
   if (!gasit) return null;
 
-  const asteptat = valoareaCookieului();
-  if (asteptat && egale(gasit, asteptat)) {
+  if (cookieCheieValid(gasit)) {
     return { fel: "cheie", rol: "administrator", nume: "Asociația" };
   }
 
@@ -223,8 +243,7 @@ const PROASPAT_S = 12 * 60 * 60;
 export async function sesiuneProaspata(): Promise<boolean> {
   const brut = (await cookies()).get(COOKIE_ADMIN)?.value;
   if (!brut) return false;
-  const cheieAsociatiei = valoareaCookieului();
-  if (cheieAsociatiei && egale(brut, cheieAsociatiei)) return true;
+  if (cookieCheieValid(brut)) return true;
   if (!cititSesiuneaUtilizator(brut)) return false;
   const ramas = Number(brut.split(":")[2]) - Math.floor(Date.now() / 1000);
   return ramas <= VIATA_S || ramas >= VIATA_LUNGA_S - PROASPAT_S;

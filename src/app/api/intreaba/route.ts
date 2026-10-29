@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns, text } from "@/lib/api";
+import { limitaDeRata, raspuns, text, octetiCuLimita } from "@/lib/api";
 import {
   SCHIMBURI,
   areAsistentPeSite,
@@ -38,7 +38,15 @@ export async function POST(cerere: Request) {
     return raspuns("Asistentul nu e pornit acum.", 503);
   }
 
-  const corp = (await cerere.json().catch(() => null)) as {
+  // Cu limită: `cerere.json()` citește oricât trimite clientul.
+  const octeti = await octetiCuLimita(cerere, 64 * 1024).catch(() => null);
+  let brut: unknown = null;
+  try {
+    brut = octeti ? JSON.parse(octeti.toString("utf8")) : null;
+  } catch {
+    brut = null;
+  }
+  const corp = brut as {
     mesaje?: Array<{ rol?: unknown; text?: unknown }>;
   } | null;
   if (!corp || !Array.isArray(corp.mesaje)) {

@@ -1,5 +1,10 @@
 import { cookies } from "next/headers";
-import { COOKIE_CONT, VIATA_SESIUNE_S, cititSesiunea, semneaza } from "./cont";
+import {
+  COOKIE_CONT,
+  VIATA_SESIUNE_S,
+  cititSesiunea,
+  valoareaSesiunii,
+} from "./cont";
 
 /**
  * Cookie-ul de sesiune al donatorului.
@@ -11,7 +16,7 @@ import { COOKIE_CONT, VIATA_SESIUNE_S, cititSesiunea, semneaza } from "./cont";
 
 export async function deschideSesiunea(email: string): Promise<void> {
   const borcan = await cookies();
-  borcan.set(COOKIE_CONT, `${email}|${semneaza(email)}`, {
+  borcan.set(COOKIE_CONT, valoareaSesiunii(email), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     // `lax`, nu `strict`: omul ajunge aici dintr-un link de e-mail, iar

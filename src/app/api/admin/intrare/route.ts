@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
+import { limitaDeRata, raspuns, trimiteLa, formularCuLimita } from "@/lib/api";
 import {
   COOKIE_ADMIN,
   COOKIE_DISPOZITIV,
@@ -52,7 +52,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  const formular = await cerere.formData().catch(() => null);
+  const formular = await formularCuLimita(cerere, 8 * 1024);
 
   /*
     Intrarea cu codul rapid. Omul nu scrie e-mailul: îl știe cookie-ul de

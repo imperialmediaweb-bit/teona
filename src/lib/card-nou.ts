@@ -1,5 +1,4 @@
-import { createHmac } from "node:crypto";
-import { egale } from "./comparatie";
+import { semnaturaLinkuluiTine, semneazaText } from "./cheie-semnare";
 
 /**
  * Linkul prin care donatorul își schimbă cardul, când plata lunară cade.
@@ -32,17 +31,8 @@ import { egale } from "./comparatie";
 const ZI_MS = 24 * 3600 * 1000;
 const VIATA_ZILE = 35;
 
-function cheie(): string | null {
-  const c = process.env.SECRET_SESIUNE ?? process.env.PAROLA_ADMIN;
-  return c && c.length >= 16 ? c : null;
-}
-
 function semneaza(client: string, expira: number): string | null {
-  const c = cheie();
-  if (!c) return null;
-  return createHmac("sha256", c)
-    .update(`card:${client}:${expira}`)
-    .digest("hex");
+  return semneazaText(`card:${client}:${expira}`);
 }
 
 /** Adresa de pus în e-mail, sau `null` dacă n-avem cheie. */
@@ -72,7 +62,6 @@ export function clientulDinLink(d: Partial<DovadaCard>): string | null {
   if (!/^cus_[A-Za-z0-9]+$/.test(client)) return null;
   if (!Number.isFinite(expira) || expira < Date.now()) return null;
 
-  const asteptat = semneaza(client, expira);
-  if (!asteptat || !egale(semn, asteptat)) return null;
+  if (!semnaturaLinkuluiTine(`card:${client}:${expira}`, semn)) return null;
   return client;
 }

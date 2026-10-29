@@ -4,6 +4,7 @@ import {
   limitaDeRata,
   raspuns,
   text,
+  formularCuLimita,
 } from "@/lib/api";
 import { areBazaDeDate } from "@/lib/baza";
 import { anuntaTransfer } from "@/lib/plati/donatori";
@@ -38,7 +39,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  const formular = await cerere.formData().catch(() => null);
+  const formular = await formularCuLimita(cerere, 16 * 1024);
   if (!formular) return raspuns("Cerere invalidă.", 400);
 
   const camp = (nume: string) => String(formular.get(nume) ?? "").trim();

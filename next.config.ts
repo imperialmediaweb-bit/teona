@@ -44,9 +44,11 @@ const cloudinary = (process.env.CLOUDINARY_CLOUD_NAME ?? "").trim();
  *   generat la fiecare cerere, în `src/proxy.ts`, ceea ce înseamnă că nicio
  *   pagină nu mai poate fi prerandată static — fiecare vizită ar fi randată
  *   pe loc. E o decizie de arhitectură, nu de audit: până se ia, site-ul nu
- *   randează nicăieri conținut scris de vizitatori și nu folosește
- *   `dangerouslySetInnerHTML`, deci nu are prin ce să intre un script
- *   străin. Celelalte directive rămân în vigoare: scripturi doar de la noi
+ *   randează nicăieri conținut scris de vizitatori ca HTML. Folosește
+ *   `dangerouslySetInnerHTML` în trei locuri, toate cu conținut făcut de noi:
+ *   datele structurate JSON-LD (`seo.tsx`, `layout.tsx`, cu `<` scăpat) și
+ *   codul QR din panou (SVG generat de bibliotecă, din linkul nostru). Deci
+ *   nu are prin ce să intre un script străin. Celelalte directive rămân în vigoare: scripturi doar de la noi
  *   și de la formular230.ro, nimic în `<object>`, fără `<base>` străin.
  * - `'unsafe-inline'` la **stiluri**: React scrie atribute `style="..."` pe
  *   elemente (animațiile din `motion`, lățimile calculate), iar scriptul de

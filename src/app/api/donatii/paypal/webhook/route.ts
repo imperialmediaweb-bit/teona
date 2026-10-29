@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { raspuns } from "@/lib/api";
+import { raspuns, limitaDeRata, octetiCuLimita } from "@/lib/api";
 import { areBazaDeDate } from "@/lib/baza";
 import {
   evenimentNou,
@@ -19,7 +19,18 @@ import { trimiteMultumirea } from "@/lib/email/donatie";
  * adevărată.
  */
 export async function POST(cerere: Request) {
-  const corp = await cerere.text();
+  // Fiecare cerere cu antetele puse costă o întrebare la PayPal: limita
+  // oprește pe cineva care ar bate la ușa asta în buclă.
+  const prea = limitaDeRata(cerere, {
+    cheie: "paypal-webhook",
+    maxim: 120,
+    fereastraMs: 60 * 1000,
+  });
+  if (prea) return prea;
+
+  const octeti = await octetiCuLimita(cerere, 256 * 1024).catch(() => null);
+  if (!octeti) return raspuns("Cerere invalidă.", 413);
+  const corp = octeti.toString("utf8");
 
   if (!(await semnaturaEValida(cerere.headers, corp))) {
     return raspuns("Semnătură invalidă.", 400);

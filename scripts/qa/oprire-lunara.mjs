@@ -20,10 +20,10 @@
 import { createHmac } from "node:crypto";
 
 const BAZA = process.env.BAZA ?? "http://localhost:3000";
-const CHEIE = process.env.SECRET_SESIUNE ?? process.env.PAROLA_ADMIN;
+const CHEIE = process.env.SECRET_SESIUNE;
 
 if (!CHEIE || CHEIE.length < 16) {
-  console.log("SĂRIT: lipsește SECRET_SESIUNE (sau PAROLA_ADMIN) de cel puțin 16 semne.");
+  console.log("SĂRIT: lipsește SECRET_SESIUNE de cel puțin 32 de semne.");
   process.exit(0);
 }
 
@@ -93,9 +93,11 @@ verifica(
 
 // ─── 4. Mesajul poartă linkul ─────────────────────────────────────────────
 if (process.env.PAROLA_ADMIN) {
-  const cookie = createHmac("sha256", process.env.PAROLA_ADMIN)
-    .update("verificare-campanii")
-    .digest("hex");
+  // Cookie-ul parolei asociației: `k:<expiră>:<semnătură>` (lib/admin.ts).
+  const expiraK = Math.floor(Date.now() / 1000) + 3600;
+  const cookie = `k:${expiraK}:${createHmac("sha256", process.env.PAROLA_ADMIN)
+    .update(`cheie:${expiraK}`)
+    .digest("hex")}`;
   const mesaj = await fetch(
     `${BAZA}/api/admin/email?ce=inainte-de-reinnoire`,
     { headers: { cookie: `teona_verificare=${cookie}` } },

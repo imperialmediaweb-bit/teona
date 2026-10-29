@@ -45,8 +45,69 @@ import { areBazaDeDate, intreaba } from "@/lib/baza";
  * `node:fs` e în regulă — `runtime` nici nu se mai poate scrie aici.
  */
 export const config = {
-  matcher: ["/proiecte/:slug", "/noutati/:slug", "/campanii/:slug"],
+  /*
+    Toate cererile, afară de fișierele statice ale lui Next: filtrul de mai
+    jos pentru adresa canonică trebuie să prindă orice cale, iar cel pentru
+    `Origin` orice rută din `/api`. Slugurile își fac singure potrivirea.
+  */
+  matcher: ["/((?!_next/static|_next/image).*)"],
 };
+
+/** Numele sub care răspunde site-ul. Toate celelalte duc aici. */
+const GAZDA = "teona-ariana.ro";
+
+/*
+  Gazde de pe care site-ul se vede, dar nu trebuie: `www.` (aceeași pagină
+  la două adrese e conținut dublat pentru Google) și adresa de lucru a
+  Railway (`….up.railway.app`), care ocolește Cloudflare cu tot cu
+  firewall-ul lui. Amândouă se trimit, cu 308, la adresa adevărată.
+  `localhost` și `127.0.0.1` rămân: pe ele rulează probele, iar pagina de 404
+  de mai jos se cere chiar de la `127.0.0.1`.
+*/
+function gazdaDeMutat(gazda: string): boolean {
+  const g = gazda.toLowerCase().replace(/:\d+$/, "");
+  return g === `www.${GAZDA}` || g.endsWith(".up.railway.app");
+}
+
+/*
+  Un POST venit de pe alt site e refuzat.
+
+  Cookie-urile panoului sunt `SameSite=strict`, deci un formular pus pe alt
+  site n-ar avea cu ce lucra în panou. Dar intrarea în panou, formularele
+  publice și contul donatorului nu cer cookie — de pe un site străin se putea
+  deci, de exemplu, intra pe ascuns în panou cu contul atacatorului, iar omul
+  scria apoi lucruri crezând că e în al lui. Browserele trimit `Origin` la
+  orice POST; dacă lipsește, cererea nu vine dintr-un browser (cron-ul
+  radarului, Stripe, PayPal) și trece.
+*/
+const FARA_ORIGIN = [/\/webhook$/, /^\/api\/radar$/];
+
+function originStrain(cerere: NextRequest): boolean {
+  const metoda = cerere.method.toUpperCase();
+  if (metoda === "GET" || metoda === "HEAD" || metoda === "OPTIONS") return false;
+  const cale = cerere.nextUrl.pathname;
+  if (!cale.startsWith("/api/")) return false;
+  if (FARA_ORIGIN.some((r) => r.test(cale))) return false;
+  const origin = cerere.headers.get("origin");
+  if (!origin) return false;
+  let gazdaOrigin: string;
+  try {
+    gazdaOrigin = new URL(origin).host.toLowerCase();
+  } catch {
+    return true;
+  }
+  const bune = new Set(
+    [
+      cerere.headers.get("x-forwarded-host"),
+      cerere.headers.get("host"),
+      GAZDA,
+      `www.${GAZDA}`,
+    ]
+      .filter((x): x is string => Boolean(x))
+      .map((x) => x.toLowerCase()),
+  );
+  return !bune.has(gazdaOrigin);
+}
 
 const SLUGURI = new Set(proiecteAfisate().map((p) => p.slug));
 
@@ -86,6 +147,23 @@ async function estePublicat(fel: string, slug: string): Promise<boolean | null> 
 }
 
 export default async function proxy(cerere: NextRequest) {
+  const gazda =
+    cerere.headers.get("x-forwarded-host") ?? cerere.headers.get("host") ?? "";
+  if (gazdaDeMutat(gazda)) {
+    const { pathname, search } = cerere.nextUrl;
+    return new NextResponse(null, {
+      status: 308,
+      headers: { Location: `https://${GAZDA}${pathname}${search}` },
+    });
+  }
+
+  if (originStrain(cerere)) {
+    return new NextResponse("Cererea vine de pe alt site.", {
+      status: 403,
+      headers: { "content-type": "text/plain; charset=utf-8" },
+    });
+  }
+
   const potriveste = cerere.nextUrl.pathname.match(
     /^\/(proiecte|noutati|campanii)\/(.+)$/,
   );

@@ -1,6 +1,7 @@
 import { createHash, createHmac, randomBytes } from "node:crypto";
 import { intreaba } from "./baza";
 import { egale } from "./comparatie";
+import { cheiaDeSemnat } from "./cheie-semnare";
 
 /**
  * Contul donatorului: intrare fără parolă, prin link trimis pe e-mail.
@@ -49,8 +50,7 @@ function amprenta(jeton: string): string {
  * implicită — o cheie implicită e aceeași pe toate instalările, deci publică.
  */
 function cheieSesiune(): string | null {
-  const cheie = process.env.SECRET_SESIUNE ?? process.env.PAROLA_ADMIN;
-  return cheie && cheie.length >= 16 ? cheie : null;
+  return cheiaDeSemnat();
 }
 
 export function areConturi(): boolean {
@@ -72,10 +72,24 @@ export function areConturi(): boolean {
  * Schimbarea invalidează sesiunile deschise: oamenii cer un link nou. E un
  * preț de nimic, plătit o dată.
  */
-export function semneaza(email: string): string {
+export function semneaza(email: string, expira: number): string {
   const cheie = cheieSesiune();
   if (!cheie) throw new Error("Lipsește cheia de sesiune.");
-  return createHmac("sha256", cheie).update(`cont:${email}`).digest("hex");
+  return createHmac("sha256", cheie)
+    .update(`cont:${email}:${expira}`)
+    .digest("hex");
+}
+
+/**
+ * Valoarea cookie-ului: `email|expiră|semnătură`.
+ *
+ * Expirarea stă în semnătură din octombrie 2026. Înainte, o valoare copiată
+ * din browser mergea cât timp nu se schimba cheia — luni sau ani —, iar
+ * `maxAge` e doar o rugăminte făcută browserului.
+ */
+export function valoareaSesiunii(email: string): string {
+  const expira = Math.floor(Date.now() / 1000) + VIATA_SESIUNE_S;
+  return `${email}|${expira}|${semneaza(email, expira)}`;
 }
 
 /**
@@ -137,12 +151,17 @@ export function cititSesiunea(brut: string | undefined): string | null {
   // în loc să compare bucăți greșite.
   const taiere = brut.lastIndexOf("|");
   if (taiere <= 0) return null;
-  const email = brut.slice(0, taiere);
   const semnatura = brut.slice(taiere + 1);
+  const rest = brut.slice(0, taiere);
+  const taiere2 = rest.lastIndexOf("|");
+  if (taiere2 <= 0) return null;
+  const email = rest.slice(0, taiere2);
+  const expira = Number(rest.slice(taiere2 + 1));
+  if (!Number.isInteger(expira) || expira * 1000 <= Date.now()) return null;
 
   let asteptat: string;
   try {
-    asteptat = semneaza(email);
+    asteptat = semneaza(email, expira);
   } catch {
     return null;
   }

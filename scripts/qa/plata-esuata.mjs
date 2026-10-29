@@ -126,7 +126,7 @@ try {
   }
 
   // ─── 1. Fără semnătură, nimic ──────────────────────────────────────────
-  const corp1 = factura("evt_proba_1", "invoice.payment_failed");
+  const corp1 = factura(`evt_proba_${Date.now()}_1`, "invoice.payment_failed");
   const nesemnat = await trimiteEveniment(corp1, null);
   verifica(nesemnat.status === 400, "un eveniment nesemnat e refuzat (400)");
 
@@ -141,7 +141,7 @@ try {
   verifica(primul.status === 200, "eșecul semnat e primit (200)");
 
   // Aceeași factură, alt eveniment: Stripe reîncearcă.
-  const corp2 = factura("evt_proba_2", "invoice.payment_failed");
+  const corp2 = factura(`evt_proba_${Date.now()}_2`, "invoice.payment_failed");
   const alDoilea = await trimiteEveniment(corp2, semneaza(corp2));
   verifica(alDoilea.status === 200, "reîncercarea e primită și ea (200)");
 
@@ -182,7 +182,7 @@ try {
   );
 
   // ─── 4. Plata trece: rândul se închide ─────────────────────────────────
-  const corpPlatit = factura("evt_proba_3", "invoice.paid");
+  const corpPlatit = factura(`evt_proba_${Date.now()}_3`, "invoice.paid");
   const platit = await trimiteEveniment(corpPlatit, semneaza(corpPlatit));
   verifica(platit.status === 200, "plata care trece e primită (200)");
 
