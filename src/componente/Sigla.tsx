@@ -66,6 +66,9 @@ export default function Sigla({
           >
             Asociația
           </span>
+          {/* Spațiul nu se vede (coloană flex), dar fără el textul citit de
+              cititoarele de ecran e „AsociațiaTeona Ariana”, iar eticheta
+              linkului din antet nu se mai potrivește cu ce scrie pe el. */}{" "}
           <span
             className={`text-[0.4em] leading-[1.05] font-extrabold tracking-[-0.025em] ${
               peFundalInchis ? "text-miere-300" : "text-miere-700"

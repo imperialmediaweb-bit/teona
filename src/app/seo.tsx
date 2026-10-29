@@ -113,6 +113,39 @@ const IMAGINE_GENERALA = {
   height: 630,
   alt: "Asociația Teona Ariana Suceava — „Împreună, aducem bucurie”. Copii, părinți și voluntari într-o tabără RESPIRO.",
 };
+/*
+  Cât arată Google dintr-un titlu și dintr-o descriere: în jur de 60 și,
+  respectiv, 155–160 de semne. Peste atât le taie el, la întâmplare, cu „…”
+  în mijlocul unui cuvânt — iar orice audit de SEO le numără ca greșeli.
+
+  Titlul paginii de pe site (`<h1>`) rămâne întreg; se scurtează numai ce
+  apare în fila browserului și în rezultatele căutării. Întâi cade numele
+  lung al asociației, apoi, dacă tot nu încape, titlul se taie la ultimul
+  cuvânt întreg. Textul asociației nu se schimbă, doar cât din el încape.
+*/
+const TITLU_MAXIM = 60;
+const DESCRIERE_MAXIMA = 155;
+const SUFIX_SCURT = "Teona Ariana";
+
+function taieLaCuvant(text: string, maxim: number): string {
+  if (text.length <= maxim) return text;
+  const bucata = text.slice(0, maxim - 1);
+  // O propoziție întreagă e mai bună decât una tăiată: „… Suceava. 3…”.
+  const punct = bucata.lastIndexOf(". ");
+  if (punct > maxim * 0.6) return bucata.slice(0, punct + 1);
+  const spatiu = bucata.lastIndexOf(" ");
+  return `${(spatiu > maxim / 2 ? bucata.slice(0, spatiu) : bucata).replace(/[\s,.;:!?—–-]+$/, "")}…`;
+}
+
+/** Titlul din `<title>`, cel mult 60 de semne. */
+function titluPentruCautare(titlu: string): string {
+  const lung = `${titlu} · ${ASOCIATIA.denumire}`;
+  if (lung.length <= TITLU_MAXIM) return lung;
+  const scurt = `${titlu} · ${SUFIX_SCURT}`;
+  if (scurt.length <= TITLU_MAXIM) return scurt;
+  return taieLaCuvant(titlu, TITLU_MAXIM);
+}
+
 export function metadate({
   titlu,
   descriere,
@@ -129,9 +162,8 @@ export function metadate({
   /** `true` = titlul e deja complet și nu trece prin șablon (prima pagină). */
   titluAbsolut?: boolean;
 }): Metadata {
-  const titluComplet = titluAbsolut
-    ? titlu
-    : `${titlu} · ${ASOCIATIA.denumire}`;
+  const titluComplet = titluAbsolut ? titlu : titluPentruCautare(titlu);
+  descriere = taieLaCuvant(descriere, DESCRIERE_MAXIMA);
   const imagini = [
     imagine
       ? { url: absoluta(imagine.cale), alt: imagine.alt }
@@ -139,7 +171,7 @@ export function metadate({
   ];
 
   return {
-    title: titluAbsolut ? { absolute: titlu } : titlu,
+    title: { absolute: titluComplet },
     description: descriere,
     alternates: { canonical: cale },
     openGraph: {

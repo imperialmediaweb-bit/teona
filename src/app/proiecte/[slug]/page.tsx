@@ -59,7 +59,7 @@ export async function generateMetadata({
     total === 0 ? "" : total === 1 ? " O fotografie." : ` ${total} fotografii.`;
   return metadate({
     titlu: proiect.titlu,
-    descriere: `${proiect.titlu} — proiect al Asociației Teona Ariana Suceava.${fotografii}`,
+    descriere: `${proiect.titlu} — proiect al Asociației Teona Ariana Suceava.${fotografii} Află cum poți ajuta copiii din proiectele noastre.`,
     cale: `/proiecte/${proiect.slug}`,
     // Fotografia proiectului spune mai mult decât imaginea generală a site-ului.
     imagine: proiect.coperta

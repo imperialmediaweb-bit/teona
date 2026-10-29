@@ -1305,6 +1305,17 @@ antetele, subdomeniile și versiunile afișate. Ce s-a găsit și ce s-a făcut:
 - `next` 16.4.0 → **16.4.3** (două execuții de cod de la distanță, publice),
   `zod` actualizat. `npm audit` dă 0.
 - `/.well-known/security.txt` cu adresa de contact.
+- **SEO și viteză, în aceeași zi** (Lighthouse pe zece pagini, crawl pe tot
+  sitemapul, cele 72 de adrese vechi din WordPress): accesibilitate și SEO
+  100 peste tot. S-au reparat: `<title>` peste 60 de semne și descrieri peste
+  155 (`metadate()` din `seo.tsx` le scurtează la cuvânt sau la propoziție;
+  `<h1>`-ul rămâne întreg); scriptul de statistici pe care **Cloudflare îl
+  lipește singur** în pagină era blocat de CSP și dădea eroare în consolă;
+  caruselul de pe prima pagină pornește abia după primul gest (altfel fiecare
+  poză nouă era „LCP” și Google măsura 6 secunde); Kalam nu se mai
+  preîncarcă (patru fonturi întârziau fotografia din capul paginii); spațiu
+  ascuns între „Asociația” și „Teona Ariana” în siglă, ca eticheta linkului
+  să se potrivească cu textul.
 - **Ce nu ține de cod** (DNS în Cloudflare, găzduirea veche) e în raportul din
   conversație: `ftp.teona-ariana.ro` arăta `phpinfo()`, WordPress-ul vechi se
   vede pe `mail.teona-ariana.ro` cu GiveWP 3.18.0 (vulnerabilitate critică

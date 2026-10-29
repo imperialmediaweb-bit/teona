@@ -40,11 +40,15 @@ const nunitoSans = Nunito_Sans({
   display: "swap",
 });
 
+// Kalam nu se preîncarcă: scrie doar legendele mici de pe poze, iar patru
+// fișiere de font cerute la început, cu prioritate mare, întârziau fotografia
+// din capul paginii cu peste două secunde pe telefon (măsurat cu Lighthouse).
 const kalam = Kalam({
   variable: "--font-kalam",
   subsets: ["latin", "latin-ext"],
   weight: ["400", "700"],
   display: "swap",
+  preload: false,
 });
 
 /**

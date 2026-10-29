@@ -77,9 +77,20 @@ const GOOGLE_SCRIPT = "https://www.googletagmanager.com";
 const GOOGLE_DATE =
   "https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com";
 
+/*
+  Statisticile Cloudflare (Web Analytics), puse în pagină de Cloudflare, nu de
+  noi: proxy-ul lipește scriptul la sfârșitul fiecărei pagini. Fără ele în
+  politică, browserul îl refuza și scria o eroare în consolă la fiecare
+  vizită — eroare pe care Lighthouse o numără la „bune practici”. Nu pune
+  cookie-uri și nu urmărește omul între site-uri, deci nu atârnă de acord.
+  Dacă statisticile se opresc din Cloudflare, rândul ăsta nu mai face nimic.
+*/
+const CLOUDFLARE_STATISTICI = "https://static.cloudflareinsights.com";
+const CLOUDFLARE_DATE = "https://cloudflareinsights.com";
+
 const politicaDeContinut = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${dezvoltare ? " 'unsafe-eval'" : ""} ${FORMULAR230} ${GOOGLE_SCRIPT}`,
+  `script-src 'self' 'unsafe-inline'${dezvoltare ? " 'unsafe-eval'" : ""} ${FORMULAR230} ${GOOGLE_SCRIPT} ${CLOUDFLARE_STATISTICI}`,
   `style-src 'self' 'unsafe-inline' ${FORMULAR230}`,
   // `data:` pentru fundalurile SVG din CSS și pentru pozele neclare de
   // încărcare ale lui `next/image`; `blob:` pentru previzualizări locale.
@@ -87,7 +98,7 @@ const politicaDeContinut = [
   // Fonturile vin de pe domeniul nostru, prin `next/font`. Dacă aici ar
   // trebui vreodată adăugat Google Fonts, înseamnă că s-a stricat ceva.
   "font-src 'self'",
-  `connect-src 'self'${dezvoltare ? " ws: wss:" : ""} ${GOOGLE_DATE}`,
+  `connect-src 'self'${dezvoltare ? " ws: wss:" : ""} ${GOOGLE_DATE} ${CLOUDFLARE_DATE}`,
   `frame-src ${FORMULAR230}`,
   "frame-ancestors 'none'",
   "object-src 'none'",

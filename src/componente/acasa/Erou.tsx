@@ -78,6 +78,7 @@ export default function Erou({
     anterior: number | null;
   }>({ activ: 0, anterior: null });
   const [oprit, setOprit] = useState(false);
+  const [pornit, setPornit] = useState(false);
 
   function mergiLa(index: number) {
     const urmator = (index + FOTOGRAFII.length) % FOTOGRAFII.length;
@@ -86,8 +87,32 @@ export default function Erou({
     );
   }
 
+  /*
+    Fotografiile încep să se schimbe abia după primul gest al omului (o
+    atingere, o derulare, o tastă) sau după 20 de secunde.
+
+    Pornite de la încărcare, la 7 secunde, fiecare poză nouă era pentru
+    browser „cel mai mare lucru apărut pe ecran”, deci timpul de încărcare
+    măsurat de Google (LCP) ieșea 6 secunde pe telefon în loc de 2 —
+    exact cifra pe care o citește orice audit de viteză. După primul gest
+    măsurătoarea se încheie, deci schimbările nu mai contează.
+  */
   useEffect(() => {
-    if (fara_miscare || oprit) return;
+    if (pornit) return;
+    const porneste = () => setPornit(true);
+    const evenimente = ["pointerdown", "keydown", "scroll", "touchstart"] as const;
+    for (const e of evenimente) {
+      window.addEventListener(e, porneste, { once: true, passive: true });
+    }
+    const rezerva = setTimeout(porneste, 20000);
+    return () => {
+      clearTimeout(rezerva);
+      for (const e of evenimente) window.removeEventListener(e, porneste);
+    };
+  }, [pornit]);
+
+  useEffect(() => {
+    if (fara_miscare || oprit || !pornit) return;
     const ceas = setInterval(
       () =>
         setPozitie((p) => ({
@@ -97,7 +122,7 @@ export default function Erou({
       INTERVAL,
     );
     return () => clearInterval(ceas);
-  }, [fara_miscare, oprit]);
+  }, [fara_miscare, oprit, pornit]);
 
   const fotografie = FOTOGRAFII[activ];
 
