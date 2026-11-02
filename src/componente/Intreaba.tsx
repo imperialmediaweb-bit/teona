@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { abonareLaAcord, areAcord } from "@/lib/cookieuri";
+import { antetOm } from "@/lib/antet-om";
 
 /**
  * Caseta de întrebări de pe site.
@@ -79,7 +80,7 @@ export default function Intreaba() {
     try {
       const r = await fetch("/api/intreaba", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: { "content-type": "application/json", ...antetOm() },
         body: JSON.stringify({ mesaje: pana }),
       });
 

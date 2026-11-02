@@ -52,7 +52,8 @@ for (const [email, nume, suma, frecventa] of [
 async function cereJeton(page, email) {
   const r = await page.request.post(BAZA + "/api/cont/intrare", {
     data: { email },
-    headers: { "Content-Type": "application/json" },
+    // „x-deschis”: ce pune pagina la trimitere (lib/antet-om.ts).
+    headers: { "Content-Type": "application/json", "x-deschis": "10" },
   });
   return r;
 }

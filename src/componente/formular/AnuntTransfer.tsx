@@ -10,6 +10,7 @@ import Camp, {
   claseControl,
   claseControlGresit,
 } from "./Camp";
+import { antetOm } from "@/lib/antet-om";
 
 /**
  * „Am făcut transferul” — bifa donatorului.
@@ -98,6 +99,7 @@ export default function AnuntTransfer() {
     try {
       const raspuns = await fetch("/api/donatii/transfer", {
         method: "POST",
+        headers: antetOm(),
         body: date,
       });
       const corp = (await raspuns.json().catch(() => ({}))) as {

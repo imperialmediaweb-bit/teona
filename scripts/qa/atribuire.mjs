@@ -49,6 +49,8 @@ async function cere(cale, optiuni = {}) {
     headers: {
       ...(optiuni.headers ?? {}),
       "x-forwarded-for": DE_LA,
+      // Ce pune pagina la trimiterea unui formular (lib/antet-om.ts).
+      "x-deschis": "10",
       ...(cookie ? { cookie } : {}),
     },
   });

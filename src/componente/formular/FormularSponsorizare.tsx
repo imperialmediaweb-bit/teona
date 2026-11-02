@@ -13,6 +13,7 @@ import Camp, {
   claseControlGresit,
 } from "./Camp";
 import CampCui, { type Firma } from "./CampCui";
+import { antetOm } from "@/lib/antet-om";
 
 /**
  * Cererea unei firme care vrea să sponsorizeze (8).
@@ -95,7 +96,7 @@ export default function FormularSponsorizare() {
     try {
       const raspuns = await fetch("/api/formulare", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...antetOm() },
         body: JSON.stringify({
           fel: "sponsorizare",
           firma: date.get("firma"),

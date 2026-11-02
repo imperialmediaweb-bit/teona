@@ -1,6 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { proiecteAfisate } from "@/date/proiecte";
 import { areBazaDeDate, intreaba } from "@/lib/baza";
+import { adresaClient } from "@/lib/api";
+import { eNodTor } from "@/lib/tor";
+import { ANTET_OM } from "@/lib/antet-om";
+import { EMAIL } from "@/date/asociatie";
 
 /**
  * O adresă de proiect care nu există răspunde cu 404, nu cu 200.
@@ -82,6 +86,45 @@ function gazdaDeMutat(gazda: string): boolean {
 */
 const FARA_ORIGIN = [/\/webhook$/, /^\/api\/radar$/];
 
+/*
+  Rutele formularelor publice: fiecare formular de pe site pune antetul din
+  `lib/antet-om.ts` (câte secunde a stat pagina deschisă). Fără el, sau sub
+  o secundă, cererea n-a venit de la un om care a completat pagina.
+  Răspunsul e un „primit” gol, nu o eroare: un robot care primește eroare
+  încearcă altceva; unul care crede că a mers, nu.
+*/
+const FORMULARE_PUBLICE = new Set([
+  "/api/campanii",
+  "/api/contact",
+  "/api/formulare",
+  "/api/formulare-230",
+  "/api/newsletter",
+  "/api/donatii/transfer",
+  "/api/donatii/stripe",
+  "/api/donatii/paypal",
+  "/api/contract/descarca",
+  "/api/cont/intrare",
+  "/api/intreaba",
+  "/api/asistent/aniversare",
+]);
+
+function faraOm(cerere: NextRequest): boolean {
+  if (cerere.method.toUpperCase() !== "POST") return false;
+  if (!FORMULARE_PUBLICE.has(cerere.nextUrl.pathname)) return false;
+  const secunde = Number(cerere.headers.get(ANTET_OM));
+  return !(Number.isFinite(secunde) && secunde >= 1);
+}
+
+/** Un POST din `/api` venit de la un nod Tor (vezi `lib/tor.ts`). */
+async function trimitereDinTor(cerere: NextRequest): Promise<boolean> {
+  if (cerere.method.toUpperCase() !== "POST") return false;
+  const cale = cerere.nextUrl.pathname;
+  if (!cale.startsWith("/api/") || FARA_ORIGIN.some((r) => r.test(cale))) {
+    return false;
+  }
+  return eNodTor(adresaClient(cerere));
+}
+
 function originStrain(cerere: NextRequest): boolean {
   const metoda = cerere.method.toUpperCase();
   if (metoda === "GET" || metoda === "HEAD" || metoda === "OPTIONS") return false;
@@ -162,6 +205,19 @@ export default async function proxy(cerere: NextRequest) {
       status: 403,
       headers: { "content-type": "text/plain; charset=utf-8" },
     });
+  }
+
+  if (faraOm(cerere)) {
+    return NextResponse.json({}, { status: 202, headers: { "Cache-Control": "no-store" } });
+  }
+
+  if (await trimitereDinTor(cerere)) {
+    return NextResponse.json(
+      {
+        mesaj: `Din rețeaua Tor nu se pot trimite formulare pe site. Scrie-ne la ${EMAIL.contact} sau sună-ne.`,
+      },
+      { status: 403, headers: { "Cache-Control": "no-store" } },
+    );
   }
 
   const potriveste = cerere.nextUrl.pathname.match(

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { email as citesteEmail, esteRobot, limitaDeRata, raspuns, text, formularCuLimita } from "@/lib/api";
+import { email as citesteEmail, esteRobot, limitaDeRata, pareText, raspuns, text, formularCuLimita } from "@/lib/api";
 import { areBazaDeDate } from "@/lib/baza";
 import { creeazaCampanie } from "@/lib/campanii";
 import { anuntaAsociatia, campanieTrimisa } from "@/lib/email/campanie";
@@ -72,13 +72,17 @@ export async function POST(cerere: Request) {
   if (!esteOcazie(ocazie)) return raspuns("Alege ocazia campaniei.", 400);
 
   const titlu = text(camp("titlu"), LIMITE.titlu);
-  if (!titlu) return raspuns("Scrie un titlu pentru pagina ta.", 400);
+  if (!titlu || !pareText(titlu)) return raspuns("Scrie un titlu pentru pagina ta.", 400);
 
   const mesaj = text(camp("mesaj"), LIMITE.mesaj);
-  if (!mesaj) return raspuns("Scrie câteva rânduri despre campania ta.", 400);
+  if (!mesaj || !pareText(mesaj) || mesaj.split(/\s+/).filter(Boolean).length < 3) {
+    return raspuns("Scrie câteva rânduri despre campania ta.", 400);
+  }
 
   const numePublic = text(camp("nume_public"), LIMITE.numePublic);
-  if (!numePublic) return raspuns("Scrie numele care apare pe pagină.", 400);
+  if (!numePublic || !pareText(numePublic)) {
+    return raspuns("Scrie numele care apare pe pagină.", 400);
+  }
 
   const email = citesteEmail(camp("email"));
   if (!email) return raspuns("Introdu o adresă de e-mail validă.", 400);

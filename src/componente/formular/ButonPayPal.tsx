@@ -10,6 +10,7 @@ import {
 import { atribuireaCurenta } from "@/lib/atribuire-browser";
 import { citesteSuma, scrieSuma } from "@/lib/suma";
 import Pictograma from "../Pictograma";
+import { antetOm } from "@/lib/antet-om";
 
 /**
  * Donația prin PayPal, în euro.
@@ -87,7 +88,7 @@ export default function ButonPayPal({
     try {
       const raspuns = await fetch("/api/donatii/paypal", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...antetOm() },
         body: JSON.stringify({
           euro: suma,
           destinatie,

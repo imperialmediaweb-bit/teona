@@ -12,6 +12,7 @@ import Camp, {
   claseControlGresit,
 } from "./Camp";
 import CampCui, { type Firma } from "./CampCui";
+import { antetOm } from "@/lib/antet-om";
 
 /** 10.4 — alegerile din „Sunt interesat de”, în ordinea din caiet. */
 const INTERESE = [
@@ -94,7 +95,7 @@ export default function FormularContact() {
     try {
       const raspuns = await fetch("/api/contact", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...antetOm() },
         body: JSON.stringify({
           fel: "contact",
           nume: date.get("nume"),

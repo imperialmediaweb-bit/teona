@@ -44,6 +44,8 @@ function ziua(peste = 0) {
 async function anunta(date) {
   const r = await fetch(`${BAZA}/api/donatii/transfer`, {
     method: "POST",
+    // Ce pune pagina la trimitere (lib/antet-om.ts); fără el, proxy-ul răspunde 202 gol.
+    headers: { "x-deschis": "10" },
     body: new URLSearchParams(date),
   });
   const corp = await r.json().catch(() => ({}));

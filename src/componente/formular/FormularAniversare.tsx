@@ -12,6 +12,7 @@ import Camp, {
   claseControl,
   claseControlGresit,
 } from "./Camp";
+import { antetOm } from "@/lib/antet-om";
 
 /**
  * Formularul prin care cineva își face pagina de campanie.
@@ -113,7 +114,7 @@ export default function FormularAniversare({
     try {
       const raspuns = await fetch("/api/asistent/aniversare", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...antetOm() },
         body: JSON.stringify({ text: el.value }),
       });
       const corp = (await raspuns.json().catch(() => ({}))) as {
@@ -146,7 +147,7 @@ export default function FormularAniversare({
 
     if (!sir("ocazie")) gasite.ocazie = "Alege ocazia campaniei.";
     if (!sir("titlu")) gasite.titlu = "Scrie un titlu pentru pagina ta.";
-    if (!sir("mesaj"))
+    if (sir("mesaj").split(/\s+/).filter(Boolean).length < 3)
       gasite.mesaj = "Scrie câteva rânduri despre campania ta.";
     if (!sir("nume_public")) gasite.nume = "Scrie numele care apare pe pagină.";
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(sir("email")))
@@ -171,6 +172,7 @@ export default function FormularAniversare({
     try {
       const raspuns = await fetch("/api/campanii", {
         method: "POST",
+        headers: antetOm(),
         body: date,
       });
       const corp = (await raspuns.json().catch(() => ({}))) as {

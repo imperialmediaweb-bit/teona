@@ -10,6 +10,7 @@ import Camp, {
   claseControl,
   claseControlGresit,
 } from "./Camp";
+import { antetOm } from "@/lib/antet-om";
 
 /**
  * Numărul pe care se primesc pozele.
@@ -79,6 +80,7 @@ export default function TrimiteFormular230({
     try {
       const raspuns = await fetch("/api/formulare-230", {
         method: "POST",
+        headers: antetOm(),
         body: date,
       });
       const corp = (await raspuns.json().catch(() => ({}))) as {

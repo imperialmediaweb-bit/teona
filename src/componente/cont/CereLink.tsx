@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import { EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import Pictograma from "../Pictograma";
+import { antetOm } from "@/lib/antet-om";
 
 /**
  * Formularul prin care donatorul cere linkul de intrare.
@@ -40,7 +41,7 @@ export default function CereLink() {
     try {
       const raspuns = await fetch("/api/cont/intrare", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...antetOm() },
         body: JSON.stringify({ email: adresa, site_web: date.get("site_web") }),
       });
       const corp = (await raspuns.json().catch(() => ({}))) as {

@@ -13,6 +13,7 @@ import Camp, {
   claseControl,
   claseControlGresit,
 } from "./Camp";
+import { antetOm } from "@/lib/antet-om";
 
 type Erori = Partial<Record<"nume" | "email" | "nastere" | "acord", string>>;
 
@@ -221,7 +222,7 @@ export default function FormularVoluntar() {
     try {
       const raspuns = await fetch("/api/contact", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...antetOm() },
         body: JSON.stringify({
           fel: "voluntariat",
           nume,

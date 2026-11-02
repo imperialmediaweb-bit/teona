@@ -1316,6 +1316,23 @@ antetele, subdomeniile și versiunile afișate. Ce s-a găsit și ce s-a făcut:
   preîncarcă (patru fonturi întârziau fotografia din capul paginii); spațiu
   ascuns între „Asociația” și „Teona Ariana” în siglă, ca eticheta linkului
   să se potrivească cu textul.
+- **Roboții de la formulare** (2 noiembrie 2026): o campanie de aniversare
+  „jfqbwd”, cu nume „294486712744” și adresă de unică folosință, a ajuns la
+  aprobare. Jurnalul HTTP al Railway arată de unde: zece încercări în patru
+  zile, **toate prin Tor**, fiecare de la alt nod (capcana `site_web` le
+  prinsese pe nouă), plus opt cereri aruncate în formularul de card — semnul
+  obișnuit al testării cardurilor furate. Trei bariere, toate în
+  `src/proxy.ts`, deci pentru **toate** formularele publice deodată:
+  - **Tor nu trimite formulare** (`lib/tor.ts`, lista Tor Project,
+    reîmprospătată din oră în oră; dacă lista nu vine, trece tot). Paginile
+    se citesc normal; POST-ul primește 403 cu e-mailul asociației.
+  - **Antetul `x-deschis`** (`lib/antet-om.ts`): fiecare formular îl pune la
+    trimitere, din `performance.now()`. Fără el sau sub o secundă — un robot
+    care lovește ruta direct — răspunsul e un `202 {}` gol, ca la capcană.
+    **O probă care face `fetch` direct la o rută de formular trebuie să-l pună**,
+    altfel primește 202 și pare că ruta nu mai scrie nimic.
+  - **Textul trebuie să semene a text** (`pareText()` din `lib/api.ts`):
+    titlul, numele și mesajul campaniei cer o vocală, iar mesajul trei cuvinte.
 - **Ce nu ține de cod** (DNS în Cloudflare, găzduirea veche) e în raportul din
   conversație: `ftp.teona-ariana.ro` arăta `phpinfo()`, WordPress-ul vechi se
   vede pe `mail.teona-ariana.ro` cu GiveWP 3.18.0 (vulnerabilitate critică

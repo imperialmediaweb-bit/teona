@@ -22,6 +22,7 @@ import Camp, {
   claseControl,
   claseControlGresit,
 } from "./Camp";
+import { antetOm } from "@/lib/antet-om";
 
 const SUME = [20, 50, 100] as const;
 
@@ -208,7 +209,7 @@ function Formular({
     try {
       const raspuns = await fetch("/api/donatii/stripe", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...antetOm() },
         body: JSON.stringify({
           lei: sumaAleasa,
           frecventa: lunar ? "lunar" : "o-data",

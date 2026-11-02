@@ -34,12 +34,17 @@ const bun = () => ({
   reprezentant: "Ion Probă",
   calitate: "Administrator",
   telefon: "0712345678",
+  // E-mailul e obligatoriu din octombrie 2026: un contract a ieșit fără el și
+  // n-a lăsat nicio urmă în panou.
+  email: "proba@exemplu.ro",
   valoare: "5.000",
 });
 
 async function descarca(date, fel) {
   const r = await fetch(`${BAZA}/api/contract/descarca`, {
     method: "POST",
+    // Ce pune pagina la trimitere (lib/antet-om.ts); fără el, proxy-ul răspunde 202 gol.
+    headers: { "x-deschis": "10" },
     body: new URLSearchParams({ ...date, fel }),
   });
   if (!r.ok) {

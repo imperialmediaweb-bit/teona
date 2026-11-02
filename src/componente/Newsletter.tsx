@@ -3,6 +3,7 @@
 import { useEffect, useId, useState } from "react";
 import { EMAIL } from "@/date/asociatie";
 import Decor from "./Decor";
+import { antetOm } from "@/lib/antet-om";
 
 type Stare =
   | { fel: "gol" }
@@ -56,7 +57,7 @@ export default function Newsletter() {
     try {
       const raspuns = await fetch("/api/newsletter", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...antetOm() },
         body: JSON.stringify({
           email: date.get("email"),
           nume: date.get("nume"),

@@ -12,6 +12,7 @@ import Camp, {
   claseControl,
   claseControlGresit,
 } from "./Camp";
+import { antetOm } from "@/lib/antet-om";
 
 /**
  * „Trimite-mi pașii” pentru Formularul 230 (7).
@@ -65,7 +66,7 @@ export default function FormularRedirectionare() {
     try {
       const raspuns = await fetch("/api/formulare", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...antetOm() },
         body: JSON.stringify({
           fel: "redirectionare",
           nume: date.get("nume"),

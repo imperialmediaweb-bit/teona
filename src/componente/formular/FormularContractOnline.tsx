@@ -10,6 +10,7 @@ import Camp, {
   claseControlGresit,
 } from "./Camp";
 import CampCui, { type Firma } from "./CampCui";
+import { antetOm } from "@/lib/antet-om";
 
 /**
  * Contractul de sponsorizare, completat și semnat pe site.
@@ -131,6 +132,7 @@ function Formular() {
     try {
       const raspuns = await fetch("/api/contract/descarca", {
         method: "POST",
+        headers: antetOm(),
         body: date,
       });
       if (!raspuns.ok) {

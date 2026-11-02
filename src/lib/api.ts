@@ -255,7 +255,7 @@ function eCloudflare(ip: string): boolean {
  * Fără `X-Real-IP` nu suntem pe Railway (rulare locală, probe): acolo se ia
  * `X-Forwarded-For`, ca probele să poată juca mai mulți oameni.
  */
-function adresaClient(cerere: Request): string {
+export function adresaClient(cerere: Request): string {
   const real = cerere.headers.get("x-real-ip")?.trim();
   if (real) {
     if (eCloudflare(real)) {
@@ -356,6 +356,18 @@ export function email(valoare: unknown): string | null {
  * Dacă e completat, ruta răspunde ca și cum a mers, fără să facă nimic:
  * robotul nu află că a fost prins, și nu încearcă altfel.
  */
+/**
+ * Seamănă textul a cuvinte? Măcar o vocală și măcar o literă.
+ *
+ * „jfqbwd” și „294486712744” n-au trecut niciodată printr-o mână de om
+ * care scrie un titlu sau un nume. Regula e largă dinadins: orice nume, din
+ * orice limbă cu alfabet latin, are o vocală.
+ */
+export function pareText(valoare: string): boolean {
+  return /[a-zăâîșțáéíóúäëïöüyà-ÿ]/i.test(valoare) &&
+    /[aeiouăâîyáéíóúäëïöüàèìòù]/i.test(valoare);
+}
+
 export function esteRobot(corp: Record<string, unknown>): boolean {
   const capcana = corp.site_web;
   return typeof capcana === "string" && capcana.trim().length > 0;

@@ -102,7 +102,7 @@ const DE_LA = `198.51.100.${1 + Math.floor(Math.random() * 250)}`;
 async function intreaba(mesaje, deLa = DE_LA) {
   return fetch(`${BAZA}/api/intreaba`, {
     method: "POST",
-    headers: { "content-type": "application/json", "x-forwarded-for": deLa },
+    headers: { "content-type": "application/json", "x-forwarded-for": deLa, "x-deschis": "10" },
     body: JSON.stringify({ mesaje }),
   });
 }
@@ -171,7 +171,7 @@ try {
   // ─── 3. Capătul public e strâns legat ──────────────────────────────────
   const stramb = await fetch(`${BAZA}/api/intreaba`, {
     method: "POST",
-    headers: { "content-type": "application/json", "x-forwarded-for": DE_LA },
+    headers: { "content-type": "application/json", "x-forwarded-for": DE_LA, "x-deschis": "10" },
     body: "nu e json",
   });
   verifica(stramb.status === 400, `o cerere strâmbă e refuzată (${stramb.status})`);
