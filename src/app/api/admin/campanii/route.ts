@@ -1,6 +1,6 @@
 import { limitaDeRata, nuTrece, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
-import { hotaraste } from "@/lib/campanii";
+import { hotaraste, stergeSpam } from "@/lib/campanii";
 import { campanieHotarata } from "@/lib/email/campanie";
 
 /** Publicarea sau respingerea unei campanii, din lista de verificare. */
@@ -21,6 +21,10 @@ export async function POST(cerere: Request) {
   const hotarare = String(formular.get("hotarare") ?? "");
   if (!/^[0-9a-f-]{36}$/i.test(id))
     return nuTrece("Campanie necunoscută.");
+  if (hotarare === "spam") {
+    await stergeSpam(id);
+    return trimiteLa("/admin/aniversari");
+  }
   if (hotarare !== "publicata" && hotarare !== "respinsa") {
     return nuTrece("Hotărâre necunoscută.");
   }

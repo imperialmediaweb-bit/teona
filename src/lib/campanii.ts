@@ -213,3 +213,21 @@ export async function hotaraste(
     ? { email: r.email, numePublic: r.nume_public, titlu: r.titlu, slug: r.slug }
     : null;
 }
+
+/**
+ * Șterge o campanie trimisă de un robot. Fără e-mail și fără urmă.
+ *
+ * Respingerea păstrează rândul și scrie omului de ce; e pentru oameni. O
+ * campanie „jfqbwd” cu adresă de unică folosință n-are cui să i se scrie, iar
+ * păstrată ar sta în tabel printre campaniile adevărate. Merge numai pe ce
+ * așteaptă încă verificarea: una publicată sau respinsă nu se mai atinge.
+ */
+export async function stergeSpam(id: string): Promise<boolean> {
+  const randuri = await intreaba<{ id: string }>(
+    `DELETE FROM campanii_aniversare
+      WHERE id = $1 AND stare = 'in_asteptare'
+      RETURNING id`,
+    [id],
+  );
+  return randuri.length > 0;
+}

@@ -220,6 +220,17 @@ async function Continut({
                   Respinge
                 </button>
               </form>
+              {/* Pentru roboți: șterge de tot, fără e-mail. „Respinge” e pentru oameni. */}
+              <form action="/api/admin/campanii" method="post">
+                <input type="hidden" name="id" value={c.id} />
+                <input type="hidden" name="hotarare" value="spam" />
+                <button
+                  type="submit"
+                  className="rounded-full px-5 py-3 font-titlu text-mic font-bold text-caramiziu-700 hover:bg-tenta-cald"
+                >
+                  E spam — șterge
+                </button>
+              </form>
               <p className="self-center text-mic text-cerneala-slab">
                 /ziua-ta/{c.slug}
               </p>
