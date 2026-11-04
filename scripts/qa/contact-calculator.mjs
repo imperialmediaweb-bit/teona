@@ -43,11 +43,17 @@ await form.locator('button[type="submit"]').click();
 await page.waitForTimeout(1500);
 log("Răspuns API:", JSON.stringify(cereri));
 await stare("totul ok, cu acord → trimis");
-log("Buton după:", (await form.locator('button[type="submit"]').innerText()).trim(), " dezactivat:", await form.locator('button[type="submit"]').isDisabled());
-log("Valorile rămân? nume=", await form.locator('input[name="nume"]').inputValue(), " mesaj=", await form.locator('textarea[name="mesaj"]').inputValue());
-// Mesajul de eroare spune cinstit?
-const alertText = await form.locator('[role="alert"]').innerText();
-log("Textul alertei complet:", alertText.replace(/\s+/g, " "));
+// Cu e-mailul configurat, formularul trimis lasă locul confirmării.
+// Fără e-mail (503) formularul rămâne, cu alerta lui.
+if ((await form.count()) === 0 || !(await form.locator('button[type="submit"]').count())) {
+  const corp = await page.locator("main").innerText();
+  log("Confirmare după trimitere:", /Mulțumim|Am primit/.test(corp));
+  if (!/Mulțumim|Am primit/.test(corp)) process.exitCode = 1;
+} else {
+  log("Buton după:", (await form.locator('button[type="submit"]').innerText()).trim(), " dezactivat:", await form.locator('button[type="submit"]').isDisabled());
+  const alertText = await form.locator('[role="alert"]').innerText().catch(() => "");
+  log("Textul alertei complet:", alertText.replace(/\s+/g, " "));
+}
 
 log("\n=== Calculatorul (Direcționează 20%) ===");
 await page.goto(BAZA + "/directioneaza-20", { waitUntil: "load" });
