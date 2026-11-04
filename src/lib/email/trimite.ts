@@ -50,7 +50,10 @@ export async function trimiteEmail(mesaj: {
   atasamente?: Array<{ nume: string; continut: Uint8Array }>;
 }): Promise<boolean> {
   const cheie = process.env.RESEND_API_KEY;
-  if (!cheie) return false;
+  if (!cheie) {
+    console.error(`[email] RESEND_API_KEY lipsește; n-a plecat „${mesaj.subiect}”`);
+    return false;
+  }
 
   /*
     `EMAIL_API` mută trimiterea pe un server de probă.
@@ -88,8 +91,19 @@ export async function trimiteEmail(mesaj: {
           : {}),
       }),
     });
+    /*
+      Un refuz de la Resend (domeniu neverificat, adresă invalidă, limită)
+      vine ca 4xx cu motivul în corp. Fără rândul ăsta, un e-mail care nu
+      pleacă nu lasă nicio urmă: omul spune „n-am primit nimic”, iar
+      jurnalul e curat. Se scrie subiectul și motivul, nu adresa omului.
+    */
+    if (!raspuns.ok) {
+      const motiv = (await raspuns.text().catch(() => "")).slice(0, 300);
+      console.error(`[email] Resend ${raspuns.status} la „${mesaj.subiect}”: ${motiv}`);
+    }
     return raspuns.ok;
-  } catch {
+  } catch (e) {
+    console.error(`[email] rețea la „${mesaj.subiect}”: ${(e as Error).message}`);
     // Rețeaua a căzut sau Resend nu răspunde. Ruta va spune omului că n-a
     // mers și îi va da telefonul — nu „am primit mesajul tău".
     return false;

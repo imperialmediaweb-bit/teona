@@ -43,8 +43,17 @@ export async function dupaIncasare(
       ...date,
       email: rand.email,
       reinnoire,
-    }).catch(() => false);
+    }).catch((e) => {
+      console.error(`[plati] mulțumirea n-a putut fi compusă: ${(e as Error).message}`);
+      return false;
+    });
   }
+  // Urmă în jurnal, fără adresă: „n-am primit nimic” trebuie să aibă răspuns.
+  console.log(
+    `[plati] donație de ${Number(rand.suma_bani) / 100} ${rand.moneda} încasată; mulțumire ${
+      !rand.email ? "fără adresă" : multumireTrimisa ? "trimisă" : "NETRIMISĂ"
+    }`,
+  );
 
   // Asociația află de fiecare donație nouă: pe e-mail și pe telefon.
   // Reînnoirile lunare nu: ar fi același om în fiecare lună.
