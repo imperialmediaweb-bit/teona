@@ -1,7 +1,7 @@
 import { ADRESA_SITE } from "@/app/seo";
 import { ASOCIATIA, EMAIL } from "@/date/asociatie";
 import { curat, trimiteEmail } from "./trimite";
-import { MIC, P, buton, pagina } from "./plic";
+import { MIC, P, buton, caseta, pagina, paginaInterna } from "./plic";
 import type { Compus } from "./campanie";
 
 /**
@@ -45,5 +45,60 @@ export async function trimiteBunVenit(d: {
     catre: d.email,
     raspundeLa: EMAIL.contact,
     ...compuneBunVenit(d),
+  });
+}
+
+/**
+ * Către asociație: s-a abonat cineva la buletin.
+ *
+ * Numai la o abonare nouă (vezi `notaAbonarea` din `lib/buletin.ts`). Adresa
+ * e în mesaj fiindcă e a asociației: omul a dat-o ca să primească buletinul.
+ */
+export function compuneAnuntAbonare(d: {
+  email: string;
+  nume: string | null;
+  lista: "persoane" | "firme";
+  sursa: string;
+}): Compus {
+  const subiect = `Abonat nou la buletin${d.nume ? ` — ${d.nume}` : ""}`;
+  const rand = (k: string, v: string) =>
+    `<p style="${MIC}margin-bottom:4px;"><strong style="color:#232323;">${curat(k)}:</strong> ${curat(v)}</p>`;
+  const corp = `
+    <p style="${P}">S-a abonat cineva la buletinul informativ.</p>
+    ${caseta(
+      [
+        d.nume ? rand("Nume", d.nume) : "",
+        rand("E-mail", d.email),
+        rand("Lista", d.lista === "firme" ? "Firme" : "Persoane fizice"),
+        rand("De unde", d.sursa),
+      ].join(""),
+    )}
+    ${buton("Vezi abonații", `${ADRESA_SITE}/admin/abonati`)}`;
+  return {
+    subiect,
+    html: paginaInterna(subiect, corp, `${d.sursa}: ${d.email}`),
+    text: [
+      "S-a abonat cineva la buletinul informativ.",
+      d.nume ? `Nume: ${d.nume}` : "",
+      `E-mail: ${d.email}`,
+      `Lista: ${d.lista === "firme" ? "Firme" : "Persoane fizice"}`,
+      `De unde: ${d.sursa}`,
+      `${ADRESA_SITE}/admin/abonati`,
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  };
+}
+
+export async function anuntaAbonarea(d: {
+  email: string;
+  nume: string | null;
+  lista: "persoane" | "firme";
+  sursa: string;
+}): Promise<boolean> {
+  return trimiteEmail({
+    catre: EMAIL.contact,
+    raspundeLa: d.email,
+    ...compuneAnuntAbonare(d),
   });
 }

@@ -73,7 +73,8 @@ export async function dupaIncasare(
 
   // Pe lista de buletin ajunge doar cine a bifat el acordul.
   if (rand.acord_buletin && rand.email) {
-    await laBuletin(rand.email).catch(() => undefined);
+    const nume = [rand.prenume, rand.nume].filter(Boolean).join(" ") || null;
+    await laBuletin(rand.email, "persoane", nume, "donatie").catch(() => undefined);
   }
 }
 

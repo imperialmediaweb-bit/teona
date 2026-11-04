@@ -322,6 +322,21 @@ const ADAOSURI = `
     răspuns. Voluntarul e o cerere de voluntariat (cereri.id), nu un tabel
     nou: aceeași fișă, aceeași căutare, același export.
   */
+  /*
+    Cine s-a abonat la buletin, de unde și când. Lista adevărată e în
+    MailerLite; rândul de aici e ca asociația să afle de fiecare abonare și
+    să vadă în panou de unde vin abonații (formular, donație, cont), fără să
+    deschidă MailerLite. Cheia e adresa: o reabonare nu face un rând nou.
+  */
+  CREATE TABLE IF NOT EXISTS abonati_buletin (
+    email          text PRIMARY KEY,
+    nume           text,
+    lista          text NOT NULL DEFAULT 'persoane',
+    sursa          text NOT NULL,
+    creat_la       timestamptz NOT NULL DEFAULT now(),
+    dezabonat_la   timestamptz
+  );
+
   CREATE TABLE IF NOT EXISTS apeluri_voluntari (
     id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     titlu       text NOT NULL,

@@ -1,5 +1,6 @@
 import { compuneAnuntDonatie, construiesteMultumirea } from "../donatie";
-import { compuneBunVenit } from "../buletin";
+import { compuneAnuntAbonare, compuneBunVenit } from "../buletin";
+import { compuneApelul } from "../apel-voluntari";
 import { compuneIntrare } from "../cont";
 import { compuneAnunt, compuneHotarare, compuneTrimisa } from "../campanie";
 import {
@@ -77,6 +78,23 @@ export function exemple(): Exemplu[] {
       compus: compuneBunVenit({ nume: "Maria Popescu", firma: false }),
     },
     {
+      id: "apel-voluntari",
+      titlu: "Apel către voluntari",
+      cand: "Când trimiteți din panou, de la Voluntari, „Avem nevoie de voluntari pe data…”.",
+      catre: "om",
+      compus: compuneApelul(
+        {
+          titlu: "Tabăra de autism",
+          cand: "sâmbătă, 15 noiembrie, 10:00–14:00",
+          unde: "Casa Teona, Strada Zamca 22",
+          mesaj: "Avem nevoie de patru oameni care să stea cu copiii la ateliere.",
+        },
+        "Maria",
+        "https://teona-ariana.ro/voluntari/raspuns?r=pot",
+        "https://teona-ariana.ro/voluntari/raspuns?r=nu-pot",
+      ),
+    },
+    {
       id: "bun-venit-buletin-firma",
       titlu: "Bun venit la newsletter (firmă)",
       cand: "Imediat după abonarea unei firme din caseta de newsletter.",
@@ -141,6 +159,18 @@ export function exemple(): Exemplu[] {
         moneda: "RON",
         destinatie: "tabere",
         client: "cus_deproba123",
+      }),
+    },
+    {
+      id: "anunt-abonare",
+      titlu: "Anunț: abonat nou la buletin",
+      cand: "La fiecare abonare nouă: din caseta de newsletter, de la o donație cu bifa de buletin sau din contul de donator.",
+      catre: "asociatie",
+      compus: compuneAnuntAbonare({
+        email: "maria.popescu@exemplu.ro",
+        nume: "Maria Popescu",
+        lista: "persoane",
+        sursa: "Formularul de newsletter",
       }),
     },
     {

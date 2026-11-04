@@ -435,6 +435,7 @@ try {
 
   // ─── Newsletterul: bun venit pe e-mail ────────────────────────────────
   const en = `buletin.${T}@exemplu.ro`;
+  const notifNl = notificari.length;
   const nl = await fetch(`${BAZA}/api/newsletter`, {
     method: "POST",
     headers: { "content-type": "application/json", "x-deschis": "30", "x-forwarded-for": DE_LA() },
@@ -444,6 +445,24 @@ try {
   await asteapta(500);
   verifica(nl.ok && /bun venit/.test(rn.mesaj ?? ""), `newsletter: abonarea spune că a trimis bun venit (${rn.mesaj})`);
   verifica(catre(en).length === 1, "newsletter: e-mailul de bun venit chiar pleacă");
+  const anuntAbonare = emailuri.filter(
+    (e) => String(e.subject ?? "").startsWith("Abonat nou la buletin") && JSON.stringify(e).includes(en),
+  );
+  verifica(anuntAbonare.length === 1, "newsletter: asociația primește „Abonat nou la buletin”");
+  verifica(notificari.length === notifNl + 1, `newsletter: notificare pe telefon (${notificari.length - notifNl})`);
+  const abonatiPanou = await (await fetch(`${BAZA}/admin/abonati`, { headers: { cookie: cookieCont } })).text();
+  verifica(abonatiPanou.includes(en), "newsletter: abonatul se vede la /admin/abonati");
+  // A doua abonare cu aceeași adresă nu e o veste nouă.
+  await fetch(`${BAZA}/api/newsletter`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-deschis": "30", "x-forwarded-for": DE_LA() },
+    body: JSON.stringify({ email: en, acord: true }),
+  });
+  await asteapta(500);
+  verifica(
+    emailuri.filter((e) => String(e.subject ?? "").startsWith("Abonat nou la buletin") && JSON.stringify(e).includes(en)).length === 1,
+    "newsletter: aceeași adresă abonată iar nu mai anunță",
+  );
 
   // ─── Transferul bancar ────────────────────────────────────────────────
   const et = `transfer.${T}@exemplu.ro`;
@@ -576,6 +595,7 @@ try {
   await baza.query("DELETE FROM campanii_aniversare WHERE email = $1", [`aniv.${T}@exemplu.ro`]).catch(() => {});
   await baza.query("DELETE FROM cereri WHERE email LIKE $1", [`%.${T}@exemplu.ro`]).catch(() => {});
   await baza.query("DELETE FROM firme WHERE email = $1", [`firma.${T}@exemplu.ro`]).catch(() => {});
+  await baza.query("DELETE FROM abonati_buletin WHERE email LIKE $1", [`%.${T}@exemplu.ro`]).catch(() => {});
   await baza.end();
   mock.close();
   serviciuPush.close();

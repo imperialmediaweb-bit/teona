@@ -131,6 +131,7 @@ export const PAGINI: ReadonlyArray<{ cale: string; roluri: readonly Rol[] }> = [
   { cale: "/admin/emailuri", roluri: ["administrator", "fundraising"] },
   { cale: "/admin/qr", roluri: ["administrator", "fundraising"] },
   { cale: "/admin/presa", roluri: ["administrator", "fundraising"] },
+  { cale: "/admin/abonati", roluri: ["administrator", "fundraising"] },
   { cale: "/admin/calendar", roluri: ["administrator", "fundraising"] },
   { cale: "/admin/cauta", roluri: ["administrator", "fundraising"] },
   /*

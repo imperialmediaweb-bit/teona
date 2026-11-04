@@ -1414,6 +1414,14 @@ antetele, subdomeniile și versiunile afișate. Ce s-a găsit și ce s-a făcut:
   (oprite de acolo) și **insignele** (`componente/cont/Insigne.tsx`) — numai
   din fapte știute: număr de donații, luni alături, donație lunară, lei
   dăruiți. **Nu „ai ajutat N copii”**: nu știm câți copii a ajutat o donație.
+- **Asociația află de fiecare abonare la buletin** (4 noiembrie 2026). Toate
+  căile — caseta de newsletter, bifa de la donație, contul de donator — trec
+  prin `laBuletin()` (`lib/buletin.ts`), care scrie și un rând în
+  `abonati_buletin` (cheia e adresa) și, **numai la o abonare nouă** sau la o
+  reabonare după dezabonare, trimite „Abonat nou la buletin” la contact@ și o
+  notificare pe telefon. În panou: `/admin/abonati`, cu sursa fiecăruia și
+  numărul întregii liste din MailerLite (cei de dinainte de 4 noiembrie sunt
+  numai acolo). Dezabonarea din cont pune `dezabonat_la`.
 - **Newsletterul trimite bun venit** (`src/lib/email/buletin.ts`). Abonarea
   merge prin API, cu starea „activ”, iar pe calea asta MailerLite nu trimite
   nimic; site-ul scria totuși „Verifică-ți emailul pentru a confirma” și

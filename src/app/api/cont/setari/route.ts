@@ -35,7 +35,7 @@ export async function POST(cerere: Request) {
     // MailerLite ține lista; baza noastră ține dovada acordului. Trebuie
     // schimbate amândouă, altfel omul se dezabonează de pe site și
     // primește în continuare.
-    if (vrea) await laBuletin(email).catch(() => undefined);
+    if (vrea) await laBuletin(email, "persoane", null, "cont").catch(() => undefined);
     else await daJosDinBuletin(email).catch(() => undefined);
     return trimiteLa(`/contul-meu?gata=${vrea ? "abonat" : "dezabonat"}`);
   }

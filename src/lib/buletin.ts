@@ -1,4 +1,15 @@
 import { intreaba } from "./baza";
+import { anuntaAbonarea } from "./email/buletin";
+import { notificaPanoul } from "./notificari";
+
+/** De unde a venit abonarea: caseta de newsletter, o donație, contul de donator. */
+export type SursaAbonare = "formular" | "donatie" | "cont";
+
+export const NUMELE_SURSEI: Record<SursaAbonare, string> = {
+  formular: "Formularul de newsletter",
+  donatie: "Bifa de la donație",
+  cont: "Contul de donator",
+};
 
 /**
  * Lista de buletin informativ, în MailerLite.
@@ -29,6 +40,7 @@ export async function laBuletin(
    */
   lista: "persoane" | "firme" = "persoane",
   nume?: string | null,
+  sursa: SursaAbonare = "formular",
 ): Promise<boolean> {
   const cheie = process.env.MAILERLITE_API_KEY;
   if (!cheie) return false;
@@ -64,7 +76,67 @@ export async function laBuletin(
     [email],
   ).catch(() => undefined);
 
+  await notaAbonarea(email, lista, nume ?? null, sursa).catch(() => undefined);
   return true;
+}
+
+/**
+ * Rândul din `abonati_buletin` și anunțul către asociație.
+ *
+ * Anunțul pleacă numai la o abonare **nouă** sau la o reabonare după
+ * dezabonare: același om care bifează iar la a doua donație nu e o veste.
+ */
+async function notaAbonarea(
+  email: string,
+  lista: "persoane" | "firme",
+  nume: string | null,
+  sursa: SursaAbonare,
+): Promise<void> {
+  const nou = await intreaba<{ email: string }>(
+    `INSERT INTO abonati_buletin (email, nume, lista, sursa)
+     VALUES ($1, $2, $3, $4)
+     ON CONFLICT (email) DO UPDATE
+       SET dezabonat_la = NULL, creat_la = now(), sursa = EXCLUDED.sursa,
+           lista = EXCLUDED.lista, nume = COALESCE(EXCLUDED.nume, abonati_buletin.nume)
+       WHERE abonati_buletin.dezabonat_la IS NOT NULL
+     RETURNING email`,
+    [email, nume, lista, sursa],
+  );
+  if (!nou.length) return;
+  await anuntaAbonarea({ email, nume, lista, sursa: NUMELE_SURSEI[sursa] }).catch(() => false);
+  await notificaPanoul({
+    titlu: "Abonat nou la buletin",
+    text: `${nume?.trim().split(/\s+/)[0] || "Cineva"} s-a abonat (${NUMELE_SURSEI[sursa].toLowerCase()}).`,
+    adresa: "/admin/abonati",
+  }).catch(() => 0);
+}
+
+export type Abonat = {
+  email: string;
+  nume: string | null;
+  lista: string;
+  sursa: SursaAbonare;
+  creatLa: string;
+  dezabonatLa: string | null;
+};
+
+export async function abonati(limita = 1000): Promise<Abonat[]> {
+  const r = await intreaba<{
+    email: string;
+    nume: string | null;
+    lista: string;
+    sursa: string;
+    creat_la: Date;
+    dezabonat_la: Date | null;
+  }>("SELECT * FROM abonati_buletin ORDER BY creat_la DESC LIMIT $1", [limita]);
+  return r.map((x) => ({
+    email: x.email,
+    nume: x.nume,
+    lista: x.lista,
+    sursa: (x.sursa in NUMELE_SURSEI ? x.sursa : "formular") as SursaAbonare,
+    creatLa: x.creat_la.toISOString(),
+    dezabonatLa: x.dezabonat_la?.toISOString() ?? null,
+  }));
 }
 
 /**
@@ -83,6 +155,10 @@ export async function laBuletin(
 export async function daJosDinBuletin(email: string): Promise<boolean> {
   await intreaba(
     "UPDATE donatii SET acord_buletin = false, dus_la_buletin = false WHERE email = $1",
+    [email],
+  ).catch(() => undefined);
+  await intreaba(
+    "UPDATE abonati_buletin SET dezabonat_la = now() WHERE email = $1 AND dezabonat_la IS NULL",
     [email],
   ).catch(() => undefined);
 

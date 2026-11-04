@@ -71,7 +71,7 @@ export async function POST(cerere: Request) {
     typeof corp.nume === "string" && corp.nume.trim()
       ? corp.nume.trim().slice(0, 120)
       : null;
-  const dus = await laBuletin(adresa, lista, nume);
+  const dus = await laBuletin(adresa, lista, nume, "formular");
   if (!dus) {
     return raspuns(
       "Nu am putut finaliza abonarea acum. Încearcă din nou peste câteva minute sau scrie-ne direct:",
