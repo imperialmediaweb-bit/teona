@@ -194,6 +194,23 @@ try {
       /\{\s*valoare:\s*(\d+),\s*sufix:\s*"([^"]*)",\s*eticheta:\s*"([^"]+)"\s*\}/g,
     ),
   ].map(([, valoare, sufix, eticheta]) => `${valoare}${sufix} ${eticheta}`);
+  /*
+    Cu bază de date, modelul primește cifrele din panou (`/admin/cifre`), iar
+    cele din cod sunt doar rezerva. Proba compară cu ce e în panou, altfel ar
+    cere modelului cifra de anul trecut după ce asociația a schimbat-o.
+  */
+  if (process.env.DATABASE_URL) {
+    const { default: pg } = await import("pg");
+    const db = new pg.Client({ connectionString: process.env.DATABASE_URL });
+    await db.connect();
+    const { rows } = await db
+      .query("SELECT valoare, sufix, eticheta FROM cifre ORDER BY ordine")
+      .catch(() => ({ rows: [] }));
+    await db.end();
+    if (rows.length === 4) {
+      cifre.splice(0, cifre.length, ...rows.map((r) => `${r.valoare}${r.sufix ?? ""} ${r.eticheta}`));
+    }
+  }
   verifica(cifre.length === 4, `am găsit cifrele verificate în sursă (${cifre.length})`);
   for (const cifra of cifre) {
     verifica(instructiuni.includes(cifra), `cifra „${cifra}” pleacă spre model`);
