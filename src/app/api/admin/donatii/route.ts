@@ -1,4 +1,4 @@
-import { email as citesteEmail, formularAdmin, limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
+import { email as citesteEmail, formularAdmin, limitaDeRata, raspuns, sesiuneExpirata, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { adaugaDonatieManuala, esteMetodaManuala } from "@/lib/plati/donatori";
 import { citesteSuma } from "@/lib/suma";
@@ -21,7 +21,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune("/admin/donatii"))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/donatii"))) return sesiuneExpirata();
 
   const citit = await formularAdmin(cerere);
   if (citit.raspuns) return citit.raspuns;

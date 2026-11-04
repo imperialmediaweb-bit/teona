@@ -32,11 +32,14 @@ export default async function Intrare({
   gresit,
   unde = "/admin",
   confirmare = false,
+  bazaCazuta = false,
 }: {
   gresit?: boolean;
   unde?: string;
   /** Omul e înăuntru, dar pagina cere o confirmare proaspătă (date sensibile). */
   confirmare?: boolean;
+  /** `?gresit=baza`: contul n-a putut fi citit, nu e parola lui. */
+  bazaCazuta?: boolean;
 }) {
   /*
     Dispozitivul ținut minte, cu un cod rapid pus: întâi codul. Intrarea cu
@@ -117,6 +120,7 @@ export default async function Intrare({
         gresit={gresit}
         codBlocat={codBlocat}
         confirmare={confirmare}
+        bazaCazuta={bazaCazuta}
       />
       {/* Pe pagina de intrare bara n-are meniu; instalarea se poate face și de aici. */}
       <div className="mt-10 max-w-xl">
@@ -131,11 +135,14 @@ function FormularParola({
   unde,
   codBlocat,
   confirmare = false,
+  bazaCazuta = false,
 }: {
   gresit?: boolean;
   unde: string;
   codBlocat: boolean;
   confirmare?: boolean;
+  /** Baza de date n-a răspuns: nu e parola lui, și trebuie să afle asta. */
+  bazaCazuta?: boolean;
 }) {
   return (
     <div className="max-w-xl">
@@ -223,13 +230,27 @@ function FormularParola({
             role="alert"
             className="mt-4 colt-mic-b border-t-4 border-caramiziu-600 bg-caramiziu-50 p-4"
           >
-            <p className="font-titlu font-bold text-caramiziu-800">
-              E-mailul sau parola nu se potrivesc.
-            </p>
-            <p className="mt-1 text-mic text-caramiziu-900">
-              Dacă vrei să intri cu parola asociației, șterge e-mailul și lasă
-              câmpul gol.
-            </p>
+            {bazaCazuta ? (
+              <>
+                <p className="font-titlu font-bold text-caramiziu-800">
+                  Nu am putut verifica contul: baza de date nu răspunde.
+                </p>
+                <p className="mt-1 text-mic text-caramiziu-900">
+                  Nu e parola ta. Încearcă din nou peste un minut; dacă se
+                  repetă, spune-i dezvoltatorului.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="font-titlu font-bold text-caramiziu-800">
+                  E-mailul sau parola nu se potrivesc.
+                </p>
+                <p className="mt-1 text-mic text-caramiziu-900">
+                  Dacă vrei să intri cu parola asociației, șterge e-mailul și lasă
+                  câmpul gol.
+                </p>
+              </>
+            )}
           </div>
         )}
 

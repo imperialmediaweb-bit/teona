@@ -1,4 +1,5 @@
 import webpush from "web-push";
+import { mediu } from "@/lib/mediu";
 import { areBazaDeDate, intreaba } from "./baza";
 
 /**
@@ -17,11 +18,11 @@ import { areBazaDeDate, intreaba } from "./baza";
  */
 
 export function cheiaPublica(): string | null {
-  return process.env.VAPID_PUBLIC_KEY || null;
+  return mediu("VAPID_PUBLIC_KEY") ?? null;
 }
 
 export function areNotificari(): boolean {
-  return Boolean(process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY);
+  return Boolean(mediu("VAPID_PUBLIC_KEY") && mediu("VAPID_PRIVATE_KEY"));
 }
 
 let pregatit = false;
@@ -30,8 +31,8 @@ function pregateste(): boolean {
   if (!pregatit) {
     webpush.setVapidDetails(
       "mailto:contact@teona-ariana.ro",
-      process.env.VAPID_PUBLIC_KEY!,
-      process.env.VAPID_PRIVATE_KEY!,
+      mediu("VAPID_PUBLIC_KEY")!,
+      mediu("VAPID_PRIVATE_KEY")!,
     );
     pregatit = true;
   }

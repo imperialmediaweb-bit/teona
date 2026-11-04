@@ -992,7 +992,7 @@ async function Continut({
   if (!(await esteAutentificat())) {
     return (
       <Cadru titlu="Intră în panou" activ="/admin/analiza" faraMeniu>
-        <Intrare gresit={Boolean(gresit)} unde="/admin/analiza" />
+        <Intrare gresit={Boolean(gresit)} bazaCazuta={gresit === "baza"} unde="/admin/analiza" />
       </Cadru>
     );
   }

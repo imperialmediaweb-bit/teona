@@ -1,7 +1,7 @@
 import { revalidateTag } from "next/cache";
 import { formularAdmin, limitaDeRata, raspuns, sesiuneExpirata, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
-import { POZA_MAXIM, tipDinOcteti, urcaPoza } from "@/lib/poza-urcata";
+import { POZA_MAXIM, areCloudinary, tipDinOcteti, urcaPoza } from "@/lib/poza-urcata";
 import {
   ETICHETA_SPONSORI,
   faceSponsor,
@@ -98,8 +98,9 @@ export async function POST(cerere: Request) {
   const sigla = await potrivesteSigla(octeti, tipSigla).catch(() => null);
   if (!sigla) return gata(cerere, "imagine");
 
+  if (!areCloudinary()) return gata(cerere, "depozit");
   const urcata = await urcaPoza(sigla.octeti, sigla.tip, "sigle").catch(() => null);
-  if (!urcata) return gata(cerere, "depozit");
+  if (!urcata) return gata(cerere, "urcare");
 
   const facut = await faceSponsor({
     nume,

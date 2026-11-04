@@ -96,6 +96,34 @@ export function sesiuneExpirata() {
   );
 }
 
+/** Eroarea vine din baza de date (semnată de `intreaba()`), nu dintr-un bug? */
+export function eroareDinBaza(e: unknown): boolean {
+  return typeof e === "object" && e !== null && (e as { dinBaza?: boolean }).dinBaza === true;
+}
+
+/**
+ * O rută din panou care scrie în bază, cu pana bazei tradusă pentru om.
+ *
+ * Fără asta, o salvare în timpul unei pene de un minut dădea pagina albă a
+ * browserului, „HTTP ERROR 500”, și omul credea că a pierdut ce a scris.
+ * Numai erorile bazei se traduc; un bug rămâne 500, ca să fie văzut.
+ */
+export function cuBaza(
+  ruta: (cerere: Request) => Promise<Response>,
+): (cerere: Request) => Promise<Response> {
+  return async (cerere) => {
+    try {
+      return await ruta(cerere);
+    } catch (e) {
+      if (!eroareDinBaza(e)) throw e;
+      return nuTrece(
+        "Nu s-a salvat: baza de date nu răspunde acum. Apasă „Înapoi” — ce ai scris e tot acolo — și încearcă peste un minut.",
+        503,
+      );
+    }
+  };
+}
+
 export function nuTrece(mesaj: string, status = 400) {
   const sigur = mesaj.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
   return new Response(

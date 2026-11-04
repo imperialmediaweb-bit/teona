@@ -84,9 +84,12 @@ function luniScris(n: number): string {
 export default function PanouDonator({
   cont,
   abonamente,
+  stripeCazut = false,
 }: {
   cont: ContulMeu;
   abonamente: AbonamentDonator[];
+  /** Stripe n-a răspuns: lista lipsește fiindcă n-a putut fi citită, nu fiindcă e goală. */
+  stripeCazut?: boolean;
 }) {
   const prenume = cont.nume?.split(" ")[0] ?? null;
   const deCand = cont.primaLa ? LUNA_AN.format(new Date(cont.primaLa)) : null;
@@ -268,6 +271,16 @@ export default function PanouDonator({
         să nu mai dea bani și nu găsește butonul nu scrie — sună la bancă și
         blochează plata, iar asociația află din Stripe, ca dispută.
       */}
+      {stripeCazut && (
+        <p
+          role="alert"
+          className="mt-8 colt-mic-a border-2 border-caramiziu-200 bg-caramiziu-50 px-5 py-4 text-mic text-caramiziu-900"
+        >
+          Nu am putut citi acum donațiile lunare de la procesatorul de plăți.
+          Dacă ai una și vrei s-o oprești, reîncarcă pagina peste câteva
+          minute sau scrie-ne — o oprim noi.
+        </p>
+      )}
       {abonamente.length > 0 ? (
         <section className="mt-8 colt-b border-2 border-turcoaz-200 bg-turcoaz-50 p-6 sm:p-7">
           <h3 className="font-titlu text-h4 font-bold text-turcoaz-900">

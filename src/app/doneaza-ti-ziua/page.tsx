@@ -13,6 +13,26 @@ import Pasi from "@/componente/pagina/Pasi";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
 import FormularAniversare from "@/componente/formular/FormularAniversare";
 import { areAsistent } from "@/lib/asistent";
+import { Suspense } from "react";
+import { connection } from "next/server";
+import MicsoreazaPoza from "@/componente/admin/MicsoreazaPoza";
+
+/**
+ * Butonul „Îndreaptă-mi textul” depinde de o cheie din mediu. Citită la
+ * build (Railway construiește uneori fără variabile), HTML-ul pleca fără
+ * buton, clientul îl randa, iar React refăcea toată pagina în browser
+ * (eroarea #418). `connection()` mută decizia la cerere, ca la asistentul
+ * de pe site. Pozele de telefon se micșorează în browser, ca în panou.
+ */
+async function FormularCuAsistent() {
+  await connection();
+  return (
+    <>
+      <MicsoreazaPoza />
+      <FormularAniversare areAsistent={areAsistent()} />
+    </>
+  );
+}
 
 export const metadata: Metadata = metadate({
   titlu: "Donează-ți ziua de naștere",
@@ -200,7 +220,9 @@ export default function DoneazaTiZiua() {
             culoare="caramiziu"
           />
           <div className="mt-8">
-            <FormularAniversare areAsistent={areAsistent()} />
+            <Suspense fallback={<FormularAniversare areAsistent={false} />}>
+              <FormularCuAsistent />
+            </Suspense>
           </div>
         </div>
       </section>

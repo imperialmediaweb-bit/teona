@@ -93,8 +93,13 @@ export async function POST(cerere: Request) {
     picat, cine știe `PAROLA_ADMIN` ar intra scriind orice adresă, iar
     panoul ar spune că e omul acela.
   */
+  // O pană a bazei nu e „parolă greșită”: omul și-ar schimba parola degeaba.
+  let bazaCazuta = false;
   const intrat = email
-    ? await intraCuParola(email, parola).catch(() => null)
+    ? await intraCuParola(email, parola).catch(() => {
+        bazaCazuta = true;
+        return null;
+      })
     : null;
 
   const valoare = email
@@ -117,7 +122,7 @@ export async function POST(cerere: Request) {
       parolă greșită. Altfel formularul de intrare devine un instrument de
       aflat cine lucrează la asociație.
     */
-    return trimiteLa(`${pagina}?gresit=1`);
+    return trimiteLa(`${pagina}?gresit=${bazaCazuta ? "baza" : "1"}`);
   }
 
   const raspunsul = trimiteLa(pagina);

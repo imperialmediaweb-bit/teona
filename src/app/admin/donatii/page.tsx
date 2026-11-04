@@ -67,7 +67,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   if (!(await esteAutentificat())) {
     return (
       <Cadru titlu="Intră în panou" activ="/admin/donatii" faraMeniu>
-        <Intrare gresit={Boolean(gresit)} unde="/admin/donatii" />
+        <Intrare gresit={Boolean(gresit)} bazaCazuta={gresit === "baza"} unde="/admin/donatii" />
       </Cadru>
     );
   }

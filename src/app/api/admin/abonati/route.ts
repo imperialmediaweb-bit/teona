@@ -1,4 +1,4 @@
-import { email, formularAdmin, limitaDeRata, nuTrece, raspuns, text, trimiteLa } from "@/lib/api";
+import { email, formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, text, trimiteLa } from "@/lib/api";
 import { arePermisiune, numeleConectat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { areBuletin, dejaAbonati, laBuletin, stareaInMailerLite } from "@/lib/buletin";
@@ -26,7 +26,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune("/admin/abonati/incarca"))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/abonati/incarca"))) return sesiuneExpirata();
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
   if (!areBuletin()) return nuTrece("MailerLite nu e legat (MAILERLITE_API_KEY), deci adresele n-ar avea unde să ajungă.");
 

@@ -595,6 +595,7 @@ async function pregateste(): Promise<void> {
     .catch((eroare) => {
       // Dacă n-a mers, următoarea cerere încearcă din nou: altfel o pană de
       // o secundă la pornire ar ține modulul oprit până la redeploy.
+      console.error(`[baza] schema n-a putut fi pregătită: ${(eroare as Error).message}`);
       schema = null;
       throw eroare;
     });
@@ -607,6 +608,14 @@ export async function intreaba<R extends Record<string, unknown>>(
   valori: unknown[] = [],
 ): Promise<R[]> {
   await pregateste();
-  const rezultat = await ia().query(text, valori);
-  return rezultat.rows as R[];
+  try {
+    const rezultat = await ia().query(text, valori);
+    return rezultat.rows as R[];
+  } catch (e) {
+    // Un singur rând aici lasă urmă pentru toate `.catch(() => …)` din jur:
+    // altfel o pană a bazei arăta, în panou, ca „nicio cerere” și „niciun cont”.
+    console.error(`[baza] ${(e as Error).message} la: ${text.replace(/\s+/g, " ").trim().slice(0, 70)}`);
+    (e as { dinBaza?: boolean }).dinBaza = true;
+    throw e;
+  }
 }

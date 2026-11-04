@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns } from "@/lib/api";
+import { limitaDeRata, nuTrece, raspuns, sesiuneExpirata } from "@/lib/api";
 import { arePermisiune, sesiuneProaspata } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import {
@@ -41,12 +41,12 @@ export async function GET(cerere: Request) {
     și fără să i-o arate nimeni în meniu.
   */
   if (!(await arePermisiune(`/admin/${lista}`))) {
-    return raspuns("Nu ai acces.", 403);
+    return sesiuneExpirata();
   }
 
   // Fișierul pleacă din panou cu nume și adrese: cere o confirmare proaspătă.
   if (!(await sesiuneProaspata())) {
-    return raspuns(
+    return nuTrece(
       "Pentru descărcare, intră din nou în panou (parola sau codul). Au trecut mai mult de 12 ore de la ultima intrare.",
       403,
     );

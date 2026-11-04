@@ -1,4 +1,4 @@
-import { formularAdmin, limitaDeRata, nuTrece, raspuns } from "@/lib/api";
+import { formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata } from "@/lib/api";
 import { arePermisiune, numeleConectat } from "@/lib/admin";
 import {
   firma as iaFirma,
@@ -32,7 +32,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune("/admin/firme"))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/firme"))) return sesiuneExpirata();
 
   const citit = await formularAdmin(cerere);
   if (citit.raspuns) return citit.raspuns;

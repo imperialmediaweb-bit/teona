@@ -397,7 +397,10 @@ export async function cereAnaliza(cifre: string): Promise<string | null> {
         messages: [{ role: "user", content: cifre }],
       }),
     });
-    if (!raspuns.ok) return null;
+    if (!raspuns.ok) {
+      console.error(`[model] ${raspuns.status}: ${(await raspuns.text().catch(() => "")).slice(0, 200)}`);
+      return null;
+    }
 
     const corp = (await raspuns.json()) as {
       content?: Array<{ type?: string; text?: string }>;
@@ -408,7 +411,8 @@ export async function cereAnaliza(cifre: string): Promise<string | null> {
       .join("")
       .trim();
     return text || null;
-  } catch {
+  } catch (e) {
+    console.error(`[model] rețea: ${(e as Error).message}`);
     return null;
   }
 }

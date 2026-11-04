@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { citesteJson, limitaDeRata, raspuns, text } from "@/lib/api";
+import { citesteJson, limitaDeRata, raspuns, sesiuneExpirata, text } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areAsistent, esteFel, scrieCiorna } from "@/lib/asistent";
 
@@ -27,7 +27,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune("/admin/scrie"))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/scrie"))) return sesiuneExpirata();
 
   if (!areAsistent()) {
     return raspuns(

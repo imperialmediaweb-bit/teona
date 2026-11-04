@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { mediu } from "@/lib/mediu";
 import { DESTINATII, type Frecventa, inBani } from "@/date/plati";
 
 /**
@@ -21,24 +22,31 @@ import { DESTINATII, type Frecventa, inBani } from "@/date/plati";
 let client: Stripe | null = null;
 
 export function areStripe(): boolean {
-  return Boolean(process.env.STRIPE_SECRET_KEY);
+  return Boolean(mediu("STRIPE_SECRET_KEY"));
 }
 
 function ia(): Stripe {
-  const cheie = process.env.STRIPE_SECRET_KEY;
+  const cheie = mediu("STRIPE_SECRET_KEY");
   if (!cheie) throw new Error("STRIPE_SECRET_KEY lipsește");
   // `STRIPE_API` numai pentru probe: un Stripe de mențiune, pe 127.0.0.1.
   const proba = process.env.STRIPE_API ? new URL(process.env.STRIPE_API) : null;
-  client ??= new Stripe(
-    cheie,
-    proba
+  /*
+    Fără limită, SDK-ul așteaptă 80 s și reîncearcă de două ori: 4 minute în
+    care donatorul stă pe „Se trimite…” (Cloudflare îl taie la 100 s cu
+    pagina lui) și tot atât la deschiderea contului. 15 s și o reîncercare:
+    o pană la Stripe se vede ca un mesaj, nu ca un site înțepenit.
+  */
+  client ??= new Stripe(cheie, {
+    timeout: 15_000,
+    maxNetworkRetries: 1,
+    ...(proba
       ? {
           host: proba.hostname,
           port: Number(proba.port),
           protocol: proba.protocol.replace(":", "") as "http" | "https",
         }
-      : undefined,
-  );
+      : {}),
+  });
   return client;
 }
 
@@ -151,7 +159,7 @@ export function citesteEveniment(
   corp: string,
   semnatura: string,
 ): Stripe.Event {
-  const secret = process.env.STRIPE_WEBHOOK_SECRET;
+  const secret = mediu("STRIPE_WEBHOOK_SECRET");
   if (!secret) throw new Error("STRIPE_WEBHOOK_SECRET lipsește");
   return ia().webhooks.constructEvent(corp, semnatura, secret);
 }

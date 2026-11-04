@@ -1,3 +1,4 @@
+import BazaCazuta from "@/componente/admin/BazaCazuta";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
@@ -156,7 +157,7 @@ async function Continut({
   if (!(await esteAutentificat())) {
     return (
       <Cadru titlu="Intră în panou" activ="/admin/utilizatori" faraMeniu>
-        <Intrare gresit={Boolean(gresit)} unde="/admin/utilizatori" />
+        <Intrare gresit={Boolean(gresit)} bazaCazuta={gresit === "baza"} unde="/admin/utilizatori" />
       </Cadru>
     );
   }
@@ -178,9 +179,17 @@ async function Continut({
   }
 
   const [oameni, cine] = await Promise.all([
-    listaUtilizatorilor().catch(() => [] as Utilizator[]),
+    listaUtilizatorilor().catch(() => null),
     cineEsteConectat(),
   ]);
+  if (oameni === null) {
+    // „Niciunul încă” ar fi o minciună: conturile există, baza nu răspunde.
+    return (
+      <Cadru titlu="Utilizatori" activ="/admin/utilizatori">
+        <BazaCazuta ce="lista conturilor" />
+      </Cadru>
+    );
+  }
   const euId = cine?.fel === "cont" ? cine.utilizator.id : null;
   const mesaj = stare ? STARI[stare] : undefined;
 

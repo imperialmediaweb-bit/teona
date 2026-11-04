@@ -1,9 +1,11 @@
-import { formularAdmin, limitaDeRata, nuTrece, raspuns, trimiteLa } from "@/lib/api";
+import { cuBaza, formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { scrieNotita, uitaDonatorul } from "@/lib/plati/donatori";
 
 /** Acțiunile din lista de donatori: notiță sau ștergerea datelor personale. */
-export async function POST(cerere: Request) {
+export const POST = cuBaza(posteaza);
+
+async function posteaza(cerere: Request) {
   const prea = limitaDeRata(cerere, {
     cheie: "admin-donatori",
     maxim: 60,
@@ -11,7 +13,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune("/admin/donatori"))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/donatori"))) return sesiuneExpirata();
 
   const citit = await formularAdmin(cerere);
   if (citit.raspuns) return citit.raspuns;

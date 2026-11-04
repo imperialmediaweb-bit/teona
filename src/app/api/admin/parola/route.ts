@@ -1,4 +1,4 @@
-import { formularAdmin, limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
 import { arePermisiune, cineEsteConectat } from "@/lib/admin";
 import { MINIM_PAROLA, schimbaParolaProprie } from "@/lib/utilizatori";
 
@@ -28,7 +28,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune(INAPOI))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune(INAPOI))) return sesiuneExpirata();
 
   const cine = await cineEsteConectat();
   /*

@@ -1,3 +1,4 @@
+import BazaCazuta from "@/componente/admin/BazaCazuta";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
@@ -69,7 +70,7 @@ async function Continut({
   if (!(await esteAutentificat())) {
     return (
       <Cadru titlu="Intră în panou" activ="/admin/cifre" faraMeniu>
-        <Intrare gresit={Boolean(gresit)} unde="/admin/cifre" />
+        <Intrare gresit={Boolean(gresit)} bazaCazuta={gresit === "baza"} unde="/admin/cifre" />
       </Cadru>
     );
   }
@@ -78,7 +79,12 @@ async function Continut({
     return <FaraDrept titlu="Cifrele" activ="/admin/cifre" />;
   }
 
-  const cifre = await cifrePanou().catch(() => [] as Cifra[]);
+  const cifre = await cifrePanou().catch(() => null);
+  if (cifre === null) return (
+      <Cadru titlu="Cifrele" activ="/admin/cifre">
+        <BazaCazuta ce="cifrele" />
+      </Cadru>
+    );
   const mesaj = stare ? STARI[stare] : undefined;
 
   return (

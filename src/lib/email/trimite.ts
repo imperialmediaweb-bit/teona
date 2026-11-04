@@ -1,4 +1,5 @@
 import { ASOCIATIA, EMAIL } from "@/date/asociatie";
+import { mediu } from "@/lib/mediu";
 
 /**
  * Trimiterea e-mailurilor, prin Resend.
@@ -77,7 +78,7 @@ export async function trimiteEmail(mesaj: {
     console.error(`[email] limita de ${LIMITA_MASA} pe oră atinsă; n-a plecat „${mesaj.subiect}”`);
     return false;
   }
-  const cheie = process.env.RESEND_API_KEY;
+  const cheie = mediu("RESEND_API_KEY");
   if (!cheie) {
     console.error(`[email] RESEND_API_KEY lipsește; n-a plecat „${mesaj.subiect}”`);
     return false;

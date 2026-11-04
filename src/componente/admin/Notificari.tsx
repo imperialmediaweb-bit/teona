@@ -47,7 +47,7 @@ export default function Notificari({ cheiePublica }: { cheiePublica: string | nu
         return;
       }
       if (Notification.permission === "denied") return setStare("oprite-de-om");
-      const reg = await navigator.serviceWorker.register("/admin/sw.js", { scope: "/admin/" });
+      const reg = await navigator.serviceWorker.register("/admin/sw.js", { scope: "/admin" });
       const ab = await reg.pushManager.getSubscription();
       setStare(ab ? "abonat" : "neabonat");
     })().catch(() => setStare("nesuportat"));
@@ -64,8 +64,22 @@ export default function Notificari({ cheiePublica }: { cheiePublica: string | nu
         setStare(permis === "denied" ? "oprite-de-om" : "neabonat");
         return;
       }
-      const reg = await navigator.serviceWorker.register("/admin/sw.js", { scope: "/admin/" });
-      await navigator.serviceWorker.ready;
+      const reg = await navigator.serviceWorker.register("/admin/sw.js", { scope: "/admin" });
+      // Nu `serviceWorker.ready`: pe o pagină din afara razei nu se rezolvă
+      // niciodată, iar butonul rămânea pe „Se pornește…” pentru totdeauna.
+      // Se așteaptă chiar înregistrarea asta, cel mult zece secunde.
+      await new Promise<void>((r) => {
+        if (reg.active) return r();
+        const w = reg.installing ?? reg.waiting;
+        if (!w) return r();
+        const ceas = setTimeout(r, 10_000);
+        w.addEventListener("statechange", () => {
+          if (w.state === "activated") {
+            clearTimeout(ceas);
+            r();
+          }
+        });
+      });
       const ab =
         (await reg.pushManager.getSubscription()) ??
         (await reg.pushManager.subscribe({
@@ -85,7 +99,7 @@ export default function Notificari({ cheiePublica }: { cheiePublica: string | nu
 
   async function opreste() {
     setStare("se-lucreaza");
-    const reg = await navigator.serviceWorker.getRegistration("/admin/");
+    const reg = await navigator.serviceWorker.getRegistration("/admin");
     const ab = await reg?.pushManager.getSubscription();
     if (ab) {
       await trimite({ fac: "dezaboneaza", abonament: ab.toJSON() });

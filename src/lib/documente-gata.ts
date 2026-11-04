@@ -35,7 +35,7 @@ export const ETICHETA_DOCUMENTE = "documente";
  * descărca zece megaocteți de contract la fiecare randare a paginii, doar ca
  * să afle dacă fișierul e acolo.
  */
-async function exista(cheie: string): Promise<boolean> {
+async function exista(cheie: string): Promise<boolean | null> {
   const legatura = legaturaSemnata(cheie, 120);
   if (!legatura) return false;
   try {
@@ -45,7 +45,8 @@ async function exista(cheie: string): Promise<boolean> {
     });
     return r.ok || r.status === 206;
   } catch {
-    return false;
+    // Pană de rețea, nu fișier lipsă: cine cheamă decide să nu țină răspunsul.
+    return null;
   }
 }
 
@@ -66,16 +67,18 @@ export async function documenteGata(): Promise<ReadonlyArray<string>> {
   const cuRezerva = DOCUMENTE.filter((d) => d.rezerva).map((d) => d.slug);
   if (!areR2()) return cuRezerva;
 
+  let pana = false;
   const verificate = await Promise.all(
-    DOCUMENTE.map(
-      async (d): Promise<string | null> =>
-        d.rezerva || (await exista(d.cheie)) ? d.slug : null,
-    ),
-  ).catch((): Array<string | null> => {
-    // Rezerva nu se ține: după publicare, primul vizitator să vadă panoul.
-    cacheRezerva();
-    return [];
-  });
+    DOCUMENTE.map(async (d): Promise<string | null> => {
+      if (d.rezerva) return d.slug;
+      const e = await exista(d.cheie);
+      if (e === null) pana = true;
+      return e ? d.slug : null;
+    }),
+  );
+  // Rezerva nu se ține: cu R2 mut la build, butoanele ar fi stat inactive
+  // cinci minute după fiecare publicare.
+  if (pana) cacheRezerva();
 
   const gata = verificate.filter((s): s is string => s !== null);
   return gata.length > 0 ? gata : cuRezerva;

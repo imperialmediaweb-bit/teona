@@ -73,7 +73,7 @@ async function Continut({
   if (!(await esteAutentificat())) {
     return (
       <Cadru titlu="Intră în panou" activ="/admin/documente" faraMeniu>
-        <Intrare gresit={Boolean(gresit)} unde="/admin/documente" />
+        <Intrare gresit={Boolean(gresit)} bazaCazuta={gresit === "baza"} unde="/admin/documente" />
       </Cadru>
     );
   }
@@ -177,7 +177,7 @@ async function Continut({
                 accept="application/pdf,.pdf"
                 required
                 disabled={!depozit}
-                className="colt-mic-a border-2 border-hartie-umbra bg-hartie px-3 py-2 text-mic file:mr-3 file:border-0 file:bg-transparent file:font-titlu file:font-bold file:text-caramiziu-700 disabled:opacity-50"
+                className="colt-mic-a w-full min-w-0 max-w-full border-2 border-hartie-umbra bg-hartie px-3 py-2 text-mic file:mr-3 sm:w-auto file:border-0 file:bg-transparent file:font-titlu file:font-bold file:text-caramiziu-700 disabled:opacity-50"
               />
               <button
                 type="submit"

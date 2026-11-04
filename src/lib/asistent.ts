@@ -111,7 +111,8 @@ function citesteJson(brut: string): { titlu: string; text: string } | null {
     if (typeof titlu !== "string" || typeof text !== "string") return null;
     if (!titlu.trim() || !text.trim()) return null;
     return { titlu: titlu.trim(), text: text.trim() };
-  } catch {
+  } catch (e) {
+    console.error(`[model] rețea: ${(e as Error).message}`);
     return null;
   }
 }
@@ -161,7 +162,10 @@ export async function indreaptaTextul(text: string): Promise<string | null> {
         messages: [{ role: "user", content: text }],
       }),
     });
-    if (!raspuns.ok) return null;
+    if (!raspuns.ok) {
+      console.error(`[model] ${raspuns.status}: ${(await raspuns.text().catch(() => "")).slice(0, 200)}`);
+      return null;
+    }
 
     const corp = (await raspuns.json()) as {
       content?: Array<{ type?: string; text?: string }>;
@@ -172,7 +176,8 @@ export async function indreaptaTextul(text: string): Promise<string | null> {
       .join("")
       .trim();
     return iesit || null;
-  } catch {
+  } catch (e) {
+    console.error(`[model] rețea: ${(e as Error).message}`);
     return null;
   }
 }
@@ -210,7 +215,10 @@ export async function scrieCiorna(cerere: {
       }),
     });
 
-    if (!raspuns.ok) return null;
+    if (!raspuns.ok) {
+      console.error(`[model] ${raspuns.status}: ${(await raspuns.text().catch(() => "")).slice(0, 200)}`);
+      return null;
+    }
 
     const corp = (await raspuns.json()) as {
       content?: Array<{ type?: string; text?: string }>;

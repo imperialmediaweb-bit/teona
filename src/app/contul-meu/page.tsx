@@ -80,8 +80,12 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
     răspunde, panoul se deschide oricum, fără lista lor: restul paginii —
     istoricul, totalurile, ștergerea datelor — nu are nicio treabă cu el.
   */
+  let stripeCazut = false;
   const abonamente = cont
-    ? await abonamenteleLui(cont.email).catch(() => [])
+    ? await abonamenteleLui(cont.email).catch(() => {
+        stripeCazut = true;
+        return [];
+      })
     : [];
 
   return (
@@ -159,6 +163,33 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
               și o oprim noi, pe loc.
             </p>
           )}
+          {eroare === "buletin" && (
+            <p
+              role="alert"
+              className="mb-8 colt-mic-a border-2 border-caramiziu-200 bg-caramiziu-50 px-5 py-4 text-mic text-caramiziu-900"
+            >
+              N-am putut schimba acum abonarea la buletin: lista de e-mail nu
+              a răspuns. Încearcă din nou peste câteva minute sau scrie-ne la{" "}
+              <a href={`mailto:${EMAIL.contact}`} className="font-semibold break-all underline underline-offset-2">
+                {EMAIL.contact}
+              </a>
+              .
+            </p>
+          )}
+          {eroare === "stergere" && (
+            <p
+              role="alert"
+              className="mb-8 colt-mic-a border-2 border-caramiziu-200 bg-caramiziu-50 px-5 py-4 text-mic text-caramiziu-900"
+            >
+              N-am putut scoate adresa din lista de buletin, așa că{" "}
+              <strong>n-am șters nimic</strong> — o ștergere pe jumătate ar fi
+              mai rea. Încearcă din nou peste câteva minute sau scrie-ne la{" "}
+              <a href={`mailto:${EMAIL.contact}`} className="font-semibold break-all underline underline-offset-2">
+                {EMAIL.contact}
+              </a>
+              .
+            </p>
+          )}
           {eroare === "confirmare" && (
             <p
               role="alert"
@@ -191,7 +222,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
               </p>
             </div>
           ) : cont ? (
-            <PanouDonator cont={cont} abonamente={abonamente} />
+            <PanouDonator cont={cont} abonamente={abonamente} stripeCazut={stripeCazut} />
           ) : email ? (
             /*
               Sesiune validă, dar nicio donație pe adresa asta. Se întâmplă

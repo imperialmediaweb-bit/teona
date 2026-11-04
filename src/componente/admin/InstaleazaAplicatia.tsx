@@ -28,7 +28,7 @@ export default function InstaleazaAplicatia({
   useEffect(() => {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
-        .register("/admin/sw.js", { scope: "/admin/" })
+        .register("/admin/sw.js", { scope: "/admin" })
         .catch(() => undefined);
     }
     const standalone =

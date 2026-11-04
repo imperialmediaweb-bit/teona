@@ -35,8 +35,12 @@ export async function POST(cerere: Request) {
     // MailerLite ține lista; baza noastră ține dovada acordului. Trebuie
     // schimbate amândouă, altfel omul se dezabonează de pe site și
     // primește în continuare.
-    if (vrea) await laBuletin(email, "persoane", null, "cont").catch(() => undefined);
-    else await daJosDinBuletin(email).catch(() => undefined);
+    // Rezultatul contează: cu MailerLite căzut, „Gata, nu mai primești
+    // buletinul” era o minciună — omul rămânea activ pe listă.
+    const ok = vrea
+      ? await laBuletin(email, "persoane", null, "cont").catch(() => false)
+      : await daJosDinBuletin(email).catch(() => false);
+    if (!ok) return trimiteLa("/contul-meu?eroare=buletin");
     return trimiteLa(`/contul-meu?gata=${vrea ? "abonat" : "dezabonat"}`);
   }
 
@@ -71,7 +75,10 @@ export async function POST(cerere: Request) {
     ) {
       return trimiteLa("/contul-meu?eroare=confirmare");
     }
-    await daJosDinBuletin(email).catch(() => undefined);
+    // Dacă lista de e-mail nu răspunde, nu se șterge nimic: altfel omul ar
+    // dispărea din baza noastră și ar primi buletinul mai departe.
+    const scos = await daJosDinBuletin(email).catch(() => false);
+    if (!scos) return trimiteLa("/contul-meu?eroare=stergere");
     await uitaDonatorul(email);
     await inchideSesiunea();
     return trimiteLa("/?sters=1");

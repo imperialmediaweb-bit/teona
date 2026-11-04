@@ -1,10 +1,12 @@
-import { formularAdmin, limitaDeRata, nuTrece, raspuns, trimiteLa } from "@/lib/api";
+import { cuBaza, formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { planificaText } from "@/lib/texte";
 
 /** Pune sau scoate ziua în care se vrea publicat un text. */
-export async function POST(cerere: Request) {
+export const POST = cuBaza(posteaza);
+
+async function posteaza(cerere: Request) {
   const prea = limitaDeRata(cerere, {
     cheie: "admin-calendar",
     maxim: 60,
@@ -12,7 +14,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune("/admin/calendar"))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/calendar"))) return sesiuneExpirata();
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
 
   const citit = await formularAdmin(cerere);

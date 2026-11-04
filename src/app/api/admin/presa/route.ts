@@ -1,4 +1,4 @@
-import { formularAdmin, limitaDeRata, nuTrece, raspuns, text, trimiteLa } from "@/lib/api";
+import { cuBaza, formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import {
@@ -9,7 +9,9 @@ import {
 } from "@/lib/presa";
 
 /** Lista de presă: adăugare, schimbare, ștergere. */
-export async function POST(cerere: Request) {
+export const POST = cuBaza(posteaza);
+
+async function posteaza(cerere: Request) {
   const prea = limitaDeRata(cerere, {
     cheie: "admin-presa",
     maxim: 60,
@@ -17,7 +19,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune("/admin/presa"))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/presa"))) return sesiuneExpirata();
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
 
   const citit = await formularAdmin(cerere);

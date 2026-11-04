@@ -141,11 +141,22 @@ export async function urcaPoza(
     "poza",
   );
 
-  const raspuns = await fetch(
-    `https://api.cloudinary.com/v1_1/${cont}/image/upload`,
-    { method: "POST", body: corp },
-  );
-  if (!raspuns.ok) return null;
+  let raspuns: Response;
+  try {
+    raspuns = await fetch(`https://api.cloudinary.com/v1_1/${cont}/image/upload`, {
+      method: "POST",
+      body: corp,
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch (e) {
+    console.error(`[cloudinary] rețea la urcare: ${(e as Error).message}`);
+    return null;
+  }
+  if (!raspuns.ok) {
+    // O cheie rotită sau expirată se vede aici, nu ca „locul pozelor nu e pornit”.
+    console.error(`[cloudinary] ${raspuns.status} la urcare: ${(await raspuns.text().catch(() => "")).slice(0, 200)}`);
+    return null;
+  }
 
   const date = (await raspuns.json()) as {
     public_id?: string;

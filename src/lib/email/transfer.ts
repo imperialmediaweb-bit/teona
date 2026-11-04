@@ -138,18 +138,18 @@ ${ADRESA_SITE}/admin/donatii`,
  * panou, iar panoul se deschide când se deschide. Cel către donator e o
  * curtoazie; cel către asociație e lucrul de făcut.
  */
-export async function anuntaTransferulPeEmail(d: Anuntat): Promise<void> {
+/** Întoarce dacă mesajul către donator a plecat: pagina spune „ți-am trimis” numai atunci. */
+export async function anuntaTransferulPeEmail(d: Anuntat): Promise<boolean> {
   await trimiteEmail({
     catre: CATRE_ASOCIATIE,
     raspundeLa: d.email,
     ...compuneAnuntTransfer(d),
   });
 
-  if (d.email) {
-    await trimiteEmail({
-      catre: d.email,
-      raspundeLa: EMAIL.contact,
-      ...compuneTransferAnuntat(d),
-    });
-  }
+  if (!d.email) return false;
+  return trimiteEmail({
+    catre: d.email,
+    raspundeLa: EMAIL.contact,
+    ...compuneTransferAnuntat(d),
+  });
 }

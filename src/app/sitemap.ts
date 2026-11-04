@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { cacheRezerva } from "@/lib/cache-panou";
 import { cacheLife } from "next/cache";
 import { RUTE } from "@/date/asociatie";
 import { pozeleProiectului, proiecteleToate } from "@/date/proiecte";
@@ -85,11 +86,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     date. Fără bază de date — în dezvoltare, de pildă — sitemapul rămâne cel
     al paginilor fixe, în loc să cadă cu totul.
   */
+  // Ca la `dinPanou()`: ce nu s-a putut citi la build nu se ține o oră.
+  let rezerva = !areBazaDeDate();
   const scrise = areBazaDeDate()
     ? (
         await Promise.all(
           FELURI.map(async (fel) => {
-            const texte = await textePublicate(fel.id, 500).catch(() => []);
+            const texte = await textePublicate(fel.id, 500).catch(() => {
+              rezerva = true;
+              return [];
+            });
             return texte.map((text) => ({
               url: `${ADRESA_SITE}${fel.cale}/${text.slug}`,
               ...(text.publicatLa
@@ -104,5 +110,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ).flat()
     : [];
 
+  if (rezerva) cacheRezerva();
   return [...pagini, ...proiecte, ...scrise];
 }

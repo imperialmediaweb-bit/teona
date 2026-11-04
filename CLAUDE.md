@@ -1187,6 +1187,67 @@ defectul, nu să-l citească. Ce s-a reparat, cu lecția fiecăruia:
   panoului când o verificare e deja în curs; previzualizarea șablonului
   spune lângă titlu când a primit 429, în loc să rămână pe varianta veche.
 
+Din rapoartele „erori”, „mediu” și „browser”, aceeași zi:
+
+- **Variabilele din Railway se citesc curățate** (`mediu()` din
+  `lib/mediu.ts`): `STRIPE_WEBHOOK_SECRET` lipit cu un spațiu la capăt
+  respingea **toate** anunțurile de plată, `STRIPE_SECRET_KEY` cu rând nou
+  oprea donațiile cu cardul, `PAROLA_ADMIN` cu spațiu închidea panoul — nimic
+  în jurnal. `fetch` curăță singur antetele, deci cheile care merg prin HTTP
+  mergeau; tocmai de aceea nu se vedea. `PAYPAL_MOD` acceptă „Live”.
+- **Stripe și PayPal au limită de timp** (15 s): fără ea, SDK-ul Stripe
+  aștepta 80 s × 3 — donatorul stătea patru minute pe „Se trimite…”, iar
+  contul lui se deschidea în patru minute **fără** donația lunară, deci n-o
+  putea opri. Acum contul spune pe față când Stripe n-a răspuns.
+- **Contul donatorului nu mai minte despre buletin**: cu MailerLite căzut,
+  „Gata, nu mai primești buletinul” se scria oricum, iar omul rămânea pe
+  listă; ștergerea datelor ștergea din baza noastră și îl lăsa în MailerLite.
+  Acum rezultatul se verifică; la ștergere, dacă lista nu răspunde, **nu se
+  șterge nimic**. `daJosDinBuletin` citește `MAILERLITE_API` ca restul.
+- **Pana bazei de date se spune, nu se ascunde**: la intrare,
+  `?gresit=baza` („nu e parola ta”) în loc de „parolă greșită”; listele din
+  panou (sponsori, cifre, texte, testimoniale, conturi) arată `BazaCazuta`,
+  nu „niciunul încă”; rutele care scriu (`cuBaza()` din `lib/api.ts`)
+  răspund 503 cu „apasă Înapoi, ce ai scris e tot acolo”, nu pagina albă a
+  browserului. `intreaba()` scrie un rând în jurnal la orice interogare
+  picată și semnează eroarea (`dinBaza`), ca un bug să rămână 500.
+- **„Ți-am trimis pe e-mail” numai dacă a plecat**: Formularul 230 scrie
+  pașii în răspuns când e-mailul cade; transferul anunțat la fel; contactul
+  intrat în CRM nu-l mai trimite pe om să scrie a doua oară (ar apărea de
+  două ori în panou); campania aniversară hotărâtă fără e-mail o spune în
+  panou, cu adresa, ca să-i trimită cineva linkul.
+- **Proba șablonului care n-a plecat e un eșec**, în roșu, fără „verifică
+  adresa și cheia Resend” (cauza era rețeaua, nu omul). Consultantul,
+  asistentul și analiza scriu în jurnal codul primit de la API.
+- **Taberele din panou nu mai dispar o oră după publicare**: `dinPanou()` și
+  `sitemap.ts` țineau lista goală de la build (Railway construiește fără
+  bază) — `/proiecte` fără tabăra nouă, pagina ei 404. Acum `cacheRezerva()`,
+  ca la cifre și sponsori. La fel documentele: R2 mut la build nu mai lasă
+  butoanele inactive cinci minute.
+- **Aplicația instalată are raza `/admin`, fără bară**: cu `/admin/`, Chrome
+  ignora raza (pagina de început `/admin` nu era în ea), aplicația înghițea
+  tot site-ul, iar „Primește notificări aici” rămânea pe „Se pornește…”
+  pentru totdeauna — `serviceWorker.ready` nu se rezolvă pe o pagină din
+  afara razei. Raza deasupra fișierului cere antetul `Service-Worker-Allowed`.
+  Cloudflare ține `/admin/sw.js` 4 ore (e „static” după extensie); o regulă
+  de „Bypass” pe `/admin/*` în Cloudflare ar grăbi orice reparație viitoare.
+- **CSP lasă playerul Facebook** în cadru: „Vezi filmarea” de pe „Suntem în
+  presă” deschidea un dreptunghi gol.
+- **Ce scrie omul în panou rămâne în filă** (`TineCiorna`, în
+  `sessionStorage`, 12 ore, șters la o salvare reușită): după sesiunea
+  expirată, „Înapoi” reîncărca formularul de intrare și textul nu mai era
+  nicăieri. Toate rutele din panou răspund acum cu `sesiuneExpirata()`.
+  Exportul pentru Excel n-are `download` pe link: un răspuns „intră din nou”
+  apărea ca o descărcare eșuată, fără mesaj.
+- **`/admin/documente` pe telefon** nu mai derulează orizontal (`min-w-0` pe
+  câmpul de fișier). **`/doneaza-ti-ziua`** hotărăște la cerere dacă are
+  asistent (un build fără cheie dădea eroarea React #418 la fiecare
+  vizitator); poza de aniversare se recunoaște după octeți și se micșorează
+  în browser; fără JavaScript, formularul reîncarcă pagina, nu arată `{}`.
+- La pornire, `instrumentation.ts` strigă în jurnal un `SECRET_SESIUNE` sub
+  32 de semne (conturile nu pot intra, e-mailurile pleacă fără buton) și un
+  `ADRESA_SITE` fără schemă.
+
 **Ce a mers și e acoperit** (nu s-a schimbat): toate cele 33 de rute POST
 din `/api/admin` dau `Location` relativ sub `Host: localhost:8080`;
 cookie-urile au `Secure; HttpOnly` și expirarea în semnătură; `www.` și
@@ -1197,6 +1258,13 @@ pagina de mulțumire = **o** donație, **o** mulțumire; 31 MB → 413 cu mesaj.
 **Ce nu se poate verifica de aici**: limita de rată pe site-ul viu (proxy-ul
 acestui mediu iese din mai multe adrese), dacă Railway reconstruiește la
 schimbarea unei variabile, un iPhone adevărat.
+
+**Ce rămâne nereparat, dinadins sau pe mai târziu**: linkul de intrare în
+cont răspunde la fel și când e-mailul n-a plecat (altfel ar trăda ce adrese
+au donat); `ADAOSURI` din `baza.ts` pleacă tot într-o singură cerere (un
+rând stricat lasă tot blocul necreat — nu e niciun defect activ, dar jurnalul
+spune acum care instrucțiune a picat); `localStorage` blocat lasă bannerul
+de cookie-uri pe loc; contactul fără JavaScript trimite datele prin GET.
 
 **Probele auditorilor** sunt în `scripts/qa/audit-<zona>-*.mjs`; `fetch`
 din Node **ignoră `Host:`** — ce vrea să imite Railway folosește `node:http`

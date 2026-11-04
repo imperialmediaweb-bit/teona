@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { formularAdmin, limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
 import {
   COOKIE_DISPOZITIV,
   VIATA_DISPOZITIV_S,
@@ -35,7 +35,7 @@ export async function POST(cerere: Request) {
     fereastraMs: 15 * 60 * 1000,
   });
   if (prea) return prea;
-  if (!(await arePermisiune(INAPOI))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune(INAPOI))) return sesiuneExpirata();
 
   const cine = await cineEsteConectat();
   if (cine?.fel !== "cont") return gata("fara-cont");

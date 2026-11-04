@@ -154,8 +154,9 @@ export async function POST(cerere: Request) {
     transfer care nu e nicăieri. Dacă trimiterea cade, anunțul rămâne —
     numărul lui stă oricum în „De făcut acum".
   */
+  let emailPlecat = false;
   if (rezultat.ok) {
-    await anuntaTransferulPeEmail({
+    emailPlecat = await anuntaTransferulPeEmail({
       nume,
       email: emailValid(adresa) ?? undefined,
       telefon: text(camp("telefon"), 40) ?? undefined,
@@ -163,7 +164,7 @@ export async function POST(cerere: Request) {
       destinatie,
       data: cand.toISOString(),
       observatii: text(camp("observatii"), 1_000) ?? undefined,
-    });
+    }).catch(() => false);
     await notificaPanoul({
       titlu: "Transfer anunțat",
       text: `${nume.split(/\s+/)[0]} spune că a trimis ${scrieSuma(suma)} lei. Caută-l în extras.`,
@@ -181,7 +182,7 @@ export async function POST(cerere: Request) {
   }
 
   return raspuns(
-    adresa
+    adresa && emailPlecat
       ? "Mulțumim! Am notat transferul și îl căutăm în extrasul de cont. Ți-am trimis pe e-mail ce ne-ai scris, iar când găsim transferul îți scriem din nou."
       : "Mulțumim! Am notat transferul și îl căutăm în extrasul de cont. Dacă ai nevoie de o confirmare scrisă, scrie-ne la " +
           `${EMAIL.contact}.`,

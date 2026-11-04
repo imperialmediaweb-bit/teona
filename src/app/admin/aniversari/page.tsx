@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 export default function Verificare({
   searchParams,
 }: {
-  searchParams: Promise<{ gresit?: string }>;
+  searchParams: Promise<{ gresit?: string; gata?: string; fara_email?: string }>;
 }) {
   return (
     <Suspense
@@ -47,10 +47,10 @@ export default function Verificare({
 async function Continut({
   searchParams,
 }: {
-  searchParams: Promise<{ gresit?: string }>;
+  searchParams: Promise<{ gresit?: string; gata?: string; fara_email?: string }>;
 }) {
   await connection();
-  const { gresit } = await searchParams;
+  const { gresit, gata, fara_email: faraEmail } = await searchParams;
 
   if (!areParolaConfigurata()) {
     return (
@@ -69,7 +69,7 @@ async function Continut({
   if (!(await esteAutentificat())) {
     return (
       <Cadru titlu="Intră în panou" activ="/admin/aniversari" faraMeniu>
-        <Intrare gresit={Boolean(gresit)} unde="/admin/aniversari" />
+        <Intrare gresit={Boolean(gresit)} bazaCazuta={gresit === "baza"} unde="/admin/aniversari" />
       </Cadru>
     );
   }
@@ -103,6 +103,19 @@ async function Continut({
       }
       activ="/admin/aniversari"
     >
+      {gata && faraEmail !== undefined && (
+        <p
+          role="alert"
+          className="mb-6 colt-mic-b border-t-4 border-caramiziu-600 bg-caramiziu-50 p-4 text-mic text-caramiziu-900"
+        >
+          <strong className="font-titlu font-bold text-caramiziu-800">
+            Campania e {gata === "publicata" ? "publicată" : "respinsă"}, dar
+            e-mailul către {faraEmail || "om"} n-a plecat.
+          </strong>{" "}
+          Serverul de e-mail n-a răspuns. Trimite-i tu linkul campaniei, altfel
+          nu află nimeni.
+        </p>
+      )}
       {campanii.length === 0 && (
         <p className="text-amplu text-cerneala-moale">
           Nimic de verificat acum.

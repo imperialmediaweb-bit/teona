@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { tipulPozei } from "@/lib/poza-browser";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { LIMITE, OCAZII, POZA_MAXIM, textGataFacut } from "@/date/aniversari";
@@ -239,7 +240,9 @@ export default function FormularAniversare({
       ref={formular}
       onSubmit={trimite}
       onChange={(ev) => actualizeazaPrevizualizarea(ev.currentTarget)}
-      action="/api/campanii"
+      // Fără JavaScript (sau cu scripturile picate), trimiterea reîncarcă
+      // pagina în loc să arate `{}` de la rută.
+      action="/doneaza-ti-ziua#creeaza"
       method="post"
       encType="multipart/form-data"
       noValidate
@@ -385,12 +388,13 @@ export default function FormularAniversare({
           name="poza"
           type="file"
           accept="image/jpeg,image/png,image/webp"
-          onChange={(ev) => {
+          onChange={async (ev) => {
             const file = ev.currentTarget.files?.[0] ?? null;
             setNumePoza(file?.name ?? null);
-            const valida = file && file.size <= POZA_MAXIM &&
-              ["image/jpeg", "image/png", "image/webp"].includes(file.type);
-            setPozaPreview(valida ? URL.createObjectURL(file) : null);
+            // Tipul din primii octeți, nu din eticheta sistemului: pe Windows
+            // `File.type` e des gol, iar previzualizarea nu apărea.
+            const tip = file && file.size <= POZA_MAXIM ? await tipulPozei(file).catch(() => null) : null;
+            setPozaPreview(tip && file ? URL.createObjectURL(file) : null);
           }}
           aria-invalid={erori.poza ? "true" : undefined}
           className="block w-full cursor-pointer font-titlu text-mic text-cerneala-moale file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-tenta-cald file:px-5 file:py-3 file:font-titlu file:text-mic file:font-bold file:text-caramiziu-700 hover:file:bg-caramiziu-100"

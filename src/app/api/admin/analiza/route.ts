@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
+import { limitaDeRata, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
 
 import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
@@ -46,7 +46,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune("/admin/analiza"))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/analiza"))) return sesiuneExpirata();
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
   if (!areAnaliza()) return inapoi(cerere, "fara-cheie");
 

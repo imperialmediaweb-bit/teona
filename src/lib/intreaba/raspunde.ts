@@ -36,7 +36,8 @@ export type Mesaj = { rol: "om" | "asistent"; text: string };
 
 let clientul: Anthropic | null = null;
 function client(): Anthropic {
-  clientul ??= new Anthropic();
+  // `ANTHROPIC_API` numai pentru probe (un API de mențiune), ca la radar.
+  clientul ??= new Anthropic(process.env.ANTHROPIC_API ? { baseURL: process.env.ANTHROPIC_API } : {});
   return clientul;
 }
 

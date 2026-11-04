@@ -78,7 +78,7 @@ export async function POST(cerere: Request) {
     );
   }
 
-  await salveazaCerere({
+  const inCrm = await salveazaCerere({
     fel: "redirectionare",
     nume,
     email: camp("email"),
@@ -87,7 +87,7 @@ export async function POST(cerere: Request) {
       "A completat formularul": "da",
       ...(ani ? { "Pe câți ani": ani === 2 ? "2 ani" : "1 an" } : {}),
     },
-  });
+  }).catch(() => null);
 
   /*
     Confirmarea, după ce anunțul e în CRM.
@@ -103,15 +103,26 @@ export async function POST(cerere: Request) {
     adresa: "/admin/formulare",
   }).catch(() => 0);
 
-  await trimiteFormular230({
+  if (inCrm === null) {
+    return raspuns(
+      `Nu putem nota asta acum. Scrie-ne pe ${EMAIL.contact} sau sună la ${TELEFON_PRINCIPAL.afisat}.`,
+      503,
+    );
+  }
+
+  // „Ți-am trimis pe e-mail” numai dacă e-mailul chiar a plecat: pașii
+  // (poza pe WhatsApp, hârtia prin poștă) erau tocmai în el.
+  const plecat = await trimiteFormular230({
     nume,
     email: camp("email"),
     telefon: camp("telefon") || undefined,
     ani,
-  });
+  }).catch(() => false);
 
   return raspuns(
-    "Am notat, mulțumim! Ți-am trimis pe e-mail și ce-ți mai rămâne de făcut: poza formularului pe WhatsApp și hârtia semnată prin poștă sau adusă la Casa Teona. Fără hârtie, ANAF nu poate înregistra redirecționarea.",
+    plecat
+      ? "Am notat, mulțumim! Ți-am trimis pe e-mail și ce-ți mai rămâne de făcut: poza formularului pe WhatsApp și hârtia semnată prin poștă sau adusă la Casa Teona. Fără hârtie, ANAF nu poate înregistra redirecționarea."
+      : `Am notat, mulțumim! E-mailul cu pașii n-a putut pleca acum, așa că ți-i scriem aici: poza formularului pe WhatsApp la ${TELEFON_PRINCIPAL.afisat} și hârtia semnată prin poștă sau adusă la Casa Teona, Strada Zamca 22, Suceava. Fără hârtie, ANAF nu poate înregistra redirecționarea.`,
     200,
   );
 }

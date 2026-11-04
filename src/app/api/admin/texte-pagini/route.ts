@@ -1,5 +1,5 @@
 import { revalidateTag } from "next/cache";
-import { formularAdmin, limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, raspuns, sesiuneExpirata, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import {
   ETICHETA_TEXTE_PAGINI,
@@ -36,7 +36,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune(INAPOI))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune(INAPOI))) return sesiuneExpirata();
 
   const citit = await formularAdmin(cerere);
   if (citit.raspuns) return citit.raspuns;

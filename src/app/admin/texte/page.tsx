@@ -1,3 +1,4 @@
+import BazaCazuta from "@/componente/admin/BazaCazuta";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
@@ -78,7 +79,7 @@ async function Continut({
   if (!(await esteAutentificat())) {
     return (
       <Cadru titlu="Intră în panou" activ="/admin/texte" faraMeniu>
-        <Intrare gresit={Boolean(gresit)} unde="/admin/texte" />
+        <Intrare gresit={Boolean(gresit)} bazaCazuta={gresit === "baza"} unde="/admin/texte" />
       </Cadru>
     );
   }
@@ -97,7 +98,12 @@ async function Continut({
     );
   }
 
-  const sloturi = await textePanou().catch(() => []);
+  const sloturi = await textePanou().catch(() => null);
+  if (sloturi === null) return (
+      <Cadru titlu="Textele paginilor" activ="/admin/texte">
+        <BazaCazuta ce="textele" />
+      </Cadru>
+    );
   const cifre = await cifreSite();
   const mesaj = stare ? STARI[stare] : undefined;
   const schimbate = sloturi.filter((s) => s.schimbat).length;

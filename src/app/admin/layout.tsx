@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import MicsoreazaPoza from "@/componente/admin/MicsoreazaPoza";
+import TineCiorna from "@/componente/admin/TineCiorna";
 
 /**
  * Panoul ca aplicație: manifestul și iconița de pe ecranul telefonului se
@@ -30,6 +31,7 @@ export default function AranjamentPanou({
       {children}
       {/* Pozele mari se micșorează în browser, înainte să plece spre server. */}
       <MicsoreazaPoza />
+      <TineCiorna />
     </>
   );
 }

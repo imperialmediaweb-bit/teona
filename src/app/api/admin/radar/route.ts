@@ -1,5 +1,5 @@
 import { after } from "next/server";
-import { formularAdmin, limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { hotaraste, scaneaza } from "@/lib/radar";
@@ -19,7 +19,7 @@ function gata(cerere: Request, cod: string) {
 }
 
 export async function POST(cerere: Request) {
-  if (!(await arePermisiune(INAPOI))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune(INAPOI))) return sesiuneExpirata();
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
 
   const citit = await formularAdmin(cerere);

@@ -381,8 +381,9 @@ ${ADRESA_SITE}/admin/formulare`,
  * Niciuna nu oprește nimic dacă nu pleacă — anunțul e deja în CRM, iar
  * numărul lui stă în „De făcut acum".
  */
-export async function trimiteFormular230(d: Formular230): Promise<void> {
-  await trimiteEmail({
+/** Întoarce dacă mesajul cu pașii a ajuns la om: pagina îi scrie pașii dacă nu. */
+export async function trimiteFormular230(d: Formular230): Promise<boolean> {
+  const laOm = await trimiteEmail({
     catre: d.email,
     raspundeLa: EMAIL.redirectionare,
     ...compuneFormular230(d),
@@ -392,4 +393,5 @@ export async function trimiteFormular230(d: Formular230): Promise<void> {
     raspundeLa: d.email,
     ...compuneAnuntFormular230(d),
   });
+  return laOm;
 }

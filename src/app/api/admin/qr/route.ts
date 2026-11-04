@@ -1,5 +1,5 @@
 import { arePermisiune } from "@/lib/admin";
-import { limitaDeRata, raspuns } from "@/lib/api";
+import { limitaDeRata, raspuns, sesiuneExpirata } from "@/lib/api";
 import { caNume, caPng, caSvg, linkEtichetat } from "@/lib/qr";
 
 /**
@@ -17,7 +17,7 @@ export async function GET(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune("/admin/qr"))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/qr"))) return sesiuneExpirata();
 
   const adresa = new URL(cerere.url);
   const cale = adresa.searchParams.get("cale") ?? "/doneaza";

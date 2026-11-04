@@ -1,3 +1,4 @@
+import { cacheRezerva } from "@/lib/cache-panou";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { pozaLocala, proiecte as proiecteBrute } from "@/lib/continut";
@@ -179,9 +180,20 @@ async function dinPanou(): Promise<ProiectAfisat[]> {
   "use cache";
   cacheLife("hours");
   cacheTag(ETICHETA_PROIECTE_PANOU);
-  if (!areBazaDeDate()) return [];
+  // Railway construiește fără acces la bază: lista goală de la build se ținea
+  // o oră, timp în care taberele scrise din panou dispăreau de pe /proiecte
+  // și paginile lor dădeau 404 (auditul din 4 noiembrie 2026). Rezerva nu se
+  // ține: primul vizitator după publicare o reîmprospătează.
+  if (!areBazaDeDate()) {
+    cacheRezerva();
+    return [];
+  }
 
-  const texte = await textePublicate("proiect", 300).catch(() => []);
+  const texte = await textePublicate("proiect", 300).catch(() => null);
+  if (texte === null) {
+    cacheRezerva();
+    return [];
+  }
   return texte.map((t) => ({
     slug: t.slug,
     titlu: t.titlu,

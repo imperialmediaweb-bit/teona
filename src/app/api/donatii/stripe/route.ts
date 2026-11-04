@@ -117,7 +117,8 @@ export async function POST(cerere: Request) {
       { adresa: sesiune.adresa },
       { status: 200, headers: { "Cache-Control": "no-store" } },
     );
-  } catch {
+  } catch (e) {
+    console.error(`[stripe] nu s-a putut deschide sesiunea: ${(e as Error).message}`);
     return raspuns(
       "Nu am putut porni plata. Încearcă din nou peste câteva minute.",
       502,

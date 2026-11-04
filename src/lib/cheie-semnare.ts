@@ -1,5 +1,6 @@
 import { createHmac } from "node:crypto";
 import { egale } from "./comparatie";
+import { mediu } from "./mediu";
 
 /**
  * Cheia cu care site-ul semnează tot ce dă în mână oamenilor: sesiunile din
@@ -23,7 +24,7 @@ import { egale } from "./comparatie";
  * care se închid, deodată, toate sesiunile, dacă s-a scurs ceva.
  */
 export function cheiaDeSemnat(): string | null {
-  const c = process.env.SECRET_SESIUNE;
+  const c = mediu("SECRET_SESIUNE");
   return c && c.length >= 32 ? c : null;
 }
 
@@ -43,7 +44,7 @@ function cheiDeVerificat(): string[] {
   const chei: string[] = [];
   const noua = cheiaDeSemnat();
   if (noua) chei.push(noua);
-  const veche = process.env.PAROLA_ADMIN;
+  const veche = mediu("PAROLA_ADMIN");
   if (Date.now() < VECHI_PANA_LA && veche && veche.length >= 16 && veche !== noua) {
     chei.push(veche);
   }

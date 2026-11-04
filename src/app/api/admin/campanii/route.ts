@@ -1,4 +1,4 @@
-import { formularAdmin, limitaDeRata, nuTrece, raspuns, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { hotaraste, stergeSpam } from "@/lib/campanii";
 import { campanieHotarata } from "@/lib/email/campanie";
@@ -12,7 +12,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune("/admin/aniversari"))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/aniversari"))) return sesiuneExpirata();
 
   const citit = await formularAdmin(cerere);
   if (citit.raspuns) return citit.raspuns;
@@ -35,12 +35,17 @@ export async function POST(cerere: Request) {
 
   // `hotaraste` întoarce rândul doar dacă starea chiar s-a schimbat acum, deci
   // o a doua apăsare pe buton nu mai trimite al doilea e-mail.
+  let anuntat = true;
   if (rand) {
-    await campanieHotarata({
+    anuntat = await campanieHotarata({
       ...rand,
       publicata: hotarare === "publicata",
       motiv,
-    }).catch(() => undefined);
+    }).catch(() => false);
   }
-  return trimiteLa("/admin/aniversari");
+  // Campania e hotărâtă oricum; dacă e-mailul către om n-a plecat, panoul o
+  // spune, ca cineva să-i trimită linkul altfel — altfel nu afla nimeni.
+  return trimiteLa(
+    `/admin/aniversari?gata=${hotarare}${anuntat ? "" : `&fara_email=${encodeURIComponent(rand?.email ?? "")}`}`,
+  );
 }

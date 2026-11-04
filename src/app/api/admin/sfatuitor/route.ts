@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns, text as curataText } from "@/lib/api";
+import { limitaDeRata, raspuns, sesiuneExpirata, text as curataText } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import {
@@ -40,7 +40,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune("/admin/analiza"))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/analiza"))) return sesiuneExpirata();
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
   if (!areSfatuitor()) {
     return raspuns("Lipsește ANTHROPIC_API_KEY din Railway.", 503);
@@ -109,9 +109,12 @@ export async function POST(cerere: Request) {
         for await (const bucata of raspundeSfatuitor(cifre, conversatie)) {
           coada.enqueue(scrie.encode(bucata));
         }
-      } catch {
+      } catch (e) {
+        console.error(`[sfatuitor] ${(e as Error).message}`);
         coada.enqueue(
-          scrie.encode("\n\n(S-a întrerupt legătura. Mai încearcă o dată.)"),
+          scrie.encode(
+            "\n\n(Nu am putut lua răspunsul de la model acum. Dacă se repetă, spune-i dezvoltatorului; cauza e în jurnalul serverului.)",
+          ),
         );
       }
       coada.close();

@@ -13,6 +13,7 @@ import {
   trimiteMesajulDeContact,
 } from "@/lib/email/contact";
 import { areBazaDeDate } from "@/lib/baza";
+import { TELEFON_PRINCIPAL } from "@/date/asociatie";
 import { salveazaCerere } from "@/lib/crm";
 import { notificaPanoul } from "@/lib/notificari";
 
@@ -171,8 +172,9 @@ export async function POST(cerere: Request) {
 
   // În CRM înainte de e-mail: un mesaj citit și uitat dispare din inbox, un
   // rând în `cereri` rămâne, cu stadiul lui — nou, în lucru, rezolvat.
+  let inCrm = false;
   if (areBazaDeDate()) {
-    await salveazaCerere({
+    inCrm = await salveazaCerere({
       fel: voluntariat ? "voluntariat" : "contact",
       nume: numeleOmului,
       email: adresaOmului,
@@ -200,7 +202,9 @@ export async function POST(cerere: Request) {
           .map(([k, v]) => [k, String(v ?? "").trim()] as [string, string])
           .filter(([, v]) => v !== ""),
       ),
-    }).catch(() => null);
+    })
+      .then(() => true)
+      .catch(() => false);
   }
 
   if (!areEmail()) {
@@ -241,8 +245,15 @@ export async function POST(cerere: Request) {
   const catreAsociatie = await trimiteMesajulDeContact(mesaj);
 
   if (!catreAsociatie) {
-    // Mesajul n-a ajuns la asociație. Omul trebuie să afle, nu să plece
-    // liniștit că a scris cuiva.
+    // Mesajul n-a ajuns pe e-mail. Dacă e în CRM, asociația îl vede în panou
+    // și omul nu trebuie trimis să scrie a doua oară (ar apărea de două ori);
+    // dacă nu e nicăieri, trebuie să afle, nu să plece liniștit.
+    if (inCrm) {
+      return raspuns(
+        `Am primit mesajul tău și îl vedem în panou. E-mailul de confirmare n-a putut pleca acum — dacă nu primești răspuns în două zile, sună-ne la ${TELEFON_PRINCIPAL.afisat}.`,
+        200,
+      );
+    }
     return raspuns(
       "Nu am putut trimite mesajul acum. Încearcă din nou peste câteva minute sau scrie-ne direct:",
       502,

@@ -1,4 +1,4 @@
-import { formularAdmin, limitaDeRata, nuTrece, raspuns, trimiteLa } from "@/lib/api";
+import { cuBaza, formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import {
   esteFelCerere,
@@ -14,7 +14,9 @@ import {
  * adică pentru tot ce nu trece prin formularele site-ului. Până acum, cineva
  * care trimitea poza pe WhatsApp rămânea doar în conversația aia.
  */
-export async function POST(cerere: Request) {
+export const POST = cuBaza(posteaza);
+
+async function posteaza(cerere: Request) {
   const prea = limitaDeRata(cerere, {
     cheie: "admin-cereri",
     maxim: 120,
@@ -22,7 +24,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune("/admin/cereri"))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/cereri"))) return sesiuneExpirata();
 
   const citit = await formularAdmin(cerere);
   if (citit.raspuns) return citit.raspuns;

@@ -1,4 +1,5 @@
 import { intreaba } from "./baza";
+import { mediu } from "@/lib/mediu";
 import { anuntaAbonarea } from "./email/buletin";
 import { notificaPanoul } from "./notificari";
 
@@ -47,7 +48,7 @@ export async function laBuletin(
   sursa: SursaAbonare = "formular",
   dinPanou?: DinPanou,
 ): Promise<boolean> {
-  const cheie = process.env.MAILERLITE_API_KEY;
+  const cheie = mediu("MAILERLITE_API_KEY");
   if (!cheie) return false;
 
   const grup =
@@ -74,7 +75,10 @@ export async function laBuletin(
     }),
   });
 
-  if (!raspuns.ok) return false;
+  if (!raspuns.ok) {
+    console.error(`[mailerlite] ${raspuns.status} la abonare: ${(await raspuns.text().catch(() => "")).slice(0, 200)}`);
+    return false;
+  }
 
   await intreaba(
     "UPDATE donatii SET dus_la_buletin = true WHERE email = $1 AND acord_buletin = true",
@@ -136,7 +140,7 @@ export type Abonat = {
  * cineva care s-a dezabonat: o listă veche de pe hârtie nu bate „nu mai vreau”.
  */
 export async function stareaInMailerLite(email: string): Promise<string | null> {
-  const cheie = process.env.MAILERLITE_API_KEY;
+  const cheie = mediu("MAILERLITE_API_KEY");
   if (!cheie) return null;
   const baza =
     process.env.MAILERLITE_API?.replace(/\/+$/, "") ?? "https://connect.mailerlite.com/api";
@@ -205,7 +209,7 @@ export async function daJosDinBuletin(email: string): Promise<boolean> {
     [email],
   ).catch(() => undefined);
 
-  const cheie = process.env.MAILERLITE_API_KEY;
+  const cheie = mediu("MAILERLITE_API_KEY");
   if (!cheie) return false;
 
   const antete = {
@@ -213,10 +217,12 @@ export async function daJosDinBuletin(email: string): Promise<boolean> {
     "Content-Type": "application/json",
     Accept: "application/json",
   };
+  // Aceeași bază ca la abonare: scrisă fix, nicio probă nu putea ajunge aici.
+  const baza = process.env.MAILERLITE_API?.replace(/\/+$/, "") ?? "https://connect.mailerlite.com/api";
 
   try {
     const cautare = await fetch(
-      `https://connect.mailerlite.com/api/subscribers/${encodeURIComponent(email)}`,
+      `${baza}/subscribers/${encodeURIComponent(email)}`,
       { headers: antete },
     );
     if (!cautare.ok) {
@@ -228,15 +234,17 @@ export async function daJosDinBuletin(email: string): Promise<boolean> {
     if (!id) return false;
 
     const oprire = await fetch(
-      `https://connect.mailerlite.com/api/subscribers/${id}`,
+      `${baza}/subscribers/${id}`,
       {
         method: "PUT",
         headers: antete,
         body: JSON.stringify({ status: "unsubscribed" }),
       },
     );
+    if (!oprire.ok) console.error(`[mailerlite] ${oprire.status} la dezabonarea unei adrese`);
     return oprire.ok;
-  } catch {
+  } catch (e) {
+    console.error(`[mailerlite] rețea la dezabonare: ${(e as Error).message}`);
     return false;
   }
 }

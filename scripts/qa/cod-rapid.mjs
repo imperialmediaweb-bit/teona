@@ -60,14 +60,22 @@ v("dispozitivul e ținut minte 90 de zile", disp && zile(disp) === 90, disp && `
 // Aplicația.
 const man = await p.request.get(BAZA + "/admin/manifest.webmanifest");
 const m = await man.json().catch(() => ({}));
-v("manifestul e al panoului", m.scope === "/admin/" && m.start_url === "/admin", `${m.scope} ${m.start_url}`);
+// Raza e `/admin`, fără bară: cu `/admin/`, `start_url` nu era în ea, Chrome
+// ignora raza, iar `serviceWorker.ready` nu se rezolva pe `/admin` (audit, 4 noiembrie 2026).
+v("manifestul e al panoului", m.scope === "/admin" && m.start_url === "/admin", `${m.scope} ${m.start_url}`);
 await p.waitForTimeout(1500);
 v(
-  "lucrătorul se înregistrează pe /admin/",
+  "lucrătorul se înregistrează pe /admin (și acoperă pagina de început)",
   await p.evaluate(async () => {
-    const r = await navigator.serviceWorker.getRegistration("/admin/");
-    return Boolean(r && r.scope.endsWith("/admin/"));
+    const r = await navigator.serviceWorker.getRegistration("/admin");
+    return Boolean(r && r.scope.endsWith("/admin"));
   }),
+);
+v(
+  "pe /admin, `serviceWorker.ready` se rezolvă (nu rămâne pe „Se pornește…”)",
+  await p.evaluate(() =>
+    Promise.race([navigator.serviceWorker.ready.then(() => true), new Promise((r) => setTimeout(() => r(false), 5000))]),
+  ),
 );
 
 // 2. Codul rapid.

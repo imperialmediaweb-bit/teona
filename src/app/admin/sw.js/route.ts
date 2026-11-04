@@ -60,6 +60,9 @@ export function GET() {
     headers: {
       "content-type": "text/javascript; charset=utf-8",
       "cache-control": "no-cache",
+      // Raza `/admin` e deasupra dosarului fișierului (`/admin/sw.js`):
+      // browserul o acceptă numai cu antetul ăsta.
+      "service-worker-allowed": "/admin",
     },
   });
 }

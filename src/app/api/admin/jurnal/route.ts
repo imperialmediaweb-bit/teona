@@ -1,4 +1,4 @@
-import { formularAdmin, limitaDeRata, nuTrece, text, trimiteLa } from "@/lib/api";
+import { cuBaza, formularAdmin, limitaDeRata, nuTrece, text, trimiteLa } from "@/lib/api";
 import { arePermisiune, esteAutentificat, numeleConectat } from "@/lib/admin";
 import { esteFelInteractiune, scrieInteractiune } from "@/lib/crm";
 
@@ -18,7 +18,9 @@ import { esteFelInteractiune, scrieInteractiune } from "@/lib/crm";
  */
 const INAPOI = /^\/admin\/(firme|donatori|cereri)(\?[\w=&%.\-+]*)?$/;
 
-export async function POST(cerere: Request) {
+export const POST = cuBaza(posteaza);
+
+async function posteaza(cerere: Request) {
   const prea = limitaDeRata(cerere, {
     cheie: "admin-jurnal",
     maxim: 120,

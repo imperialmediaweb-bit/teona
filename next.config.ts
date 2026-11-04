@@ -99,7 +99,9 @@ const politicaDeContinut = [
   // trebui vreodată adăugat Google Fonts, înseamnă că s-a stricat ceva.
   "font-src 'self'",
   `connect-src 'self'${dezvoltare ? " ws: wss:" : ""} ${GOOGLE_DATE} ${CLOUDFLARE_DATE}`,
-  `frame-src ${FORMULAR230}`,
+  // Playerul Facebook din „Suntem în presă” (`VideoIncorporat`) se montează la
+  // apăsare; fără el, butonul lăsa un cadru gol (auditul din 4 noiembrie 2026).
+  `frame-src ${FORMULAR230} https://www.facebook.com`,
   "frame-ancestors 'none'",
   "object-src 'none'",
   "base-uri 'self'",

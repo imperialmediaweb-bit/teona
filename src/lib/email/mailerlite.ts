@@ -1,4 +1,5 @@
 import { construieste, textSimplu, type ContinutEmail } from "./sablon";
+import { mediu } from "@/lib/mediu";
 
 /**
  * Campaniile de e-mail, prin MailerLite.
@@ -55,7 +56,7 @@ export async function creeazaCiorna(date: {
   html?: string;
   textSimplu?: string;
 }): Promise<Raspuns> {
-  const cheie = process.env.MAILERLITE_API_KEY;
+  const cheie = mediu("MAILERLITE_API_KEY");
   if (!cheie) return { ok: false, mesaj: "Cheia MailerLite lipsește." };
 
   const raspuns = await fetch(`${BAZA}/campaigns`, {
@@ -112,7 +113,7 @@ export async function creeazaCiorna(date: {
  * MailerLite, la statistici.
  */
 export async function trimiteCampania(id: string): Promise<Raspuns> {
-  const cheie = process.env.MAILERLITE_API_KEY;
+  const cheie = mediu("MAILERLITE_API_KEY");
   if (!cheie) return { ok: false, mesaj: "Cheia MailerLite lipsește." };
   const raspuns = await fetch(
     `${BAZA}/campaigns/${encodeURIComponent(id)}/schedule`,
@@ -147,7 +148,7 @@ export async function trimiteCampania(id: string): Promise<Raspuns> {
 export async function grupuri(): Promise<
   Array<{ id: string; nume: string; activi: number }>
 > {
-  const cheie = process.env.MAILERLITE_API_KEY;
+  const cheie = mediu("MAILERLITE_API_KEY");
   if (!cheie) return [];
 
   const raspuns = await fetch(`${BAZA}/groups?limit=100`, {
@@ -188,7 +189,7 @@ export async function abonatiiGrupului(
   grup: string,
   maxim = 2000,
 ): Promise<AbonatMailerLite[]> {
-  const cheie = process.env.MAILERLITE_API_KEY;
+  const cheie = mediu("MAILERLITE_API_KEY");
   if (!cheie || !grup) return [];
   const toti: AbonatMailerLite[] = [];
   let cursor: string | null = null;

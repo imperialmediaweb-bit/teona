@@ -1,3 +1,4 @@
+import BazaCazuta from "@/componente/admin/BazaCazuta";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
@@ -48,6 +49,10 @@ const STARI: Record<string, { text: string; bun: boolean }> = {
     text: "Locul pozelor nu e pornit. Cere-i dezvoltatorului.",
     bun: false,
   },
+  urcare: {
+    text: "Depozitul de poze n-a primit sigla acum. Încearcă din nou peste un minut; dacă se repetă, cere-i dezvoltatorului să se uite în jurnal la cheile Cloudinary.",
+    bun: false,
+  },
   necunoscut: { text: "N-a mers. Încearcă din nou.", bun: false },
 };
 
@@ -87,7 +92,7 @@ async function Continut({
   if (!(await esteAutentificat())) {
     return (
       <Cadru titlu="Intră în panou" activ="/admin/sponsori" faraMeniu>
-        <Intrare gresit={Boolean(gresit)} unde="/admin/sponsori" />
+        <Intrare gresit={Boolean(gresit)} bazaCazuta={gresit === "baza"} unde="/admin/sponsori" />
       </Cadru>
     );
   }
@@ -106,7 +111,12 @@ async function Continut({
     );
   }
 
-  const toate = await sponsoriPanou().catch(() => [] as SiglaPanou[]);
+  const toate = await sponsoriPanou().catch(() => null);
+  if (toate === null) return (
+      <Cadru titlu="Sponsori" activ="/admin/sponsori">
+        <BazaCazuta ce="lista siglelor" />
+      </Cadru>
+    );
   const mesaj = stare ? STARI[stare] : undefined;
   const active = toate.filter((s) => s.activ);
   const poze = areCloudinary();

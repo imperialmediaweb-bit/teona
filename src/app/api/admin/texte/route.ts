@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { ETICHETA_PROIECTE_PANOU } from "@/date/proiecte";
-import { formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
+import { cuBaza, formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import {
   creeazaText,
@@ -24,7 +24,9 @@ import { citesteSuma, laBan } from "@/lib/suma";
  * **Poza se urcă în Cloudinary, nu pe disc.** Discul containerului dispare la
  * fiecare publicare, iar o noutate de acum trei luni și-ar pierde fotografia.
  */
-export async function POST(cerere: Request) {
+export const POST = cuBaza(posteaza);
+
+async function posteaza(cerere: Request) {
   const prea = limitaDeRata(cerere, {
     cheie: "admin-texte",
     maxim: 60,

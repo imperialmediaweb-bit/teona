@@ -1,4 +1,4 @@
-import { formularAdmin, limitaDeRata, nuTrece, raspuns, text, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { marcheazaFacebook, textDupaId, felul } from "@/lib/texte";
@@ -21,7 +21,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune("/admin/facebook"))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/facebook"))) return sesiuneExpirata();
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
   if (!arePagina()) return inapoi(cerere, "fara-pagina");
 

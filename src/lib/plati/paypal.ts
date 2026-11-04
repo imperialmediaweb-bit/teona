@@ -1,3 +1,4 @@
+import { mediu } from "@/lib/mediu";
 import { DESTINATII, type Frecventa } from "@/date/plati";
 
 /**
@@ -16,7 +17,7 @@ import { DESTINATII, type Frecventa } from "@/date/plati";
 // `PAYPAL_API` numai pentru probe (un PayPal de mențiune, pe 127.0.0.1).
 const BAZA = () =>
   process.env.PAYPAL_API ||
-  (process.env.PAYPAL_MOD === "live"
+  (mediu("PAYPAL_MOD")?.toLowerCase() === "live"
     ? "https://api-m.paypal.com"
     : "https://api-m.sandbox.paypal.com");
 
@@ -36,7 +37,7 @@ async function iaJeton(): Promise<string> {
   const secret = process.env.PAYPAL_CLIENT_SECRET;
   if (!id || !secret) throw new Error("Cheile PayPal lipsesc");
 
-  const raspuns = await fetch(`${BAZA()}/v1/oauth2/token`, {
+  const raspuns = await fetch(`${BAZA()}/v1/oauth2/token`, { signal: AbortSignal.timeout(15_000),
     method: "POST",
     headers: {
       Authorization: `Basic ${Buffer.from(`${id}:${secret}`).toString("base64")}`,
@@ -75,7 +76,7 @@ export async function deschideComanda(
   cerere: CerereEuro,
 ): Promise<{ id: string; adresa: string }> {
   const acces = await iaJeton();
-  const raspuns = await fetch(`${BAZA()}/v2/checkout/orders`, {
+  const raspuns = await fetch(`${BAZA()}/v2/checkout/orders`, { signal: AbortSignal.timeout(15_000),
     method: "POST",
     headers: {
       Authorization: `Bearer ${acces}`,
@@ -185,7 +186,7 @@ export async function semnaturaEValida(
   for (const webhookId of idUri) {
     const raspuns = await fetch(
       `${BAZA()}/v1/notifications/verify-webhook-signature`,
-      {
+      { signal: AbortSignal.timeout(15_000),
         method: "POST",
         headers: {
           Authorization: `Bearer ${acces}`,
@@ -242,12 +243,12 @@ export async function incaseazaComanda(comanda: string): Promise<Incasare | null
     Authorization: `Bearer ${acces}`,
     "Content-Type": "application/json",
   };
-  let raspuns = await fetch(`${BAZA()}/v2/checkout/orders/${comanda}/capture`, {
+  let raspuns = await fetch(`${BAZA()}/v2/checkout/orders/${comanda}/capture`, { signal: AbortSignal.timeout(15_000),
     method: "POST",
     headers: { ...antete, "PayPal-Request-Id": `incasare-${comanda}` },
   });
   if (raspuns.status === 422) {
-    raspuns = await fetch(`${BAZA()}/v2/checkout/orders/${comanda}`, { headers: antete });
+    raspuns = await fetch(`${BAZA()}/v2/checkout/orders/${comanda}`, { signal: AbortSignal.timeout(15_000), headers: antete });
   }
   if (!raspuns.ok) {
     const spus = await raspuns.text().catch(() => "");

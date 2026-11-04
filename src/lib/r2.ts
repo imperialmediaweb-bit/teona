@@ -1,4 +1,5 @@
 import "server-only";
+import { mediu } from "@/lib/mediu";
 import { createHash, createHmac } from "node:crypto";
 
 /**
@@ -29,10 +30,10 @@ const REGIUNE = "auto";
 const SERVICIU = "s3";
 
 function config() {
-  const cont = process.env.R2_ACCOUNT_ID;
-  const cheie = process.env.R2_ACCESS_KEY_ID;
-  const secret = process.env.R2_SECRET_ACCESS_KEY;
-  const galeata = process.env.R2_BUCKET;
+  const cont = mediu("R2_ACCOUNT_ID");
+  const cheie = mediu("R2_ACCESS_KEY_ID");
+  const secret = mediu("R2_SECRET_ACCESS_KEY");
+  const galeata = mediu("R2_BUCKET");
   if (!cont || !cheie || !secret || !galeata) return null;
   const adresa = process.env.R2_ENDPOINT?.trim();
   return {

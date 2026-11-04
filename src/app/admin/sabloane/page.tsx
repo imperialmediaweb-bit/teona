@@ -57,6 +57,8 @@ const RATAT: Record<string, string> = {
   fel: "Alege pentru cine e e-mailul.",
   "poza-mare":
     "Fotografia e prea mare. Alege una mai mică de 6 MB sau micșoreaz-o întâi.",
+  "proba-nu":
+    "Proba n-a putut pleca: serverul de e-mail n-a răspuns. Încearcă peste câteva minute; cauza e în jurnalul serverului, nu în ce ai scris tu.",
   gol: "Scrie titlul și textul campaniei. Fără ele ar pleca textul de exemplu din șablon.",
   "titlu-lung": "Titlul are peste 160 de semne. Scurtează-l.",
   "poza-tip":
@@ -69,7 +71,6 @@ const RATAT: Record<string, string> = {
 
 const FACUT: Record<string, string> = {
   proba: "Proba a plecat. Uită-te la ea în inbox, pe telefon și pe calculator.",
-  "proba-nu": "Proba n-a putut pleca. Verifică adresa și cheia Resend.",
   ciorna:
     "Ciorna e în MailerLite. Deschide-o acolo, trimite-ți o probă de la ei și abia apoi apasă pe trimitere.",
   trimisa:
@@ -151,7 +152,7 @@ async function Continut({
   if (!(await esteAutentificat())) {
     return (
       <Cadru titlu="Intră în panou" activ="/admin/sabloane" faraMeniu>
-        <Intrare gresit={Boolean(gresit)} unde="/admin/sabloane" />
+        <Intrare gresit={Boolean(gresit)} bazaCazuta={gresit === "baza"} unde="/admin/sabloane" />
       </Cadru>
     );
   }

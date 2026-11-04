@@ -42,9 +42,11 @@ export async function POST(cerere: Request) {
   let eveniment: Stripe.Event;
   try {
     eveniment = citesteEveniment(corp, semnatura);
-  } catch {
+  } catch (e) {
     // Semnătură greșită înseamnă fie o cheie nepotrivită, fie cineva care
-    // încearcă să inventeze donații. Oricum, nu scriem nimic.
+    // încearcă să inventeze donații. Oricum, nu scriem nimic — dar spunem în
+    // jurnal: un secret lipit cu un spațiu la capăt respingea toate plățile.
+    console.error(`[stripe] semnătură invalidă la webhook: ${(e as Error).message}`);
     return raspuns("Semnătură invalidă.", 400);
   }
 

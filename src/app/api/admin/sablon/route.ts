@@ -283,10 +283,8 @@ export async function POST(cerere: Request) {
       }).catch(() => false);
       if (trimis) plecate++;
     }
-    return inapoi(cerere, {
-      facut: plecate === adrese.length ? "proba" : "proba-nu",
-      fel,
-    });
+    if (plecate === adrese.length) return inapoi(cerere, { facut: "proba", fel });
+    return inapoi(cerere, { ratat: "proba-nu", fel });
   }
 
   if (fac === "ciorna" || fac === "trimite") {

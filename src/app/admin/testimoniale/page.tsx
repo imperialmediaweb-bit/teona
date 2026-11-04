@@ -1,3 +1,4 @@
+import BazaCazuta from "@/componente/admin/BazaCazuta";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
@@ -83,7 +84,7 @@ async function Continut({
   if (!(await esteAutentificat())) {
     return (
       <Cadru titlu="Intră în panou" activ="/admin/testimoniale" faraMeniu>
-        <Intrare gresit={Boolean(gresit)} unde="/admin/testimoniale" />
+        <Intrare gresit={Boolean(gresit)} bazaCazuta={gresit === "baza"} unde="/admin/testimoniale" />
       </Cadru>
     );
   }
@@ -102,7 +103,12 @@ async function Continut({
     );
   }
 
-  const toate = await testimonialeToate().catch(() => [] as Testimonial[]);
+  const toate = await testimonialeToate().catch(() => null);
+  if (toate === null) return (
+      <Cadru titlu="Testimoniale" activ="/admin/testimoniale">
+        <BazaCazuta ce="testimonialele" />
+      </Cadru>
+    );
   const mesaj = stare ? STARI[stare] : undefined;
   const active = toate.filter((t) => t.activ);
 

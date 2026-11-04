@@ -1,4 +1,5 @@
 import { createHmac } from "node:crypto";
+import { mediu } from "@/lib/mediu";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { connection } from "next/server";
@@ -48,7 +49,7 @@ export const VIATA_DISPOZITIV_S = 90 * 24 * 60 * 60;
 export const COOKIE_DISPOZITIV = "teona_dispozitiv";
 
 function cheie(): string | null {
-  const parola = process.env.PAROLA_ADMIN;
+  const parola = mediu("PAROLA_ADMIN");
   return parola && parola.length >= 12 ? parola : null;
 }
 
