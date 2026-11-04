@@ -12,7 +12,7 @@
  *   2. **nu se amestecă** — e-mailul pentru firme n-are butoane de SMS, cel
  *      pentru oameni n-are contract de sponsorizare;
  *   3. **MailerLite primește ce-i trebuie** — variabila de dezabonare;
- *   4. **nimic nu iese fără sesiune**, și o poză fără descriere e refuzată.
+ *   4. **nimic nu iese fără sesiune**, iar o poză fără descriere poartă titlul.
  *
  * Rulare, pe un server pornit cu PAROLA_ADMIN:
  *     BAZA=http://localhost:3000 PAROLA_ADMIN=… node scripts/qa/sabloane-email.mjs
@@ -171,11 +171,11 @@ verifica(
 );
 
 /*
-  Poza fără descriere nu intră.
+  Poza fără descriere poartă titlul campaniei.
 
-  Aceeași regulă ca la scrisul pe site: cine nu vede imaginea — pentru că
-  folosește cititor de ecran sau pentru că nu i se încarcă pozele — rămâne cu
-  textul alternativ sau cu nimic.
+  Cine nu vede imaginea — cititor de ecran, poze blocate în Outlook — rămâne
+  cu textul alternativ; înainte lipsa lui oprea trimiterea, iar fundraiserul
+  a sărit câmpul și n-a înțeles de ce nu merge (4 noiembrie 2026).
 */
 const faraDescriere = await trimite({
   fel: "persoane",
@@ -183,10 +183,10 @@ const faraDescriere = await trimite({
   poza: "Teona/2025/ceva/poza-1",
   fac: "vezi",
 });
-const dus = faraDescriere.headers.get("location") ?? "";
+const htmlFaraDescriere = await faraDescriere.text();
 verifica(
-  faraDescriere.status === 303 && dus.includes("ratat=poza"),
-  `poza fără descriere e refuzată (${faraDescriere.status})`,
+  faraDescriere.status === 200 && htmlFaraDescriere.includes('alt="Cu poză"'),
+  `poza fără descriere trece, cu titlul ca text alternativ (${faraDescriere.status})`,
 );
 
 console.log(rele === 0 ? "\ntoate probele trec" : `\n${rele} probe cad`);

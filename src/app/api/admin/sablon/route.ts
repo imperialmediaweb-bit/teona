@@ -115,19 +115,17 @@ function citeste(
           .map((p) => p.replace(/\n/g, " ").trim())
           .filter(Boolean)
       : EXEMPLU.paragrafe,
-    poza: pozaId ? { adresa: pozaPentruEmail(pozaId), alt: pozaAlt } : null,
+    // Fără descriere scrisă, poza poartă titlul campaniei: cine nu vede
+    // imaginea (cititor de ecran, poze blocate în Outlook) află măcar despre
+    // ce e. Înainte lipsa ei oprea trimiterea; fundraiserul a sărit-o și
+    // n-a înțeles de ce nu merge.
+    poza: pozaId
+      ? { adresa: pozaPentruEmail(pozaId), alt: pozaAlt || titlu || EXEMPLU.titlu }
+      : null,
     campanie: /^[a-z0-9-]{1,120}$/.test(campanie) ? campanie : null,
   };
 
   if (!esteFelSablon(fel)) return { fel: "persoane", continut, eroare: "fel" };
-  /*
-    Poza fără descriere nu intră.
-
-    Aceeași regulă ca la scrisul pe site. Un e-mail ajunge și la oameni care
-    folosesc cititor de ecran, și la cei cărora clientul de e-mail nu încarcă
-    imaginile — pentru amândoi, textul alternativ e singura urmă a pozei.
-  */
-  if (pozaId && pozaAlt.length < 3) return { fel, continut, eroare: "poza" };
   return { fel, continut };
 }
 
@@ -191,7 +189,7 @@ export async function POST(cerere: Request) {
     if (locala.startsWith("blob:")) {
       continut.poza = {
         adresa: locala,
-        alt: String(formular.get("poza_alt") ?? ""),
+        alt: String(formular.get("poza_alt") ?? "").trim() || continut.titlu,
       };
     }
     return paginaHtml(sablonCampanie(fel, continut));

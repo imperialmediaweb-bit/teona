@@ -298,7 +298,7 @@ async function Continut({
                 <Eticheta
                   htmlFor="poza_alt"
                   copii="Ce se vede în poză"
-                  nota="Obligatoriu dacă pui poză."
+                  nota="Dacă nu scrii nimic, se folosește titlul campaniei."
                 />
                 <input
                   id="poza_alt"
