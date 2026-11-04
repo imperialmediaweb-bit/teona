@@ -23,6 +23,9 @@ import { FELURI_CERERE, STADII_FIRMA } from "@/lib/crm";
 import { DESTINATII_DONATIE } from "@/date/asociatie";
 import { scrieSuma } from "@/lib/suma";
 import Cadru from "@/componente/admin/Cadru";
+import Notificari from "@/componente/admin/Notificari";
+import { cheiaPublica } from "@/lib/notificari";
+import { verificaInainte } from "@/lib/plati/confirmare";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 import {
@@ -142,6 +145,11 @@ async function Continut({
     );
   }
 
+  // Plățile cu cardul rămase neconfirmate se întreabă întâi la Stripe, ca
+  // cifrele de mai jos să le cuprindă (cel mult o dată la cinci minute și
+  // cel mult patru secunde; altfel pagina nu așteaptă după Stripe).
+  await verificaInainte();
+
   const [
     cifre,
     luni,
@@ -193,6 +201,9 @@ async function Continut({
       descriere="Cum stă asociația cu banii și ce așteaptă un răspuns."
       activ="/admin"
     >
+      <div className="mb-6 max-w-xl">
+        <Notificari cheiePublica={cheiaPublica()} />
+      </div>
       {/*
         Ce așteaptă un răspuns, înaintea oricărei cifre.
 

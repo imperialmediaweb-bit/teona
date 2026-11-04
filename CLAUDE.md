@@ -1345,6 +1345,34 @@ antetele, subdomeniile și versiunile afișate. Ce s-a găsit și ce s-a făcut:
   Probă, pe tot drumul, cu anunțul trimis exact la `www.`:
   `PAROLA_ADMIN=… DATABASE_URL=… node scripts/qa/donatie-card.mjs`.
   **Orice schimbare în `proxy.ts` se probează și cu ea.**
+- **Plățile nu mai depind de un singur anunț** (4 noiembrie 2026). Tot ce
+  urmează unei încasări stă în `src/lib/plati/confirmare.ts`
+  (`dupaIncasare`): mulțumirea la donator, „Donație nouă” la asociație,
+  notificarea pe telefon, buletinul. Rândul vine din `marcheazaPlatita`,
+  care îl întoarce **numai prima dată**, deci oricâte căi ajung la aceeași
+  plată, nimic nu pleacă de două ori. Căile:
+  - **Stripe**: webhook-ul (și `async_payment_succeeded`); pagina de
+    mulțumire (`ConfirmaPlata` → `/api/donatii/confirma`, întreabă Stripe);
+    panoul — `/admin` și `/admin/donatii` întreabă Stripe despre plățile
+    rămase „inițiate” din ultimele 30 de zile (cel mult o dată la cinci
+    minute, cel mult patru secunde), plus butonul „Verifică plățile la
+    Stripe”. Dacă rândul „inițiat” lipsește, se scrie din metadatele
+    sesiunii, nu se pierde plata.
+  - **PayPal**: comanda trebuie **încasată** (capture). Până acum nu o
+    încasa nimeni, deci nicio donație PayPal nu s-a luat vreodată. Se
+    încasează din pagina de mulțumire (`token` din adresă) și din webhook-ul
+    `CHECKOUT.ORDER.APPROVED`; referința e identificatorul încasării, același
+    cu al lui `PAYMENT.CAPTURE.COMPLETED`.
+  - **Transferul**: neschimbat — anunțul, apoi „Am găsit-o în extras”.
+  **Notificări pe telefon** (`src/lib/notificari.ts`, web-push, cheile
+  `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY` în Railway): butonul e pe tabloul de
+  bord; pe iPhone merg numai din aplicația instalată. Pleacă la donație nouă,
+  transfer anunțat și contract făcut pe site; textul are doar prenumele și
+  suma (apare pe ecranul blocat).
+  Probă pe toate căile, cu Stripe, PayPal, Resend și serviciul de notificări
+  de mențiune: `PAROLA_ADMIN=… DATABASE_URL=… node scripts/qa/plati.mjs`
+  (28 de verificări; `STRIPE_API` și `PAYPAL_API` îndreaptă clienții spre
+  mențiune, numai în probe).
 - **Ce nu ține de cod** (DNS în Cloudflare, găzduirea veche) e în raportul din
   conversație: `ftp.teona-ariana.ro` arăta `phpinfo()`, WordPress-ul vechi se
   vede pe `mail.teona-ariana.ro` cu GiveWP 3.18.0 (vulnerabilitate critică

@@ -12,6 +12,31 @@
 const COD = `
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (e) => e.waitUntil(self.clients.claim()));
+// Notificările panoului: o donație nouă, un transfer anunțat (lib/notificari.ts).
+self.addEventListener("push", (e) => {
+  let n = { titlu: "Panou Teona", text: "", adresa: "/admin" };
+  try { n = Object.assign(n, e.data ? e.data.json() : {}); } catch (_) {}
+  e.waitUntil(
+    self.registration.showNotification(n.titlu, {
+      body: n.text,
+      icon: "/panou/icon-192.png",
+      badge: "/panou/icon-192.png",
+      data: { adresa: n.adresa },
+    }),
+  );
+});
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  const adresa = (e.notification.data && e.notification.data.adresa) || "/admin";
+  e.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((lista) => {
+      for (const c of lista) {
+        if (c.url.includes("/admin") && "focus" in c) { c.navigate(adresa); return c.focus(); }
+      }
+      return self.clients.openWindow(adresa);
+    }),
+  );
+});
 self.addEventListener("fetch", (e) => {
   // Numai deschiderile de pagină. Formularele (POST) trec pe lângă lucrător,
   // direct la server, cu redirecționarea lor cu tot.

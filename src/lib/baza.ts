@@ -312,6 +312,20 @@ const DEFINITIE = `
 */
 const ADAOSURI = `
   /*
+    Telefoanele și calculatoarele care primesc notificări din panou (o donație
+    nouă, un transfer anunțat). Un rând pe abonament al browserului; cheia e
+    adresa lui, pe care o dă browserul. utilizator_id e gol pentru cine a
+    intrat cu parola asociației.
+  */
+  CREATE TABLE IF NOT EXISTS abonamente_push (
+    endpoint        text PRIMARY KEY,
+    p256dh          text NOT NULL,
+    auth            text NOT NULL,
+    utilizator_id   uuid,
+    creat_la        timestamptz NOT NULL DEFAULT now()
+  );
+
+  /*
     Proiectele scrise din panou: tabere, ateliere, orice are o dată și poze.
 
     Stau în acelasi tabel ca noutățile și campaniile, cu „fel" pe „proiect".

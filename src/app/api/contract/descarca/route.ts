@@ -4,6 +4,7 @@ import { email as emailValid } from "@/lib/api";
 import { areBazaDeDate, intreaba } from "@/lib/baza";
 import { salveazaFirma, scrieInteractiune } from "@/lib/crm";
 import { numarPentruContract } from "@/lib/contracte";
+import { notificaPanoul } from "@/lib/notificari";
 import { inBani } from "@/date/plati";
 import {
   anuntaDescarcarea,
@@ -224,6 +225,11 @@ export async function POST(cerere: Request) {
       const date = citit.date;
       after(async () => {
         await Promise.allSettled([
+          notificaPanoul({
+            titlu: "Contract de sponsorizare nou",
+            text: `${date.denumire} și-a făcut contractul pe site.`,
+            adresa: "/admin/contracte",
+          }),
           trimiteContractulNesemnat({
             denumire: date.denumire,
             reprezentant: date.reprezentant,

@@ -13,6 +13,7 @@ import { DESTINATII_DONATIE } from "@/date/asociatie";
 import { scrieSuma } from "@/lib/suma";
 import { platiEsuate } from "@/lib/plati/esuate";
 import Cadru from "@/componente/admin/Cadru";
+import { verificaInainte } from "@/lib/plati/confirmare";
 import Descarca from "@/componente/admin/Descarca";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
@@ -24,6 +25,8 @@ export const metadata: Metadata = {
 
 type Cautare = {
   gata?: string;
+  verificat?: string;
+  din?: string;
   respins?: string;
   eroare?: string;
   gresit?: string;
@@ -49,7 +52,7 @@ export default function PaginaDonatii({
 
 async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   await connection();
-  const { gata, respins, eroare, gresit } = await searchParams;
+  const { gata, respins, eroare, gresit, verificat, din } = await searchParams;
 
   if (!areParolaConfigurata()) {
     return (
@@ -86,6 +89,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
     );
   }
 
+  await verificaInainte();
   const lista = await donatii(100);
   const anuntate = await transferuriAnuntate();
   const esuate = await platiEsuate().catch(() => []);
@@ -97,8 +101,33 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
     <Cadru
       titlu="Donații"
       activ="/admin/donatii"
-      actiuni={<Descarca ce="donatii" />}
+      actiuni={
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Plasa de siguranță: întreabă Stripe despre plățile neconfirmate. */}
+          <form action="/api/admin/donatii/verifica" method="post">
+            <button
+              type="submit"
+              className="rounded-full border border-hartie-umbra px-4 py-2 font-titlu text-mic font-bold text-cerneala hover:border-caramiziu-400"
+            >
+              Verifică plățile la Stripe
+            </button>
+          </form>
+          <Descarca ce="donatii" />
+        </div>
+      }
     >
+      {verificat && (
+        <p
+          role="status"
+          className="mb-6 rounded-card border border-turcoaz-200 bg-turcoaz-50 p-4 text-mic text-turcoaz-900"
+        >
+          {verificat === "fara-stripe"
+            ? "Stripe nu e configurat pe server."
+            : Number(verificat) > 0
+              ? `Am găsit la Stripe ${verificat} ${Number(verificat) === 1 ? "plată care nu ajunsese" : "plăți care nu ajunseseră"} în panou. Acum sunt în listă, iar donatorii au primit mulțumirea.`
+              : `Toate plățile cu cardul sunt în panou (${din ?? 0} verificate la Stripe, niciuna lipsă).`}
+        </p>
+      )}
       {gata && (
         <p
           role="status"

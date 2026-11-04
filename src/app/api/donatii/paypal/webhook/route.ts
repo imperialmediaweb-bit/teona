@@ -1,13 +1,9 @@
 import { NextResponse } from "next/server";
 import { raspuns, limitaDeRata, octetiCuLimita } from "@/lib/api";
 import { areBazaDeDate } from "@/lib/baza";
-import {
-  evenimentNou,
-  marcheazaPlatita,
-  scrieInitiata,
-} from "@/lib/plati/donatii";
+import { evenimentNou } from "@/lib/plati/donatii";
 import { semnaturaEValida } from "@/lib/plati/paypal";
-import { trimiteMultumirea } from "@/lib/email/donatie";
+import { incaseazaSiInregistreaza, inregistreazaPayPal } from "@/lib/plati/confirmare";
 
 /**
  * Confirmarea plăților, de la PayPal.
@@ -61,41 +57,25 @@ export async function POST(cerere: Request) {
 
   if (eveniment.event_type === "PAYMENT.CAPTURE.COMPLETED") {
     const resursa = eveniment.resource ?? {};
-    const referinta = resursa.id ?? eveniment.id;
-    const bani = Math.round(Number(resursa.amount?.value ?? 0) * 100);
-    // „destinatie|canal", cum l-am trimis noi la deschiderea comenzii.
-    const [destinatie, canal] = (resursa.custom_id ?? "").split("|");
-
-    await scrieInitiata({
-      procesator: "paypal",
-      referinta,
-      sumaBani: bani,
+    await inregistreazaPayPal({
+      id: resursa.id ?? eveniment.id,
+      bani: Math.round(Number(resursa.amount?.value ?? 0) * 100),
       moneda: resursa.amount?.currency_code ?? "EUR",
-      frecventa: "o-data",
-      destinatie: destinatie || "oriunde",
       email: resursa.payer?.email_address ?? null,
-      prenume: null,
-      nume: null,
-      telefon: null,
-      // PayPal nu ne poate transmite o bifă pe care omul n-a văzut-o pe
-      // site-ul nostru. Fără acord explicit, nimeni nu ajunge pe listă.
-      acordBuletin: false,
-      canal: canal || null,
+      // „destinatie|canal", cum l-am trimis noi la deschiderea comenzii.
+      customId: resursa.custom_id ?? "",
     });
-    const rand = await marcheazaPlatita("paypal", referinta, bani);
+  }
 
-    // Ca la Stripe: rândul se întoarce doar prima dată, deci mulțumirea nu
-    // poate pleca de două ori pentru aceeași donație.
-    if (rand?.email) {
-      await trimiteMultumirea({
-        email: rand.email,
-        prenume: rand.prenume,
-        nume: rand.nume,
-        sumaBani: Number(rand.suma_bani),
-        moneda: rand.moneda,
-        frecventa: rand.frecventa,
-        destinatie: rand.destinatie,
-      }).catch(() => undefined);
+  /*
+    Omul a aprobat plata, dar a închis fila înainte de pagina de mulțumire:
+    comanda trebuie încasată de aici, altfel expiră și banii nu se iau.
+  */
+  if (eveniment.event_type === "CHECKOUT.ORDER.APPROVED" && eveniment.resource?.id) {
+    try {
+      await incaseazaSiInregistreaza(eveniment.resource.id);
+    } catch (e) {
+      console.error("PayPal:", e instanceof Error ? e.message : "încasare picată");
     }
   }
 

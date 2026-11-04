@@ -4,6 +4,7 @@ import { ASOCIATIA, EMAIL, RUTE, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import Buton from "@/componente/Buton";
 import Decor from "@/componente/Decor";
 import Pictograma from "@/componente/Pictograma";
+import ConfirmaPlata from "@/componente/ConfirmaPlata";
 import { metadate } from "@/app/seo";
 
 export const metadata: Metadata = {
@@ -51,6 +52,7 @@ export default function Multumim() {
           {ASOCIATIA.motto}
         </p>
         <h1 className="mt-2 text-h1 text-cerneala">Mulțumim pentru donație!</h1>
+        <ConfirmaPlata />
         <p className="mx-auto mt-5 max-w-2xl text-amplu text-cerneala-moale">
           Donația ta înseamnă mult pentru noi. Vei primi o confirmare pe e-mail
           din partea platformei de plată — dacă nu ajunge în câteva minute,

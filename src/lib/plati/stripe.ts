@@ -27,7 +27,18 @@ export function areStripe(): boolean {
 function ia(): Stripe {
   const cheie = process.env.STRIPE_SECRET_KEY;
   if (!cheie) throw new Error("STRIPE_SECRET_KEY lipsește");
-  client ??= new Stripe(cheie);
+  // `STRIPE_API` numai pentru probe: un Stripe de mențiune, pe 127.0.0.1.
+  const proba = process.env.STRIPE_API ? new URL(process.env.STRIPE_API) : null;
+  client ??= new Stripe(
+    cheie,
+    proba
+      ? {
+          host: proba.hostname,
+          port: Number(proba.port),
+          protocol: proba.protocol.replace(":", "") as "http" | "https",
+        }
+      : undefined,
+  );
   return client;
 }
 
@@ -115,6 +126,22 @@ function metadate(cerere: CerereDonatie): Record<string, string> {
     canal: cerere.canal ?? "",
     sursa: cerere.sursa ?? "",
   };
+}
+
+/**
+ * Starea unei sesiuni de plată, întrebată direct la Stripe.
+ *
+ * Webhook-ul e calea obișnuită, dar nu singura: dacă anunțul Stripe nu ajunge
+ * (o adresă greșită în contul Stripe, o redirecționare — s-a întâmplat pe 3
+ * noiembrie 2026), plata rămâne „inițiată” deși banii au intrat. Răspunsul
+ * vine de la Stripe, cu cheia secretă, deci nu se poate falsifica dintr-o
+ * adresă de pagină.
+ */
+export async function sesiuneaDeLaStripe(
+  id: string,
+): Promise<Stripe.Checkout.Session | null> {
+  if (!/^cs_(live|test)_[A-Za-z0-9]+$/.test(id)) return null;
+  return ia().checkout.sessions.retrieve(id);
 }
 
 /** Verifică semnătura webhookului. Fără secret, nu acceptăm nimic. */

@@ -9,6 +9,8 @@ import {
 import { areBazaDeDate } from "@/lib/baza";
 import { anuntaTransfer } from "@/lib/plati/donatori";
 import { anuntaTransferulPeEmail } from "@/lib/email/transfer";
+import { notificaPanoul } from "@/lib/notificari";
+import { scrieSuma } from "@/lib/suma";
 import { citesteSuma } from "@/lib/suma";
 import { esteCanal } from "@/lib/atribuire";
 import { esteDestinatie, inBani, sumaAcceptata } from "@/date/plati";
@@ -162,6 +164,11 @@ export async function POST(cerere: Request) {
       data: cand.toISOString(),
       observatii: text(camp("observatii"), 1_000) ?? undefined,
     });
+    await notificaPanoul({
+      titlu: "Transfer anunțat",
+      text: `${nume.split(/\s+/)[0]} spune că a trimis ${scrieSuma(suma)} lei. Caută-l în extras.`,
+      adresa: "/admin/donatii",
+    }).catch(() => 0);
   }
 
   if (!rezultat.ok) {

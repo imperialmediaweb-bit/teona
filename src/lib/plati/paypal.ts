@@ -13,10 +13,12 @@ import { DESTINATII, type Frecventa } from "@/date/plati";
  * dependență în plus pentru atât n-ar plăti întreținerea.
  */
 
+// `PAYPAL_API` numai pentru probe (un PayPal de mențiune, pe 127.0.0.1).
 const BAZA = () =>
-  process.env.PAYPAL_MOD === "live"
+  process.env.PAYPAL_API ||
+  (process.env.PAYPAL_MOD === "live"
     ? "https://api-m.paypal.com"
-    : "https://api-m.sandbox.paypal.com";
+    : "https://api-m.sandbox.paypal.com");
 
 export function arePayPal(): boolean {
   return Boolean(
@@ -209,3 +211,71 @@ export async function semnaturaEValida(
 }
 
 export type { Frecventa };
+
+export type Incasare = {
+  /** Identificatorul încasării (capture), aceeași referință ca în webhook. */
+  id: string;
+  bani: number;
+  moneda: string;
+  email: string | null;
+  customId: string;
+};
+
+/**
+ * Încasează o comandă aprobată de donator.
+ *
+ * Cu `intent: "CAPTURE"`, aprobarea omului pe pagina PayPal **nu ia banii**:
+ * comanda stă „APPROVED” până o încasează vânzătorul, iar dacă n-o încasează
+ * nimeni, expiră. Până în noiembrie 2026 site-ul nu făcea pasul ăsta, deci
+ * nicio donație prin PayPal nu s-a încasat vreodată și nici webhook-ul
+ * `PAYMENT.CAPTURE.COMPLETED` n-a avut de ce să vină.
+ *
+ * Se cheamă din pagina de mulțumire (PayPal adaugă `token=<comanda>` la
+ * adresa de întoarcere) și din webhook-ul `CHECKOUT.ORDER.APPROVED`, pentru
+ * omul care închide fila înainte să se încarce pagina. O comandă încasată deja
+ * răspunde 422 `ORDER_ALREADY_CAPTURED`; atunci se citește încasarea din ea.
+ */
+export async function incaseazaComanda(comanda: string): Promise<Incasare | null> {
+  if (!/^[A-Z0-9]{8,40}$/.test(comanda)) return null;
+  const acces = await iaJeton();
+  const antete = {
+    Authorization: `Bearer ${acces}`,
+    "Content-Type": "application/json",
+  };
+  let raspuns = await fetch(`${BAZA()}/v2/checkout/orders/${comanda}/capture`, {
+    method: "POST",
+    headers: { ...antete, "PayPal-Request-Id": `incasare-${comanda}` },
+  });
+  if (raspuns.status === 422) {
+    raspuns = await fetch(`${BAZA()}/v2/checkout/orders/${comanda}`, { headers: antete });
+  }
+  if (!raspuns.ok) {
+    const spus = await raspuns.text().catch(() => "");
+    throw new Error(`PayPal: încasare refuzată (${raspuns.status}) ${spus.slice(0, 300)}`);
+  }
+  const date = (await raspuns.json()) as {
+    status?: string;
+    payer?: { email_address?: string };
+    purchase_units?: Array<{
+      custom_id?: string;
+      payments?: {
+        captures?: Array<{
+          id: string;
+          status: string;
+          custom_id?: string;
+          amount?: { value?: string; currency_code?: string };
+        }>;
+      };
+    }>;
+  };
+  const unitate = date.purchase_units?.[0];
+  const incasare = unitate?.payments?.captures?.find((c) => c.status === "COMPLETED");
+  if (!incasare) return null;
+  return {
+    id: incasare.id,
+    bani: Math.round(Number(incasare.amount?.value ?? 0) * 100),
+    moneda: incasare.amount?.currency_code ?? "EUR",
+    email: date.payer?.email_address ?? null,
+    customId: incasare.custom_id ?? unitate?.custom_id ?? "",
+  };
+}

@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { raspuns } from "@/lib/api";
+import { octetiCuLimita, raspuns } from "@/lib/api";
 import { areBazaDeDate } from "@/lib/baza";
 import {
   evenimentNou,
   marcheazaPlatita,
   scrieInitiata,
-  type DonatieIncasata,
 } from "@/lib/plati/donatii";
 import { citesteEveniment } from "@/lib/plati/stripe";
-import { laBuletin } from "@/lib/buletin";
-import { anuntaDonatia, trimiteMultumirea } from "@/lib/email/donatie";
+import { dupaIncasare, inregistreazaSesiuneaStripe } from "@/lib/plati/confirmare";
 import { trimiteVesteaReinnoirii } from "@/lib/email/reinnoire";
 import {
   anuntaPlataEsuata,
@@ -35,7 +33,11 @@ export async function POST(cerere: Request) {
   const semnatura = cerere.headers.get("stripe-signature");
   if (!semnatura) return raspuns("Lipsește semnătura.", 400);
 
-  const corp = await cerere.text();
+  // Brut, ca semnătura să se potrivească, dar cu limită: un eveniment Stripe
+  // are câțiva kiloocteți, nu megaocteți.
+  const octeti = await octetiCuLimita(cerere, 512 * 1024).catch(() => null);
+  if (!octeti) return raspuns("Cerere prea mare.", 413);
+  const corp = octeti.toString("utf8");
 
   let eveniment: Stripe.Event;
   try {
@@ -81,15 +83,12 @@ async function stergeEveniment(id: string) {
 async function prelucreaza(eveniment: Stripe.Event) {
   switch (eveniment.type) {
     /* Plată unică, sau prima plată a unui abonament. */
-    case "checkout.session.completed": {
+    case "checkout.session.completed":
+    // Plățile cu confirmare întârziată (transfer SEPA, unele portofele) vin
+    // „plătite” abia aici; cardurile, cu 3D Secure cu tot, vin direct mai sus.
+    case "checkout.session.async_payment_succeeded": {
       const sesiune = eveniment.data.object as Stripe.Checkout.Session;
-      if (sesiune.payment_status !== "paid") return;
-      const rand = await marcheazaPlatita(
-        "stripe",
-        sesiune.id,
-        sesiune.amount_total ?? undefined,
-      );
-      await dupaIncasare(rand);
+      await inregistreazaSesiuneaStripe(sesiune);
       return;
     }
 
@@ -304,53 +303,6 @@ function metadateleAbonamentului(
   );
 }
 
-/**
- * Ce se întâmplă după ce banii au intrat.
- *
- * `marcheazaPlatita` întoarce un rând **doar prima dată**, pentru că schimbă
- * starea; la o a doua livrare a aceluiași eveniment întoarce `null`. De aceea
- * nimic de aici nu se poate întâmpla de două ori: nici mulțumirea, nici
- * urcarea pe listă.
- *
- * Mulțumirea nu oprește nimic dacă pică. Banii au intrat și sunt înregistrați;
- * un e-mail netrimis e supărător, dar a cere procesatorului să retrimită tot
- * evenimentul pentru atât ar risca o dublă înregistrare.
- */
-async function dupaIncasare(
-  rand: DonatieIncasata | null,
-  reinnoire = false,
-): Promise<void> {
-  if (!rand?.email) return;
-
-  await trimiteMultumirea({
-    email: rand.email,
-    prenume: rand.prenume,
-    nume: rand.nume,
-    sumaBani: Number(rand.suma_bani),
-    moneda: rand.moneda,
-    frecventa: rand.frecventa,
-    destinatie: rand.destinatie,
-    reinnoire,
-  }).catch(() => undefined);
-
-  // Și asociația află, nu doar din panou. Nu la fiecare lună de abonament.
-  if (!reinnoire) {
-    await anuntaDonatia({
-      email: rand.email,
-      prenume: rand.prenume,
-      nume: rand.nume,
-      sumaBani: Number(rand.suma_bani),
-      moneda: rand.moneda,
-      frecventa: rand.frecventa,
-      destinatie: rand.destinatie,
-    }).catch(() => undefined);
-  }
-
-  // Pe lista de buletin ajunge doar cine a bifat el acordul.
-  if (rand.acord_buletin) {
-    await laBuletin(rand.email).catch(() => undefined);
-  }
-}
 
 /**
  * Abonamentul de pe o factură.
