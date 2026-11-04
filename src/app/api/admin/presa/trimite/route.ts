@@ -108,6 +108,7 @@ export async function POST(cerere: Request) {
       text: simplu,
       raspundeLa: EMAIL.contact,
       atasamente,
+      masa: true,
     }).catch(() => false);
     if (ok) plecate++;
     else ratate.push(c.publicatie);

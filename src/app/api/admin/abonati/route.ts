@@ -2,7 +2,6 @@ import { email, limitaDeRata, nuTrece, raspuns, text, trimiteLa } from "@/lib/ap
 import { arePermisiune, numeleConectat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { areBuletin, dejaAbonati, laBuletin, stareaInMailerLite } from "@/lib/buletin";
-import { trimiteBunVenit } from "@/lib/email/buletin";
 
 /**
  * Adresele adăugate de mână în lista de buletin, din panou.
@@ -57,7 +56,6 @@ export async function POST(cerere: Request) {
 
   const deja = await dejaAbonati(bune);
   const deAdaugat = bune.filter((e) => !deja.has(e));
-  const bunVenit = formular.get("bun_venit") === "da";
   const adaugatDe = await numeleConectat();
 
   let adaugati = 0;
@@ -79,8 +77,10 @@ export async function POST(cerere: Request) {
       ratate.push(e);
       continue;
     }
+    // Nu pleacă niciun e-mail de aici: o listă încărcată ar însemna sute de
+    // mesaje din serverul de pe Railway. Bun venitul, dacă se vrea, se pune
+    // ca automatizare în MailerLite, care trimite de pe serverele lui.
     adaugati++;
-    if (bunVenit) await trimiteBunVenit({ email: e, nume: null, firma: lista === "firme" }).catch(() => false);
   }
 
   const q = new URLSearchParams({ adaugati: String(adaugati), lista });

@@ -52,6 +52,10 @@ export async function POST(cerere: Request) {
   const voluntari = (await totiVoluntarii()).filter((v) => alese.has(v.id));
   if (!voluntari.length) return nuTrece("Bifează cel puțin un voluntar.");
   if (peEmail && !areEmail()) return nuTrece("Trimiterea de e-mailuri nu e configurată pe site.");
+  // Un apel e o întrebare către câțiva oameni, nu o campanie.
+  if (peEmail && voluntari.length > 50) {
+    return nuTrece("Pe e-mail, cel mult 50 de voluntari o dată. Restrânge lista cu filtrele, sau scrie-le pe WhatsApp.");
+  }
 
   const apelId = await creeazaApel({
     titlu,
@@ -80,6 +84,7 @@ export async function POST(cerere: Request) {
           html: compus.html,
           text: compus.text,
           raspundeLa: EMAIL.contact,
+          masa: true,
         }).catch(() => false);
       }
     }

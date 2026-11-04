@@ -151,7 +151,7 @@ try {
     !jurnal.some((x) => x.cale.startsWith("/emails") && /Abonat nou/.test(String(x.corp.subject))),
     "asociația nu primește anunț despre ce a adăugat ea",
   );
-  verifica(!jurnal.some((x) => x.cale.startsWith("/emails")), "fără bifa de bun venit, nu pleacă niciun e-mail");
+  verifica(!jurnal.some((x) => x.cale.startsWith("/emails")), "încărcarea nu trimite niciun e-mail");
 
   const { rows } = await baza.query(
     "SELECT email, sursa, lista, acord_nota FROM abonati_buletin WHERE email LIKE $1 ORDER BY email",
@@ -168,10 +168,10 @@ try {
   verifica(incarca.includes("câte una pe rând") && incarca.includes("Firme (persoane juridice)"), "pagina „Încarcă abonați” se deschide, cu cele două liste");
 
   jurnal.length = 0;
-  const iar = await trimite({ adrese: A1, lista: "persoane", acord: "da", acord_nota: "a doua oară", bun_venit: "da" });
+  const iar = await trimite({ adrese: A1, lista: "persoane", acord: "da", acord_nota: "a doua oară" });
   const unde2 = decodeURIComponent(iar.headers.get("location") ?? "");
   verifica(unde2.includes("adaugati=0") && unde2.includes("deja=1"), "aceeași adresă a doua oară: „era deja abonată”");
-  verifica(!jurnal.some((x) => x.cale.startsWith("/emails")), "…și nu primește iar bun venit");
+  verifica(!jurnal.some((x) => x.cale.startsWith("/emails")), "…și nu pleacă niciun e-mail");
 } finally {
   await baza.query("DELETE FROM abonati_buletin WHERE email LIKE $1", [`%.${RUL}@exemplu.ro`]).catch(() => {});
   await baza.end();

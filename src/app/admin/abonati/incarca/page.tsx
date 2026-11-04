@@ -160,10 +160,6 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
           <input type="checkbox" name="acord" value="da" required className="mt-1" />
           <span>Am acordul fiecăruia să primească buletinul asociației.</span>
         </label>
-        <label className="flex items-start gap-2.5 text-mic">
-          <input type="checkbox" name="bun_venit" value="da" className="mt-1" />
-          <span>Trimite-le și e-mailul de bun venit</span>
-        </label>
 
         <div>
           <button
@@ -176,7 +172,9 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
       </form>
 
       <p className="mt-4 max-w-2xl text-nota text-cerneala-slab">
-        Cine s-a dezabonat vreodată nu se pune înapoi, nici dacă e pe o listă veche.
+        Cine s-a dezabonat vreodată nu se pune înapoi, nici dacă e pe o listă veche. De
+        aici nu pleacă niciun e-mail către cei încărcați; campaniile le trimiteți din
+        MailerLite.
       </p>
     </Cadru>
   );

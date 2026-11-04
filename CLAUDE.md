@@ -706,7 +706,8 @@ poate trimite cuiva ca link.
   Serverul primește numai cele trei valori: altceva nu ajunge în fișă.
 - **Apelul** („avem nevoie de voluntari pe data X”): se bifează oamenii
   (din start toți cei din lista filtrată), se scrie pentru ce, când, unde și
-  ce vor face. Fiecare primește **e-mailul lui** (`lib/email/apel-voluntari.ts`),
+  ce vor face. Fiecare primește **e-mailul lui** (`lib/email/apel-voluntari.ts`;
+  cel mult 50 pe e-mail, vezi „Site-ul nu face campanii”),
   cu „Da, pot veni” și „Nu pot de data asta”. Adresele vin din baza de date,
   nu din formular. Pentru cei care preferă WhatsApp, la apel e un link
   `wa.me` cu textul și linkul lor de răspuns gata scrise.
@@ -1086,6 +1087,31 @@ Textele stau în tabelul `texte`, nu în cod. Probe:
 `BAZA=… PAROLA_ADMIN=… node scripts/qa/scrie-pe-site.mjs` și
 `… node scripts/qa/panou-fundraising.mjs`.
 
+## Site-ul nu face campanii de e-mail
+
+Asociația a fost oprită odată de Railway pentru e-mailuri trimise în masă.
+De atunci regula e: **campaniile către liste pleacă numai din MailerLite**, de
+pe serverele lor. Panoul face doar ciorna acolo (`creeazaCiorna`) și, la
+cerere, îi spune lui MailerLite s-o trimită (`trimiteCampania`).
+
+Site-ul n-are server de e-mail și nu folosește SMTP; trimite prin API-ul
+Resend, și numai:
+
+- **mesaje către un om anume** (mulțumiri, confirmări, anunțuri către
+  asociație) — fără limită, o mulțumire nu se oprește niciodată;
+- **trei trimiteri mici, făcute de un om din panou**, marcate `masa: true`:
+  comunicatul de presă (câteva redacții), apelul către voluntari (cel mult
+  50 pe e-mail) și proba unui șablon (cel mult 10). Peste toate, `LIMITA_MASA`
+  din `lib/email/trimite.ts`: **150 pe oră**, după care `trimiteEmail` refuză
+  și scrie în jurnal.
+
+Încărcarea de abonați din panou **nu trimite nimic**: o listă de 200 de
+adrese ar fi însemnat 200 de mesaje din serverul de pe Railway. Un bun venit
+pentru cei încărcați se face ca automatizare în MailerLite.
+
+**Nu adăuga o trimitere către o listă de oameni din cod.** Dacă e nevoie de
+una, adresele intră într-un grup MailerLite și mesajul pleacă de acolo.
+
 ## Mesajele automate: un singur plic
 
 Toate e-mailurile tranzacționale — mulțumiri, confirmări, pașii fiscali,
@@ -1438,7 +1464,7 @@ antetele, subdomeniile și versiunile afișate. Ce s-a găsit și ce s-a făcut:
   **Cine s-a dezabonat din MailerLite nu se pune înapoi**: fiecare adresă se
   întreabă întâi acolo (`stareaInMailerLite`), iar orice altă stare decât
   „active” o sare și o numește. Nu pleacă anunț „Abonat nou” (a adăugat-o chiar
-  omul care l-ar primi); bun venit numai dacă se bifează. Cel mult 200 o dată.
+  omul care l-ar primi) și **niciun e-mail către cei încărcați**. Cel mult 200 o dată.
   Probă: `PAROLA_ADMIN=… DATABASE_URL=… node scripts/qa/abonati-panou.mjs` — 21
   de verificări.
 - **Anunțurile către asociație pleacă la două adrese** (`CATRE_ASOCIATIE` din

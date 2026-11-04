@@ -271,6 +271,7 @@ export async function POST(cerere: Request) {
         html,
         text,
         raspundeLa: EMAIL.contact,
+        masa: true,
       }).catch(() => false);
       if (trimis) plecate++;
     }

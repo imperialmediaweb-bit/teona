@@ -32,6 +32,25 @@ function expeditor(): string {
   );
 }
 
+/*
+  Site-ul nu face campanii. Campaniile către liste pleacă din MailerLite, de
+  pe serverele lor; de aici pleacă numai mesaje către un om anume (mulțumiri,
+  confirmări, anunțuri) și câteva trimiteri mici către mai mulți, făcute de un
+  om din panou. Asociația a fost oprită odată de Railway pentru e-mailuri în
+  masă, așa că trimiterile „în masă” au o limită pe oră, oricine ar apăsa și
+  de oricâte ori. Mesajele către un om anume nu intră sub limită: o mulțumire
+  pentru o donație nu se oprește niciodată.
+*/
+export const LIMITA_MASA = 150;
+const trimiseInMasa: number[] = [];
+function locInMasa(): boolean {
+  const acum = Date.now();
+  while (trimiseInMasa.length && acum - trimiseInMasa[0] > 60 * 60 * 1000) trimiseInMasa.shift();
+  if (trimiseInMasa.length >= LIMITA_MASA) return false;
+  trimiseInMasa.push(acum);
+  return true;
+}
+
 export async function trimiteEmail(mesaj: {
   catre: string | string[];
   subiect: string;
@@ -48,7 +67,16 @@ export async function trimiteEmail(mesaj: {
    * ei și e dovada că l-a primit atunci.
    */
   atasamente?: Array<{ nume: string; continut: Uint8Array }>;
+  /**
+   * Face parte dintr-o trimitere către mai mulți oameni deodată (presă,
+   * apel către voluntari, proba unui șablon). Vezi `LIMITA_MASA`.
+   */
+  masa?: boolean;
 }): Promise<boolean> {
+  if (mesaj.masa && !locInMasa()) {
+    console.error(`[email] limita de ${LIMITA_MASA} pe oră atinsă; n-a plecat „${mesaj.subiect}”`);
+    return false;
+  }
   const cheie = process.env.RESEND_API_KEY;
   if (!cheie) {
     console.error(`[email] RESEND_API_KEY lipsește; n-a plecat „${mesaj.subiect}”`);
