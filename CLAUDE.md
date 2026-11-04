@@ -1087,6 +1087,34 @@ Textele stau în tabelul `texte`, nu în cod. Probe:
 `BAZA=… PAROLA_ADMIN=… node scripts/qa/scrie-pe-site.mjs` și
 `… node scripts/qa/panou-fundraising.mjs`.
 
+## O poză de telefon rupea formularele din panou
+
+Pe 4 noiembrie 2026 fundraiserul a pus o poză pe un șablon de e-mail și a
+primit „Cerere invalidă”, la „Vezi cum arată” și la „Trimite o probă”. În
+jurnalul Railway scria adevărul: „Request body exceeded 10MB for
+/api/admin/sablon”. Cu `proxy.ts` pe toate căile, Next taie corpul cererii
+la 10 MB **în tăcere**: formularul ajunge rupt, `formData()` cade, iar omul
+citește că a greșit el ceva. Probele n-au prins-o: trimiteau poze de 4 KB.
+
+Trei apărări, în ordinea în care lucrează:
+
+- **Pozele se micșorează în browser** (`componente/admin/MicsoreazaPoza.tsx`,
+  montată o dată în `admin/layout.tsx`, ascultă toate câmpurile de fișier din
+  panou): orice fotografie peste 1,5 MB se redesenează la cel mult 2.000 px
+  și pleacă JPEG (PNG rămâne PNG), cu orientarea din EXIF păstrată; sub câmp
+  scrie de la cât la cât. O poză de telefon de 12 MB ajunge la câteva sute
+  de KB. PDF și SVG trec neatinse. `data-fara-micsorare` pe un câmp o oprește.
+- **Limita lui Next e 30 MB** (`experimental.proxyClientMaxBodySize` în
+  `next.config.ts`), peste orice fișier legitim: contractele PDF, cele trei
+  atașamente de presă.
+- **Rutele din panou citesc formularul prin `formularAdmin()`** (`lib/api.ts`):
+  peste limită, 413 cu mărimea și limita scrise; dacă tot nu se poate citi,
+  un mesaj care spune că fișierul e probabil prea mare — niciodată „Cerere
+  invalidă”.
+
+Probă, cu o „poză de telefon” de 19 MB făcută cu sharp, în browser și direct
+la rută: `BAZA=… PAROLA_ADMIN=… node scripts/qa/poza-mare.mjs` — 7 verificări.
+
 ## Site-ul nu face campanii de e-mail
 
 Asociația a fost oprită odată de Railway pentru e-mailuri trimise în masă.

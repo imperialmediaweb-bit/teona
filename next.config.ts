@@ -140,6 +140,18 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
 
+  /*
+    Cât de mare poate fi o cerere. Implicit Next taie corpul la 10 MB când
+    există `proxy.ts`, și o taie în tăcere: formularul ajunge rupt, `formData()`
+    cade, iar omul vede „Cerere invalidă”. S-a întâmplat pe 4 noiembrie 2026
+    cu o poză de telefon pusă pe un șablon de e-mail. Pozele se micșorează
+    acum în browser (`componente/admin/MicsoreazaPoza.tsx`), dar limita
+    rămâne peste orice fișier legitim (contractele PDF, atașamentele de
+    presă), iar rutele spun pe față când un fișier e prea mare
+    (`formularAdmin` din `lib/api.ts`).
+  */
+  experimental: { proxyClientMaxBodySize: "30mb" },
+
   // `X-Powered-By: Next.js` spunea fiecărui vizitator ce rulează pe server.
   // Nu e un secret mare, dar e o informație gratuită pentru cine caută
   // versiuni vulnerabile.

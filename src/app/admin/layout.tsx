@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import MicsoreazaPoza from "@/componente/admin/MicsoreazaPoza";
 
 /**
  * Panoul ca aplicație: manifestul și iconița de pe ecranul telefonului se
@@ -24,5 +25,11 @@ export default function AranjamentPanou({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      {children}
+      {/* Pozele mari se micșorează în browser, înainte să plece spre server. */}
+      <MicsoreazaPoza />
+    </>
+  );
 }

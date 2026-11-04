@@ -193,6 +193,41 @@ export async function octetiCuLimita(
  * exact ce întorcea și `cerere.formData().catch(() => null)`, deci rutele
  * nu-și schimbă purtarea.
  */
+/** Cât de mare poate fi o cerere din panou; vezi `proxyClientMaxBodySize` în `next.config.ts`. */
+export const CORP_ADMIN_MAXIM = 30 * 1024 * 1024;
+
+/**
+ * Formularul unei rute din panou, citit cu un mesaj omenesc la capăt.
+ *
+ * Un fișier peste limita lui Next ajungea tăiat, `formData()` cădea și omul
+ * citea „Cerere invalidă” — ca și cum ar fi greșit el ceva. Acum lungimea
+ * se verifică înainte, iar mesajul spune ce e de făcut.
+ */
+export async function formularAdmin(
+  cerere: Request,
+  limita = CORP_ADMIN_MAXIM,
+): Promise<{ formular: FormData; raspuns?: undefined } | { formular?: undefined; raspuns: Response }> {
+  const mb = (n: number) => (n / 1024 / 1024).toFixed(1).replace(".", ",");
+  const lungime = Number(cerere.headers.get("content-length") ?? 0);
+  if (lungime > limita) {
+    return {
+      raspuns: nuTrece(
+        `Fișierul atașat e prea mare: ${mb(lungime)} MB, iar limita e ${mb(limita)} MB. Alege unul mai mic.`,
+        413,
+      ),
+    };
+  }
+  const formular = await cerere.formData().catch(() => null);
+  if (!formular) {
+    return {
+      raspuns: nuTrece(
+        "N-am putut citi ce ai trimis. Dacă ai atașat un fișier, probabil e prea mare: alege unul mai mic și încearcă din nou.",
+      ),
+    };
+  }
+  return { formular };
+}
+
 export async function formularCuLimita(
   cerere: Request,
   limita: number,

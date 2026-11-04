@@ -1,4 +1,4 @@
-import { limitaDeRata, nuTrece, raspuns, text, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, nuTrece, raspuns, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { contactePresa } from "@/lib/presa";
@@ -63,8 +63,9 @@ export async function POST(cerere: Request) {
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
   if (!areEmail()) return nuTrece("Trimiterea de e-mailuri nu e configurată pe site.");
 
-  const formular = await cerere.formData().catch(() => null);
-  if (!formular) return nuTrece("Cerere invalidă.");
+  const citit = await formularAdmin(cerere);
+  if (citit.raspuns) return citit.raspuns;
+  const formular = citit.formular;
 
   const subiect = text(formular.get("subiect"), 200);
   if (!subiect) return nuTrece("Scrie subiectul comunicatului.");

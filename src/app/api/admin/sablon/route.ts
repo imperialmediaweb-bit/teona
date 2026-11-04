@@ -1,4 +1,4 @@
-import {
+import { formularAdmin,
   limitaDeRata,
   nuTrece,
   raspuns,
@@ -175,8 +175,9 @@ export async function POST(cerere: Request) {
   if (!(await arePermisiune("/admin/sabloane")))
     return raspuns("Nu ai acces.", 403);
 
-  const formular = await cerere.formData().catch(() => null);
-  if (!formular) return nuTrece("Cerere invalidă.");
+  const citit = await formularAdmin(cerere);
+  if (citit.raspuns) return citit.raspuns;
+  const formular = citit.formular;
 
   if (previzualizare) {
     /*

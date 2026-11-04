@@ -1,5 +1,5 @@
 import { revalidateTag } from "next/cache";
-import { limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { POZA_MAXIM, pareImagine, urcaPoza } from "@/lib/poza-urcata";
 import {
@@ -35,8 +35,9 @@ export async function POST(cerere: Request) {
 
   if (!(await arePermisiune(INAPOI))) return raspuns("Nu ai acces.", 403);
 
-  const formular = await cerere.formData().catch(() => null);
-  if (!formular) return raspuns("Cerere invalidă.", 400);
+  const citit = await formularAdmin(cerere);
+  if (citit.raspuns) return citit.raspuns;
+  const formular = citit.formular;
 
   const fel = String(formular.get("fel") ?? "");
   const id = String(formular.get("id") ?? "").trim();
