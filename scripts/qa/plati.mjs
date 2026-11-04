@@ -11,8 +11,8 @@
  *
  *  Stripe   – anunțul semnat trimis la www. e primit și marchează plătită;
  *           – un anunț pentru o plată fără rând „inițiată” scrie rândul;
- *           – plata rămasă neconfirmată e găsită de panou (deschiderea
- *             donațiilor și butonul „Verifică plățile la Stripe”);
+ *           – plata rămasă neconfirmată e găsită singură de panou, la
+ *             deschiderea donațiilor; cea abandonată se închide;
  *           – pagina de mulțumire o confirmă și ea;
  *  PayPal   – pagina de mulțumire încasează comanda aprobată;
  *  transfer – anunțul intră „anunțată”, bifa din panou o face donație;
@@ -310,7 +310,8 @@ try {
   await asteapta(1200);
   verifica(r1.status === 200 && (await stare(id1)) === "platita", `Stripe la www.: primit și plătit (${r1.status}, ${await stare(id1)})`);
   verifica(catre(e1).length === 1, "Stripe: donatorul primește o mulțumire");
-  verifica(anunturi("Donație nouă cu cardul").length === 1, "Stripe: asociația primește „Donație nouă cu cardul”");
+  verifica(anunturi("Donație nouă").length === 1, "Stripe: asociația primește „Donație nouă”");
+  verifica(JSON.stringify(anunturi("Donație nouă")[0] ?? {}).includes("I-am trimis donatorului mulțumirea"), "anunțul spune că mulțumirea a plecat, fiindcă a plecat");
   verifica(notificari.length === 2, `Stripe: notificare pe telefon (${notificari.length - 1})`);
   const inainte = emailuri.length;
   await webhook({ id: `evt_unu_${T}`, type: "checkout.session.completed", data: { object: sesiune(id1, e1) } });
@@ -335,25 +336,16 @@ try {
   const id4 = `cs_test_patru${T}`;
   await initiata(id4, `card.patru.${T}@exemplu.ro`);
   sesiuniStripe.set(id4, sesiune(id4, `card.patru.${T}@exemplu.ro`, "unpaid"));
+  const id7 = `cs_test_sapte${T}`;
+  await initiata(id7, `card.sapte.${T}@exemplu.ro`);
+  sesiuniStripe.set(id7, { ...sesiune(id7, `card.sapte.${T}@exemplu.ro`, "unpaid"), status: "expired" });
   const panou = await (await fetch(`${BAZA}/admin/donatii`, { headers: { cookie } })).text();
+  verifica((await stare(id7)) === "expirata", `o plată abandonată (expirată la Stripe) se închide singură (${await stare(id7)})`);
+  verifica(!panou.includes("Verifică plățile la Stripe"), "în panou nu e nimic de apăsat pentru plăți: se confirmă singure");
   verifica((await stare(id3)) === "platita", `panoul găsește singur plata neanunțată (${await stare(id3)})`);
   verifica(panou.includes(e3), "…și o arată chiar la prima deschidere a donațiilor");
   verifica((await stare(id4)) === "initiata", "o plată neachitată la Stripe rămâne inițiată");
   verifica(catre(e3).length === 1 && anunturi("Donație nouă").length >= 3, "plata găsită de panou trimite mulțumirea și anunțul");
-
-  const id5 = `cs_test_cinci${T}`;
-  const e5 = `card.cinci.${T}@exemplu.ro`;
-  await initiata(id5, e5);
-  sesiuniStripe.set(id5, sesiune(id5, e5));
-  const buton = await fetch(`${BAZA}/api/admin/donatii/verifica`, {
-    method: "POST",
-    redirect: "manual",
-    headers: { cookie, "x-forwarded-for": DE_LA() },
-  });
-  verifica(
-    (await stare(id5)) === "platita" && (buton.headers.get("location") ?? "").includes("verificat=1"),
-    `butonul „Verifică plățile la Stripe” o găsește (${buton.headers.get("location")})`,
-  );
 
   // ─── Stripe 4: pagina de mulțumire ────────────────────────────────────
   const id6 = `cs_test_sase${T}`;
@@ -441,17 +433,6 @@ try {
   await asteapta(500);
   verifica(catre(ep2).length === 1, "PayPal: pagina deschisă după anunț nu dublează mulțumirea");
 
-  // ─── Stripe: o plată abandonată se închide ────────────────────────────
-  const id7 = `cs_test_sapte${T}`;
-  await initiata(id7, `card.sapte.${T}@exemplu.ro`);
-  sesiuniStripe.set(id7, { ...sesiune(id7, `card.sapte.${T}@exemplu.ro`, "unpaid"), status: "expired" });
-  await fetch(`${BAZA}/api/admin/donatii/verifica`, {
-    method: "POST",
-    redirect: "manual",
-    headers: { cookie, "x-forwarded-for": DE_LA() },
-  });
-  verifica((await stare(id7)) === "expirata", `o plată abandonată (expirată la Stripe) se închide (${await stare(id7)})`);
-
   // ─── Newsletterul: bun venit pe e-mail ────────────────────────────────
   const en = `buletin.${T}@exemplu.ro`;
   const nl = await fetch(`${BAZA}/api/newsletter`, {
@@ -496,7 +477,7 @@ try {
 
   // ─── În panou și în contul donatorului ────────────────────────────────
   const tot = await (await fetch(`${BAZA}/admin/donatii`, { headers: { cookie } })).text();
-  verifica([e1, e2, e3, e5, e6, ep, et].every((e) => tot.includes(e)), "toate donațiile se văd la /admin/donatii");
+  verifica([e1, e2, e3, e6, ep, et].every((e) => tot.includes(e)), "toate donațiile se văd la /admin/donatii");
   const bord = await (await fetch(`${BAZA}/admin`, { headers: { cookie: cookieCont } })).text();
   verifica(bord.includes("Notificări pe telefon"), "tabloul de bord are butonul de notificări");
 
@@ -513,6 +494,28 @@ try {
   const cookieDonator = (intrare?.headers.getSetCookie?.() ?? []).map((c) => c.split(";")[0]).join("; ");
   const contDonator = await (await fetch(`${BAZA}/contul-meu`, { headers: { cookie: cookieDonator } })).text();
   verifica(cere.ok && Boolean(link) && /50(,00)? lei/.test(contDonator), "donatorul își vede donația în contul lui (/contul-meu)");
+  verifica(contDonator.includes("Insignele tale") && contDonator.includes("Prima donație"), "contul donatorului are insignele (Prima donație)");
+  verifica(!/ai ajutat \d+ copii/i.test(contDonator), "nicio insignă nu inventează „ai ajutat N copii”");
+  const multumire = JSON.stringify(catre(e1)[0] ?? {});
+  verifica(multumire.includes(`contul-meu#email=${encodeURIComponent(e1)}`), "mulțumirea are butonul spre cont, cu adresa completată (după #, nu pleacă la server)");
+
+  // ─── Toate e-mailurile, cum le vede asociația în panou ────────────────
+  const pagEmail = await (await fetch(`${BAZA}/admin/emailuri`, { headers: { cookie } })).text();
+  const iduri = [...new Set([...pagEmail.matchAll(/\/api\/admin\/email\?ce=([a-z0-9-]+)/g)].map((m) => m[1]))];
+  let stricate = [];
+  for (const id of iduri) {
+    const r = await fetch(`${BAZA}/api/admin/email?ce=${id}`, { headers: { cookie } });
+    const h = await r.text();
+    if (!r.ok || /\$\{|undefined|NaN|\[object Object\]|lorem/i.test(h)) stricate.push(`${id}(${r.status})`);
+  }
+  verifica(
+    iduri.length >= 15 && stricate.length === 0 && ["anunt-donatie", "bun-venit-buletin"].every((x) => iduri.includes(x)),
+    `toate e-mailurile din panou se deschid curate (${iduri.length}${stricate.length ? `; stricate: ${stricate.join(", ")}` : ""})`,
+  );
+
+  // ─── Fiecare e-mail trimis în probă e curat ───────────────────────────
+  const urate = emailuri.filter((e) => /\$\{|undefined|NaN|\[object Object\]/.test(`${e.subject ?? ""} ${e.html ?? ""} ${e.text ?? ""}`));
+  verifica(urate.length === 0, `niciun e-mail trimis nu are „undefined”, „NaN” sau șabloane necompletate (${emailuri.length} trimise${urate.length ? `; ${urate.map((e) => e.subject).join(" | ")}` : ""})`);
 } finally {
   await baza.query("DELETE FROM donatii WHERE referinta = ANY($1) OR id::text = ANY($1)", [referinte]).catch(() => {});
   await baza.query("DELETE FROM abonamente_push WHERE endpoint LIKE $1", [`%telefon-${T}`]).catch(() => {});

@@ -13,6 +13,7 @@ import { scrieSuma } from "@/lib/suma";
 import Buton from "../Buton";
 import Decor from "../Decor";
 import Pictograma from "../Pictograma";
+import Insigne from "@/componente/cont/Insigne";
 
 /**
  * Ce vede donatorul în contul lui.
@@ -138,6 +139,8 @@ export default function PanouDonator({
           culoare="miere"
         />
       </div>
+
+      <Insigne cont={cont} lunaraActiva={abonamente.length > 0} />
 
       {/* Unde s-au dus banii lui. Destinația e aleasă de el, deci e a lui. */}
       <section className="mt-8 colt-b border border-hartie-umbra bg-hartie p-7 sm:p-8">

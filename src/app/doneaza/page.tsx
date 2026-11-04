@@ -61,9 +61,16 @@ const INTREBARI: ReadonlyArray<Intrebare> = [
     intrebare: "Pot dona lunar și opri oricând?",
     raspuns: (
       <p>
-        Da. Poți dona lunar prin SMS sau prin card, iar donația lunară se
-        oprește oricând, fără motivare și fără penalități. Dacă ai nevoie de
-        ajutor, scrie-ne la{" "}
+        Da. Poți dona lunar prin SMS sau prin card. Donația lunară cu cardul
+        o oprești oricând, singur, din{" "}
+        <a
+          href="/contul-meu"
+          className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"
+        >
+          contul tău
+        </a>
+        , fără motivare și fără penalități; pe cea prin SMS, cu SUSTIN STOP la
+        8835. Dacă ai nevoie de ajutor, scrie-ne la{" "}
         <a
           href={`mailto:${EMAIL.contact}`}
           className="font-titlu font-semibold text-caramiziu-700 underline-offset-4 hover:underline"

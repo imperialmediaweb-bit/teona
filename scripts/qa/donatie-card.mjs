@@ -149,8 +149,8 @@ try {
   verifica(catre.some((c) => c.includes(EMAIL_DONATOR)), "donatorul primește mulțumirea");
   verifica(
     catre.some((c) => c.includes("contact@teona-ariana.ro")) &&
-      emailuri.some((e) => String(e.subject ?? "").startsWith("Donație nouă cu cardul")),
-    "asociația primește „Donație nouă cu cardul”",
+      emailuri.some((e) => String(e.subject ?? "").startsWith("Donație nouă")),
+    "asociația primește „Donație nouă”",
   );
 
   // ─── 2. În panou ──────────────────────────────────────────────────────

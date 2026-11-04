@@ -1,4 +1,5 @@
-import { construiesteMultumirea } from "../donatie";
+import { compuneAnuntDonatie, construiesteMultumirea } from "../donatie";
+import { compuneBunVenit } from "../buletin";
 import { compuneIntrare } from "../cont";
 import { compuneAnunt, compuneHotarare, compuneTrimisa } from "../campanie";
 import {
@@ -53,6 +54,35 @@ export type Exemplu = {
 
 export function exemple(): Exemplu[] {
   return [
+    {
+      id: "anunt-donatie",
+      titlu: "Donație nouă (către asociație)",
+      cand: "La fiecare donație nouă cu cardul sau prin PayPal. Nu și la reînnoirile lunare.",
+      catre: "asociatie",
+      compus: compuneAnuntDonatie({
+        email: "maria@exemplu.ro",
+        prenume: "Maria",
+        nume: "Popescu",
+        sumaBani: 15000,
+        moneda: "RON",
+        frecventa: "o-data",
+        destinatie: "tabere",
+      }),
+    },
+    {
+      id: "bun-venit-buletin",
+      titlu: "Bun venit la newsletter",
+      cand: "Imediat după abonarea din caseta de newsletter de pe site.",
+      catre: "om",
+      compus: compuneBunVenit({ nume: "Maria Popescu", firma: false }),
+    },
+    {
+      id: "bun-venit-buletin-firma",
+      titlu: "Bun venit la newsletter (firmă)",
+      cand: "Imediat după abonarea unei firme din caseta de newsletter.",
+      catre: "om",
+      compus: compuneBunVenit({ nume: null, firma: true }),
+    },
     {
       id: "multumire",
       titlu: "Mulțumire după donație",

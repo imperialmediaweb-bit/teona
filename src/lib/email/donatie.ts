@@ -39,6 +39,8 @@ type Date = {
   destinatie: string;
   /** `true` la reînnoirea lunară: textul e altul, nu „bine ai venit”. */
   reinnoire?: boolean;
+  /** Numai în anunțul către asociație: a plecat mulțumirea către donator? */
+  multumireTrimisa?: boolean;
   /**
    * Ziua donației, dacă nu e azi.
    *
@@ -58,6 +60,18 @@ type Date = {
    */
   prinTransfer?: boolean;
 };
+
+/**
+ * Linkul spre cont, cu adresa deja completată. Nu deschide contul: acolo omul
+ * apasă „Trimite-mi linkul” și primește un link de intrare care merge o dată.
+ * Un link care ar deschide direct istoricul donațiilor ar fi o cheie plimbată
+ * prin lume odată cu e-mailul (retrimis, tipărit, ajuns la altcineva).
+ */
+function linkCont(email: string): string {
+  // După „#”, nu după „?”: fragmentul nu pleacă la server, deci adresa nu
+  // ajunge nici în jurnalul HTTP, nici în Google Analytics.
+  return `${ADRESA_SITE}/contul-meu#email=${encodeURIComponent(email)}`;
+}
 
 function salut(d: Date): string {
   const prenume = (d.prenume ?? "").trim();
@@ -142,10 +156,10 @@ export function construiesteMultumirea(d: Date): Compus {
     ...randuri.map(([e, v]) => `${e}: ${v}`),
     "",
     lunar
-      ? `Poți opri donația lunară oricând, fără motivare — scrie-ne la ${EMAIL.contact} sau sună la ${TELEFON_PRINCIPAL.afisat}.`
+      ? `Poți opri donația lunară oricând, singur, din contul tău (${linkCont(d.email)}). Sau scrie-ne la ${EMAIL.contact}.`
       : `Dacă ai nevoie de o confirmare scrisă din partea asociației, scrie-ne la ${EMAIL.contact}.`,
     "",
-    `Îți poți vedea oricând toate donațiile, fără parolă: ${ADRESA_SITE}/contul-meu`,
+    `Contul tău, cu toate donațiile și insignele, fără parolă: ${linkCont(d.email)}`,
     "",
     `${ASOCIATIA.denumireLegala} · CIF ${ASOCIATIA.cif}`,
     `${ADRESE.casaTeona.strada}, ${ADRESE.casaTeona.oras} ${ADRESE.casaTeona.cod}`,
@@ -175,7 +189,7 @@ export function construiesteMultumirea(d: Date): Compus {
     )}
     <p style="${MIC}">${
       lunar
-        ? `Poți opri donația lunară oricând, fără motivare și fără explicații — scrie-ne la <a href="mailto:${EMAIL.contact}" style="color:${CULORI.accent};">${EMAIL.contact}</a> sau sună la <strong>${curat(TELEFON_PRINCIPAL.afisat)}</strong>.`
+        ? `Poți opri donația lunară oricând, singur, din <a href="${linkCont(d.email)}" style="color:${CULORI.accent};">contul tău</a>, fără motivare. Sau scrie-ne la <a href="mailto:${EMAIL.contact}" style="color:${CULORI.accent};">${EMAIL.contact}</a>.`
         : `Dacă ai nevoie de o confirmare scrisă din partea asociației, scrie-ne la <a href="mailto:${EMAIL.contact}" style="color:${CULORI.accent};">${EMAIL.contact}</a>.`
     }</p>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="padding:6px 0 2px;">
@@ -191,10 +205,9 @@ export function construiesteMultumirea(d: Date): Compus {
       direct istoricul donațiilor ar fi o cheie plimbată prin lume. Acolo cere
       singur un link de intrare, care merge o dată.
     -->
-    <p style="${MIC}margin:16px 0 0;text-align:center;">
-      Îți poți vedea oricând toate donațiile în
-      <a href="${ADRESA_SITE}/contul-meu" style="color:${CULORI.accent};font-weight:bold;">contul tău</a>.
-      Nu-ți trebuie parolă.
+    <div style="margin:20px 0 0;text-align:center;">${buton("Vezi donațiile tale", linkCont(d.email))}</div>
+    <p style="${MIC}margin:8px 0 0;text-align:center;">
+      În contul tău vezi toate donațiile și insignele, și poți opri o donație lunară. Nu-ți trebuie parolă: primești pe e-mail un link de intrare.
     </p>
     <!--
       Motto-ul, la sfârșit, nu în antet.
@@ -241,7 +254,7 @@ export async function trimiteMultumirea(d: Date): Promise<boolean> {
 export function compuneAnuntDonatie(d: Date): Compus {
   const suma = sumaScrisa(d);
   const nume = [d.prenume, d.nume].filter(Boolean).join(" ") || d.email;
-  const titlu = "Donație nouă cu cardul";
+  const titlu = "Donație nouă";
   const lunar = d.frecventa === "lunar";
   const campuri = tabel([
     ["Cine", nume],
@@ -250,13 +263,13 @@ export function compuneAnuntDonatie(d: Date): Compus {
     ["E-mail", d.email],
   ]);
   const corp = `
-    <p style="${P}">A intrat o donație cu cardul pe site. E deja în panou, ca plătită, iar omul a primit mulțumirea.</p>
+    <p style="${P}">A intrat o donație pe site. E deja în panou, ca plătită. ${d.multumireTrimisa === false ? "<strong>Mulțumirea către donator n-a putut pleca</strong>; scrieți-i voi." : "I-am trimis donatorului mulțumirea."}</p>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 16px;">${campuri.html}</table>
     ${buton("Deschide donațiile", `${ADRESA_SITE}/admin/donatii`)}`;
   return {
     subiect: `${titlu} — ${nume}, ${lunar ? `${suma}/lună` : suma}`,
     html: paginaInterna(titlu, corp, `${nume} · ${suma}`),
-    text: `A intrat o donație cu cardul pe site.\n\n${campuri.text}\n\n${ADRESA_SITE}/admin/donatii`,
+    text: `A intrat o donație pe site.\n\n${campuri.text}\n\n${ADRESA_SITE}/admin/donatii`,
   };
 }
 

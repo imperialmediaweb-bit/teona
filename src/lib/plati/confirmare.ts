@@ -37,17 +37,22 @@ export async function dupaIncasare(
     destinatie: rand.destinatie,
   };
 
+  let multumireTrimisa = false;
   if (rand.email) {
-    await trimiteMultumirea({ ...date, email: rand.email, reinnoire }).catch(
-      () => undefined,
-    );
+    multumireTrimisa = await trimiteMultumirea({
+      ...date,
+      email: rand.email,
+      reinnoire,
+    }).catch(() => false);
   }
 
   // Asociația află de fiecare donație nouă: pe e-mail și pe telefon.
   // Reînnoirile lunare nu: ar fi același om în fiecare lună.
   if (!reinnoire) {
     if (rand.email) {
-      await anuntaDonatia({ ...date, email: rand.email }).catch(() => undefined);
+      await anuntaDonatia({ ...date, email: rand.email, multumireTrimisa }).catch(
+        () => undefined,
+      );
     }
     const suma = `${scrieSuma(date.sumaBani / 100)}${rand.moneda === "EUR" ? " €" : " lei"}`;
     await notificaPanoul({
@@ -128,8 +133,8 @@ export async function confirmaSesiuneaStripe(
   trece pe „plătit”. Dacă anunțul nu ajunge, rândul rămâne așa pentru
   totdeauna, deși banii au intrat — exact ce s-a întâmplat pe 3 noiembrie
   2026. Aici se întreabă Stripe despre toate rândurile inițiate din ultimele
-  30 de zile. Rulează din panou (buton și, singură, la deschiderea donațiilor,
-  cel mult o dată la cinci minute).
+  30 de zile. Rulează singură, din panou, la deschiderea tabloului de bord și
+  a donațiilor, cel mult o dată la cinci minute. Nu e nimic de apăsat.
 */
 let ultimaVerificare = 0;
 let inCurs: Promise<{ verificate: number; confirmate: number }> | null = null;

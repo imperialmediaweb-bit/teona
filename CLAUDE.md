@@ -1355,9 +1355,10 @@ antetele, subdomeniile și versiunile afișate. Ce s-a găsit și ce s-a făcut:
     mulțumire (`ConfirmaPlata` → `/api/donatii/confirma`, întreabă Stripe);
     panoul — `/admin` și `/admin/donatii` întreabă Stripe despre plățile
     rămase „inițiate” din ultimele 30 de zile (cel mult o dată la cinci
-    minute, cel mult patru secunde), plus butonul „Verifică plățile la
-    Stripe”. Dacă rândul „inițiat” lipsește, se scrie din metadatele
-    sesiunii, nu se pierde plata.
+    minute, cel mult patru secunde). **Nu e niciun buton de apăsat**: un buton
+    „verifică” lăsa impresia că plățile trebuie confirmate de mână. Dacă
+    rândul „inițiat” lipsește, se scrie din metadatele sesiunii, nu se
+    pierde plata.
   - **PayPal**: comanda trebuie **încasată** (capture). Până acum nu o
     încasa nimeni, deci nicio donație PayPal nu s-a luat vreodată. Se
     încasează din pagina de mulțumire (`token` din adresă) și din webhook-ul
@@ -1377,6 +1378,14 @@ antetele, subdomeniile și versiunile afișate. Ce s-a găsit și ce s-a făcut:
   oprit. Plățile abandonate (sesiune expirată la Stripe) trec pe `expirata`,
   ca verificarea să nu le mai întrebe. La PayPal, anunțul
   `PAYMENT.CAPTURE.COMPLETED` citește comanda, ca să aibă adresa donatorului.
+- **Contul donatorului** (`/contul-meu`): fără parolă — omul își scrie
+  adresa și primește un link de intrare care merge o dată. E-mailul de
+  mulțumire are butonul „Vezi donațiile tale”, cu adresa deja completată
+  (`?email=`); nu deschide contul direct, ca un e-mail retrimis să nu fie o
+  cheie. În cont: totalul, donațiile, unde s-au dus banii, donațiile lunare
+  (oprite de acolo) și **insignele** (`componente/cont/Insigne.tsx`) — numai
+  din fapte știute: număr de donații, luni alături, donație lunară, lei
+  dăruiți. **Nu „ai ajutat N copii”**: nu știm câți copii a ajutat o donație.
 - **Newsletterul trimite bun venit** (`src/lib/email/buletin.ts`). Abonarea
   merge prin API, cu starea „activ”, iar pe calea asta MailerLite nu trimite
   nimic; site-ul scria totuși „Verifică-ți emailul pentru a confirma” și

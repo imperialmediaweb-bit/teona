@@ -78,8 +78,12 @@ export default function Multumim() {
                 className="mt-2 size-2 shrink-0 rounded-full bg-miere-400"
               />
               <span>
-                Dacă ai ales donația lunară, se reînnoiește singură și o poți
-                opri oricând, fără motivare — scrie-ne la{" "}
+                Dacă ai ales donația lunară, se reînnoiește singură. O poți
+                opri oricând, singur, din{" "}
+                <a href="/contul-meu" className="subliniat font-semibold text-caramiziu-700">
+                  contul tău
+                </a>
+                , fără motivare. Sau scrie-ne la{" "}
                 <a
                   href={`mailto:${EMAIL.contact}`}
                   className="subliniat font-semibold text-caramiziu-700"

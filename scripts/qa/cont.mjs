@@ -132,7 +132,7 @@ verifica(
 
 // ─── Intrarea ─────────────────────────────────────────────────────────────
 console.log("\n=== Intrarea ===");
-await page.goto(BAZA + "/contul-meu", { waitUntil: "networkidle" });
+await page.goto(BAZA + "/contul-meu", { waitUntil: "load" });
 verifica(
   "neconectat, pagina cere adresa — nu arată date",
   (await page.locator('input[name="email"]').count()) >= 1 &&
@@ -157,7 +157,7 @@ await sql.query(
 );
 
 await page.goto(`${BAZA}/contul-meu/intra?jeton=${brut}`, {
-  waitUntil: "networkidle",
+  waitUntil: "load",
 });
 verifica(
   "linkul duce în cont, fără jeton în adresă",
@@ -169,7 +169,9 @@ const panou = await page.locator("body").innerText();
 verifica("se vede mulțumirea pe nume", panou.includes("Mulțumim, Ana"), panou.slice(0, 60).replace(/\n/g, " "));
 verifica("se vede totalul lui", panou.includes("200 lei"), panou.match(/Ai dăruit[^\n]*\n[^\n]*/)?.[0]?.replace(/\n/g, " ") ?? "");
 verifica("se văd două donații", (await page.locator("tbody tr").count()) === 2);
-verifica("se vede că are donație lunară", panou.includes("Ai o donație lunară"));
+// Fără Stripe în probă nu există abonament pornit, deci panoul spune cinstit
+// că a existat unul (din evidență), nu că mai e activ.
+verifica("se vede donația lunară din istoric", panou.includes("Ai avut o donație lunară"));
 
 // ─── Nicio cifră inventată ────────────────────────────────────────────────
 console.log("\n=== Fără cifre inventate ===");
@@ -186,7 +188,7 @@ verifica(
 console.log("\n=== Jetonul ===");
 const { page: altul } = await omNou();
 await altul.goto(`${BAZA}/contul-meu/intra?jeton=${brut}`, {
-  waitUntil: "networkidle",
+  waitUntil: "load",
 });
 verifica(
   "același link, a doua oară, nu mai intră",
@@ -198,7 +200,7 @@ verifica(
   (await altul.locator("body").innerText()).includes("Linkul nu mai e bun"),
 );
 await altul.goto(`${BAZA}/contul-meu/intra?jeton=inventat-complet`, {
-  waitUntil: "networkidle",
+  waitUntil: "load",
 });
 verifica("un jeton inventat nu intră", altul.url().includes("expirat=1"));
 
@@ -212,7 +214,7 @@ await sql.query(
   [createHash("sha256").update(brut2).digest("hex"), DAN],
 );
 await alDoilea.goto(`${BAZA}/contul-meu/intra?jeton=${brut2}`, {
-  waitUntil: "networkidle",
+  waitUntil: "load",
 });
 const panouDan = await alDoilea.locator("body").innerText();
 verifica("Dan își vede propriile date", panouDan.includes("Mulțumim, Dan"));
@@ -224,7 +226,7 @@ verifica("Dan vede o singură donație", (await alDoilea.locator("tbody tr").cou
 await ctxDan.addCookies([
   { name: "teona_cont", value: `${ANA}|` + "a".repeat(64), url: BAZA },
 ]);
-await alDoilea.goto(BAZA + "/contul-meu", { waitUntil: "networkidle" });
+await alDoilea.goto(BAZA + "/contul-meu", { waitUntil: "load" });
 verifica(
   "un cookie cu semnătură inventată nu deschide contul nimănui",
   (await alDoilea.locator('input[name="email"]').count()) >= 1,
@@ -233,7 +235,7 @@ verifica(
 
 // ─── Setări: buletin și ștergere ──────────────────────────────────────────
 console.log("\n=== Setări ===");
-await page.goto(BAZA + "/contul-meu", { waitUntil: "networkidle" });
+await page.goto(BAZA + "/contul-meu", { waitUntil: "load" });
 await page.click('button:has-text("Vreau buletinul")');
 await page.waitForLoadState("networkidle");
 verifica("abonarea se salvează", page.url().includes("gata=abonat"), page.url());

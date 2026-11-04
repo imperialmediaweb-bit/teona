@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import Pictograma from "../Pictograma";
 import { antetOm } from "@/lib/antet-om";
@@ -26,6 +26,14 @@ type Stare =
 export default function CereLink() {
   const id = useId();
   const [stare, setStare] = useState<Stare>({ fel: "gol" });
+  // Adresa venită din e-mailul de mulțumire (`#email=`), deja completată:
+  // omul apasă doar „Trimite-mi linkul”. Din fragment, nu din `?`: nu pleacă
+  // la server și nu ajunge în statistici.
+  const [adresaData, setAdresaData] = useState("");
+  useEffect(() => {
+    const e = new URLSearchParams(window.location.hash.slice(1)).get("email");
+    if (e && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) setAdresaData(e);
+  }, []);
 
   async function trimite(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
@@ -103,6 +111,8 @@ export default function CereLink() {
         name="email"
         type="email"
         autoComplete="email"
+        defaultValue={adresaData}
+        key={adresaData}
         required
         className="colt-mic-a min-h-12 w-full border-2 border-hartie-umbra bg-hartie px-4 py-3 text-corp transition-colors outline-none focus:border-caramiziu-400 sm:max-w-md"
       />

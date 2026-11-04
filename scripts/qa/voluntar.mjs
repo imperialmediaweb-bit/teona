@@ -7,7 +7,7 @@ const page = await ctx.newPage();
 const erori = urmaresteErori(page);
 
 async function deschide() {
-  await page.goto(BAZA + "/devino-voluntar", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/devino-voluntar", { waitUntil: "load" });
 }
 const form = () => page.locator("form#formular");
 async function stare(eticheta) {
