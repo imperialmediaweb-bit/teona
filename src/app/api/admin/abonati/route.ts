@@ -1,4 +1,4 @@
-import { email, limitaDeRata, nuTrece, raspuns, text, trimiteLa } from "@/lib/api";
+import { email, formularAdmin, limitaDeRata, nuTrece, raspuns, text, trimiteLa } from "@/lib/api";
 import { arePermisiune, numeleConectat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { areBuletin, dejaAbonati, laBuletin, stareaInMailerLite } from "@/lib/buletin";
@@ -30,8 +30,9 @@ export async function POST(cerere: Request) {
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
   if (!areBuletin()) return nuTrece("MailerLite nu e legat (MAILERLITE_API_KEY), deci adresele n-ar avea unde să ajungă.");
 
-  const formular = await cerere.formData().catch(() => null);
-  if (!formular) return nuTrece("Cerere invalidă.");
+  const citit = await formularAdmin(cerere);
+  if (citit.raspuns) return citit.raspuns;
+  const { formular } = citit;
 
   const lista = formular.get("lista") === "firme" ? "firme" : formular.get("lista") === "persoane" ? "persoane" : null;
   if (!lista) return nuTrece("Alege lista: persoane fizice sau firme.");

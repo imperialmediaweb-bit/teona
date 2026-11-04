@@ -1,5 +1,5 @@
 import { revalidateTag } from "next/cache";
-import { limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import {
   ETICHETA_TEXTE_PAGINI,
@@ -38,8 +38,9 @@ export async function POST(cerere: Request) {
 
   if (!(await arePermisiune(INAPOI))) return raspuns("Nu ai acces.", 403);
 
-  const formular = await cerere.formData().catch(() => null);
-  if (!formular) return raspuns("Cerere invalidă.", 400);
+  const citit = await formularAdmin(cerere);
+  if (citit.raspuns) return citit.raspuns;
+  const { formular } = citit;
 
   const cheie = text(formular.get("cheie"), 80) ?? "";
   const pagina = paginiCuTexte().find((p) => p === formular.get("pagina")) ?? "";

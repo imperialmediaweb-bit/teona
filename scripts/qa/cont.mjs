@@ -160,9 +160,23 @@ await sql.query(
 await page.goto(`${BAZA}/contul-meu/intra?jeton=${brut}`, {
   waitUntil: "load",
 });
+// Deschiderea linkului nu intră și nu stinge jetonul: un scaner de e-mail
+// care deschide adresa înaintea omului n-ar trebui să-i ardă linkul.
+verifica(
+  "deschiderea linkului nu pune cookie-ul de cont",
+  !(await page.context().cookies()).some((c) => c.name === "teona_cont"),
+);
+verifica(
+  "…și arată un buton „Intră în cont”",
+  (await page.locator('button:has-text("Intră în cont")').count()) === 1,
+);
+await Promise.all([
+  page.waitForNavigation({ waitUntil: "load" }).catch(() => {}),
+  page.click('button:has-text("Intră în cont")'),
+]);
 await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 verifica(
-  "linkul duce în cont, fără jeton în adresă",
+  "butonul duce în cont, fără jeton în adresă",
   new URL(page.url()).pathname === "/contul-meu" && !page.url().includes("jeton"),
   page.url(),
 );
@@ -192,6 +206,10 @@ const { page: altul } = await omNou();
 await altul.goto(`${BAZA}/contul-meu/intra?jeton=${brut}`, {
   waitUntil: "load",
 });
+await Promise.all([
+  altul.waitForNavigation({ waitUntil: "load" }).catch(() => {}),
+  altul.click('button:has-text("Intră în cont")'),
+]);
 await altul.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 verifica(
   "același link, a doua oară, nu mai intră",
@@ -205,6 +223,10 @@ verifica(
 await altul.goto(`${BAZA}/contul-meu/intra?jeton=inventat-complet`, {
   waitUntil: "load",
 });
+await Promise.all([
+  altul.waitForNavigation({ waitUntil: "load" }).catch(() => {}),
+  altul.click('button:has-text("Intră în cont")'),
+]);
 await altul.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 verifica("un jeton inventat nu intră", altul.url().includes("expirat=1"));
 
@@ -220,6 +242,10 @@ await sql.query(
 await alDoilea.goto(`${BAZA}/contul-meu/intra?jeton=${brut2}`, {
   waitUntil: "load",
 });
+await Promise.all([
+  alDoilea.waitForNavigation({ waitUntil: "load" }).catch(() => {}),
+  alDoilea.click('button:has-text("Intră în cont")'),
+]);
 await alDoilea.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const panouDan = await alDoilea.locator("body").innerText();
 verifica("Dan își vede propriile date", panouDan.includes("Mulțumim, Dan"));

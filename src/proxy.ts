@@ -139,10 +139,14 @@ function originStrain(cerere: NextRequest): boolean {
   } catch {
     return true;
   }
+  // Pe Railway `host` e `localhost:8080`; când proxy-ul lui spune gazda
+  // adevărată în `x-forwarded-host`, numai aia contează — altfel o pagină de
+  // pe `localhost:8080` de pe calculatorul omului ar trece de filtru.
+  const gazdaCererii =
+    cerere.headers.get("x-forwarded-host") ?? cerere.headers.get("host");
   const bune = new Set(
     [
-      cerere.headers.get("x-forwarded-host"),
-      cerere.headers.get("host"),
+      gazdaCererii,
       GAZDA,
       `www.${GAZDA}`,
     ]

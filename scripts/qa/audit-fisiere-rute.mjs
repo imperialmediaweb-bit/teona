@@ -41,7 +41,7 @@ const RAILWAY = {
 const zgomot = (w, h, canale, extra = {}) =>
   sharp({ create: { width: w, height: h, channels: canale, noise: { type: "gaussian", mean: 128, sigma: 60 }, ...extra } });
 const jpeg1 = await zgomot(1400, 1000, 3).jpeg({ quality: 90 }).toBuffer();
-const jpeg15 = await zgomot(5600, 4200, 3).jpeg({ quality: 98 }).toBuffer();
+const jpeg15 = await zgomot(5200, 3900, 3).jpeg({ quality: 93 }).toBuffer();
 const png3 = await zgomot(1100, 800, 4).png().toBuffer();
 const pngMeta = await sharp(png3).metadata();
 const svg = Buffer.from(`<?xml version="1.0"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="300" height="120"><rect width="300" height="120" fill="#1a73e8"/><text x="20" y="75" font-size="48" fill="#fff">EGGER</text></svg>`);
@@ -216,7 +216,7 @@ const sablon = (campuri, fisiere, cale = "/api/admin/sablon", railway = false) =
 // ═══ 2. formularAdmin: 31 MB, corp rupt, chunked ══════════════════════════
 console.log("\n── formularAdmin");
 {
-  const mare = Buffer.concat([jpeg15, jpeg15, jpeg15]);
+  const mare = Buffer.concat([jpeg15, Buffer.alloc(31 * 1048576 - jpeg15.length, 1)]);
   const r = await sablon({ fac: "vezi" }, [["poza_fisier", mare, "mare.jpg", "image/jpeg"]]);
   const corp = await r.text();
   nota(`${mb(mare)} MB cu Content-Length: ${r.status} — „${corp.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").slice(0, 160)}”`);
@@ -271,7 +271,7 @@ async function brut(cale, antete, corp) {
 }
 {
   // 31 MB chunked, fără Content-Length: formularAdmin nu vede lungimea; Next taie la 30 MB.
-  const mare = Buffer.concat([jpeg15, jpeg15, jpeg15]);
+  const mare = Buffer.concat([jpeg15, Buffer.alloc(31 * 1048576 - jpeg15.length, 1)]);
   const r = await cere("/api/admin/sablon", {
     method: "POST",
     headers: { "content-type": "multipart/form-data; boundary=----Chunk" },
@@ -291,7 +291,7 @@ async function brut(cale, antete, corp) {
 }
 {
   // Rutele din panou fără formularAdmin: 31 MB la /api/admin/cereri.
-  const mare = Buffer.concat([jpeg15, jpeg15, jpeg15]);
+  const mare = Buffer.concat([jpeg15, Buffer.alloc(31 * 1048576 - jpeg15.length, 1)]);
   const r = await cere("/api/admin/cereri", { method: "POST", body: fd({ actiune: "adauga" }, [["fisier", mare, "x.jpg", "image/jpeg"]]) });
   const corp = await r.text();
   nota(`/api/admin/cereri cu 31 MB: ${r.status} — „${corp.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").slice(0, 120)}”`);
@@ -345,19 +345,19 @@ for (const [eticheta, octeti, nume, tip, asteptat] of [
 // ═══ 5. /api/admin/documente și /api/admin/formulare ═══════════════════════
 console.log("\n── /api/admin/documente, /api/admin/formulare");
 {
-  const r = await cere("/api/admin/documente", { method: "POST", body: fd({ slug: "contract-sponsorizare" }, [["fisier", pdf(12), "Contract 2026, model – nou.pdf", "application/pdf"]]) });
+  const r = await cere("/api/admin/documente", { method: "POST", body: fd({ slug: "contract-de-sponsorizare" }, [["fisier", pdf(12), "Contract 2026, model – nou.pdf", "application/pdf"]]) });
   nota(`PDF 12 MB: ${r.status} ${loc(r)}`);
   verifica(r.status === 303 && loc(r).includes("stare=mare"), "documente: PDF de 12 MB → „prea mare (peste 10 MB)”");
   const pagina = await (await cere(loc(r))).text();
   verifica(/prea mare \(peste 10 MB\)/.test(pagina), "…mesajul se vede pe pagină");
 }
 {
-  const r = await cere("/api/admin/documente", { method: "POST", body: fd({ slug: "contract-sponsorizare" }, [["fisier", pdf(1), "Contract, nou – 2026.pdf", "application/pdf"]]) });
+  const r = await cere("/api/admin/documente", { method: "POST", body: fd({ slug: "contract-de-sponsorizare" }, [["fisier", pdf(1), "Contract, nou – 2026.pdf", "application/pdf"]]) });
   nota(`PDF 1 MB: ${r.status} ${loc(r)}`);
   verifica(loc(r).includes("stare=depozit"), "documente: PDF bun trece validarea (se oprește la lipsa R2)");
 }
 {
-  const r = await cere("/api/admin/documente", { method: "POST", body: fd({ slug: "contract-sponsorizare" }, [["fisier", pdf(31), "mare.pdf", "application/pdf"]]) });
+  const r = await cere("/api/admin/documente", { method: "POST", body: fd({ slug: "contract-de-sponsorizare" }, [["fisier", pdf(31), "mare.pdf", "application/pdf"]]) });
   const corp = await r.text();
   verifica(r.status === 413 && /prea mare/.test(corp), `documente: PDF de 31 MB → 413 cu mesaj (${r.status})`);
 }
@@ -378,7 +378,7 @@ console.log("\n── /api/admin/presa/trimite");
 // Sămânța se pune la prima deschidere a paginii.
 await cere("/admin/presa");
 const paginaPresa = await (await cere("/admin/presa")).text();
-const contacte = [...paginaPresa.matchAll(/name="contact" value="([^"]+)"/g)].map((m) => m[1]);
+const contacte = [...paginaPresa.matchAll(/name="contact"[^>]*value="([^"]+)"/g)].map((m) => m[1]);
 nota(`redacții cu e-mail în formular: ${contacte.length}`);
 const presa = (campuri, fisiere) => {
   const f = fd({ subiect: "Comunicat de probă", text: "Un comunicat de probă, destul de lung ca să treacă de verificarea de lungime a rutei.", confirm: "da", ...campuri }, fisiere);

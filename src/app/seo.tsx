@@ -27,9 +27,10 @@ import {
  * cădea pe `http://localhost:3000` și previzualizările distribuite pe rețele
  * arătau o adresă care nu există.
  *
- * Valoarea implicită e domeniul final, `www.teona-ariana.ro`, pentru că e singura
- * valoare care nu trebuie ținută minte la lansare: dacă variabila lipsește,
- * site-ul se descrie corect.
+ * Valoarea implicită e domeniul final, `teona-ariana.ro` **fără `www`** —
+ * aceeași gazdă spre care `proxy.ts` mută `www.` cu 308. Cu `www` implicit,
+ * ștearsă variabila, fiecare canonică, sitemap-ul și linkurile din e-mail ar
+ * fi arătat spre o adresă care, cerută, duce în altă parte.
  *
  * Până la lansare, site-ul nou e la `https://site-production-641f.up.railway.app`.
  * Ca previzualizările distribuite de acolo să aibă imaginea și adresa bune,
@@ -38,21 +39,41 @@ import {
  *     ADRESA_SITE=https://site-production-641f.up.railway.app
  *
  * LA LANSARE: se șterge variabila din Railway (sau se pune
- * `https://www.teona-ariana.ro`). Cât timp adresa nu e cea finală, `robots.txt`
+ * `https://teona-ariana.ro`). Cât timp adresa nu e cea finală, `robots.txt`
  * și eticheta `robots` cer motoarelor să NU indexeze — vezi `INDEXABIL`.
  */
-export const ADRESA_SITE = (
-  process.env.ADRESA_SITE?.trim() || "https://www.teona-ariana.ro"
-).replace(/\/+$/, "");
+const ADRESA_IMPLICITA = "https://teona-ariana.ro";
+
+/**
+ * Adresa din mediu, verificată. Scrisă fără `https://` („teona-ariana.ro”,
+ * cum se scrie un domeniu oriunde altundeva), `new URL(ADRESA_SITE)` din
+ * `metadataBase` arunca în mijlocul fluxului: jumătate din pagini plecau cu
+ * corp gol și cod 200, iar `/admin` nu se mai deschidea (auditul din 4
+ * noiembrie 2026). Acum schema lipsă se completează, iar o valoare care tot
+ * nu e o adresă cade pe cea implicită.
+ */
+function adresaSite(): string {
+  const brut = (process.env.ADRESA_SITE ?? "").trim().replace(/\/+$/, "");
+  if (!brut) return ADRESA_IMPLICITA;
+  const cuSchema = /^https?:\/\//i.test(brut) ? brut : `https://${brut}`;
+  try {
+    return new URL(cuSchema).origin;
+  } catch {
+    return ADRESA_IMPLICITA;
+  }
+}
+
+export const ADRESA_SITE = adresaSite();
 
 /**
  * Domeniul pe care site-ul are voie să fie indexat.
  *
- * Verificat pe site-ul viu: `teona-ariana.ro`, cu sau fără `http`, se
- * redirecționează la `https://www.teona-ariana.ro`. Deci adresa canonică e
- * cea cu `www`, iar valoarea implicită de mai sus o folosește pe ea — altfel
- * fiecare pagină ar fi declarat drept canonică o adresă care, cerută, duce
- * în altă parte.
+ * Site-ul ăsta răspunde pe `teona-ariana.ro`; `www.` se mută acolo cu 308
+ * (`src/proxy.ts`). Deci adresa canonică e cea fără `www`, iar valoarea
+ * implicită de mai sus o folosește pe ea — altfel fiecare pagină ar fi
+ * declarat drept canonică o adresă care, cerută, duce în altă parte. (Pe
+ * WordPress-ul vechi era invers; comentariul de aici a descris ani de zile
+ * site-ul care nu mai e.)
  *
  * Verificarea de mai jos acceptă și forma fără `www`, pentru cazul în care
  * cineva pune `ADRESA_SITE` așa din obișnuință: site-ul tot pe domeniul lui

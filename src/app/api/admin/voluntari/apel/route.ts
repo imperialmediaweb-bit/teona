@@ -1,4 +1,4 @@
-import { limitaDeRata, nuTrece, raspuns, text, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, nuTrece, raspuns, text, trimiteLa } from "@/lib/api";
 import { arePermisiune, numeleConectat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { areEmail, trimiteEmail } from "@/lib/email/trimite";
@@ -32,8 +32,9 @@ export async function POST(cerere: Request) {
   if (!(await arePermisiune("/admin/voluntari"))) return raspuns("Nu ai acces.", 403);
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
 
-  const formular = await cerere.formData().catch(() => null);
-  if (!formular) return nuTrece("Cerere invalidă.");
+  const citit = await formularAdmin(cerere);
+  if (citit.raspuns) return citit.raspuns;
+  const { formular } = citit;
 
   const titlu = text(formular.get("titlu"), 120);
   if (!titlu) return nuTrece("Scrie pentru ce e nevoie de voluntari (de exemplu: Tabăra de autism).");

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { ETICHETA_PROIECTE_PANOU } from "@/date/proiecte";
-import { formularAdmin, limitaDeRata, nuTrece, raspuns, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import {
   creeazaText,
@@ -10,7 +10,7 @@ import {
   stergeText,
   textDupaId,
 } from "@/lib/texte";
-import { POZA_MAXIM, pareImagine, urcaPoza } from "@/lib/poza-urcata";
+import { POZA_MAXIM, tipDinOcteti, urcaPoza } from "@/lib/poza-urcata";
 import { citesteSuma, laBan } from "@/lib/suma";
 
 /**
@@ -32,7 +32,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune("/admin/scrie"))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/scrie"))) return sesiuneExpirata();
 
   const citit = await formularAdmin(cerere);
   if (citit.raspuns) return citit.raspuns;
@@ -102,10 +102,11 @@ export async function POST(cerere: Request) {
       return nuTrece("Scrie ce se vede în poză. Fără descriere, poza nu există pentru cineva care nu vede.");
     }
     const octeti = new Uint8Array(await fisier.arrayBuffer());
-    if (!pareImagine(fisier.type, octeti)) {
+    const tipPoza = tipDinOcteti(octeti);
+    if (!tipPoza) {
       return nuTrece("Fișierul nu pare o fotografie (JPG, PNG sau WebP).");
     }
-    const urcata = await urcaPoza(octeti, fisier.type, "noutati");
+    const urcata = await urcaPoza(octeti, tipPoza, "noutati");
     if (!urcata)
       return nuTrece("Nu am putut urca poza. Încearcă din nou.", 502);
     poza = { ...urcata, alt };

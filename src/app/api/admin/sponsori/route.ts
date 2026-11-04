@@ -1,7 +1,7 @@
 import { revalidateTag } from "next/cache";
-import { formularAdmin, limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, raspuns, sesiuneExpirata, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
-import { POZA_MAXIM, pareImagine, urcaPoza } from "@/lib/poza-urcata";
+import { POZA_MAXIM, tipDinOcteti, urcaPoza } from "@/lib/poza-urcata";
 import {
   ETICHETA_SPONSORI,
   faceSponsor,
@@ -33,7 +33,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune(INAPOI))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune(INAPOI))) return sesiuneExpirata();
 
   const citit = await formularAdmin(cerere);
   if (citit.raspuns) return citit.raspuns;
@@ -88,12 +88,14 @@ export async function POST(cerere: Request) {
     Se verifică octeții, nu extensia: un fișier oarecare redenumit în .png ar
     ajunge pe prima pagină ca o imagine ruptă, lângă sigle adevărate.
   */
-  if (!pareImagine(fisier.type, octeti) && !pareSvg(fisier.type, octeti)) {
+  // Tipul din conținut, nu din eticheta browserului (pe Windows e des goală).
+  const tipSigla = tipDinOcteti(octeti) ?? (pareSvg(fisier.type, octeti) ? "image/svg+xml" : null);
+  if (!tipSigla) {
     return gata(cerere, "imagine");
   }
 
   // Oricum vine — cu margini, în SVG, albă pe transparent —, iese potrivită.
-  const sigla = await potrivesteSigla(octeti, fisier.type).catch(() => null);
+  const sigla = await potrivesteSigla(octeti, tipSigla).catch(() => null);
   if (!sigla) return gata(cerere, "imagine");
 
   const urcata = await urcaPoza(sigla.octeti, sigla.tip, "sigle").catch(() => null);

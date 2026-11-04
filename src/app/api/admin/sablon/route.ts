@@ -1,10 +1,4 @@
-import { formularAdmin,
-  limitaDeRata,
-  nuTrece,
-  raspuns,
-  text as curataText,
-  trimiteLa,
-} from "@/lib/api";
+import { formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, text as curataText, trimiteLa } from "@/lib/api";
 import { email as emailValid } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { ASOCIATIA, EMAIL } from "@/date/asociatie";
@@ -15,7 +9,7 @@ import {
   POZA_MAXIM,
   areCloudinary,
   numeDupaContinut,
-  pareImagine,
+  tipDinOcteti,
   urcaPoza,
 } from "@/lib/poza-urcata";
 import {
@@ -73,15 +67,19 @@ async function pozaDinFormular(
     Cloudinary ar primi „urcarea nu e configurată" și ar suna degeaba
     dezvoltatorul, când de fapt greșise fișierul.
   */
+  // Întâi tipul (din primii octeți), apoi mărimea: un HEIC de 8 MB primea
+  // „prea mare, micșoreaz-o” — n-avea cum, formatul era problema.
+  const cap = new Uint8Array(await fisier.slice(0, 16).arrayBuffer());
+  const tip = tipDinOcteti(cap);
+  if (!tip) return { eroare: "poza-tip" };
   if (fisier.size > POZA_MAXIM) return { eroare: "poza-mare" };
 
   const octeti = new Uint8Array(await fisier.arrayBuffer());
-  if (!pareImagine(fisier.type, octeti)) return { eroare: "poza-tip" };
   if (!areCloudinary()) return { eroare: "fara-cloudinary" };
 
   const urcata = await urcaPoza(
     octeti,
-    fisier.type,
+    tip,
     "campanii-email",
     numeDupaContinut(octeti, "campanie"),
   ).catch(() => null);
@@ -149,7 +147,7 @@ function paginaHtml(html: string) {
 /** Previzualizarea din panou, pentru cadrul care arată șablonul gol. */
 export async function GET(cerere: Request) {
   if (!(await arePermisiune("/admin/sabloane")))
-    return raspuns("Nu ai acces.", 403);
+    return sesiuneExpirata();
   const fel = new URL(cerere.url).searchParams.get("fel");
   return paginaHtml(
     sablonCampanie(esteFelSablon(fel) ? fel : "persoane", EXEMPLU),
@@ -171,7 +169,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
   if (!(await arePermisiune("/admin/sabloane")))
-    return raspuns("Nu ai acces.", 403);
+    return sesiuneExpirata();
 
   const citit = await formularAdmin(cerere);
   if (citit.raspuns) return citit.raspuns;
@@ -209,6 +207,17 @@ export async function POST(cerere: Request) {
   if (eroare) return inapoi(cerere, { ratat: eroare, fel });
 
   const fac = String(formular.get("fac") ?? "vezi");
+  /*
+    Textul de exemplu e pentru „vezi” și „descarcă”. La probă, ciornă și
+    trimitere, câmpurile goale ar pleca la listă ca „Titlul campaniei — îl
+    scrii tu” — exact „Sorem ipsum” de pe site-ul vechi (prins de audit pe 4
+    noiembrie 2026). Un titlu peste 160 de semne devenea, în tăcere, exemplul.
+  */
+  const scris = (n: string) => String(formular.get(n) ?? "").trim();
+  if (fac !== "vezi" && fac !== "descarca" && (!scris("titlu") || !scris("text"))) {
+    return inapoi(cerere, { ratat: "gol", fel });
+  }
+  if (scris("titlu").length > 160) return inapoi(cerere, { ratat: "titlu-lung", fel });
   const html = sablonCampanie(fel, continut);
 
   if (fac === "vezi") return paginaHtml(html);

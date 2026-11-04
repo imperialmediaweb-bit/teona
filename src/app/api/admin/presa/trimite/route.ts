@@ -1,9 +1,10 @@
-import { formularAdmin, limitaDeRata, nuTrece, raspuns, text, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { contactePresa } from "@/lib/presa";
 import { areEmail, curat, trimiteEmail } from "@/lib/email/trimite";
 import { ASOCIATIA, EMAIL, TELEFOANE } from "@/date/asociatie";
+import { tipDinOcteti } from "@/lib/poza-urcata";
 import { ADRESA_SITE } from "@/app/seo";
 
 /**
@@ -59,7 +60,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune("/admin/presa"))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/presa"))) return sesiuneExpirata();
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
   if (!areEmail()) return nuTrece("Trimiterea de e-mailuri nu e configurată pe site.");
 
@@ -88,6 +89,13 @@ export async function POST(cerere: Request) {
     return nuTrece(`Cel mult ${FISIERE_MAXIM} fișiere atașate.`);
   if (fisiere.some((f) => !TIPURI.test(f.name)))
     return nuTrece("Atașează numai PDF, Word sau poze (JPG, PNG, WebP).");
+  // Și conținutul, nu doar numele: un `.exe.jpg` cu „MZ” în cap nu pleacă la redacții.
+  for (const f of fisiere) {
+    const cap = new Uint8Array(await f.slice(0, 16).arrayBuffer());
+    const text = String.fromCharCode(...cap.slice(0, 4));
+    const bun = tipDinOcteti(cap) !== null || text === "%PDF" || text.startsWith("PK");
+    if (!bun) return nuTrece(`„${f.name}” nu e un PDF, un Word sau o poză. Verifică fișierul.`);
+  }
   if (fisiere.reduce((t, f) => t + f.size, 0) > FISIER_MAXIM)
     return nuTrece("Fișierele atașate trec de 10 MB împreună. Trimite pozele mai mici.");
   const atasamente = await Promise.all(

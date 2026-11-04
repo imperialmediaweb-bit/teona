@@ -56,11 +56,18 @@ export const LIMITA_CORP = 16 * 1024;
 export function trimiteLa(unde: string | URL, status = 303): NextResponse {
   const cale =
     typeof unde === "string" ? unde : unde.pathname + unde.search + unde.hash;
+  // Un antet nu poate purta rând nou sau diacritice: `?cauta=Ștefan` sau un
+  // „înapoi” lipit cu un rând nou dădeau 500 după o salvare făcută (auditul
+  // din 4 noiembrie 2026). `encodeURI` lasă `?&=#%` neatinse, deci ce era deja
+  // codificat rămâne cum e (`encodeURI` ar fi făcut din `%20` un `%2520`).
+  const curat = cale
+    .replace(/[\r\n]/g, "")
+    .replace(/[^\x21-\x7e]/g, (c) => encodeURIComponent(c));
   return new NextResponse(null, {
     status,
     // Nici `/\evil.com`: browserul citește bara inversă ca pe una dreaptă,
     // deci `/\…` ar fi tot `//…`, adică alt site.
-    headers: { Location: /^\/(?![\/\\])/.test(cale) ? cale : "/" },
+    headers: { Location: /^\/(?![\/\\])/.test(curat) ? curat : "/" },
   });
 }
 
@@ -75,6 +82,20 @@ export function trimiteLa(unde: string | URL, status = 303): NextResponse {
  * browserul întoarce formularul cu tot ce era scris în el, deci nu se pierde
  * nimic. `raspuns()` rămâne pentru rutele chemate din cod, nu din formulare.
  */
+/**
+ * Răspunsul unui formular din panou trimis după ce sesiunea a expirat.
+ *
+ * Omul a lăsat fila deschisă ore întregi, a scris, a apăsat Salvează. Un JSON
+ * `{"mesaj":"Nu ai acces."}` pe pagină albă îi spune că a fost dat afară și
+ * nu-i spune că textul lui e încă în formular, la un „Înapoi” distanță.
+ */
+export function sesiuneExpirata() {
+  return nuTrece(
+    "Sesiunea din panou a expirat. Deschide panoul într-o filă nouă și intră din nou, apoi apasă „Înapoi” aici: ce ai scris e tot acolo.",
+    403,
+  );
+}
+
 export function nuTrece(mesaj: string, status = 400) {
   const sigur = mesaj.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
   return new Response(

@@ -57,6 +57,8 @@ const RATAT: Record<string, string> = {
   fel: "Alege pentru cine e e-mailul.",
   "poza-mare":
     "Fotografia e prea mare. Alege una mai mică de 6 MB sau micșoreaz-o întâi.",
+  gol: "Scrie titlul și textul campaniei. Fără ele ar pleca textul de exemplu din șablon.",
+  "titlu-lung": "Titlul are peste 160 de semne. Scurtează-l.",
   "poza-tip":
     "Fișierul ăla nu e o fotografie. Merg JPG, PNG și WebP — nu și PDF sau document.",
   "poza-urcare":

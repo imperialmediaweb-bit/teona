@@ -1,4 +1,4 @@
-import { limitaDeRata, nuTrece, text, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, nuTrece, text, trimiteLa } from "@/lib/api";
 import { arePermisiune, esteAutentificat, numeleConectat } from "@/lib/admin";
 import { esteFelInteractiune, scrieInteractiune } from "@/lib/crm";
 
@@ -29,8 +29,9 @@ export async function POST(cerere: Request) {
   // Întâi cine e, apoi ce a trimis: fără sesiune, „n-ai acces”, nu „cerere invalidă”.
   if (!(await esteAutentificat())) return nuTrece("Nu ai acces.", 403);
 
-  const formular = await cerere.formData().catch(() => null);
-  if (!formular) return nuTrece("Cerere invalidă.");
+  const citit = await formularAdmin(cerere);
+  if (citit.raspuns) return citit.raspuns;
+  const { formular } = citit;
 
   const cerut = String(formular.get("inapoi") ?? "");
   const potrivit = INAPOI.exec(cerut);

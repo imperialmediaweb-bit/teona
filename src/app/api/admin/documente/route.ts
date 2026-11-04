@@ -1,5 +1,5 @@
 import { revalidateTag } from "next/cache";
-import { formularAdmin, limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, raspuns, sesiuneExpirata, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areR2, urcaInR2 } from "@/lib/r2";
 import { documentDupaSlug } from "@/lib/documente";
@@ -33,7 +33,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune(INAPOI))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune(INAPOI))) return sesiuneExpirata();
 
   const citit = await formularAdmin(cerere);
   if (citit.raspuns) return citit.raspuns;

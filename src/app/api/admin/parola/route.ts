@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune, cineEsteConectat } from "@/lib/admin";
 import { MINIM_PAROLA, schimbaParolaProprie } from "@/lib/utilizatori";
 
@@ -38,8 +38,9 @@ export async function POST(cerere: Request) {
   */
   if (cine?.fel !== "cont") return gata(cerere, "fara-cont");
 
-  const formular = await cerere.formData().catch(() => null);
-  if (!formular) return raspuns("Cerere invalidă.", 400);
+  const citit = await formularAdmin(cerere);
+  if (citit.raspuns) return citit.raspuns;
+  const { formular } = citit;
 
   const veche = String(formular.get("veche") ?? "");
   const noua = String(formular.get("noua") ?? "");

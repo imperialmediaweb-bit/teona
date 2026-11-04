@@ -1,4 +1,4 @@
-import { limitaDeRata, nuTrece, raspuns } from "@/lib/api";
+import { formularAdmin, limitaDeRata, nuTrece, raspuns } from "@/lib/api";
 import { arePermisiune, numeleConectat } from "@/lib/admin";
 import {
   firma as iaFirma,
@@ -34,8 +34,9 @@ export async function POST(cerere: Request) {
 
   if (!(await arePermisiune("/admin/firme"))) return raspuns("Nu ai acces.", 403);
 
-  const formular = await cerere.formData().catch(() => null);
-  if (!formular) return nuTrece("Cerere invalidă.");
+  const citit = await formularAdmin(cerere);
+  if (citit.raspuns) return citit.raspuns;
+  const { formular } = citit;
 
   const camp = (nume: string) => String(formular.get(nume) ?? "").trim();
   const id = camp("id");

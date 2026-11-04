@@ -23,7 +23,7 @@ export async function potrivesteSigla(
   tip: string,
 ): Promise<{ octeti: Uint8Array; tip: "image/png" }> {
   const intrare = Buffer.from(octeti);
-  const svg = tip === "image/svg+xml";
+  const svg = tip === "image/svg+xml" || pareSvg(tip, octeti);
   let img = sharp(intrare, svg ? { density: 300 } : {}).rotate();
 
   // Marginile goale: transparente sau de culoarea colțului.
@@ -61,8 +61,8 @@ export async function potrivesteSigla(
 }
 
 /** SVG-ul nu are semnătură binară: se recunoaște după primele caractere. */
-export function pareSvg(tip: string, octeti: Uint8Array): boolean {
-  if (tip !== "image/svg+xml") return false;
+export function pareSvg(_tip: string, octeti: Uint8Array): boolean {
+  // Eticheta browserului nu contează (pe Windows poate fi goală): se uită în text.
   const inceput = Buffer.from(octeti.slice(0, 512)).toString("utf8").trimStart().toLowerCase();
   return inceput.startsWith("<svg") || (inceput.startsWith("<?xml") && inceput.includes("<svg"));
 }

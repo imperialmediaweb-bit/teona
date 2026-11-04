@@ -30,17 +30,29 @@ export type PozaUrcata = { id: string; latime: number; inaltime: number };
  * fișier executabil trimis cu `Content-Type: image/png` ar trece de o
  * verificare care se uită doar la antet. De aceea citim primii octeți.
  */
-export function pareImagine(tip: string, octeti: Uint8Array): boolean {
-  const asteptat = TIPURI.get(tip);
-  if (!asteptat) return false;
-  const { semnatura } = asteptat;
-  if (octeti.length < semnatura.length + 8) return false;
-  if (!semnatura.every((octet, i) => octeti[i] === octet)) return false;
-  if (tip === "image/webp") {
-    const marca = String.fromCharCode(...octeti.slice(8, 12));
-    return marca === "WEBP";
+export type TipImagine = "image/jpeg" | "image/png" | "image/webp";
+
+/**
+ * Tipul imaginii, citit din primii octeți.
+ *
+ * Eticheta pusă de browser (`File.type`) nu contează: pe Windows un `.jpg`
+ * vine des cu tip gol sau `application/octet-stream`, după ce program e legat
+ * de extensie. Un cod care cerea „image/jpeg” înainte să se uite la fișier
+ * refuza poze adevărate cu „nu e o fotografie” (auditul din 4 noiembrie 2026).
+ */
+export function tipDinOcteti(octeti: Uint8Array): TipImagine | null {
+  for (const [tip, { semnatura }] of TIPURI) {
+    if (octeti.length < semnatura.length + 8) continue;
+    if (!semnatura.every((octet, i) => octeti[i] === octet)) continue;
+    if (tip === "image/webp" && String.fromCharCode(...octeti.slice(8, 12)) !== "WEBP") continue;
+    return tip as TipImagine;
   }
-  return true;
+  return null;
+}
+
+/** Octeții chiar sunt o imagine din tipurile acceptate? Eticheta nu e luată în seamă. */
+export function pareImagine(_tip: string, octeti: Uint8Array): boolean {
+  return tipDinOcteti(octeti) !== null;
 }
 
 function semneaza(parametri: Record<string, string>, secret: string): string {

@@ -40,6 +40,7 @@ export default function PrevizualizareEmail({
 }) {
   const [html, setHtml] = useState<string>("");
   const [incarc, setIncarc] = useState(false);
+  const [problema, setProblema] = useState<string | null>(null);
   const blob = useRef<string | null>(null);
   const ultima = useRef(0);
   /** Poza aleasă, scrisă `data:`, ca să nu se citească iar la fiecare literă. */
@@ -56,11 +57,9 @@ export default function PrevizualizareEmail({
       date.delete("poza_fisier");
       let adresaInPagina: string | null = null;
       if (fisier instanceof File && fisier.size > 0) {
-        if (!blob.current) blob.current = URL.createObjectURL(new Blob());
-        date.set("poza_locala", blob.current);
-        // Până la 6 MB (cât primește și ruta) se scrie în pagină; peste, rămâne
-        // semnul de loc până o micșorează `MicsoreazaPoza`. Tipul se citește
-        // din conținut: pe Windows eticheta fișierului poate fi goală.
+        // Până la 6 MB (cât primește și ruta) se scrie în pagină; peste, se
+        // așteaptă micșorarea din `MicsoreazaPoza`. Tipul se citește din
+        // conținut: pe Windows eticheta fișierului poate fi goală.
         if (fisier.size <= 6 * 1024 * 1024) {
           if (inPagina.current?.fisier !== fisier) {
             const tip = await tipulPozei(fisier).catch(() => null);
@@ -68,6 +67,12 @@ export default function PrevizualizareEmail({
             inPagina.current = adresa ? { fisier, adresa } : null;
           }
           adresaInPagina = inPagina.current?.adresa ?? null;
+        }
+        // Semnul de loc pleacă numai când există o poză de pus în locul lui;
+        // altfel (HEIC, fișier stricat) în cadru ar rămâne o imagine ruptă.
+        if (adresaInPagina) {
+          if (!blob.current) blob.current = URL.createObjectURL(new Blob());
+          date.set("poza_locala", blob.current);
         }
       } else {
         inPagina.current = null;
@@ -84,7 +89,12 @@ export default function PrevizualizareEmail({
         const text = await r.text();
         // Un răspuns venit târziu nu suprascrie unul mai nou.
         if (nr !== ultima.current) return;
-        if (r.ok) {
+        if (r.status === 429) {
+          setProblema("Prea multe previzualizări într-un minut. Așteaptă puțin: textul tău e tot aici.");
+        } else if (!r.ok) {
+          setProblema("Previzualizarea nu s-a putut desena acum. Textul tău e tot aici.");
+        } else {
+          setProblema(null);
           // Linkurile din e-mail se deschid în altă filă, nu în cadru.
           /*
             Pozele din e-mail au adresa întreagă, cu `www.` — în inbox așa
@@ -146,8 +156,8 @@ export default function PrevizualizareEmail({
         <p className="font-titlu text-mic font-bold text-cerneala">
           Așa arată e-mailul
         </p>
-        <p className="text-nota text-cerneala-slab" aria-live="polite">
-          {incarc ? "se desenează…" : "se schimbă cât scrii"}
+        <p className={`text-nota ${problema ? "text-caramiziu-700" : "text-cerneala-slab"}`} aria-live="polite">
+          {problema ?? (incarc ? "se desenează…" : "se schimbă cât scrii")}
         </p>
       </div>
       <iframe

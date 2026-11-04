@@ -189,5 +189,35 @@ verifica(
   `poza fără descriere trece, cu titlul ca text alternativ (${faraDescriere.status})`,
 );
 
+/*
+  Câmpurile goale nu pleacă nicăieri.
+
+  La „vezi” și „descarcă”, textul de exemplu al șablonului e util. La probă,
+  ciornă și trimitere ar fi plecat la oameni ca „Titlul campaniei — îl scrii
+  tu” — „Sorem ipsum” de pe site-ul vechi, prins de audit pe 4 noiembrie 2026.
+*/
+for (const fac of ["proba", "ciorna", "trimite"]) {
+  const gol = await trimite({ fel: "persoane", fac, catre: "proba@exemplu.ro" });
+  verifica(
+    gol.status === 303 && /ratat=gol/.test(gol.headers.get("location") ?? ""),
+    `fără titlu și text, „${fac}” e refuzat cu un mesaj, nu pleacă exemplul (${gol.status} ${gol.headers.get("location") ?? ""})`,
+  );
+}
+const titluLung = await trimite({ fel: "persoane", titlu: "x".repeat(161), text: "Un text.", fac: "proba", catre: "proba@exemplu.ro" });
+verifica(
+  titluLung.status === 303 && /ratat=titlu-lung/.test(titluLung.headers.get("location") ?? ""),
+  `un titlu de 161 de semne e refuzat pe față, nu înlocuit în tăcere cu exemplul (${titluLung.headers.get("location") ?? ""})`,
+);
+const expirata = await fetch(`${BAZA}/api/admin/sablon?fel=persoane`, {
+  method: "POST",
+  headers: { origin: BAZA, "x-forwarded-for": DE_LA },
+  body: new URLSearchParams({ fel: "persoane", titlu: "T", text: "x", fac: "vezi" }),
+});
+const textExpirat = await expirata.text();
+verifica(
+  expirata.status === 403 && textExpirat.includes("Sesiunea din panou a expirat") && textExpirat.includes("Înapoi"),
+  `fără sesiune, formularul primește o pagină cu „sesiunea a expirat” și Înapoi, nu un JSON (${expirata.status})`,
+);
+
 console.log(rele === 0 ? "\ntoate probele trec" : `\n${rele} probe cad`);
 process.exit(rele === 0 ? 0 : 1);

@@ -1135,6 +1135,73 @@ Probă, cu o „poză de telefon” de 19 MB făcută cu sharp, în browser (inc
 cadrul de previzualizare), direct la rută și pe funcția cu adresa de pe site:
 `BAZA=… PAROLA_ADMIN=… node scripts/qa/poza-mare.mjs` — 11 verificări.
 
+## Auditul adversarial din 4 noiembrie 2026
+
+După a treia defecțiune văzută de fundraiser și nu de probe, cinci agenți au
+căutat în paralel **restul** defectelor de aceeași formă: cod care merge pe
+localhost și cade în condițiile adevărate (Railway, Windows, poze de telefon,
+scanere de e-mail, variabile scrise greșit). Fiecare a trebuit să **ruleze**
+defectul, nu să-l citească. Ce s-a reparat, cu lecția fiecăruia:
+
+- **Câmpurile goale plecau la listă ca text de exemplu.** La „probă”,
+  „ciornă” și „trimite”, un șablon fără titlu sau text pleca cu „Titlul
+  campaniei — îl scrii tu” — „Sorem ipsum”, din nou. Un titlu peste 160 de
+  semne devenea exemplul **în tăcere**. Acum `ratat=gol` / `ratat=titlu-lung`;
+  exemplul rămâne numai pentru „vezi” și „descarcă”.
+- **Tipul fișierului se citește din octeți și pe server** (`tipDinOcteti`
+  din `lib/poza-urcata.ts`), nu din `File.type`: pe Windows eticheta e des
+  goală, iar un JPEG adevărat primea „nu e o fotografie”. Sigla SVG la fel
+  (`pareSvg` se uită în text). Atașamentele de presă se verifică după
+  conținut (JPEG/PNG/WebP, `%PDF`, `PK`), nu după extensie. La șablon, tipul
+  se verifică **înaintea** mărimii: un HEIC de 8 MB primea „micșoreaz-o”.
+- **HEIC de pe iPhone se spune pe față** în browser (`MicsoreazaPoza`), nu
+  ajunge la server ca „prea mare”; un PNG micșorat peste 4 MB pleacă JPEG;
+  nota de sub câmp se șterge când poza nouă n-a avut nevoie de nimic.
+- **Sesiunea expirată dă o pagină cu „Înapoi”** (`sesiuneExpirata()` din
+  `lib/api.ts`, 403), nu `{"mesaj":"Nu ai acces."}`: omul a lăsat fila
+  deschisă ore, a scris, a apăsat — textul lui e tot în formular.
+- **Toate rutele din panou citesc formularul prin `formularAdmin()`**; nicio
+  rută nu mai scrie „Cerere invalidă.” de mână.
+- **`ADRESA_SITE` se validează** (`seo.tsx`): scrisă „teona-ariana.ro”, fără
+  schemă, `new URL()` din `metadataBase` arunca în mijlocul fluxului și
+  jumătate din pagini plecau cu corp gol și **cod 200** — `/admin` nu se mai
+  deschidea. Implicitul e acum `https://teona-ariana.ro`, **fără `www`**:
+  aceeași gazdă spre care `proxy.ts` mută `www.` cu 308; cu `www` implicit,
+  ștearsă variabila, fiecare canonică și sitemap-ul ar fi arătat spre o
+  adresă care redirecționează. Paginile pregenerate o îngheață la build, deci
+  o schimbare în Railway cere o publicare, nu un „Redeploy”.
+- **`trimiteLa` curăță destinația**: un `inapoi` cu rând nou sau `?cauta=Ștefan`
+  dădea 500 **după** ce salvarea se făcuse — omul credea că nu s-a salvat.
+- **Filtrul anti-CSRF nu mai crede `host`** când există `x-forwarded-host`:
+  pe Railway `host` e `localhost:8080`, deci `Origin: https://localhost:8080`
+  trecea.
+- **Linkul de intrare în cont și cel de schimbat cardul nu mai fac nimic la
+  deschidere**: pagină cu buton, consumarea jetonului / sesiunea de portal
+  Stripe se fac prin POST (`/api/cont/intra`, `/api/cont/card`). Scanerele
+  de e-mail ale firmelor (Safe Links, Mimecast) deschid toate adresele
+  înaintea omului: jetonul se consuma în scaner, omul vedea „linkul a
+  expirat”, iar portalul Stripe se deschidea autentificat într-un robot.
+  Aceeași regulă ca la `/opreste-donatia`, acum **peste tot**.
+- Mărunte: cookie-ul de cont se șterge cu aceleași opțiuni cu care se pune;
+  `verificaInainte` nu mai așteaptă 4 secunde la fiecare deschidere a
+  panoului când o verificare e deja în curs; previzualizarea șablonului
+  spune lângă titlu când a primit 429, în loc să rămână pe varianta veche.
+
+**Ce a mers și e acoperit** (nu s-a schimbat): toate cele 33 de rute POST
+din `/api/admin` dau `Location` relativ sub `Host: localhost:8080`;
+cookie-urile au `Secure; HttpOnly` și expirarea în semnătură; `www.` și
+`….up.railway.app` se mută numai pe GET/HEAD în afara lui `/api`; Origin
+străin → 403; limita de rată se numără pe `x-real-ip`/`cf-connecting-ip`;
+404 adevărat pe sluguri inexistente; PayPal aprobat de două ori + captură +
+pagina de mulțumire = **o** donație, **o** mulțumire; 31 MB → 413 cu mesaj.
+**Ce nu se poate verifica de aici**: limita de rată pe site-ul viu (proxy-ul
+acestui mediu iese din mai multe adrese), dacă Railway reconstruiește la
+schimbarea unei variabile, un iPhone adevărat.
+
+**Probele auditorilor** sunt în `scripts/qa/audit-<zona>-*.mjs`; `fetch`
+din Node **ignoră `Host:`** — ce vrea să imite Railway folosește `node:http`
+sau `curl`.
+
 ## Site-ul nu face campanii de e-mail
 
 Asociația a fost oprită odată de Railway pentru e-mailuri trimise în masă.

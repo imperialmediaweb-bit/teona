@@ -39,12 +39,12 @@ export async function POST(cerere: Request) {
 
   if (!abonament) return inapoi("");
   if (!areStripe()) {
-    return inapoi(`?a=${dovada.a}&p=${dovada.p}&s=${dovada.s}&eroare=1`);
+    return inapoi(`?${new URLSearchParams({ ...dovada, eroare: "1" })}`);
   }
 
   const oprit = await opresteAbonamentulDupaId(abonament).catch(() => false);
   if (!oprit) {
-    return inapoi(`?a=${dovada.a}&p=${dovada.p}&s=${dovada.s}&eroare=1`);
+    return inapoi(`?${new URLSearchParams({ ...dovada, eroare: "1" })}`);
   }
   return trimiteLa("/oprit");
 }

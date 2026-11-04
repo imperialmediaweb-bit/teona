@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { hotarasteTransfer } from "@/lib/plati/donatori";
 import { trimiteMultumirea } from "@/lib/email/donatie";
@@ -24,8 +24,9 @@ export async function POST(cerere: Request) {
 
   if (!(await arePermisiune("/admin/donatii"))) return raspuns("Nu ai acces.", 403);
 
-  const formular = await cerere.formData().catch(() => null);
-  if (!formular) return raspuns("Cerere invalidă.", 400);
+  const citit = await formularAdmin(cerere);
+  if (citit.raspuns) return citit.raspuns;
+  const { formular } = citit;
 
   const inapoi = (parametru: string) =>
     trimiteLa(`/admin/donatii?${parametru}`);

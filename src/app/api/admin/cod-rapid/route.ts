@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import {
   COOKIE_DISPOZITIV,
   VIATA_DISPOZITIV_S,
@@ -40,8 +40,9 @@ export async function POST(cerere: Request) {
   const cine = await cineEsteConectat();
   if (cine?.fel !== "cont") return gata("fara-cont");
 
-  const formular = await cerere.formData().catch(() => null);
-  if (!formular) return raspuns("Cerere invalidă.", 400);
+  const citit = await formularAdmin(cerere);
+  if (citit.raspuns) return citit.raspuns;
+  const { formular } = citit;
   const ce = String(formular.get("ce") ?? "");
   const id = cine.utilizator.id;
 

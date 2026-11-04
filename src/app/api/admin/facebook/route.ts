@@ -1,4 +1,4 @@
-import { limitaDeRata, nuTrece, raspuns, text, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, nuTrece, raspuns, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { marcheazaFacebook, textDupaId, felul } from "@/lib/texte";
@@ -25,8 +25,9 @@ export async function POST(cerere: Request) {
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
   if (!arePagina()) return inapoi(cerere, "fara-pagina");
 
-  const formular = await cerere.formData().catch(() => null);
-  if (!formular) return nuTrece("Cerere invalidă.");
+  const citit = await formularAdmin(cerere);
+  if (citit.raspuns) return citit.raspuns;
+  const { formular } = citit;
 
   const id = String(formular.get("id") ?? "").trim();
   if (!/^[0-9a-f-]{36}$/i.test(id)) return nuTrece("Text necunoscut.");

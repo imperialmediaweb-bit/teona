@@ -232,6 +232,9 @@ export async function incaseazaSiInregistreaza(comanda: string): Promise<boolean
  */
 export async function verificaInainte(): Promise<void> {
   if (!process.env.STRIPE_SECRET_KEY) return;
+  // Dacă o verificare e deja în curs (Stripe lent), prima deschidere a
+  // plătit cele patru secunde; următoarele nu mai așteaptă nimic.
+  if (inCurs) return;
   await Promise.race([
     verificaPlatileStripe().catch(() => undefined),
     new Promise((r) => setTimeout(r, 4000)),

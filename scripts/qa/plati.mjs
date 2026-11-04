@@ -567,7 +567,12 @@ try {
   await asteapta(800);
   const link = JSON.stringify(catre(e1).at(-1) ?? {}).match(/contul-meu\/intra\?jeton=([A-Za-z0-9_%-]+)/);
   const intrare = link
-    ? await fetch(`${BAZA}/contul-meu/intra?jeton=${link[1]}`, { redirect: "manual" })
+    ? await fetch(`${BAZA}/api/cont/intra`, {
+        method: "POST",
+        redirect: "manual",
+        headers: { "content-type": "application/x-www-form-urlencoded", origin: BAZA },
+        body: new URLSearchParams({ jeton: decodeURIComponent(link[1]) }),
+      })
     : null;
   const cookieDonator = (intrare?.headers.getSetCookie?.() ?? []).map((c) => c.split(";")[0]).join("; ");
   const contDonator = await (await fetch(`${BAZA}/contul-meu`, { headers: { cookie: cookieDonator } })).text();

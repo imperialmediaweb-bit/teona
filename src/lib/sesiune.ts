@@ -29,7 +29,13 @@ export async function deschideSesiunea(email: string): Promise<void> {
 }
 
 export async function inchideSesiunea(): Promise<void> {
-  (await cookies()).delete(COOKIE_CONT);
+  (await cookies()).set(COOKIE_CONT, "", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+  });
 }
 
 /** Adresa donatorului conectat, sau `null`. Verificată, nu doar citită. */

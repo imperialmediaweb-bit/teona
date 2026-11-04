@@ -68,7 +68,7 @@ http
       try {
         j = JSON.parse(corp || "{}");
       } catch {}
-      jurnal.push({ metoda: req.method, cale: u, corp: j, antete: req.headers });
+      jurnal.push({ metoda: req.method, cale: u, corp: j, brut: corp.slice(0, 4000), antete: req.headers });
 
       if (u.startsWith("/emails")) return da({ id: "em_" + jurnal.length });
       if (u.startsWith("/groups"))

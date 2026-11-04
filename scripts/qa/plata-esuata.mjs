@@ -200,10 +200,22 @@ try {
   const semn = createHmac("sha256", SECRET_SESIUNE)
     .update(`card:cus_probadonator:${expira}`)
     .digest("hex");
-  const bun = await fetch(
+  // Deschiderea linkului arată un buton; nimic nu se cere de la Stripe la
+  // GET (un scaner de e-mail ar ajunge altfel în portalul donatorului).
+  const deschis = await fetch(
     `${BAZA}/actualizeaza-cardul?c=cus_probadonator&p=${expira}&s=${semn}`,
     { redirect: "manual", headers: { "x-forwarded-for": DE_LA } },
   );
+  verifica(
+    deschis.status === 200 && (await deschis.text()).includes('action="/api/cont/card"'),
+    `linkul bun arată pagina cu butonul „Schimbă cardul” (${deschis.status})`,
+  );
+  const bun = await fetch(`${BAZA}/api/cont/card`, {
+    method: "POST",
+    redirect: "manual",
+    headers: { "x-forwarded-for": DE_LA, origin: BAZA, "content-type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ c: "cus_probadonator", p: String(expira), s: semn }),
+  });
   /*
     Cu chei de probă, Stripe refuză sesiunea de portal — și exact asta se
     verifică aici: omul primește o pagină cu telefon, nu o eroare albă.

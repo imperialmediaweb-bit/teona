@@ -1,4 +1,4 @@
-import { limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
+import { formularAdmin, limitaDeRata, raspuns, text, trimiteLa } from "@/lib/api";
 import { arePermisiune, cineEsteConectat } from "@/lib/admin";
 import { ADRESA_SITE } from "@/app/seo";
 import { linkInvitatie } from "@/lib/invitatie";
@@ -91,8 +91,9 @@ export async function POST(cerere: Request) {
 
   if (!(await arePermisiune(INAPOI))) return raspuns("Nu ai acces.", 403);
 
-  const formular = await cerere.formData().catch(() => null);
-  if (!formular) return raspuns("Cerere invalidă.", 400);
+  const citit = await formularAdmin(cerere);
+  if (citit.raspuns) return citit.raspuns;
+  const { formular } = citit;
 
   const fel = String(formular.get("fel") ?? "");
   const id = String(formular.get("id") ?? "").trim();

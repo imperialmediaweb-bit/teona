@@ -20,6 +20,14 @@ import { type TipPoza, tipulPozei } from "@/lib/poza-browser";
 
 const LATURA_MAXIMA = 2000;
 const PESTE = 1.5 * 1024 * 1024;
+/** Peste atât, un PNG micșorat pleacă totuși JPEG: ruta primește cel mult 6 MB. */
+const PNG_MAXIM = 4 * 1024 * 1024;
+
+/** HEIC/HEIF (iPhone): „ftyp” la octetul 4, apoi „heic”/„heix”/„mif1”… */
+function pareHeic(cap: Uint8Array): boolean {
+  const marca = String.fromCharCode(...cap.slice(4, 12));
+  return marca.startsWith("ftyp") && /^(heic|heix|hevc|mif1|msf1|heif)/.test(marca.slice(4));
+}
 
 function mb(n: number): string {
   return (n / 1024 / 1024).toFixed(1).replace(".", ",");
@@ -49,7 +57,18 @@ async function micsoreaza(f: File): Promise<File | null> {
   if (f.size <= PESTE) return null;
   // Tipul din conținut, nu din eticheta sistemului: pe Windows poate fi gol.
   const tip = await tipulPozei(f);
-  if (!tip) return null;
+  if (!tip) {
+    // Nu se tace: un HEIC de pe iPhone ar ajunge la server și ar primi
+    // „prea mare” sau „nu e o fotografie”, fără ca omul să afle ce să facă.
+    const cap = new Uint8Array(await f.slice(0, 16).arrayBuffer());
+    if (pareHeic(cap)) {
+      throw new Error("e un HEIC de pe iPhone; trimite-ți poza pe WhatsApp sau alege „Cel mai compatibil” în setările camerei, apoi urc-o ca JPEG");
+    }
+    if (/\.(heic|heif)$/i.test(f.name)) {
+      throw new Error("e un HEIC de pe iPhone; alege un JPEG");
+    }
+    return null;
+  }
   const bitmap = await deseneaza(f, tip);
   const scara = Math.min(1, LATURA_MAXIMA / Math.max(bitmap.width, bitmap.height));
   const latime = Math.max(1, Math.round(bitmap.width * scara));
@@ -62,8 +81,13 @@ async function micsoreaza(f: File): Promise<File | null> {
   ctx.drawImage(bitmap, 0, 0, latime, inaltime);
   if ("close" in bitmap) bitmap.close();
   // PNG rămâne PNG (poate avea transparență); restul pleacă JPEG.
-  const tipNou = tip === "image/png" ? "image/png" : "image/jpeg";
-  const blob = await new Promise<Blob | null>((r) => panza.toBlob(r, tipNou, 0.86));
+  let tipNou: "image/png" | "image/jpeg" = tip === "image/png" ? "image/png" : "image/jpeg";
+  let blob = await new Promise<Blob | null>((r) => panza.toBlob(r, tipNou, 0.86));
+  if (blob && tipNou === "image/png" && blob.size > PNG_MAXIM) {
+    // O captură de ecran PNG de 4.000 px rămâne uriașă și micșorată; ca JPEG trece.
+    tipNou = "image/jpeg";
+    blob = await new Promise<Blob | null>((r) => panza.toBlob(r, tipNou, 0.86));
+  }
   if (!blob) throw new Error("browserul n-a putut scrie poza");
   if (blob.size >= f.size) return null;
   const nume = f.name.replace(/\.\w+$/, "") + (tipNou === "image/png" ? ".png" : ".jpg");
@@ -72,12 +96,15 @@ async function micsoreaza(f: File): Promise<File | null> {
 
 export default function MicsoreazaPoza() {
   useEffect(() => {
+    /** Pozele scrise de noi: schimbarea pe care o trimitem după înlocuire nu e a omului. */
+    const produse = new WeakSet<File>();
     async function laSchimbare(e: Event) {
       const input = e.target;
       if (!(input instanceof HTMLInputElement) || input.type !== "file" || !input.files?.length) return;
       if (input.dataset.faraMicsorare !== undefined) return;
 
       const initiale = Array.from(input.files);
+      if (initiale.every((f) => produse.has(f))) return;
       const noi: File[] = [];
       let dinainte = 0;
       let dupa = 0;
@@ -97,18 +124,26 @@ export default function MicsoreazaPoza() {
         }
         noi.push(mic ?? f);
       }
-      if (!dinainte && !nuAmPutut) return;
+      const notaVeche = input.parentElement?.querySelector<HTMLElement>("[data-nota-poza]") ?? null;
+      if (!dinainte && !nuAmPutut) {
+        // Poza nouă n-a avut nevoie de nimic: nota de la cea dinainte nu mai e adevărată.
+        if (notaVeche) notaVeche.textContent = "";
+        return;
+      }
 
       if (dinainte) {
         const dt = new DataTransfer();
-        for (const f of noi) dt.items.add(f);
+        for (const f of noi) {
+          dt.items.add(f);
+          produse.add(f);
+        }
         input.files = dt.files;
         // Cine ascultă câmpul (previzualizarea) află că poza s-a schimbat.
         // Poza mică nu mai trece de prag, deci schimbarea asta nu o ia de la capăt.
         input.dispatchEvent(new Event("change", { bubbles: true }));
       }
 
-      let nota = input.parentElement?.querySelector<HTMLElement>("[data-nota-poza]") ?? null;
+      let nota = notaVeche;
       if (!nota) {
         nota = document.createElement("p");
         nota.dataset.notaPoza = "";
