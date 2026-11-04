@@ -55,7 +55,9 @@ await Promise.all([page.waitForNavigation({ waitUntil: "load" }).catch(() => {})
 await page.goto(`${BAZA}/admin/sabloane?fel=persoane`, { waitUntil: "load" });
 await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const camp = page.locator('input[type="file"][name="poza_fisier"]');
-await camp.setInputFiles({ name: "IMG_4231.jpg", mimeType: "image/jpeg", buffer: poza12 });
+// Cu tipul pe care îl dă Windows unui fișier cu asociere ciudată: gol/necunoscut.
+// Micșorarea trebuie să se uite în conținut, nu în eticheta asta.
+await camp.setInputFiles({ name: "IMG_4231.jpg", mimeType: "application/octet-stream", buffer: poza12 });
 await page.waitForFunction(() => document.querySelector("[data-nota-poza]")?.textContent?.includes("micșorată"), null, { timeout: 20000 }).catch(() => {});
 const dupa = await camp.evaluate((el) => ({ marime: el.files?.[0]?.size ?? 0, tip: el.files?.[0]?.type ?? "", nume: el.files?.[0]?.name ?? "" }));
 verifica(dupa.marime > 0 && dupa.marime < 1.5 * 1024 * 1024, `în browser, poza pleacă micșorată (${(dupa.marime / 1024).toFixed(0)} KB, ${dupa.tip})`);

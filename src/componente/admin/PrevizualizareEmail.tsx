@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { pozaInPagina, tipulPozei } from "@/lib/poza-browser";
 
 /**
  * E-mailul, desenat lângă formular, cât scrii.
@@ -57,14 +58,13 @@ export default function PrevizualizareEmail({
       if (fisier instanceof File && fisier.size > 0) {
         if (!blob.current) blob.current = URL.createObjectURL(new Blob());
         date.set("poza_locala", blob.current);
-        if (fisier.size <= 2 * 1024 * 1024) {
+        // Până la 6 MB (cât primește și ruta) se scrie în pagină; peste, rămâne
+        // semnul de loc până o micșorează `MicsoreazaPoza`. Tipul se citește
+        // din conținut: pe Windows eticheta fișierului poate fi goală.
+        if (fisier.size <= 6 * 1024 * 1024) {
           if (inPagina.current?.fisier !== fisier) {
-            const adresa = await new Promise<string>((r, nu) => {
-              const c = new FileReader();
-              c.onload = () => r(String(c.result));
-              c.onerror = () => nu(c.error);
-              c.readAsDataURL(fisier);
-            }).catch(() => null);
+            const tip = await tipulPozei(fisier).catch(() => null);
+            const adresa = tip ? await pozaInPagina(fisier, tip).catch(() => null) : null;
             inPagina.current = adresa ? { fisier, adresa } : null;
           }
           adresaInPagina = inPagina.current?.adresa ?? null;
