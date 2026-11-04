@@ -69,6 +69,8 @@ const iso = (d) => d.toISOString().slice(0, 10);
 const cu18 = new Date(azi.getFullYear() - 18, azi.getMonth(), azi.getDate());
 const ieri18 = new Date(cu18); ieri18.setDate(ieri18.getDate() - 1); // ziua de naștere a fost ieri -> 18 ani și o zi
 const maine18 = new Date(cu18); maine18.setDate(maine18.getDate() + 1); // împlinește 18 mâine -> 17
+// Vârsta minimă e 16 ani: cine împlinește 16 mâine are încă 15 și e oprit.
+const maine16 = new Date(azi.getFullYear() - 16, azi.getMonth(), azi.getDate()); maine16.setDate(maine16.getDate() + 1);
 
 log("Azi (browser):", await page.evaluate(() => new Date().toString()));
 log("Date de test: exact 18 =", iso(cu18), " 18+1 zi =", iso(ieri18), " 17 ani 364 zile =", iso(maine18));
@@ -95,7 +97,7 @@ await page.waitForTimeout(400);
 await stare("Enter la pasul 1 cu date valide (unde ajung?)");
 
 // D. Datele de naștere
-for (const [d, nume] of [[iso(cu18), "exact 18 ani azi"], [iso(ieri18), "18 ani + 1 zi"], [iso(maine18), "cu o zi înainte de 18"], ["2030-01-01", "în viitor"], ["0001-01-01", "anul 1"], ["1900-02-30", "dată invalidă"], ["", "goală"]]) {
+for (const [d, nume] of [[iso(cu18), "exact 18 ani azi"], [iso(ieri18), "18 ani + 1 zi"], [iso(maine18), "cu o zi înainte de 18"], [iso(maine16), "cu o zi înainte de 16"], ["2030-01-01", "în viitor"], ["0001-01-01", "anul 1"], ["1900-02-30", "dată invalidă"], ["", "goală"]]) {
   await deschide();
   await page.fill('input[name="nume"]', "Ion Popescu");
   await page.fill('input[name="email"]', "ion@example.com");
@@ -124,7 +126,7 @@ await page.waitForTimeout(200);
 await page.click('button:has-text("Înapoi")');
 await page.waitForTimeout(200);
 log("\nDupă două Înapoi: nume=", await page.inputValue('input[name="nume"]'), " telefon=", await page.inputValue('input[name="telefon"]'), " localitate=", await page.inputValue('input[name="localitate"]'));
-await scrieNasterea(page, iso(maine18)); // devin minor
+await scrieNasterea(page, iso(maine16)); // sub 16 ani: oprit la pasul 1
 await page.click('button:has-text("Continuă")');
 await page.waitForTimeout(200);
 await stare("schimb data la minor și Continuă");

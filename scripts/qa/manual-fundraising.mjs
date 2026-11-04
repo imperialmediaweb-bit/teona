@@ -21,6 +21,82 @@ const jurnal = async () => (await (await fetch(`${M}/__jurnal`)).json());
 const golesteJurnal = () => fetch(`${M}/__goleste`);
 const peste = (t, re) => re.test(t);
 
+/*
+  Datele de probă. Proba a fost scrisă pe o bază pregătită de mână, care nu
+  mai există; acum și le pune singură, cu un sufix al rulării, și le șterge la
+  final. Fără DATABASE_URL presupune că baza le are deja.
+*/
+const DB_URL = process.env.DATABASE_URL;
+if (DB_URL && /railway|teona-ariana/.test(DB_URL)) {
+  console.log("REFUZAT: proba scrie date de probă; rulează numai pe o bază locală.");
+  process.exit(1);
+}
+const RUL = Date.now().toString(36);
+let db = null;
+if (DB_URL) {
+  const { default: pg } = await import("pg");
+  db = new pg.Client({ connectionString: DB_URL });
+  await db.connect();
+  const don = (ref, suma, frecventa, email, prenume, nume, stare, zile) =>
+    db.query(
+      `INSERT INTO donatii (procesator, referinta, suma_bani, moneda, frecventa, destinatie,
+         email, prenume, nume, stare, creat_la, platita_la)
+       VALUES ($1, $2, $3, 'RON', $4, 'oriunde', $5, $6, $7, $8,
+               now() - ($9 || ' days')::interval,
+               CASE WHEN $8 = 'platita' THEN now() - ($9 || ' days')::interval END)`,
+      [stare === "anuntata" ? "manual-transfer" : "stripe", `qa-mf-${RUL}-${ref}`, suma, frecventa,
+       email, prenume, nume, stare, String(zile)],
+    );
+  await don("p1", 10000, "o-data", "maria.popescu@example.com", "Maria", "Popescu", "platita", 3);
+  await don("p2", 10000, "o-data", "maria.popescu@example.com", "Maria", "Popescu", "platita", 200);
+  await don("r1", 120000, "o-data", "vlad.radu@example.com", "Vlad", "Radu", "platita", 10);
+  await don("l1", 5000, "lunar", "ioana.lunar@example.com", "Ioana", "Lunar", "platita", 5);
+  await don("t1", 20000, "o-data", "dana.enache@example.com", null, "Dana Enache", "anuntata", 1);
+  await don("t2", 15000, "o-data", "sorin.lazar@example.com", null, "Sorin Lazăr", "anuntata", 1);
+  for (const [fel, nume, email] of [
+    ["voluntariat", "Cristina Lupu", "cristina.lupu@example.com"],
+    ["contact", "George Matei", "george.matei@example.com"],
+  ]) {
+    await db.query(
+      "INSERT INTO cereri (fel, nume, email, telefon, detalii) VALUES ($1, $2, $3, '0700 000 000', $4)",
+      [fel, nume, email, JSON.stringify({ qa: RUL })],
+    );
+  }
+  for (const [i, den, tel] of [
+    [1, "Firma de Probă SRL", "0745 111 222"],
+    [2, "Transport Nordic SRL", "0745 333 444"],
+    [3, "Lemnul Bucovinei SRL", "0745 555 666"],
+  ]) {
+    await db.query(
+      `INSERT INTO firme (cui, denumire, persoana, email, telefon, cale, mesaj)
+       VALUES ($1, $2, 'Ion Probă', $3, $4, 'formular', $5)`,
+      [`QA${RUL}${i}`, den, `firma${i}.${RUL}@example.com`, tel, `qa-mf-${RUL}`],
+    );
+  }
+  // Ana se aprobă, Dan se respinge; panoul le arată de la cea mai veche,
+  // deci amândouă se pun „mai vechi” decât orice altă campanie în așteptare.
+  await db.query("DELETE FROM campanii_aniversare WHERE slug IN ('ziua-anei', 'ziua-lui-dan')");
+  for (const [slug, titlu, nume, email, ani] of [
+    ["ziua-anei", "Împlinesc 30 de ani", "Ana Marin", "ana.marin@example.com", 20],
+    ["ziua-lui-dan", "Fac 40 de ani", "Dan Moraru", "dan.moraru@example.com", 19],
+  ]) {
+    await db.query(
+      `INSERT INTO campanii_aniversare (slug, ocazie, titlu, mesaj, nume_public, email, jeton, creat_la)
+       VALUES ($1, 'ziua mea', $2, 'Anul acesta îmi doresc să ajutăm copiii de la Casa Teona.',
+               $3, $4, $5, now() - ($6 || ' years')::interval)`,
+      [slug, titlu, nume, email, `jeton-qa-${RUL}-${slug}`, String(ani)],
+    );
+  }
+}
+async function curataSamanta() {
+  if (!db) return;
+  await db.query("DELETE FROM donatii WHERE referinta LIKE $1", [`qa-mf-${RUL}-%`]).catch(() => {});
+  await db.query("DELETE FROM cereri WHERE detalii->>'qa' = $1", [RUL]).catch(() => {});
+  await db.query("DELETE FROM firme WHERE mesaj = $1", [`qa-mf-${RUL}`]).catch(() => {});
+  await db.query("DELETE FROM campanii_aniversare WHERE slug IN ('ziua-anei', 'ziua-lui-dan')").catch(() => {});
+  await db.end().catch(() => {});
+}
+
 const b = await chromium.launch({
   args: ["--no-sandbox"],
   ...(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {}),
@@ -32,7 +108,13 @@ p.on("response", (r) => { if (r.status() >= 500 && r.url().startsWith(S)) erori.
 const text = async () => (await p.locator("body").innerText()).replace(/\s+/g, " ");
 const merg = async (cale) => { await p.goto(S + cale, { waitUntil: "load" });
 await p.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {}); };
-const apasa = async (loc) => { await Promise.all([p.waitForNavigation({ waitUntil: "load" }).catch(() => {}), loc.click()]); };
+// Linkurile din panou navighează pe client: adresa se schimbă înaintea
+// conținutului. După clic se așteaptă și liniștea rețelei (cel mult 8 s).
+const apasa = async (loc) => {
+  await Promise.all([p.waitForNavigation({ waitUntil: "load" }).catch(() => {}), loc.click()]);
+  await p.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
+  await p.waitForTimeout(300);
+};
 const deschide = () => p.evaluate(() => document.querySelectorAll("details").forEach((d) => (d.open = true)));
 const asteaptaText = (t) => p.waitForFunction((x) => document.body.innerText.includes(x), t, { timeout: 15000 }).catch(() => {});
 const nuEJson = async () => !(await p.content()).includes('{"mesaj"');
@@ -49,8 +131,10 @@ await sectiune("Contul de strângere de fonduri", async () => {
   await f.locator('[name="parola"]').fill(EU.parola);
   await f.locator('[name="rol"]').selectOption("fundraising").catch(async () => { await f.locator('[name="rol"][value="fundraising"]').check(); });
   await apasa(f.locator('button:has-text("Fac eu parola")'));
+  await asteaptaText("Contul a fost făcut");
   ok((await text()).includes(EU.email), "administratorul îi face cont, cu parola lui");
-  await apasa(p.locator('button:has-text("Ieși din panou")'));
+  // Butonul e și în meniul de telefon; primul e cel din bara laterală.
+  await apasa(p.locator('button:has-text("Ieși din panou")').first());
   await merg("/admin");
   await p.fill('input[name="email"]', EU.email);
   await p.fill('input[name="parola"]', EU.parola);
@@ -124,6 +208,8 @@ await sectiune("Căutarea", async () => {
   await merg("/admin");
   await p.locator('input[name="q"]').first().fill("popescu");
   await Promise.all([p.waitForNavigation({ waitUntil: "load" }), p.locator('input[name="q"]').first().press("Enter")]);
+  await p.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
+  await asteaptaText("Maria Popescu");
   let t = await text();
   ok(t.includes("Maria Popescu"), "caută după nume (litere mici)");
   await merg("/admin/cauta?q=0745%20111");
@@ -452,12 +538,17 @@ await sectiune("Calendarul", async () => {
 // ─── 11. Cifrele și consultantul ──────────────────────────────────────────
 await sectiune("Analiza și consultantul", async () => {
   await golesteJurnal();
-  await merg("/admin/analiza");
-  let t = await text();
+  // Pagina e pe file: vizitele și canalele, campaniile, apoi consultantul.
+  let t = "";
+  for (const fila of ["vizite", "campanii"]) {
+    await merg(`/admin/analiza?fila=${fila}`);
+    t += " " + (await text());
+  }
   ok(/De unde vin donatorii/i.test(t), "are „De unde vin donatorii”");
   ok(/campanie/i.test(t), "are „Ce a adus fiecare campanie”");
   ok(/Google Analytics|GA_PROPERTY_ID/i.test(t), "secțiunea de vizite se vede (sau spune ce lipsește)");
-  await apasa(p.locator('button:has-text("Fă prima analiză"), button:has-text("Fă analiza")').first());
+  await merg("/admin/analiza?fila=consultant");
+  await apasa(p.locator('button:has-text("Fă prima analiză"), button:has-text("Fă o analiză nouă")').first());
   t = await text();
   ok(t.includes("Răspuns de probă de la model") || /puține|prea puțin/i.test(t), "analiza: răspunde (sau spune că sunt prea puține donații pentru o citire)");
   const j = await jurnal();
@@ -469,7 +560,14 @@ await sectiune("Analiza și consultantul", async () => {
   await p.locator('button:has-text("Întreabă")').click();
   await asteaptaText("Răspuns de probă de la model");
   ok((await text()).includes("Răspuns de probă de la model"), "consultantul răspunde în casetă");
-  ok((await jurnal()).some((x) => x.cale.startsWith("/v1/messages")), "întrebarea a ajuns la model");
+  // Textul de probă e deja pe pagină de la analiza de mai sus, deci se
+  // așteaptă cererea însăși, nu textul.
+  let ajuns = false;
+  for (let i = 0; i < 30 && !ajuns; i++) {
+    ajuns = (await jurnal()).some((x) => x.cale.startsWith("/v1/messages"));
+    if (!ajuns) await p.waitForTimeout(500);
+  }
+  ok(ajuns, "întrebarea a ajuns la model");
 });
 
 await sectiune("Rapoartele în PDF", async () => {
@@ -518,7 +616,7 @@ await sectiune("Parola ei", async () => {
   const dupa = await text();
   console.log("   [parola] adresa:", p.url().replace(S, ""), "| mesaj:", (dupa.match(/(Parola[^.]{0,80}\.|schimbat[^.]{0,60})/i) ?? [""])[0]);
   ok(await nuEJson() && /stare=(gata|schimbata|ok|facut)/.test(p.url()) || /a fost schimbat|s-a schimbat|Gata/i.test(dupa), "își schimbă parola, cu cea de acum în mână", p.url());
-  await apasa(p.locator('button:has-text("Ieși din panou")'));
+  await apasa(p.locator('button:has-text("Ieși din panou")').first());
   await merg("/admin");
   await p.fill('input[name="email"]', EU.email); await p.fill('input[name="parola"]', nou);
   await apasa(p.locator('button:has-text("Intră")'));
@@ -528,6 +626,7 @@ await sectiune("Parola ei", async () => {
 
 ok(erori.length === 0, "nicio pagină n-a răspuns cu eroare 5xx", erori.slice(0, 5).join(", "));
 await b.close();
+await curataSamanta();
 console.log(`\n${bune} bune, ${rele} căzute`);
 if (caderi.length) { console.log("\nCĂZUTE:"); caderi.forEach((c) => console.log(" - " + c)); }
 fs.writeFileSync("/tmp/cont-proba.txt", EU.email);

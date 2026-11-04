@@ -132,7 +132,9 @@ verifica(panou.includes("Ce e bine de știut"), "pagina din panou răspunde");
 const dupaNume = new Map(
   [
     ...panou.matchAll(
-      /name="id" value="([0-9a-f-]{36})"[\s\S]{0,900}?name="nume"[^>]*value="([^"]*)"/g,
+      // Fără limită de lungime, dar fără alt `name="id"` la mijloc: Next trimite
+      // pagina în bucăți, iar un rând poate fi rupt de restul meniului.
+      /name="id" value="([0-9a-f-]{36})"(?:(?!name="id")[\s\S])*?name="nume"[^>]*value="([^"]*)"/g,
     ),
   ].map((m) => [m[2], m[1]]),
 );

@@ -32,7 +32,7 @@ await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await nf.locator('input[name="email"]').fill("a@b.ro"); await nf.locator("button").click(); await page.waitForTimeout(800); await st("email ok, fără acord");
   await nf.locator('input[name="acord"]').check(); await nf.locator("button").click(); await page.waitForTimeout(1500);
   // Abonarea reușită înlocuiește formularul cu „Gata, te-ai abonat”.
-  const abonat = (await page.locator("main").innerText()).includes("te-ai abonat");
+  const abonat = (await page.locator("body").innerText()).includes("te-ai abonat");
   log("[email ok, acord] abonat:", abonat);
   if (!abonat) process.exitCode = 1;
 
