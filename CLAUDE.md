@@ -1119,9 +1119,21 @@ HTML-ul primit semnul devine poza scrisă în pagină (`data:`), după ce a fost
 micșorată; `MicsoreazaPoza` trimite un `change` după înlocuire, ca
 previzualizarea să se redeseneze cu poza mică.
 
+**Greșeala care se vedea numai pe site** (a treia încercare a fundraiserului):
+previzualizarea scrie relativ adresele `https://teona-ariana.ro/` din HTML,
+pentru CSP; regula tăia domeniul și din semnul de loc
+`blob:https://teona-ariana.ro/…`, iar poza aleasă rămânea ruptă. Pe localhost
+semnul n-are domeniul, deci probele treceau. Acum înlocuirile stau într-o
+funcție pură, `htmlPentruCadru` (`lib/poza-browser.ts`): întâi semnul de loc
+devine poza, apoi adresele site-ului devin relative, cu `(?<!blob:)`; proba o
+încearcă direct, cu adresa de pe site. **Tot ce depinde de domeniul paginii
+se probează cu domeniul adevărat, nu cu localhost.** Tipul pozei se citește
+din primii octeți (`tipulPozei`), nu din `File.type`, care pe Windows poate fi
+gol.
+
 Probă, cu o „poză de telefon” de 19 MB făcută cu sharp, în browser (inclusiv
-cadrul de previzualizare) și direct la rută:
-`BAZA=… PAROLA_ADMIN=… node scripts/qa/poza-mare.mjs` — 8 verificări.
+cadrul de previzualizare), direct la rută și pe funcția cu adresa de pe site:
+`BAZA=… PAROLA_ADMIN=… node scripts/qa/poza-mare.mjs` — 11 verificări.
 
 ## Site-ul nu face campanii de e-mail
 

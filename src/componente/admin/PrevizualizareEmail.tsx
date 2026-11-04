@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { pozaInPagina, tipulPozei } from "@/lib/poza-browser";
+import { htmlPentruCadru, pozaInPagina, tipulPozei } from "@/lib/poza-browser";
 
 /**
  * E-mailul, desenat lângă formular, cât scrii.
@@ -86,19 +86,13 @@ export default function PrevizualizareEmail({
         if (nr !== ultima.current) return;
         if (r.ok) {
           // Linkurile din e-mail se deschid în altă filă, nu în cadru.
-          setHtml(
-            text
-              .replace(/<head>/i, '<head><base target="_blank">')
-              /*
-                Pozele din e-mail au adresa întreagă, cu `www.` — în inbox
-                așa trebuie. Aici, regula de securitate a panoului lasă poze
-                numai de pe adresa exactă a paginii, iar `www.` e alta; se
-                scriu deci relativ, din același site.
-              */
-              .replace(/https?:\/\/(www\.)?teona-ariana\.ro\//g, "/")
-              // Semnul de loc devine poza întreagă, scrisă în pagină.
-              .replaceAll(blob.current ?? "\u0000", adresaInPagina ?? blob.current ?? ""),
-          );
+          /*
+            Pozele din e-mail au adresa întreagă, cu `www.` — în inbox așa
+            trebuie. Aici, regula de securitate a panoului lasă poze numai de
+            pe adresa exactă a paginii, iar `www.` e alta; se scriu deci
+            relativ. Ordinea înlocuirilor contează: vezi `htmlPentruCadru`.
+          */
+          setHtml(htmlPentruCadru(text, blob.current, adresaInPagina));
         }
       } catch {
         // Fără rețea, rămâne ultima variantă desenată.

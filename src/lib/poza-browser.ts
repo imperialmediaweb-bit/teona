@@ -36,3 +36,25 @@ export async function pozaInPagina(f: Blob, tip: TipPoza): Promise<string> {
   });
   return brut.replace(/^data:[^;,]*/, `data:${tip}`);
 }
+
+/**
+ * HTML-ul previzualizării, pregătit pentru cadru.
+ *
+ * Două înlocuiri, **în ordinea asta**: întâi semnul de loc al pozei alese
+ * (`blob:https://teona-ariana.ro/…`) devine poza scrisă în pagină; abia apoi
+ * adresele site-ului se scriu relativ, pentru regula de securitate a
+ * panoului, care lasă poze numai de pe adresa exactă a paginii. Invers,
+ * regula a doua tăia domeniul și din semnul de loc, iar poza aleasă apărea
+ * ruptă — **numai pe site**, unde semnul de loc poartă domeniul; pe
+ * localhost nu-l poartă, și probele treceau. Prins de fundraiser pe 4
+ * noiembrie 2026, la a treia încercare.
+ */
+export function htmlPentruCadru(
+  text: string,
+  semnDeLoc: string | null,
+  pozaInPagina: string | null,
+): string {
+  let html = text.replace(/<head>/i, '<head><base target="_blank">');
+  if (semnDeLoc && pozaInPagina) html = html.replaceAll(semnDeLoc, pozaInPagina);
+  return html.replace(/(?<!blob:)https?:\/\/(www\.)?teona-ariana\.ro\//g, "/");
+}

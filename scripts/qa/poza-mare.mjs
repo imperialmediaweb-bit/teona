@@ -42,6 +42,23 @@ async function pozaMare(latime, inaltime) {
 const poza12 = await pozaMare(5000, 3750);
 verifica(poza12.length > 10 * 1024 * 1024, `poza de probă are peste 10 MB (${(poza12.length / 1048576).toFixed(1)} MB)`);
 
+// ─── 0. Înlocuirile din previzualizare, cu adresa de pe site ─────────────
+// Pe localhost semnul de loc n-are domeniul, deci greșeala nu se vede decât
+// pe teona-ariana.ro. Funcția se încearcă direct, cu adresa adevărată.
+{
+  const ts = (await import("typescript")).default;
+  const sursa = (await import("node:fs")).readFileSync("src/lib/poza-browser.ts", "utf8");
+  const js = ts.transpileModule(sursa, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText;
+  const { htmlPentruCadru } = await import(`data:text/javascript;base64,${Buffer.from(js).toString("base64")}`);
+  const semn = "blob:https://teona-ariana.ro/7c1a-aaaa";
+  const text = `<html><head></head><body><img src="${semn}" alt="aleasă"><img src="https://www.teona-ariana.ro/poze/sigla.png"></body></html>`;
+  const cuPoza = htmlPentruCadru(text, semn, "data:image/png;base64,AAAA");
+  verifica(cuPoza.includes('src="data:image/png;base64,AAAA"') && !cuPoza.includes("blob:"), "pe site, semnul de loc devine poza scrisă în pagină");
+  verifica(cuPoza.includes('src="/poze/sigla.png"'), "…iar pozele site-ului rămân relative");
+  const faraPoza = htmlPentruCadru(text, semn, null);
+  verifica(faraPoza.includes(`src="${semn}"`) && !faraPoza.includes("blob:/"), "fără poză în pagină, semnul de loc rămâne întreg, nu tăiat la „blob:/”");
+}
+
 // ─── 1. În browser: micșorarea la alegerea fișierului ────────────────────
 const b = await chromium.launch({
   args: ["--no-sandbox"],
