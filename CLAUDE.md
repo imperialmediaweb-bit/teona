@@ -1422,6 +1422,18 @@ antetele, subdomeniile și versiunile afișate. Ce s-a găsit și ce s-a făcut:
   notificare pe telefon. În panou: `/admin/abonati`, cu sursa fiecăruia și
   numărul întregii liste din MailerLite (cei de dinainte de 4 noiembrie sunt
   numai acolo). Dezabonarea din cont pune `dezabonat_la`.
+- **Adrese adăugate de mână, din panou** (`/admin/abonati`, „Adaugă adrese
+  în listă”; `/api/admin/abonati`): una sau mai multe, despărțite prin virgulă,
+  punct și virgulă sau rând nou, toate în lista aleasă (persoane fizice sau
+  firme — dintr-o adresă nu se poate ști sigur care e). **Bifa de acord și
+  „de unde aveți acordul” se cer și pe server**, iar nota stă lângă fiecare
+  adresă, cu numele celui care a adăugat-o (`acord_nota`, `adaugat_de`).
+  **Cine s-a dezabonat din MailerLite nu se pune înapoi**: fiecare adresă se
+  întreabă întâi acolo (`stareaInMailerLite`), iar orice altă stare decât
+  „active” o sare și o numește. Nu pleacă anunț „Abonat nou” (a adăugat-o chiar
+  omul care l-ar primi); bun venit numai dacă se bifează. Cel mult 200 o dată.
+  Probă: `PAROLA_ADMIN=… DATABASE_URL=… node scripts/qa/abonati-panou.mjs` — 18
+  verificări.
 - **Anunțurile către asociație pleacă la două adrese** (`CATRE_ASOCIATIE` din
   `date/asociatie.ts`): contact@ și mihaela.sfichi@ (fundraising). Donație
   nouă, transfer anunțat, contact, voluntar, aniversare, plată eșuată, abonat

@@ -26,7 +26,19 @@ export const metadata: Metadata = {
  * dedesubt sunt abonările făcute de pe site de atunci încoace.
  */
 
-type Cautare = { sursa?: string; gresit?: string };
+type Cautare = {
+  sursa?: string;
+  gresit?: string;
+  adaugati?: string;
+  lista?: string;
+  deja?: string;
+  gresite?: string;
+  ratate?: string;
+  dezabonati?: string;
+};
+
+const CAMP =
+  "w-full rounded-lg border border-hartie-umbra bg-hartie px-3.5 py-2.5 text-mic text-cerneala focus:border-caramiziu-600";
 
 export default function PaginaAbonati({ searchParams }: { searchParams: Promise<Cautare> }) {
   return (
@@ -38,7 +50,8 @@ export default function PaginaAbonati({ searchParams }: { searchParams: Promise<
 
 async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   await connection();
-  const { sursa, gresit } = await searchParams;
+  const cauta = await searchParams;
+  const { sursa, gresit } = cauta;
   const activ = "/admin/abonati";
 
   if (!areParolaConfigurata()) {
@@ -108,7 +121,87 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
         dinainte și dezabonările din e-mail sunt în MailerLite.
       </p>
 
-      <nav aria-label="Sursa" className="mt-6 flex flex-wrap gap-2">
+      <section id="adauga" className="mt-8 colt-a border border-hartie-umbra bg-hartie p-5">
+        <h2 className="font-titlu text-amplu font-extrabold text-cerneala">Adaugă adrese în listă</h2>
+        <p className="mt-1 max-w-2xl text-mic text-cerneala-moale">
+          Una sau mai multe, despărțite prin virgulă sau fiecare pe rândul ei. Toate intră
+          în lista aleasă mai jos; firmele le pui separat, cu „Firme”. Numai oameni care
+          ți-au dat acordul să primească buletinul.
+        </p>
+
+        {cauta.adaugati !== undefined && (
+          <div role="status" className="mt-4 grid gap-1 colt-mic-a border border-turcoaz-200 bg-turcoaz-50 px-4 py-3 text-mic text-turcoaz-900">
+            <p className="font-semibold">
+              {cauta.adaugati === "1" ? "O adresă adăugată" : `${cauta.adaugati} adrese adăugate`} în lista de{" "}
+              {cauta.lista === "firme" ? "firme" : "persoane fizice"}.
+            </p>
+            {cauta.deja && <p>{cauta.deja} erau deja abonate; nu s-a schimbat nimic la ele.</p>}
+            {cauta.dezabonati && (
+              <p>
+                Nu le-am pus înapoi, fiindcă s-au dezabonat sau n-au confirmat: {cauta.dezabonati}
+              </p>
+            )}
+            {cauta.gresite && <p>Nu sunt adrese de e-mail: {cauta.gresite}</p>}
+            {cauta.ratate && <p>MailerLite n-a răspuns pentru: {cauta.ratate}. Încearcă din nou cu ele.</p>}
+          </div>
+        )}
+
+        <form action="/api/admin/abonati" method="post" className="mt-4 grid gap-4">
+          <label className="grid gap-1">
+            <span className="font-titlu text-nota font-bold">Adresele</span>
+            <textarea
+              name="adrese"
+              required
+              rows={4}
+              placeholder={"maria@exemplu.ro, ion@exemplu.ro\nana@exemplu.ro"}
+              className={CAMP}
+            />
+          </label>
+          <fieldset className="flex flex-wrap gap-x-6 gap-y-2">
+            <legend className="mb-1 font-titlu text-nota font-bold">În ce listă</legend>
+            <label className="flex items-center gap-2 text-mic">
+              <input type="radio" name="lista" value="persoane" required defaultChecked />
+              Persoane fizice
+            </label>
+            <label className="flex items-center gap-2 text-mic">
+              <input type="radio" name="lista" value="firme" required />
+              Firme
+            </label>
+          </fieldset>
+          <label className="grid gap-1">
+            <span className="font-titlu text-nota font-bold">De unde aveți acordul lor</span>
+            <input
+              name="acord_nota"
+              required
+              maxLength={300}
+              placeholder="lista semnată la tabăra din iulie 2026"
+              className={CAMP}
+            />
+            <span className="text-nota text-cerneala-slab">
+              Se păstrează lângă fiecare adresă, cu numele tău. Dacă cineva întreabă de ce a
+              primit buletinul, răspunsul e aici.
+            </span>
+          </label>
+          <label className="flex items-start gap-2.5 text-mic">
+            <input type="checkbox" name="acord" value="da" required className="mt-1" />
+            <span>Am acordul fiecăruia să primească buletinul asociației.</span>
+          </label>
+          <label className="flex items-start gap-2.5 text-mic">
+            <input type="checkbox" name="bun_venit" value="da" className="mt-1" />
+            <span>Trimite-le și e-mailul de bun venit</span>
+          </label>
+          <div>
+            <button
+              type="submit"
+              className="inline-flex min-h-11 items-center rounded-full bg-caramiziu-700 px-5 font-titlu font-bold text-hartie hover:bg-caramiziu-600"
+            >
+              Adaugă în listă
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <nav aria-label="Sursa" className="mt-8 flex flex-wrap gap-2">
         <Filtru href={activ} activ={!sursaAleasa}>
           Toate ({activi.length})
         </Filtru>
@@ -141,6 +234,12 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                 {new Date(a.creatLa).toLocaleDateString("ro-RO", { day: "numeric", month: "long", year: "numeric" })}
                 {a.dezabonatLa && " · s-a dezabonat"}
               </span>
+              {a.sursa === "panou" && (
+                <span className="basis-full text-nota text-cerneala-slab">
+                  Adăugat de {a.adaugatDe ?? "parola asociației"}
+                  {a.acordNota ? ` · acordul: ${a.acordNota}` : ""}
+                </span>
+              )}
             </li>
           ))}
         </ul>

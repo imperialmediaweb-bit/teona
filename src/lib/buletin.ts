@@ -3,13 +3,17 @@ import { anuntaAbonarea } from "./email/buletin";
 import { notificaPanoul } from "./notificari";
 
 /** De unde a venit abonarea: caseta de newsletter, o donație, contul de donator. */
-export type SursaAbonare = "formular" | "donatie" | "cont";
+export type SursaAbonare = "formular" | "donatie" | "cont" | "panou";
 
 export const NUMELE_SURSEI: Record<SursaAbonare, string> = {
   formular: "Formularul de newsletter",
   donatie: "Bifa de la donație",
   cont: "Contul de donator",
+  panou: "Adăugat din panou",
 };
+
+/** Pentru cei adăugați de mână: cine i-a pus și de unde e acordul lor. */
+export type DinPanou = { adaugatDe: string | null; acordNota: string };
 
 /**
  * Lista de buletin informativ, în MailerLite.
@@ -41,6 +45,7 @@ export async function laBuletin(
   lista: "persoane" | "firme" = "persoane",
   nume?: string | null,
   sursa: SursaAbonare = "formular",
+  dinPanou?: DinPanou,
 ): Promise<boolean> {
   const cheie = process.env.MAILERLITE_API_KEY;
   if (!cheie) return false;
@@ -76,7 +81,7 @@ export async function laBuletin(
     [email],
   ).catch(() => undefined);
 
-  await notaAbonarea(email, lista, nume ?? null, sursa).catch(() => undefined);
+  await notaAbonarea(email, lista, nume ?? null, sursa, dinPanou).catch(() => undefined);
   return true;
 }
 
@@ -91,18 +96,21 @@ async function notaAbonarea(
   lista: "persoane" | "firme",
   nume: string | null,
   sursa: SursaAbonare,
+  dinPanou?: DinPanou,
 ): Promise<void> {
   const nou = await intreaba<{ email: string }>(
-    `INSERT INTO abonati_buletin (email, nume, lista, sursa)
-     VALUES ($1, $2, $3, $4)
+    `INSERT INTO abonati_buletin (email, nume, lista, sursa, adaugat_de, acord_nota)
+     VALUES ($1, $2, $3, $4, $5, $6)
      ON CONFLICT (email) DO UPDATE
        SET dezabonat_la = NULL, creat_la = now(), sursa = EXCLUDED.sursa,
-           lista = EXCLUDED.lista, nume = COALESCE(EXCLUDED.nume, abonati_buletin.nume)
+           lista = EXCLUDED.lista, nume = COALESCE(EXCLUDED.nume, abonati_buletin.nume),
+           adaugat_de = EXCLUDED.adaugat_de, acord_nota = EXCLUDED.acord_nota
        WHERE abonati_buletin.dezabonat_la IS NOT NULL
      RETURNING email`,
-    [email, nume, lista, sursa],
+    [email, nume, lista, sursa, dinPanou?.adaugatDe ?? null, dinPanou?.acordNota ?? null],
   );
-  if (!nou.length) return;
+  // Cine adaugă din panou știe deja: nu-i trimitem anunț despre ce tocmai a făcut.
+  if (!nou.length || sursa === "panou") return;
   await anuntaAbonarea({ email, nume, lista, sursa: NUMELE_SURSEI[sursa] }).catch(() => false);
   await notificaPanoul({
     titlu: "Abonat nou la buletin",
@@ -118,7 +126,38 @@ export type Abonat = {
   sursa: SursaAbonare;
   creatLa: string;
   dezabonatLa: string | null;
+  adaugatDe: string | null;
+  acordNota: string | null;
 };
+
+/**
+ * Starea unei adrese în MailerLite: „active”, „unsubscribed” etc., sau null
+ * dacă nu e acolo. Adăugarea din panou o întreabă ca să nu reaboneze pe
+ * cineva care s-a dezabonat: o listă veche de pe hârtie nu bate „nu mai vreau”.
+ */
+export async function stareaInMailerLite(email: string): Promise<string | null> {
+  const cheie = process.env.MAILERLITE_API_KEY;
+  if (!cheie) return null;
+  const baza =
+    process.env.MAILERLITE_API?.replace(/\/+$/, "") ?? "https://connect.mailerlite.com/api";
+  const r = await fetch(`${baza}/subscribers/${encodeURIComponent(email)}`, {
+    headers: { Authorization: `Bearer ${cheie}`, Accept: "application/json" },
+  });
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error(`MailerLite ${r.status}`);
+  const corp = (await r.json().catch(() => ({}))) as { data?: { status?: string } };
+  return corp.data?.status ?? null;
+}
+
+/** Adresele deja abonate (active), dintr-o listă. */
+export async function dejaAbonati(adrese: string[]): Promise<Set<string>> {
+  if (!adrese.length) return new Set();
+  const r = await intreaba<{ email: string }>(
+    "SELECT email FROM abonati_buletin WHERE dezabonat_la IS NULL AND lower(email) = ANY($1)",
+    [adrese.map((a) => a.toLowerCase())],
+  );
+  return new Set(r.map((x) => x.email.toLowerCase()));
+}
 
 export async function abonati(limita = 1000): Promise<Abonat[]> {
   const r = await intreaba<{
@@ -128,6 +167,8 @@ export async function abonati(limita = 1000): Promise<Abonat[]> {
     sursa: string;
     creat_la: Date;
     dezabonat_la: Date | null;
+    adaugat_de: string | null;
+    acord_nota: string | null;
   }>("SELECT * FROM abonati_buletin ORDER BY creat_la DESC LIMIT $1", [limita]);
   return r.map((x) => ({
     email: x.email,
@@ -136,6 +177,8 @@ export async function abonati(limita = 1000): Promise<Abonat[]> {
     sursa: (x.sursa in NUMELE_SURSEI ? x.sursa : "formular") as SursaAbonare,
     creatLa: x.creat_la.toISOString(),
     dezabonatLa: x.dezabonat_la?.toISOString() ?? null,
+    adaugatDe: x.adaugat_de,
+    acordNota: x.acord_nota,
   }));
 }
 

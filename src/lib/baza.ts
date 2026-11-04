@@ -336,6 +336,9 @@ const ADAOSURI = `
     creat_la       timestamptz NOT NULL DEFAULT now(),
     dezabonat_la   timestamptz
   );
+  -- Adăugați de mână din panou: cine i-a pus și de unde e acordul lor.
+  ALTER TABLE abonati_buletin ADD COLUMN IF NOT EXISTS adaugat_de text;
+  ALTER TABLE abonati_buletin ADD COLUMN IF NOT EXISTS acord_nota text;
 
   CREATE TABLE IF NOT EXISTS apeluri_voluntari (
     id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
