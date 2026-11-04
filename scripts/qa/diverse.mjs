@@ -30,8 +30,11 @@ await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await nf.locator("button").click(); await page.waitForTimeout(800); await st("gol");
   await nf.locator('input[name="email"]').fill("abc"); await nf.locator("button").click(); await page.waitForTimeout(800); await st("email abc");
   await nf.locator('input[name="email"]').fill("a@b.ro"); await nf.locator("button").click(); await page.waitForTimeout(800); await st("email ok, fără acord");
-  await nf.locator('input[name="acord"]').check(); await nf.locator("button").click(); await page.waitForTimeout(800); await st("email ok, acord");
-  log("Erorile newsletter sunt lângă câmp?", await nf.locator("p.text-caramiziu-700").count(), "mesaje la câmp; aria-invalid:", await nf.locator('[aria-invalid="true"]').count());
+  await nf.locator('input[name="acord"]').check(); await nf.locator("button").click(); await page.waitForTimeout(1500);
+  // Abonarea reușită înlocuiește formularul cu „Gata, te-ai abonat”.
+  const abonat = (await page.locator("main").innerText()).includes("te-ai abonat");
+  log("[email ok, acord] abonat:", abonat);
+  if (!abonat) process.exitCode = 1;
 
   log("\n=== Bara de anunț ===");
   await page.goto(BAZA + "/", { waitUntil: "load" });
