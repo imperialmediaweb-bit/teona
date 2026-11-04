@@ -316,6 +316,31 @@ const ADAOSURI = `
     nouă, un transfer anunțat). Un rând pe abonament al browserului; cheia e
     adresa lui, pe care o dă browserul. Numai conturile cu nume se pot abona.
   */
+  /*
+    Apelurile către voluntari: „avem nevoie de oameni pe data X". Un rând pe
+    apel; în al doilea tabel, un rând pe fiecare voluntar întrebat, cu ce a
+    răspuns. Voluntarul e o cerere de voluntariat (cereri.id), nu un tabel
+    nou: aceeași fișă, aceeași căutare, același export.
+  */
+  CREATE TABLE IF NOT EXISTS apeluri_voluntari (
+    id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    titlu       text NOT NULL,
+    cand        text NOT NULL,
+    unde        text,
+    mesaj       text NOT NULL,
+    creat_de    text,
+    creat_la    timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE TABLE IF NOT EXISTS raspunsuri_voluntari (
+    apel_id     uuid NOT NULL REFERENCES apeluri_voluntari(id) ON DELETE CASCADE,
+    cerere_id   uuid NOT NULL,
+    trimis_la   timestamptz NOT NULL DEFAULT now(),
+    pe_email    boolean NOT NULL DEFAULT false,
+    raspuns     text,
+    raspuns_la  timestamptz,
+    PRIMARY KEY (apel_id, cerere_id)
+  );
+
   CREATE TABLE IF NOT EXISTS abonamente_push (
     endpoint        text PRIMARY KEY,
     p256dh          text NOT NULL,

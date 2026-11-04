@@ -115,6 +115,7 @@ export async function POST(cerere: Request) {
   // Câmpurile opționale pot lipsi, dar nu pot fi oricât de lungi.
   const scurte: Array<[unknown, number]> = [
     [corp.telefon, MAXIM.telefon],
+    [corp.contact, MAXIM.scurt],
     [corp.interes, MAXIM.scurt],
     [corp.localitate, MAXIM.scurt],
     [corp.experienta, MAXIM.scurt],
@@ -135,6 +136,11 @@ export async function POST(cerere: Request) {
   ];
   if (!scurte.every(([valoare, maxim]) => textOptional(valoare, maxim))) {
     return raspuns("Mesajul e prea lung.", 400);
+  }
+
+  // Numai cele trei căi oferite; altceva nu ajunge în fișa voluntarului.
+  if (!["Telefon", "WhatsApp", "E-mail"].includes(String(corp.contact ?? ""))) {
+    corp.contact = undefined;
   }
 
   if (corp.fel === "voluntariat") {
@@ -174,6 +180,7 @@ export async function POST(cerere: Request) {
       detalii: Object.fromEntries(
         (
           [
+            ["Contact preferat", corp.contact],
             ["Interesat de", corp.interes],
             ["Firma", corp.firma],
             ["CUI", corp.cui],
@@ -207,6 +214,7 @@ export async function POST(cerere: Request) {
     ["Nume", numeleOmului],
     ["E-mail", adresaOmului],
     ["Telefon", String(corp.telefon ?? "")],
+    ["Contact preferat", String(corp.contact ?? "")],
     ["Interesat de", String(corp.interes ?? "")],
     ["Firma", String(corp.firma ?? "")],
     ["CUI", String(corp.cui ?? "")],

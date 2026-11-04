@@ -15,7 +15,7 @@ import Camp, {
 } from "./Camp";
 import { antetOm } from "@/lib/antet-om";
 
-type Erori = Partial<Record<"nume" | "email" | "nastere" | "acord", string>>;
+type Erori = Partial<Record<"nume" | "email" | "telefon" | "nastere" | "acord", string>>;
 
 type Stare =
   | { fel: "gol" }
@@ -32,7 +32,7 @@ const PASI = [
 
 /** Câmpurile din fiecare pas, ca eroarea să ducă la pasul potrivit. */
 const CAMPURI_PE_PAS: ReadonlyArray<ReadonlyArray<keyof Erori>> = [
-  ["nume", "email", "nastere"],
+  ["nume", "email", "telefon", "nastere"],
   [],
   ["acord"],
 ];
@@ -162,6 +162,12 @@ export default function FormularVoluntar() {
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
       gasite.email = "Introdu o adresă de e-mail validă.";
 
+    // Cine alege să fie sunat sau căutat pe WhatsApp are nevoie de un număr.
+    const contact = String(date.get("contact") ?? "");
+    const telefon = String(date.get("telefon") ?? "").replace(/\D/g, "");
+    if ((contact === "Telefon" || contact === "WhatsApp") && telefon.length < 9)
+      gasite.telefon = "Scrie numărul de telefon, ca să te putem contacta cum ai ales.";
+
     if (!nastere) {
       gasite.nastere = "Completează data nașterii.";
     } else {
@@ -228,6 +234,7 @@ export default function FormularVoluntar() {
           nume,
           email: String(date.get("email") ?? "").trim(),
           telefon: date.get("telefon"),
+          contact: date.get("contact"),
           nastere: date.get("nastere"),
           localitate: date.get("localitate"),
           experienta: date.get("experienta"),
@@ -451,15 +458,29 @@ export default function FormularVoluntar() {
                   />
                 </Camp>
 
-                <Camp id={`${id}-telefon`} eticheta="Telefon">
+                <Camp id={`${id}-telefon`} eticheta="Telefon" eroare={erori.telefon}>
                   <input
                     id={`${id}-telefon`}
                     name="telefon"
                     type="tel"
                     autoComplete="tel"
-                    className={claseControl}
+                    aria-invalid={Boolean(erori.telefon)}
+                    className={erori.telefon ? claseControlGresit : claseControl}
                   />
                 </Camp>
+
+                <Optiuni
+                  name="contact"
+                  legenda="Cum preferi să te contactăm?"
+                  obligatoriu
+                  defaultValue="Telefon"
+                  coloane={3}
+                  optiuni={[
+                    { valoare: "Telefon", eticheta: "Telefon" },
+                    { valoare: "WhatsApp", eticheta: "WhatsApp" },
+                    { valoare: "E-mail", eticheta: "E-mail" },
+                  ]}
+                />
 
                 <Camp
                   id={`${id}-nastere-zi`}

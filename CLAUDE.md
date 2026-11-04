@@ -691,6 +691,34 @@ rămână logat și să se intre repede. **Numai panoul**, nu site-ul public.
   încercare de cod pleacă din alt „loc”, ca limita rutei de intrare să nu
   oprească proba înainte de a cincea greșeală.
 
+## Baza de voluntari și apelurile către ei
+
+`/admin/voluntari` (ambele roluri) citește cererile de voluntariat venite de pe
+site — **nu e un tabel nou**: aceeași fișă se vede la Cereri, la căutare și în
+export. Sus stau filtrele după care se caută un om pentru o zi anume:
+localitatea, cât timp are, limba, cum preferă să fie contactat, „are permis”,
+„experiență cu copii”, „numai 18+”. Filtrele sunt un GET, deci o căutare se
+poate trimite cuiva ca link.
+
+- **Cum preferă să fie contactat** se întreabă în formular (Telefon, WhatsApp,
+  E-mail; din start Telefon). Cine alege telefon sau WhatsApp trebuie să
+  scrie numărul. În panou, calea aleasă de om e butonul plin; lângă ea, celelalte.
+  Serverul primește numai cele trei valori: altceva nu ajunge în fișă.
+- **Apelul** („avem nevoie de voluntari pe data X”): se bifează oamenii
+  (din start toți cei din lista filtrată), se scrie pentru ce, când, unde și
+  ce vor face. Fiecare primește **e-mailul lui** (`lib/email/apel-voluntari.ts`),
+  cu „Da, pot veni” și „Nu pot de data asta”. Adresele vin din baza de date,
+  nu din formular. Pentru cei care preferă WhatsApp, la apel e un link
+  `wa.me` cu textul și linkul lor de răspuns gata scrise.
+- **Răspunsul se dă cu un buton, nu la deschiderea linkului** (`/voluntari/raspuns`
+  → POST `/api/voluntari/raspuns`): scanerele de e-mail deschid toate
+  adresele dintr-un mesaj. Semnătura acoperă apelul și voluntarul; pagina nu
+  scrie numele omului. Un „pot” trimite notificare pe telefon în panou.
+- Tabelele `apeluri_voluntari` și `raspunsuri_voluntari` stau în `ADAOSURI`.
+- Probă, pe tot drumul (înscriere, filtre, apel pe e-mail, răspuns, link
+  falsificat): `PAROLA_ADMIN=… DATABASE_URL=… node scripts/qa/voluntari.mjs`
+  — 27 de verificări, numai pe o bază locală.
+
 ## Radarul de finanțări: caută singur, nu hotărăște nimic
 
 Patru termene mari au trecut pe lângă asociație în 2026 — Fondul SEE (8

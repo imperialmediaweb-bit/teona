@@ -160,6 +160,8 @@ log("Text zona formular:", text.replace(/\s+/g, " ").slice(0, 400));
 await deschide();
 await page.fill('input[name="nume"]', "Ion Popescu");
 await page.fill('input[name="email"]', "ion@example.com");
+// „Telefon” e calea aleasă din start, deci numărul e cerut.
+await page.fill('input[name="telefon"]', "0700000000");
 await scrieNasterea(page, "1990-05-05");
 await page.click('button:has-text("Continuă")');
 await page.click('button:has-text("Continuă")');
