@@ -10,7 +10,7 @@ import {
 } from "@/lib/plati/donatii";
 import { citesteEveniment } from "@/lib/plati/stripe";
 import { laBuletin } from "@/lib/buletin";
-import { trimiteMultumirea } from "@/lib/email/donatie";
+import { anuntaDonatia, trimiteMultumirea } from "@/lib/email/donatie";
 import { trimiteVesteaReinnoirii } from "@/lib/email/reinnoire";
 import {
   anuntaPlataEsuata,
@@ -332,6 +332,19 @@ async function dupaIncasare(
     destinatie: rand.destinatie,
     reinnoire,
   }).catch(() => undefined);
+
+  // Și asociația află, nu doar din panou. Nu la fiecare lună de abonament.
+  if (!reinnoire) {
+    await anuntaDonatia({
+      email: rand.email,
+      prenume: rand.prenume,
+      nume: rand.nume,
+      sumaBani: Number(rand.suma_bani),
+      moneda: rand.moneda,
+      frecventa: rand.frecventa,
+      destinatie: rand.destinatie,
+    }).catch(() => undefined);
+  }
 
   // Pe lista de buletin ajunge doar cine a bifat el acordul.
   if (rand.acord_buletin) {

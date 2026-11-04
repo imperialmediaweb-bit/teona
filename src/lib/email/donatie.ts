@@ -8,8 +8,8 @@ import {
 import { DESTINATII } from "@/date/plati";
 import { scrieSuma } from "@/lib/suma";
 import { ADRESA_SITE } from "@/app/seo";
-import { curat, trimiteEmail } from "./trimite";
-import { CULORI, MIC, P, caseta, pagina } from "./plic";
+import { curat, tabel, trimiteEmail } from "./trimite";
+import { CULORI, MIC, P, buton, caseta, pagina, paginaInterna } from "./plic";
 
 /**
  * Mulțumirea pentru o donație.
@@ -226,5 +226,44 @@ export async function trimiteMultumirea(d: Date): Promise<boolean> {
     raspundeLa: EMAIL.contact,
     html: compus.html,
     text: compus.text,
+  });
+}
+
+/**
+ * Către asociație: a intrat o donație cu cardul.
+ *
+ * Până în noiembrie 2026 nu pleca nimic către asociație la o plată cu cardul:
+ * donația apărea doar în panou, iar panoul se deschide când se deschide. La
+ * o donație de probă făcută de fundraiser, „n-am primit nimic” era adevărat
+ * și pe e-mail. Reînnoirile lunare nu trec pe aici: ar umple căsuța cu același
+ * om în fiecare lună; se văd în panou, la „cât vine lunar”.
+ */
+export function compuneAnuntDonatie(d: Date): Compus {
+  const suma = sumaScrisa(d);
+  const nume = [d.prenume, d.nume].filter(Boolean).join(" ") || d.email;
+  const titlu = "Donație nouă cu cardul";
+  const lunar = d.frecventa === "lunar";
+  const campuri = tabel([
+    ["Cine", nume],
+    ["Suma", lunar ? `${suma} pe lună` : suma],
+    ["Pentru", Object.hasOwn(DESTINATII, d.destinatie) ? DESTINATII[d.destinatie] : d.destinatie],
+    ["E-mail", d.email],
+  ]);
+  const corp = `
+    <p style="${P}">A intrat o donație cu cardul pe site. E deja în panou, ca plătită, iar omul a primit mulțumirea.</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 16px;">${campuri.html}</table>
+    ${buton("Deschide donațiile", `${ADRESA_SITE}/admin/donatii`)}`;
+  return {
+    subiect: `${titlu} — ${nume}, ${lunar ? `${suma}/lună` : suma}`,
+    html: paginaInterna(titlu, corp, `${nume} · ${suma}`),
+    text: `A intrat o donație cu cardul pe site.\n\n${campuri.text}\n\n${ADRESA_SITE}/admin/donatii`,
+  };
+}
+
+export async function anuntaDonatia(d: Date): Promise<boolean> {
+  return trimiteEmail({
+    catre: EMAIL.contact,
+    raspundeLa: d.email,
+    ...compuneAnuntDonatie(d),
   });
 }

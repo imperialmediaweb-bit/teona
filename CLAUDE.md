@@ -1333,6 +1333,18 @@ antetele, subdomeniile și versiunile afișate. Ce s-a găsit și ce s-a făcut:
     altfel primește 202 și pare că ruta nu mai scrie nimic.
   - **Textul trebuie să semene a text** (`pareText()` din `lib/api.ts`):
     titlul, numele și mesajul campaniei cer o vocală, iar mesajul trei cuvinte.
+- **Redirecționarea `www.` a oprit plățile cu cardul** (3–4 noiembrie
+  2026). Stripe anunță plățile la `www.teona-ariana.ro/api/donatii/stripe/webhook`;
+  de când `www.` dădea 308, fiecare anunț a fost respins — webhook-urile nu
+  urmează redirecționările. Banii intrau în Stripe, iar în panou nu apărea
+  nimic; a observat-o fundraiserul, la o donație de probă. Acum `proxy.ts`
+  mută pe adresa canonică **numai GET/HEAD în afara lui `/api`**. Tot atunci
+  s-a adăugat anunțul către asociație la fiecare donație nouă cu cardul
+  (`anuntaDonatia`, nu și la reînnoirile lunare) — înainte pleca doar
+  mulțumirea către donator.
+  Probă, pe tot drumul, cu anunțul trimis exact la `www.`:
+  `PAROLA_ADMIN=… DATABASE_URL=… node scripts/qa/donatie-card.mjs`.
+  **Orice schimbare în `proxy.ts` se probează și cu ea.**
 - **Ce nu ține de cod** (DNS în Cloudflare, găzduirea veche) e în raportul din
   conversație: `ftp.teona-ariana.ro` arăta `phpinfo()`, WordPress-ul vechi se
   vede pe `mail.teona-ariana.ro` cu GiveWP 3.18.0 (vulnerabilitate critică

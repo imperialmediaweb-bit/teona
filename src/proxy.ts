@@ -192,7 +192,20 @@ async function estePublicat(fel: string, slug: string): Promise<boolean | null> 
 export default async function proxy(cerere: NextRequest) {
   const gazda =
     cerere.headers.get("x-forwarded-host") ?? cerere.headers.get("host") ?? "";
-  if (gazdaDeMutat(gazda)) {
+  /*
+    Numai paginile se mută pe adresa canonică, niciodată `/api` și niciodată
+    un POST. Stripe e configurat să anunțe plățile la `www.teona-ariana.ro`,
+    iar webhook-urile nu urmează redirecționările: din 3 noiembrie 2026, de
+    când `www.` dădea 308, nicio plată cu cardul n-a mai ajuns în panou, deși
+    banii intraseră. Un formular trimis prin redirecționare și-ar pierde și
+    el corpul în unele browsere.
+  */
+  const metoda = cerere.method.toUpperCase();
+  if (
+    gazdaDeMutat(gazda) &&
+    (metoda === "GET" || metoda === "HEAD") &&
+    !cerere.nextUrl.pathname.startsWith("/api/")
+  ) {
     const { pathname, search } = cerere.nextUrl;
     return new NextResponse(null, {
       status: 308,
