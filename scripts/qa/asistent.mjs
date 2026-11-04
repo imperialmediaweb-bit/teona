@@ -38,10 +38,16 @@ function verifica(eticheta, conditie, detaliu = "") {
 }
 
 // ─── Intrarea în panou ────────────────────────────────────────────────────
-await page.goto(BAZA + "/admin/email", { waitUntil: "networkidle" });
+// Asistentul stă acum pe pagina de scris o noutate, nu pe vechiul /admin/email.
+await page.goto(BAZA + "/admin/scrie/nou?fel=noutate", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 await page.fill('input[type="password"]', PAROLA);
 await page.click('button[type="submit"]');
-await page.waitForLoadState("networkidle");
+await page.waitForURL(/\/admin\/scrie/, { timeout: 15000 }).catch(() => {});
+// Intrarea duce la /admin/scrie (adresele de întoarcere sunt numai paginile
+// din listă, ca formularul să nu devină trambulină); ciorna e pe „nou”.
+await page.goto(BAZA + "/admin/scrie/nou?fel=noutate", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 verifica("intrarea în panou merge", (await page.locator("#asistent, section:has-text(\"Vrei o primă ciornă\")").count()) > 0);
 
 // ─── Brief prea scurt: nu pleacă nicio cerere ─────────────────────────────
@@ -82,11 +88,10 @@ await page.waitForTimeout(600);
 
 verifica("cererea pleacă o singură dată", cereri === 1, `${cereri} cereri`);
 const titlu = await page.inputValue('input[name="titlu"]');
-const text = await page.inputValue('textarea[name="text"]');
-const subiect = await page.inputValue('input[name="subiect"]');
+// Pe pagina de scris, textul e în „continut”; „subiect” nu există aici.
+const text = await page.inputValue('textarea[name="continut"]');
 verifica("titlul e completat", titlu === "Titlu pentru multumire", titlu);
 verifica("textul e completat", text.includes("Al doilea paragraf"), text.slice(0, 40));
-verifica("subiectul gol se umple cu titlul", subiect === titlu, subiect);
 verifica(
   "spune omului să verifice cifrele",
   /verific/i.test(
@@ -94,13 +99,13 @@ verifica(
   ),
 );
 
-// ─── Subiectul deja scris nu se suprascrie ────────────────────────────────
-await page.fill('input[name="subiect"]', "Subiectul meu");
+// ─── Titlul deja scris nu se suprascrie ───────────────────────────────────
+await page.fill('input[name="titlu"]', "Subiectul meu");
 await butonScrie.click();
 await page.waitForTimeout(600);
 verifica(
-  "subiectul scris de om rămâne al lui",
-  (await page.inputValue('input[name="subiect"]')) === "Subiectul meu",
+  "titlul scris de om rămâne al lui",
+  (await page.inputValue('input[name="titlu"]')) === "Subiectul meu",
 );
 
 // ─── Refuzul serverului se vede ───────────────────────────────────────────

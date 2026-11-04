@@ -66,12 +66,14 @@ await ctx.close();
 const ctx2 = await b.newContext({ viewport: { width: 1280, height: 900 } });
 const p2 = await ctx2.newPage();
 for (const s of ["/proiecte/pastram-amintirile-frumoase-in-inimile-noastre-multumim-pentru-implicare", "/proiecte/daruieste-din-inima-si-ajuta-o-inima-bolnava", "/proiecte/tabara-respiro-dedicata-copiilor-cu-sindrom-down-si-autism-30-septembrie"]) {
-  await p2.goto(BAZA + s, { waitUntil: "networkidle" });
+  await p2.goto(BAZA + s, { waitUntil: "load" });
+await p2.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   const t = await p2.evaluate(() => ({ imgMain: document.querySelectorAll("main img").length, fotografii: document.querySelector("main")?.innerText.match(/\d+ fotografii/)?.[0] ?? "(fără mențiune)", text: [...document.querySelectorAll("main p")].map((p) => p.innerText.replace(/\s+/g, " ")).find((t) => t.includes("Descrierea")) }));
   log(s.slice(0, 60), JSON.stringify(t));
 }
 // Cardul din listă pentru aceleași proiecte
-await p2.goto(BAZA + "/proiecte", { waitUntil: "networkidle" });
+await p2.goto(BAZA + "/proiecte", { waitUntil: "load" });
+await p2.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 await p2.click('[role="tab"]:has-text("Cazuri umanitare")');
 await p2.waitForTimeout(300);
 log("Card „Dăruiește…” în listă:", JSON.stringify(await p2.$eval('#lista-proiecte a[href*="daruieste"]', (a) => ({ img: !!a.querySelector("img"), src: a.querySelector("img")?.getAttribute("src")?.slice(0, 70), fotografii: a.innerText.match(/\d+ fotografii/)?.[0] ?? "(fără)" }))));
@@ -81,7 +83,8 @@ log("Card „Păstrăm…” în listă:", JSON.stringify(await p2.$eval('#lista
 // Antetul la 1280 și 1440: capturi
 for (const w of [1280, 1440]) {
   await p2.setViewportSize({ width: w, height: 300 });
-  await p2.goto(BAZA + "/", { waitUntil: "networkidle" });
+  await p2.goto(BAZA + "/", { waitUntil: "load" });
+await p2.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   // Selectoare după rol și etichetă, nu după poziția în arbore: antetul are
   // acum două rânduri și o panglică decorativă, iar un `header > div` ia
   // panglica.

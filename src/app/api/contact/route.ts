@@ -14,6 +14,7 @@ import {
 } from "@/lib/email/contact";
 import { areBazaDeDate } from "@/lib/baza";
 import { salveazaCerere } from "@/lib/crm";
+import { notificaPanoul } from "@/lib/notificari";
 
 /**
  * Formularul de contact (10.4) și cel de voluntariat (11.4).
@@ -243,6 +244,13 @@ export async function POST(cerere: Request) {
   // Confirmarea către om. Dacă ea nu pleacă, nu e grav: mesajul lui a ajuns
   // deja unde trebuie, iar asociația îl va contacta.
   await trimiteConfirmareaDeContact(mesaj);
+  await notificaPanoul({
+    titlu: voluntariat ? "Voluntar nou" : "Mesaj nou pe site",
+    text: voluntariat
+      ? `${numeleOmului.split(/\s+/)[0]} vrea să fie voluntar.`
+      : `${numeleOmului.split(/\s+/)[0]} v-a scris pe site.`,
+    adresa: "/admin/cereri",
+  }).catch(() => 0);
 
   return raspuns(
     voluntariat

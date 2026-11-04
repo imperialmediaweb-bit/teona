@@ -10,7 +10,8 @@ log("=== Sliderul de pe prima pagină ===");
   await ctx.addInitScript(ACORD);
   const page = await ctx.newPage();
   const erori = urmaresteErori(page);
-  await page.goto(BAZA + "/", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   const activ = async () => {
     return page.evaluate(() => {
       const b = [...document.querySelectorAll('button[aria-label^="Fotografia"]')];
@@ -65,7 +66,8 @@ log("=== Sliderul de pe prima pagină ===");
   const ctxR = await b.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
   await ctxR.addInitScript(ACORD);
   const pr = await ctxR.newPage();
-  await pr.goto(BAZA + "/", { waitUntil: "networkidle" });
+  await pr.goto(BAZA + "/", { waitUntil: "load" });
+await pr.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   const a0 = await pr.evaluate(() => [...document.querySelectorAll('button[aria-label^="Fotografia"]')].findIndex((x) => x.getAttribute("aria-current") === "true"));
   await pr.mouse.move(5, 5);
   await pr.waitForTimeout(7600);
@@ -86,7 +88,8 @@ log("\n=== Meniul (desktop 1440) ===");
   const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } });
   await ctx.addInitScript(ACORD);
   const page = await ctx.newPage();
-  await page.goto(BAZA + "/", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   const sub = page.locator('header nav button[aria-expanded]');
   const stareSub = async () => ({
     expanded: await sub.getAttribute("aria-expanded"),
@@ -149,7 +152,8 @@ log("\n=== Meniul de telefon (390) ===");
   const ctx = await b.newContext({ viewport: { width: 390, height: 844 } });
   await ctx.addInitScript(ACORD);
   const page = await ctx.newPage();
-  await page.goto(BAZA + "/", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   const ham = page.locator('button[aria-controls="meniu-ecran-mic"]');
   const st = async () => ({
     expanded: await ham.getAttribute("aria-expanded"),
@@ -191,7 +195,8 @@ log("\n=== Meniul de telefon (390) ===");
   log("După navigare la /contact:", JSON.stringify(await st()));
   // Pe 320
   await page.setViewportSize({ width: 320, height: 568 });
-  await page.goto(BAZA + "/", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   log("320px antet:", JSON.stringify(await page.evaluate(() => { const h = document.querySelector("header > div"); return { inaltime: Math.round(h.getBoundingClientRect().height), overflow: document.documentElement.scrollWidth > innerWidth, doneazaText: document.querySelector('header a[aria-label="Donează"]').innerText.trim() || "(doar inimă)" }; })));
   await ham.click();
   await page.waitForTimeout(400);

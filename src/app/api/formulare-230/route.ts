@@ -10,6 +10,7 @@ import { areBazaDeDate } from "@/lib/baza";
 import { salveazaCerere } from "@/lib/crm";
 import { trimiteFormular230 } from "@/lib/email/formulare";
 import { EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
+import { notificaPanoul } from "@/lib/notificari";
 
 /**
  * „Am completat formularul 230” — anunțul, nu formularul.
@@ -96,6 +97,12 @@ export async function POST(cerere: Request) {
     25 mai. Mesajul le scrie negru pe alb, cu numărul de WhatsApp și adresa
     Casei Teona, ca să le aibă când se așază cu plicul în față.
   */
+  await notificaPanoul({
+    titlu: "Formular 230 completat",
+    text: `${nume.split(/\s+/)[0]} a completat Formularul 230 pe hârtie.`,
+    adresa: "/admin/formulare",
+  }).catch(() => 0);
+
   await trimiteFormular230({
     nume,
     email: camp("email"),

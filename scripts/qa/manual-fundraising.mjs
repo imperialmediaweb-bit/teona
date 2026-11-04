@@ -30,8 +30,9 @@ const p = await ctx.newPage();
 const erori = [];
 p.on("response", (r) => { if (r.status() >= 500 && r.url().startsWith(S)) erori.push(`${r.status()} ${r.url().replace(S, "")}`); });
 const text = async () => (await p.locator("body").innerText()).replace(/\s+/g, " ");
-const merg = async (cale) => { await p.goto(S + cale, { waitUntil: "networkidle" }); };
-const apasa = async (loc) => { await Promise.all([p.waitForNavigation({ waitUntil: "networkidle" }).catch(() => {}), loc.click()]); };
+const merg = async (cale) => { await p.goto(S + cale, { waitUntil: "load" });
+await p.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {}); };
+const apasa = async (loc) => { await Promise.all([p.waitForNavigation({ waitUntil: "load" }).catch(() => {}), loc.click()]); };
 const deschide = () => p.evaluate(() => document.querySelectorAll("details").forEach((d) => (d.open = true)));
 const asteaptaText = (t) => p.waitForFunction((x) => document.body.innerText.includes(x), t, { timeout: 15000 }).catch(() => {});
 const nuEJson = async () => !(await p.content()).includes('{"mesaj"');
@@ -122,7 +123,7 @@ await sectiune("Donațiile", async () => {
 await sectiune("Căutarea", async () => {
   await merg("/admin");
   await p.locator('input[name="q"]').first().fill("popescu");
-  await Promise.all([p.waitForNavigation({ waitUntil: "networkidle" }), p.locator('input[name="q"]').first().press("Enter")]);
+  await Promise.all([p.waitForNavigation({ waitUntil: "load" }), p.locator('input[name="q"]').first().press("Enter")]);
   let t = await text();
   ok(t.includes("Maria Popescu"), "caută după nume (litere mici)");
   await merg("/admin/cauta?q=0745%20111");

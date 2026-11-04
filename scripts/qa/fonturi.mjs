@@ -5,7 +5,8 @@ await ctx.addInitScript(() => localStorage.setItem("teona:acord-cookieuri", JSON
 const page = await ctx.newPage();
 const fonturi = [];
 page.on("response", (r) => { if (r.url().includes(".woff2")) fonturi.push(`${r.status()} ${r.url().split("/").pop()}`); });
-await page.goto(BAZA + "/casa-teona", { waitUntil: "networkidle" });
+await page.goto(BAZA + "/casa-teona", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const r = await page.evaluate(async () => {
   await document.fonts.ready;
   const incarcate = [...document.fonts].filter((f) => f.status === "loaded").map((f) => `${f.family} ${f.weight}`);

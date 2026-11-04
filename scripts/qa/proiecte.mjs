@@ -7,7 +7,8 @@ const ctx = await b.newContext({ viewport: { width: 1280, height: 900 } });
 await ctx.addInitScript(ACORD);
 const page = await ctx.newPage();
 const erori = urmaresteErori(page);
-await page.goto(BAZA + "/proiecte", { waitUntil: "networkidle" });
+await page.goto(BAZA + "/proiecte", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 
 const taburi = page.locator('[role="tablist"] [role="tab"]');
 log("Filtre:", JSON.stringify(await taburi.evaluateAll((ts) => ts.map((t) => ({ text: t.innerText.replace(/\s+/g, " "), selected: t.getAttribute("aria-selected"), tabindex: t.getAttribute("tabindex") })))));
@@ -40,7 +41,8 @@ log("Tab → focus:", await page.evaluate(() => document.activeElement.innerText
 await taburi.nth(3).click();
 await page.waitForTimeout(200);
 log("URL după alegerea tabului 4:", page.url());
-await page.reload({ waitUntil: "networkidle" });
+await page.reload({ waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 log("După reîncărcare, tab selectat:", await page.locator('[role="tab"][aria-selected="true"]').innerText().then((t) => t.replace(/\s+/g, " ")));
 
 // Pagini de proiect: toate, cu verificare de poze
@@ -50,10 +52,11 @@ for (const href of toateLinkurile) {
   const localErori = [];
   const asculta = (r) => { if (r.status() >= 400) localErori.push(`${r.status()} ${r.url().replace(BAZA, "")}`); };
   page.on("response", asculta);
-  await page.goto(BAZA + href, { waitUntil: "networkidle" });
+  await page.goto(BAZA + href, { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   // derulează ca să se încarce pozele lazy
   await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 700) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 120)); } });
-  await page.waitForLoadState("networkidle");
+  await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   page.off("response", asculta);
   const stricate = await page.$$eval("img", (imgs) => imgs.filter((i) => i.complete && i.naturalWidth === 0).map((i) => i.getAttribute("src")?.slice(0, 100)));
   const h1 = await page.locator("h1").innerText();

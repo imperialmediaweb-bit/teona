@@ -133,6 +133,7 @@ verifica(
 // ─── Intrarea ─────────────────────────────────────────────────────────────
 console.log("\n=== Intrarea ===");
 await page.goto(BAZA + "/contul-meu", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 verifica(
   "neconectat, pagina cere adresa — nu arată date",
   (await page.locator('input[name="email"]').count()) >= 1 &&
@@ -159,6 +160,7 @@ await sql.query(
 await page.goto(`${BAZA}/contul-meu/intra?jeton=${brut}`, {
   waitUntil: "load",
 });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 verifica(
   "linkul duce în cont, fără jeton în adresă",
   new URL(page.url()).pathname === "/contul-meu" && !page.url().includes("jeton"),
@@ -190,6 +192,7 @@ const { page: altul } = await omNou();
 await altul.goto(`${BAZA}/contul-meu/intra?jeton=${brut}`, {
   waitUntil: "load",
 });
+await altul.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 verifica(
   "același link, a doua oară, nu mai intră",
   altul.url().includes("expirat=1"),
@@ -202,6 +205,7 @@ verifica(
 await altul.goto(`${BAZA}/contul-meu/intra?jeton=inventat-complet`, {
   waitUntil: "load",
 });
+await altul.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 verifica("un jeton inventat nu intră", altul.url().includes("expirat=1"));
 
 // ─── Un om nu vede datele altuia ──────────────────────────────────────────
@@ -216,6 +220,7 @@ await sql.query(
 await alDoilea.goto(`${BAZA}/contul-meu/intra?jeton=${brut2}`, {
   waitUntil: "load",
 });
+await alDoilea.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const panouDan = await alDoilea.locator("body").innerText();
 verifica("Dan își vede propriile date", panouDan.includes("Mulțumim, Dan"));
 verifica("Dan NU vede adresa Anei", !panouDan.includes(ANA));
@@ -227,6 +232,7 @@ await ctxDan.addCookies([
   { name: "teona_cont", value: `${ANA}|` + "a".repeat(64), url: BAZA },
 ]);
 await alDoilea.goto(BAZA + "/contul-meu", { waitUntil: "load" });
+await alDoilea.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 verifica(
   "un cookie cu semnătură inventată nu deschide contul nimănui",
   (await alDoilea.locator('input[name="email"]').count()) >= 1,
@@ -236,8 +242,9 @@ verifica(
 // ─── Setări: buletin și ștergere ──────────────────────────────────────────
 console.log("\n=== Setări ===");
 await page.goto(BAZA + "/contul-meu", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 await page.click('button:has-text("Vreau buletinul")');
-await page.waitForLoadState("networkidle");
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 verifica("abonarea se salvează", page.url().includes("gata=abonat"), page.url());
 const acord = await sql.query(
   "SELECT bool_or(acord_buletin) AS a FROM donatii WHERE email = $1",
@@ -246,7 +253,7 @@ const acord = await sql.query(
 verifica("și chiar în baza de date", acord.rows[0].a === true);
 
 await page.click('button:has-text("Nu mai vreau buletinul")');
-await page.waitForLoadState("networkidle");
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const acord2 = await sql.query(
   "SELECT bool_or(acord_buletin) AS a FROM donatii WHERE email = $1",
   [ANA],

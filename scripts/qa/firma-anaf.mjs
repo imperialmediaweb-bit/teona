@@ -74,7 +74,8 @@ const pagina = await b.newPage();
 
 try {
   // 1. Calculatorul
-  await pagina.goto(`${BAZA}/directioneaza-20`, { waitUntil: "networkidle" });
+  await pagina.goto(`${BAZA}/directioneaza-20`, { waitUntil: "load" });
+await pagina.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   const cifra = pagina.getByLabel(/Cifra de afaceri/i);
   await cifra.waitFor();
 
@@ -120,7 +121,8 @@ try {
 
   // 2. Formularul de sponsorizare, pe aceeași pagină sau pe cea de firme.
   for (const cale of ["/directioneaza-20", "/sponsori-si-parteneri"]) {
-    await pagina.goto(`${BAZA}${cale}`, { waitUntil: "networkidle" });
+    await pagina.goto(`${BAZA}${cale}`, { waitUntil: "load" });
+await pagina.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
     const denumire = pagina.locator('input[name="firma"]');
     if ((await denumire.count()) === 0) continue;
 
@@ -139,7 +141,8 @@ try {
   }
 
   // 3. Formularul de contact
-  await pagina.goto(`${BAZA}/contact`, { waitUntil: "networkidle" });
+  await pagina.goto(`${BAZA}/contact`, { waitUntil: "load" });
+await pagina.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await scrie(
     pagina,
     pagina.getByLabel(/CUI \(dacă scrii/i),

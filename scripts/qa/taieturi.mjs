@@ -22,7 +22,8 @@ const b = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium" })
 const p = await b.newPage({ viewport: { width: 1280, height: 950 } });
 const rau = new Map();
 for (const cale of PAGINI) {
-  await p.goto(BAZA + cale, { waitUntil: "networkidle" });
+  await p.goto(BAZA + cale, { waitUntil: "load" });
+await p.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await p.waitForTimeout(800);
   const r = await p.evaluate(() =>
     [...document.querySelectorAll("#continut img")].flatMap((i) => {
@@ -57,7 +58,8 @@ ${l.map((x, i) => `<div><h3>${i + 1}. ${x.f.split("/").pop().slice(0, 26)}</h3>
 </div>`;
 writeFileSync(IESIRE + "/inainte-dupa.html", html);
 const pg = await b.newPage({ viewport: { width: 1340, height: 1000 } });
-await pg.goto("file://" + IESIRE + "/inainte-dupa.html", { waitUntil: "networkidle" });
+await pg.goto("file://" + IESIRE + "/inainte-dupa.html", { waitUntil: "load" });
+await pg.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 await pg.waitForTimeout(1800);
 await pg.screenshot({ path: IESIRE + "/inainte-dupa.png", fullPage: true });
 writeFileSync(IESIRE + "/taiate.json", JSON.stringify(l, null, 1));

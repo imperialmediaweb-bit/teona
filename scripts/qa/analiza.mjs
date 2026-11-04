@@ -20,6 +20,7 @@
 
 import { createServer } from "node:http";
 import { spawn } from "node:child_process";
+import pg from "pg";
 
 const BAZA = process.env.BAZA ?? "http://localhost:3000";
 const PAROLA = process.env.PAROLA_ADMIN;
@@ -82,7 +83,11 @@ const intrare = await cere("/api/admin/intrare", {
 verifica(intrare.status === 303, `intrarea în panou (${intrare.status})`);
 
 // ─── 2. Pagina ────────────────────────────────────────────────────────────
-const html = await (await cere("/admin/analiza")).text();
+// Pagina e împărțită pe file (`?fila=`); se citesc toate, ca înainte o singură pagină.
+const FILE_ANALIZA = ["pe-scurt","donatori","firme","campanii","vizite","reclame","consultant"];
+const html = (
+  await Promise.all(FILE_ANALIZA.map((f) => cere(`/admin/analiza?fila=${f}`).then((r) => r.text())))
+).join("\n");
 for (const bucata of [
   "Profilul donatorilor",
   "Profilul firmelor",
@@ -196,6 +201,24 @@ if (!process.env.DATABASE_URL) {
     });
   });
   await new Promise((r) => fals.listen(PORT_API, r));
+
+  /*
+    Sub 20 de donații analiza refuză („putine-date”), dinadins. O bază locală
+    proaspătă n-are atâtea, deci proba își pune 20 de donații de probă,
+    cu referința „qa-analiza-”, și le șterge la sfârșit.
+  */
+  const db = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await db.connect();
+  const PREFIX = `qa-analiza-${Date.now()}-`;
+  for (let i = 0; i < 20; i++) {
+    await db.query(
+      `INSERT INTO donatii (procesator, referinta, suma_bani, moneda, frecventa, destinatie,
+         email, prenume, stare, platita_la)
+       VALUES ('stripe', $1, $2, 'RON', 'o-data', 'oriunde', $3, 'Proba', 'platita',
+               now() - ($4 || ' days')::interval)`,
+      [PREFIX + i, 5000 + i * 100, `analiza.${i % 7}@exemplu.ro`, String(i * 9)],
+    );
+  }
 
   const site = spawn("npm", ["run", "start"], {
     detached: true,
@@ -369,7 +392,7 @@ if (!process.env.DATABASE_URL) {
     );
     verifica(fara.status === 403, `fără parolă, consultantul refuză (${fara.status})`);
 
-    const dupa = await fetch(`http://127.0.0.1:${PORT_SITE}/admin/analiza`, {
+    const dupa = await fetch(`http://127.0.0.1:${PORT_SITE}/admin/analiza?fila=consultant`, {
       headers: { cookie: cookie2 },
     });
     const htmlDupa = await dupa.text();
@@ -384,6 +407,8 @@ if (!process.env.DATABASE_URL) {
       /* se închisese singur */
     }
     fals.close();
+    await db.query("DELETE FROM donatii WHERE referinta LIKE $1", [PREFIX + "%"]).catch(() => {});
+    await db.end();
   }
 }
 

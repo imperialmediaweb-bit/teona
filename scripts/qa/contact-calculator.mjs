@@ -8,6 +8,7 @@ const erori = urmaresteErori(page);
 
 log("=== Formularul de contact ===");
 await page.goto(BAZA + "/contact", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const form = page.locator("form").filter({ hasText: "Trimite-ne un mesaj" });
 async function stare(eticheta) {
   const mesaje = await form.locator("p.text-caramiziu-700").allInnerTexts();
@@ -50,6 +51,7 @@ log("Textul alertei complet:", alertText.replace(/\s+/g, " "));
 
 log("\n=== Calculatorul (Direcționează 20%) ===");
 await page.goto(BAZA + "/directioneaza-20", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const cifra = page.locator('input[name="cifra-de-afaceri"]');
 const impozit = page.locator('input[name="impozit-pe-profit"]');
 async function rezultat(eticheta) {

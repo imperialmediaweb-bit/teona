@@ -82,16 +82,15 @@ export default function Asistent() {
         });
         return;
       }
-      completeaza("titlu", corp.titlu);
+      // Un titlu scris deja de om rămâne al lui: ciorna nu-l suprascrie.
+      const golit = (nume: string) =>
+        !(document.querySelector(`[name="${nume}"]`) as HTMLInputElement | null)?.value?.trim();
+      if (golit("titlu")) completeaza("titlu", corp.titlu);
       // Câmpul textului se numește altfel în editorul de noutăți decât în
       // formularul de e-mail. Se completează cel care există pe pagină.
       completeaza("text", corp.text);
       completeaza("continut", corp.text);
-      if (
-        !(document.querySelector('[name="subiect"]') as HTMLInputElement)?.value
-      ) {
-        completeaza("subiect", corp.titlu);
-      }
+      if (golit("subiect")) completeaza("subiect", corp.titlu);
       setStare({ fel: "gata" });
     } catch {
       setStare({

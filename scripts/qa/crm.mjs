@@ -47,10 +47,11 @@ function verifica(eticheta, conditie, detaliu = "") {
 }
 
 // ─── Intrare ──────────────────────────────────────────────────────────────
-await page.goto(BAZA + "/admin", { waitUntil: "networkidle" });
+await page.goto(BAZA + "/admin", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 await page.fill('input[name="parola"]', PAROLA);
 await page.click('button[type="submit"]');
-await page.waitForLoadState("networkidle");
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 verifica("intrarea duce la tabloul de bord", new URL(page.url()).pathname === "/admin", page.url());
 
 // ─── Tabloul de bord ──────────────────────────────────────────────────────
@@ -135,7 +136,8 @@ verifica("nicio etichetă nu iese din card", iesite.length === 0, JSON.stringify
 
 // ─── Firme: filtre, căutare, mutare între stadii ──────────────────────────
 console.log("\n=== Firme ===");
-await page.goto(BAZA + "/admin/firme", { waitUntil: "networkidle" });
+await page.goto(BAZA + "/admin/firme", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const toate = await page.locator("#continut-panou ul > li").count();
 verifica("lista are firme", toate >= 2, `${toate} firme`);
 
@@ -149,30 +151,34 @@ verifica("lista are firme", toate >= 2, `${toate} firme`);
 const deFiltrat = page.locator("#continut-panou ul > li").first();
 await deFiltrat.locator('select[name="stadiu"]').selectOption("semnat");
 await deFiltrat.locator('button:has-text("Salvează")').click();
-await page.waitForLoadState("networkidle");
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 
-await page.goto(BAZA + "/admin/firme?stadiu=semnat", { waitUntil: "networkidle" });
+await page.goto(BAZA + "/admin/firme?stadiu=semnat", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const semnate = await page.locator("#continut-panou ul > li").count();
 verifica("filtrul pe stadiu reduce lista", semnate >= 1 && semnate < toate, `${semnate} din ${toate}`);
 
-await page.goto(BAZA + "/admin/firme", { waitUntil: "networkidle" });
-await page.fill('input[name="cauta"]', "lemnul");
+await page.goto(BAZA + "/admin/firme", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
+// „Bucovinei”, nu „lemnul”: alte probe lasă în baza locală un „Lemnul Bun SRL”.
+await page.fill('input[name="cauta"]', "bucovinei");
 await page.click('button:has-text("Caută")');
-await page.waitForLoadState("networkidle");
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 verifica("căutarea după denumire", (await page.locator("#continut-panou ul > li").count()) === 1);
 await page.fill('input[name="cauta"]', "zzzz");
 await page.click('button:has-text("Caută")');
-await page.waitForLoadState("networkidle");
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 verifica("căutare fără rezultat spune asta", (await page.locator("#panou-admin").innerText()).includes("Nicio firmă"));
 
 // Mutarea unei firme + suma încasată.
-await page.goto(BAZA + "/admin/firme", { waitUntil: "networkidle" });
+await page.goto(BAZA + "/admin/firme", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const primul = page.locator("#continut-panou ul > li").first();
 const numeFirma = await primul.locator("p").first().innerText();
 await primul.locator('select[name="stadiu"]').selectOption("incasat");
 await primul.locator('input[name="suma"]').fill("12.500");
 await primul.locator('button:has-text("Salvează")').click();
-await page.waitForLoadState("networkidle");
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 verifica("mutarea duce înapoi la lista de firme", new URL(page.url()).pathname === "/admin/firme", page.url());
 
 const dupa = page.locator("#continut-panou ul > li").filter({ hasText: numeFirma }).first();
@@ -184,16 +190,17 @@ verifica("suma scrisă cu punct de mii s-a citit corect", textDupa.includes("12.
 await dupa.locator('select[name="stadiu"]').selectOption("contract_trimis");
 await dupa.locator('input[name="suma"]').fill("aiurea");
 await dupa.locator('button:has-text("Salvează")').click();
-await page.waitForLoadState("networkidle");
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const dupa2 = await page.locator("#continut-panou ul > li").filter({ hasText: numeFirma }).first().innerText();
 verifica("o sumă scrisă greșit nu anulează mutarea", dupa2.includes("Contract trimis"), dupa2.split("\n")[0]);
 verifica("și nu șterge suma dinainte", dupa2.includes("12.500 lei"));
 
 // ─── Jurnalul discuțiilor ─────────────────────────────────────────────────
 console.log("\n=== Jurnal ===");
-await page.goto(BAZA + "/admin/firme", { waitUntil: "networkidle" });
+await page.goto(BAZA + "/admin/firme", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 await page.locator("#continut-panou ul > li").first().locator('a:has-text("Discuții și notițe")').click();
-await page.waitForLoadState("networkidle");
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 verifica("jurnalul se deschide", (await page.locator('form[action="/api/admin/jurnal"]').count()) === 1);
 // Pe o bază curată jurnalul e gol; la a doua rulare are deja intrări. Se
 // verifică doar că spune una dintre cele două, nu că e neapărat gol.
@@ -206,7 +213,7 @@ verifica(
 await page.selectOption('form[action="/api/admin/jurnal"] select[name="fel"]', "telefon");
 await page.fill('form[action="/api/admin/jurnal"] input[name="rezumat"]', "L-am sunat pe Andrei: trimite actele până vineri.");
 await page.click('form[action="/api/admin/jurnal"] button:has-text("Adaugă")');
-await page.waitForLoadState("networkidle");
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const cuJurnal = await page.locator("#panou-admin").innerText();
 verifica("intrarea se salvează și se vede", cuJurnal.includes("trimite actele până vineri"));
 verifica("cu felul ei", cuJurnal.includes("Telefon"));
@@ -222,7 +229,8 @@ verifica("rezumatul gol e oprit de browser", !golAcceptat);
 
 // ─── Cereri ───────────────────────────────────────────────────────────────
 console.log("\n=== Cereri ===");
-await page.goto(BAZA + "/admin/cereri", { waitUntil: "networkidle" });
+await page.goto(BAZA + "/admin/cereri", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const nrCereri = await page.locator("#continut-panou ul > li").count();
 verifica("lista are cereri", nrCereri >= 2, `${nrCereri} cereri`);
 
@@ -235,7 +243,7 @@ verifica("lista are cereri", nrCereri >= 2, `${nrCereri} cereri`);
   alarmă falsă care așteaptă să sune.
 */
 await page.click('a:has-text("Voluntariat")');
-await page.waitForLoadState("networkidle");
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const filtrate = await page.locator("#continut-panou ul > li").count();
 verifica("filtrul pe fel lasă ceva", filtrate >= 1 && filtrate <= nrCereri, `${filtrate} din ${nrCereri}`);
 const feluri = await page
@@ -247,21 +255,25 @@ verifica(
   JSON.stringify(feluri.filter((t) => !t.includes("Voluntariat")).slice(0, 2)),
 );
 
-await page.goto(BAZA + "/admin/cereri", { waitUntil: "networkidle" });
+await page.goto(BAZA + "/admin/cereri", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const cerere = page.locator("#continut-panou ul > li").first();
 await cerere.locator('select[name="stadiu"]').selectOption("rezolvat");
 await cerere.locator('button:has-text("Salvează")').click();
-await page.waitForLoadState("networkidle");
-await page.goto(BAZA + "/admin/cereri?stadiu=rezolvat", { waitUntil: "networkidle" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
+await page.goto(BAZA + "/admin/cereri?stadiu=rezolvat", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 verifica("cererea s-a mutat în „rezolvat”", (await page.locator("#continut-panou ul > li").count()) >= 1);
 
 // ─── Donații trecute de mână ──────────────────────────────────────────────
 console.log("\n=== Donații de mână ===");
-await page.goto(BAZA + "/admin/donatii", { waitUntil: "networkidle" });
+await page.goto(BAZA + "/admin/donatii", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const inainte = await page.locator("#panou-admin tbody tr").count();
 
 async function treceDonatie(camp) {
-  await page.goto(BAZA + "/admin/donatii", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/admin/donatii", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await page.click('summary:has-text("Trece o donație de mână")');
   // Limitat la formularul panoului: subsolul site-ului are și el un câmp
   // „nume”, cel de abonare la buletin, iar Playwright se oprește pe două
@@ -274,7 +286,7 @@ async function treceDonatie(camp) {
     else await el.fill(val);
   }
   await formular.locator('button:has-text("Trece donația")').click();
-  await page.waitForLoadState("networkidle");
+  await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   return page.locator("#panou-admin").innerText();
 }
 
@@ -330,21 +342,23 @@ verifica("serverul respinge suma zero", unde.includes("Scrie suma"), unde);
 
 // ─── Jurnal pe donatori ───────────────────────────────────────────────────
 console.log("\n=== Jurnal pe donatori ===");
-await page.goto(BAZA + "/admin/donatori", { waitUntil: "networkidle" });
+await page.goto(BAZA + "/admin/donatori", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const randuri = await page.locator("#panou-admin tbody tr").count();
 if (randuri === 0) {
   console.log("  (fără donatori cu e-mail — se sare peste)");
 } else {
   await page.locator('a:has-text("Discuții și notițe")').first().click();
-  await page.waitForLoadState("networkidle");
+  await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   verifica("jurnalul se deschide pe donator", (await page.locator('form[action="/api/admin/jurnal"]').count()) === 1);
   await page.fill('form[action="/api/admin/jurnal"] input[name="rezumat"]', "Am sunat-o: vrea să treacă pe donație lunară.");
   await page.click('form[action="/api/admin/jurnal"] button:has-text("Adaugă")');
-  await page.waitForLoadState("networkidle");
+  await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   verifica("se salvează pe donator", (await page.locator("#panou-admin").innerText()).includes("vrea să treacă pe donație lunară"));
   verifica("rămâne pe pagina de donatori", new URL(page.url()).pathname === "/admin/donatori", page.url());
   // Telefonul apare doar dacă donatorul l-a lăsat; pe firme e întotdeauna.
-  await page.goto(BAZA + "/admin/firme", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/admin/firme", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   const tel = await page.locator('#panou-admin a[href^="tel:"]').count();
   verifica("telefoanele sunt apelabile dintr-un clic", tel >= 1, `${tel} linkuri tel:`);
 }
@@ -353,7 +367,8 @@ if (randuri === 0) {
 console.log("\n=== Fără sesiune ===");
 const anonim = await b.newPage();
 for (const cale of ["/admin", "/admin/firme", "/admin/cereri", "/admin/donatii"]) {
-  await anonim.goto(BAZA + cale, { waitUntil: "networkidle" });
+  await anonim.goto(BAZA + cale, { waitUntil: "load" });
+await anonim.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   const text = await anonim.locator("#panou-admin").innerText();
   verifica(`${cale} cere parola`, text.includes("Parola") && !text.includes("CUI"), text.slice(0, 40).replace(/\n/g, " "));
 }

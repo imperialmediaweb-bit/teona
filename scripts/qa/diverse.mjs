@@ -10,18 +10,21 @@ log("=== Linkurile „Susține” cu ?destinatie= ===");
   await ctx.addInitScript(ACORD);
   const page = await ctx.newPage();
   for (const d of ["tabere", "casa-teona", "cazuri-umanitare"]) {
-    await page.goto(BAZA + "/doneaza?destinatie=" + d, { waitUntil: "networkidle" });
+    await page.goto(BAZA + "/doneaza?destinatie=" + d, { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
     log(`/doneaza?destinatie=${d} → bifat: ${await page.locator('input[name="destinatie"]:checked').inputValue()}`);
   }
   // De pe prima pagină, prin clic
-  await page.goto(BAZA + "/", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await page.click('a[href="/doneaza?destinatie=casa-teona"]');
   await page.waitForURL("**/doneaza?destinatie=casa-teona");
   await page.waitForTimeout(300);
   log("Prin clic din Campanii (Casa Teona) → bifat:", await page.locator('input[name="destinatie"]:checked').inputValue());
 
   log("\n=== Newsletter ===");
-  await page.goto(BAZA + "/contact", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/contact", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   const nf = page.locator("form").filter({ hasText: "Abonează-mă" });
   const st = async (e) => log(`[${e}] alert=${JSON.stringify(await nf.locator('[role="alert"]').allInnerTexts().then((t) => t.map((x) => x.replace(/\s+/g, " "))))} buton="${(await nf.locator("button").innerText()).trim()}"`);
   await nf.locator("button").click(); await page.waitForTimeout(800); await st("gol");
@@ -31,7 +34,8 @@ log("=== Linkurile „Susține” cu ?destinatie= ===");
   log("Erorile newsletter sunt lângă câmp?", await nf.locator("p.text-caramiziu-700").count(), "mesaje la câmp; aria-invalid:", await nf.locator('[aria-invalid="true"]').count());
 
   log("\n=== Bara de anunț ===");
-  await page.goto(BAZA + "/", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   const bara = () => page.locator('button[aria-label="Închide anunțul"]').count();
   log("Vizibilă la început:", await bara());
   await page.click('button[aria-label="Închide anunțul"]');
@@ -39,16 +43,19 @@ log("=== Linkurile „Susține” cu ?destinatie= ===");
   log("După închidere:", await bara());
   await page.click('header nav a[href="/contact"]'); await page.waitForURL("**/contact"); await page.waitForTimeout(300);
   log("Pe altă pagină:", await bara());
-  await page.reload({ waitUntil: "networkidle" });
+  await page.reload({ waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   log("După reîncărcare:", await bara());
   const p2 = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
-  await p2.goto(BAZA + "/", { waitUntil: "networkidle" });
+  await p2.goto(BAZA + "/", { waitUntil: "load" });
+await p2.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   log("Într-o sesiune nouă:", await p2.locator('button[aria-label="Închide anunțul"]').count());
   log("Textul barei:", (await p2.locator('button[aria-label="Închide anunțul"]').evaluate((b) => b.parentElement.innerText)).replace(/\s+/g, " "));
   await p2.context().close();
 
   log("\n=== Meniu desktop: hover apoi clic ===");
-  await page.goto(BAZA + "/", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   const sub = page.locator('header nav button[aria-expanded]');
   await sub.hover(); await page.waitForTimeout(400);
   log("După hover:", await sub.getAttribute("aria-expanded"));
@@ -71,7 +78,8 @@ log("\n=== Butoanele Copiază, listă completă ===");
   await ctx.addInitScript(ACORD);
   const page = await ctx.newPage();
   for (const cale of ["/doneaza", "/redirectioneaza-3-5", "/directioneaza-20", "/contact"]) {
-    await page.goto(BAZA + cale, { waitUntil: "networkidle" });
+    await page.goto(BAZA + cale, { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
     const n = await page.locator('button:has-text("Copiază")').count();
     log(`${cale}: ${n} butoane`);
     for (let i = 0; i < n; i++) {

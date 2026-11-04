@@ -9,7 +9,8 @@ const ACORD = () => localStorage.setItem("teona:acord-cookieuri", JSON.stringify
   const ctx = await b.newContext({ viewport: { width: 1280, height: 900 }, permissions: ["clipboard-read", "clipboard-write"] });
   await ctx.addInitScript(ACORD);
   const page = await ctx.newPage();
-  await page.goto(BAZA + "/doneaza", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/doneaza", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   const h = await page.$('#transfer button');
   await h.click();
   await page.waitForTimeout(150);
@@ -25,7 +26,8 @@ await ctx.addInitScript(ACORD);
 const page = await ctx.newPage();
 async function captura(cale, selector, nume, w = 320) {
   await page.setViewportSize({ width: w, height: 640 });
-  await page.goto(BAZA + cale, { waitUntil: "networkidle" });
+  await page.goto(BAZA + cale, { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   const el = await page.$(selector);
   if (!el) { log("lipsă", selector, "pe", cale); return; }
   await el.scrollIntoViewIfNeeded();
@@ -38,7 +40,8 @@ await captura("/", "main > section:first-of-type", "s320-erou");
 await captura("/doneaza", "form", "s320-formular-donatie");
 await captura("/doneaza", "#transfer", "s320-transfer");
 await captura("/directioneaza-20", "form[aria-labelledby]", "s320-calculator");
-await page.goto(BAZA + "/directioneaza-20", { waitUntil: "networkidle" });
+await page.goto(BAZA + "/directioneaza-20", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 await page.fill('input[name="cifra-de-afaceri"]', "123456789012");
 await page.fill('input[name="impozit-pe-profit"]', "98765432");
 await page.waitForTimeout(200);

@@ -13,7 +13,7 @@ while (coada.length) {
   vazute.add(cale);
   const erori = urmaresteErori(page);
   const r = await page
-    .goto(BAZA + cale, { waitUntil: "networkidle" })
+    .goto(BAZA + cale, { waitUntil: "load" })
     .catch((e) => ({ status: () => "ERR " + e.message }));
   await page.waitForTimeout(500);
   const titlu = await page.title().catch(() => "");

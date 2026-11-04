@@ -239,7 +239,8 @@ let totalPePoza = 0;
 const unice = new Map();
 
 for (const cale of PAGINI) {
-  await page.goto(BAZA + cale, { waitUntil: "networkidle" });
+  await page.goto(BAZA + cale, { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   // Animațiile de intrare schimbă opacitatea; le lăsăm să se termine.
   await page.waitForTimeout(1200);
   const { rele, pePoza } = await page.evaluate(MASURA);

@@ -7,7 +7,8 @@ const log = (...a) => console.log(...a);
 {
   const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } });
   const page = await ctx.newPage();
-  await page.goto(BAZA + "/", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   // Fără acord, bannerul de cookie-uri acoperă subsolul: verific întâi asta.
   const acoperit = await page.evaluate(() => {
     const a = document.querySelector('footer a[href="/doneaza"]');
@@ -33,18 +34,21 @@ const log = (...a) => console.log(...a);
   await page.click('header a[aria-label="Donează"]');
   await page.waitForURL("**/doneaza");
   log("Antet → Donează: ", page.url());
-  await page.goto(BAZA + "/", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   // Cardul 1
   await page.click('main a:has-text("Donează acum") >> nth=1');
   await page.waitForURL("**/doneaza");
   log("Cardul 1 → Donează: ", page.url());
-  await page.goto(BAZA + "/", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   // Erou
   await page.click('main a:has-text("Donează acum") >> nth=0');
   await page.waitForURL("**/doneaza");
   log("Erou → Donează: ", page.url());
   // Card SMS -> /doneaza#sms
-  await page.goto(BAZA + "/", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await page.click('a[href="/doneaza#sms"]');
   await page.waitForURL("**/doneaza#sms");
   await page.waitForTimeout(800);
@@ -55,7 +59,8 @@ const log = (...a) => console.log(...a);
   });
   log("Card SMS → /doneaza#sms, secțiunea #sms: ", JSON.stringify(smsVizibil));
   // Subsol
-  await page.goto(BAZA + "/", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await page.click('footer a[href="/doneaza"]');
   await page.waitForURL("**/doneaza");
   log("Subsol → Donează: ", page.url());
@@ -66,7 +71,8 @@ const log = (...a) => console.log(...a);
 {
   const ctx = await b.newContext({ viewport: { width: 390, height: 844 } });
   const page = await ctx.newPage();
-  await page.goto(BAZA + "/", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   const plutitor = await page.$('div.fixed a[href="/doneaza"]');
   log("Buton plutitor Donează pe 390px (fără acord cookie):", plutitor ? await plutitor.isVisible() : "lipsă");
   await page.click("text=Acceptă toate");
@@ -88,7 +94,8 @@ const ctx = await b.newContext({ viewport: { width: 1280, height: 900 } });
 await ctx.addInitScript(() => localStorage.setItem("teona:acord-cookieuri", JSON.stringify({ necesare: true, statistici: false, marketing: false, laData: new Date().toISOString() })));
 const page = await ctx.newPage();
 const erori = urmaresteErori(page);
-await page.goto(BAZA + "/doneaza", { waitUntil: "networkidle" });
+await page.goto(BAZA + "/doneaza", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const form = page.locator("form").filter({ hasText: "Donează cu cardul" });
 const alta = form.locator('input[name="alta"]');
 const email = form.locator('input[name="email"]');

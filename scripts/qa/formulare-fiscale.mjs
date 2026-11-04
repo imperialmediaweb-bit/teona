@@ -26,7 +26,8 @@ function verifica(eticheta, conditie, detaliu = "") {
 }
 
 async function deschide(cale, ancora) {
-  await page.goto(BAZA + cale, { waitUntil: "networkidle" });
+  await page.goto(BAZA + cale, { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   // Bannerul de cookie-uri acoperă butonul de trimitere la 1280×1000.
   await page.click('button:has-text("Acceptă toate")').catch(() => {});
   await page.locator(ancora).scrollIntoViewIfNeeded();

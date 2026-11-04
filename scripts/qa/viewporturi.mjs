@@ -34,18 +34,20 @@ for (const w of LATIMI) {
   // O singură autentificare per lățime; cookie-ul ține pentru tot contextul.
   let admin = false;
   if (PAROLA) {
-    await page.goto(BAZA + "/admin", { waitUntil: "networkidle" });
+    await page.goto(BAZA + "/admin", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
     const camp = page.locator('input[name="parola"]');
     if ((await camp.count()) > 0) {
       await camp.fill(PAROLA);
       await page.click('button[type="submit"]');
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
     }
     admin = (await page.locator('input[name="parola"]').count()) === 0;
   }
 
   for (const cale of [...PAGINI, ...(admin ? PAGINI_ADMIN : [])]) {
-    await page.goto(BAZA + cale, { waitUntil: "networkidle" });
+    await page.goto(BAZA + cale, { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
     await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 900) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 60)); } window.scrollTo(0, 0); });
     const r = await page.evaluate(() => {
       const sw = document.documentElement.scrollWidth, cw = document.documentElement.clientWidth;

@@ -29,7 +29,9 @@ function verifica(ok, mesaj) {
 
 const GOOGLE = /googletagmanager\.com|google-analytics\.com|analytics\.google\.com/;
 
-const browser = await chromium.launch();
+const browser = await chromium.launch(
+  process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {},
+);
 
 /** O filă curată, cu lista cererilor spre Google. */
 async function fila() {
@@ -43,7 +45,8 @@ async function fila() {
   pagina.on("console", (m) => {
     if (m.type() === "error") greseli.push(m.text());
   });
-  await pagina.goto(BAZA, { waitUntil: "networkidle" });
+  await pagina.goto(BAZA, { waitUntil: "load" });
+await pagina.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   return { context, pagina, cereri, greseli };
 }
 

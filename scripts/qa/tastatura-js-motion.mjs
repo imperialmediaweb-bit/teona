@@ -11,7 +11,8 @@ log("=== Navigare cu tastatura ===");
   await ctx.addInitScript(ACORD);
   const page = await ctx.newPage();
   for (const cale of PAGINI) {
-    await page.goto(BAZA + cale, { waitUntil: "networkidle" });
+    await page.goto(BAZA + cale, { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
     // Sari la conținut
     await page.keyboard.press("Tab");
     const primul = await page.evaluate(() => { const a = document.activeElement; const r = a.getBoundingClientRect(); const s = getComputedStyle(a); return { text: a.innerText.trim(), vizibil: r.width > 0 && r.height > 0 && s.visibility !== "hidden" && s.clipPath !== "inset(50%)" && s.position !== "static" ? true : r.width > 1 && r.height > 1, w: Math.round(r.width), h: Math.round(r.height), clip: s.clip }; });
@@ -82,7 +83,8 @@ log("\n=== prefers-reduced-motion: reduce ===");
   await ctx.addInitScript(ACORD);
   const page = await ctx.newPage();
   for (const cale of ["/", "/doneaza", "/proiecte", "/devino-voluntar", "/casa-teona", "/despre-noi"]) {
-    await page.goto(BAZA + cale, { waitUntil: "networkidle" });
+    await page.goto(BAZA + cale, { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
     await page.waitForTimeout(500);
     const r = await page.evaluate(() => {
       const anim = [];

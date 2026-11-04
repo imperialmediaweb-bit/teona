@@ -164,7 +164,10 @@ try {
     body: new URLSearchParams({ parola: PAROLA, unde: "/admin/analiza" }),
   });
 
-  const html = await (await cere("/admin/analiza")).text();
+  // Vizitele stau pe fila lor (`?fila=vizite`), ca și canalele.
+  const html = (
+    await Promise.all(["pe-scurt","donatori","firme","campanii","vizite","reclame","consultant"].map((f) => cere(`/admin/analiza?fila=${f}`).then((r) => r.text())))
+  ).join("\n");
 
   verifica(semnaturaBuna, "JWT-ul e semnat cu cheia contului de serviciu");
   verifica(scopBun, "cere exact scopul analytics.readonly");
@@ -196,7 +199,7 @@ try {
   );
 
   const deAtatea = cereriDeJeton;
-  await cere("/admin/analiza");
+  await cere("/admin/analiza?fila=vizite");
   verifica(
     cereriDeJeton === deAtatea,
     `jetonul se refolosește, nu se cere la fiecare pagină (${deAtatea} → ${cereriDeJeton})`,

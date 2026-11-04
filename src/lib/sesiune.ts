@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import {
   COOKIE_CONT,
   VIATA_SESIUNE_S,
@@ -33,5 +34,7 @@ export async function inchideSesiunea(): Promise<void> {
 
 /** Adresa donatorului conectat, sau `null`. Verificată, nu doar citită. */
 export async function donatorulConectat(): Promise<string | null> {
+  // Expirarea se compară cu ora de acum: numai la cerere, nu la pregenerare.
+  await connection();
   return cititSesiunea((await cookies()).get(COOKIE_CONT)?.value);
 }

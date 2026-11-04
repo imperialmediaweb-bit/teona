@@ -7,7 +7,8 @@ const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } });
 await ctx.addInitScript(ACORD);
 const page = await ctx.newPage();
 for (const cale of PAGINI) {
-  await page.goto(BAZA + cale, { waitUntil: "networkidle" });
+  await page.goto(BAZA + cale, { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await page.evaluate(() => { let n = 0; for (const e of document.querySelectorAll("a,button,input,select,textarea,summary,iframe,[tabindex]")) e.dataset.qa = String(n++); });
   const secv = []; let capcana = null; const vazut = new Map(); let corp = 0;
   for (let i = 0; i < 500; i++) {

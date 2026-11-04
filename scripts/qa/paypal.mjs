@@ -29,7 +29,8 @@ for (const latime of [1280, 390]) {
   log(`\n=== ${latime}px ===`);
   const page = await b.newPage({ viewport: { width: latime, height: 1000 } });
   const erori = urmaresteErori(page);
-  await page.goto(BAZA + "/doneaza", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/doneaza", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await page.click('button:has-text("Acceptă toate")').catch(() => {});
 
   if ((await page.locator("#paypal").count()) === 0) {

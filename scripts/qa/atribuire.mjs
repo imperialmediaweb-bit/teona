@@ -234,7 +234,8 @@ if (!process.env.DATABASE_URL) {
     for (const c of intra.headers.getSetCookie?.() ?? [])
       cookie2 = c.split(";")[0];
 
-    const panou = await fetch(`http://127.0.0.1:${PORT_SITE}/admin/analiza`, {
+    // Reclamele stau pe fila lor.
+    const panou = await fetch(`http://127.0.0.1:${PORT_SITE}/admin/analiza?fila=reclame`, {
       headers: { cookie: cookie2, "x-forwarded-for": DE_LA },
     });
     const html = await panou.text();

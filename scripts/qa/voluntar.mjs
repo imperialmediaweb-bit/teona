@@ -8,6 +8,7 @@ const erori = urmaresteErori(page);
 
 async function deschide() {
   await page.goto(BAZA + "/devino-voluntar", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 }
 const form = () => page.locator("form#formular");
 async function stare(eticheta) {
@@ -173,6 +174,7 @@ await stare("email stricat la întoarcere, Continuă");
 const ctx2 = await b.newContext({ javaScriptEnabled: false, viewport: { width: 1280, height: 900 } });
 const p2 = await ctx2.newPage();
 await p2.goto(BAZA + "/devino-voluntar");
+await p2.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 const vizibil = await p2.evaluate(() => {
   const f = document.querySelector("form#formular");
   if (!f) return "fără formular";

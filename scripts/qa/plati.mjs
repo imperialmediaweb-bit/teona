@@ -475,6 +475,59 @@ try {
   verifica((await stare(rt?.id ? (await baza.query("SELECT referinta FROM donatii WHERE id=$1", [rt.id])).rows[0].referinta : "")) === "platita", `bifa „Am găsit-o în extras” o face donație (${bifa.status})`);
   verifica(catre(et).some((e) => String(e.subject).includes("Am găsit transferul")), "transfer: donatorul primește „Am găsit transferul tău”");
 
+  // ─── Formularele: e-mail la asociație, e-mail la om, notificare ───────
+  async function formular(cale, corp, json = true) {
+    const inainte = { e: emailuri.length, n: notificari.length };
+    const r = await fetch(`${BAZA}${cale}`, {
+      method: "POST",
+      headers: {
+        ...(json ? { "content-type": "application/json" } : {}),
+        "x-deschis": "30",
+        "x-forwarded-for": DE_LA(),
+      },
+      body: json ? JSON.stringify(corp) : new URLSearchParams(corp),
+    });
+    await asteapta(800);
+    const noi = emailuri.slice(inainte.e);
+    return { stare: r.status, noi, notificari: notificari.length - inainte.n };
+  }
+  const laAsociatie = (noi) =>
+    noi.some((e) => [].concat(e.to ?? []).join(",").includes("@teona-ariana.ro"));
+  const laOm = (noi, adresa) => noi.some((e) => [].concat(e.to ?? []).join(",").includes(adresa));
+  const cazuri = [
+    ["contact", "/api/contact", { fel: "contact", nume: "Ana Contact", email: `contact.${T}@exemplu.ro`, mesaj: "Aș vrea să aflu cum pot ajuta la tabere.", acord: true }, `contact.${T}@exemplu.ro`],
+    ["voluntariat", "/api/contact", { fel: "voluntariat", nume: "Vlad Voluntar", email: `voluntar.${T}@exemplu.ro`, telefon: "0712345678", nastere: "1995-05-05", localitate: "Suceava", interes: "tabere", disponibilitate: "weekend", acord: true }, `voluntar.${T}@exemplu.ro`],
+    ["redirecționare 3,5%", "/api/formulare", { fel: "redirectionare", nume: "Ion Redirectionare", email: `redir.${T}@exemplu.ro`, telefon: "0712345678", preferinta: "Completez online", acord: true }, `redir.${T}@exemplu.ro`],
+    ["sponsorizare", "/api/formulare", { fel: "sponsorizare", firma: "FIRMA DE PROBA SRL", cui: "43533953", persoana: "Ion Firma", email: `firma.${T}@exemplu.ro`, telefon: "0712345678", cale: "Declarația 177", acord: true }, `firma.${T}@exemplu.ro`],
+  ];
+  for (const [nume, cale, corp, adresa] of cazuri) {
+    const r = await formular(cale, corp);
+    verifica(
+      r.stare === 200 && laAsociatie(r.noi) && laOm(r.noi, adresa) && r.notificari === 1,
+      `${nume}: trimis (${r.stare}), e-mail la asociație ${laAsociatie(r.noi) ? "da" : "NU"}, la om ${laOm(r.noi, adresa) ? "da" : "NU"}, notificare ${r.notificari}`,
+    );
+  }
+  const f230 = await formular(
+    "/api/formulare-230",
+    { nume: "Maria Hartie", email: `f230.${T}@exemplu.ro`, ani: "1", acord: "da" },
+    false,
+  );
+  verifica(
+    f230.stare === 200 && laOm(f230.noi, `f230.${T}@exemplu.ro`) && f230.notificari === 1,
+    `Formularul 230 pe hârtie: trimis (${f230.stare}), pașii pe e-mail la om, notificare ${f230.notificari}`,
+  );
+  const fdAniv = new FormData();
+  for (const [k, v] of Object.entries({ ocazie: "zi-de-nastere-copil", titlu: "Ziua lui Andrei", mesaj: "Andrei face 7 ani și vrem să ajutăm copiii din tabere.", nume_public: "Familia Pop", email: `aniv.${T}@exemplu.ro`, acord: "da" })) fdAniv.append(k, v);
+  const n0 = notificari.length;
+  const e0 = emailuri.length;
+  const aniv = await fetch(`${BAZA}/api/campanii`, { method: "POST", headers: { "x-deschis": "30", "x-forwarded-for": DE_LA() }, body: fdAniv });
+  await asteapta(800);
+  const noiAniv = emailuri.slice(e0);
+  verifica(
+    aniv.status === 201 && laAsociatie(noiAniv) && laOm(noiAniv, `aniv.${T}@exemplu.ro`) && notificari.length === n0 + 1,
+    `campanie de aniversare: trimisă (${aniv.status}), e-mail la asociație și la om, notificare ${notificari.length - n0}`,
+  );
+
   // ─── În panou și în contul donatorului ────────────────────────────────
   const tot = await (await fetch(`${BAZA}/admin/donatii`, { headers: { cookie } })).text();
   verifica([e1, e2, e3, e6, ep, et].every((e) => tot.includes(e)), "toate donațiile se văd la /admin/donatii");
@@ -520,6 +573,9 @@ try {
   await baza.query("DELETE FROM donatii WHERE referinta = ANY($1) OR id::text = ANY($1)", [referinte]).catch(() => {});
   await baza.query("DELETE FROM abonamente_push WHERE endpoint LIKE $1", [`%telefon-${T}`]).catch(() => {});
   await baza.query("DELETE FROM utilizatori WHERE email = $1", [`plati.${T}@exemplu.ro`]).catch(() => {});
+  await baza.query("DELETE FROM campanii_aniversare WHERE email = $1", [`aniv.${T}@exemplu.ro`]).catch(() => {});
+  await baza.query("DELETE FROM cereri WHERE email LIKE $1", [`%.${T}@exemplu.ro`]).catch(() => {});
+  await baza.query("DELETE FROM firme WHERE email = $1", [`firma.${T}@exemplu.ro`]).catch(() => {});
   await baza.end();
   mock.close();
   serviciuPush.close();

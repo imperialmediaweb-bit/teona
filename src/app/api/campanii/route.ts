@@ -10,6 +10,7 @@ import {
   urcaPoza,
 } from "@/lib/poza-urcata";
 import { LIMITE, esteOcazie } from "@/date/aniversari";
+import { notificaPanoul } from "@/lib/notificari";
 
 /**
  * Crearea unei campanii aniversare.
@@ -151,6 +152,11 @@ export async function POST(cerere: Request) {
     await Promise.allSettled([
       campanieTrimisa({ email, numePublic, titlu, slug, jeton }),
       anuntaAsociatia({ numePublic, titlu, email }),
+      notificaPanoul({
+        titlu: "Aniversare de aprobat",
+        text: `${numePublic} a pornit o campanie de ziua cuiva.`,
+        adresa: "/admin/aniversari",
+      }),
     ]);
 
     return NextResponse.json(

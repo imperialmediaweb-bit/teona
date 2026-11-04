@@ -1,6 +1,7 @@
 import { createHmac } from "node:crypto";
 import { cache } from "react";
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import { egale } from "./comparatie";
 import { cheiaDeSemnat } from "./cheie-semnare";
 import {
@@ -203,6 +204,13 @@ export function cititSesiuneaUtilizator(brut: string | undefined): string | null
  * 10:01, nu la expirarea cookie-ului.
  */
 export const cineEsteConectat = cache(async (): Promise<Conectat | null> => {
+  /*
+    Expirarea sesiunii se compară cu ora de acum (`Date.now()`). Fără
+    `connection()`, Next ajunge aici și când pregenerează scheletul paginii, unde
+    ora curentă e interzisă, și umple jurnalul cu „unstable value Date.now()”.
+    Sesiunea ține de cererea omului, deci se citește numai la cerere.
+  */
+  await connection();
   const borcan = await cookies();
   const gasit = borcan.get(COOKIE_ADMIN)?.value;
   if (!gasit) return null;
@@ -241,6 +249,7 @@ const PROASPAT_S = 12 * 60 * 60;
  * se citește din expirarea semnată.
  */
 export async function sesiuneProaspata(): Promise<boolean> {
+  await connection();
   const brut = (await cookies()).get(COOKIE_ADMIN)?.value;
   if (!brut) return false;
   if (cookieCheieValid(brut)) return true;

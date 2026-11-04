@@ -19,6 +19,7 @@ import {
 } from "@/date/formulare";
 import { areBazaDeDate } from "@/lib/baza";
 import { salveazaCerere, salveazaFirma } from "@/lib/crm";
+import { notificaPanoul } from "@/lib/notificari";
 
 /**
  * Cele două formulare fiscale: 20% pentru firme (8) și 3,5% pentru persoane
@@ -179,6 +180,12 @@ export async function POST(cerere: Request) {
         }).catch(() => null)
       : null;
 
+    await notificaPanoul({
+      titlu: "Cerere de sponsorizare",
+      text: `${firma} vrea să sponsorizeze.`,
+      adresa: "/admin/firme",
+    }).catch(() => 0);
+
     const inactiv = nuPleacaNimic(fel);
     // Fără Resend, cererea tot e salvată — deci nu mai e o cerere pierdută.
     // Omul află totuși că nu i-am trimis nimic pe e-mail.
@@ -231,6 +238,12 @@ export async function POST(cerere: Request) {
       detalii: { preferinta },
     }).catch(() => null);
   }
+
+  await notificaPanoul({
+    titlu: "Redirecționare 3,5%",
+    text: `${nume.split(/\s+/)[0]} vrea să redirecționeze 3,5% către asociație.`,
+    adresa: "/admin/formulare",
+  }).catch(() => 0);
 
   const inactiv = nuPleacaNimic(fel);
   if (inactiv) return inactiv;

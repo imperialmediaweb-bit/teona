@@ -19,7 +19,8 @@ log("=== Bannerul de cookie-uri ===");
   const ctx = await b.newContext({ viewport: { width: 1280, height: 900 } });
   const page = await ctx.newPage();
   const erori = urmaresteErori(page);
-  await page.goto(BAZA + "/", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   log("La prima vizită:", JSON.stringify(await banner(page)));
   log("Textul bannerului:", (await page.locator('[role="dialog"] p').first().innerText()).replace(/\s+/g, " "));
   log("Link politică:", await page.locator('[role="dialog"] a').getAttribute("href"));
@@ -30,7 +31,8 @@ log("=== Bannerul de cookie-uri ===");
   await page.click('[role="dialog"] button:has-text("Salvează alegerea")');
   await page.waitForTimeout(200);
   log("După Salvează (statistici bifat):", JSON.stringify(await banner(page)), " salvat=", await acordSalvat(page));
-  await page.reload({ waitUntil: "networkidle" });
+  await page.reload({ waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   log("După reîncărcare:", JSON.stringify(await banner(page)));
   // Redeschidere din subsol
   await page.click('footer button:has-text("Setări cookie-uri")');
@@ -39,7 +41,8 @@ log("=== Bannerul de cookie-uri ===");
   await page.click('[role="dialog"] button:has-text("Refuz")');
   await page.waitForTimeout(200);
   log("După Refuz:", JSON.stringify(await banner(page)), " salvat=", await acordSalvat(page));
-  await page.reload({ waitUntil: "networkidle" });
+  await page.reload({ waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   log("După reîncărcare (refuz):", JSON.stringify(await banner(page)));
   await page.click('footer button:has-text("Setări cookie-uri")');
   await page.click('[role="dialog"] button:has-text("Acceptă toate")');
@@ -52,7 +55,8 @@ log("=== Bannerul de cookie-uri ===");
   log("Pe /contact după acord:", JSON.stringify(await banner(page)));
   // Escape pe banner?
   await page.evaluate(() => localStorage.clear());
-  await page.reload({ waitUntil: "networkidle" });
+  await page.reload({ waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await page.keyboard.press("Escape");
   await page.waitForTimeout(200);
   log("Banner după Escape (fără alegere):", JSON.stringify(await banner(page)));
@@ -71,7 +75,8 @@ log("=== Bannerul de cookie-uri ===");
   // Pe telefon, bannerul vs butonul plutitor
   const ctxM = await b.newContext({ viewport: { width: 320, height: 568 } });
   const pm = await ctxM.newPage();
-  await pm.goto(BAZA + "/", { waitUntil: "networkidle" });
+  await pm.goto(BAZA + "/", { waitUntil: "load" });
+await pm.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   /*
     Așteptăm bannerul anume, nu ne bazăm pe `networkidle`.
 
@@ -102,7 +107,8 @@ log("\n=== Formularul 230 încorporat ===");
   const erori = urmaresteErori(page);
   const cereriExterne = [];
   page.on("request", (r) => { if (r.url().includes("formular230")) cereriExterne.push(r.url()); });
-  await page.goto(BAZA + "/redirectioneaza-3-5", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/redirectioneaza-3-5", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await page.waitForTimeout(800);
   const zona = async () => {
     const t = await page.locator('section[aria-labelledby^="formular230"]').allInnerTexts();
@@ -126,18 +132,21 @@ log("\n=== Formularul 230 încorporat ===");
   await page.click('[role="dialog"] button:has-text("Refuz")');
   await page.waitForTimeout(500);
   log("După refuz ulterior:", JSON.stringify(await zona()));
-  await page.reload({ waitUntil: "networkidle" });
+  await page.reload({ waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await page.waitForTimeout(500);
   log("După reîncărcare (refuz ulterior):", JSON.stringify(await zona()));
   // Acceptă toate -> se încarcă
   await page.evaluate(() => localStorage.clear());
-  await page.reload({ waitUntil: "networkidle" });
+  await page.reload({ waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await page.click('[role="dialog"] button:has-text("Acceptă toate")');
   await page.waitForTimeout(2000);
   log("După Acceptă toate:", JSON.stringify(await zona()), " script:", await page.locator('script[src*="formular230"]').count());
   // Setări: doar statistici → nu e suficient
   await page.evaluate(() => localStorage.clear());
-  await page.reload({ waitUntil: "networkidle" });
+  await page.reload({ waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await page.click('[role="dialog"] button:has-text("Setări")');
   await page.check("#cookie-marketing");
   await page.click('[role="dialog"] button:has-text("Salvează alegerea")');
@@ -145,7 +154,8 @@ log("\n=== Formularul 230 încorporat ===");
   log("Doar marketing bifat:", JSON.stringify(await zona()));
   // Fără localStorage (privat / blocat)
   await page.evaluate(() => { localStorage.clear(); });
-  await page.reload({ waitUntil: "networkidle" });
+  await page.reload({ waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await page.evaluate(() => { Object.defineProperty(window, "localStorage", { get() { throw new Error("blocat"); } }); });
   await page.click('button:has-text("Accept și încarcă formularul")').catch((e) => log("  clic a eșuat:", e.message.split("\n")[0]));
   await page.waitForTimeout(1500);
@@ -159,7 +169,8 @@ log("\n=== Butoanele Copiază ===");
 {
   const ctx = await b.newContext({ viewport: { width: 1280, height: 900 }, permissions: ["clipboard-read", "clipboard-write"] });
   const page = await ctx.newPage();
-  await page.goto(BAZA + "/doneaza", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/doneaza", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await page.click('[role="dialog"] button:has-text("Refuz")');
   const butoane = page.locator('#transfer button:has-text("Copiază")');
   log("Butoane Copiază în #transfer:", await butoane.count());
@@ -176,7 +187,8 @@ log("\n=== Butoanele Copiază ===");
   await page.waitForTimeout(2700);
   log("  După 2,5 s butonul revine la:", (await butoane.first().innerText()).trim());
   // Pe 3,5%: denumire, CIF, IBAN
-  await page.goto(BAZA + "/redirectioneaza-3-5", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/redirectioneaza-3-5", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   const toate = page.locator('button:has-text("Copiază")');
   const n = await toate.count();
   log("Butoane Copiază pe /redirectioneaza-3-5:", n);
@@ -185,7 +197,8 @@ log("\n=== Butoanele Copiază ===");
     await page.waitForTimeout(80);
     log("  copiat:", JSON.stringify(await page.evaluate(() => navigator.clipboard.readText())));
   }
-  await page.goto(BAZA + "/directioneaza-20", { waitUntil: "networkidle" });
+  await page.goto(BAZA + "/directioneaza-20", { waitUntil: "load" });
+await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   const t2 = page.locator('button:has-text("Copiază")');
   log("Butoane Copiază pe /directioneaza-20:", await t2.count());
   for (let i = 0; i < (await t2.count()); i++) {
@@ -201,7 +214,8 @@ log("\n=== Butoanele Copiază ===");
   await p2.addInitScript(() => {
     Object.defineProperty(navigator, "clipboard", { get: () => ({ writeText: () => Promise.reject(new DOMException("Write permission denied.", "NotAllowedError")) }) });
   });
-  await p2.goto(BAZA + "/doneaza", { waitUntil: "networkidle" });
+  await p2.goto(BAZA + "/doneaza", { waitUntil: "load" });
+await p2.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   const btn = p2.locator('#transfer button:has-text("Copiază")').first();
   await btn.click();
   await p2.waitForTimeout(200);
@@ -213,7 +227,8 @@ log("\n=== Butoanele Copiază ===");
   const p3 = await ctx3.newPage();
   await p3.addInitScript(() => { Object.defineProperty(navigator, "clipboard", { get: () => undefined }); });
   const erori3 = urmaresteErori(p3);
-  await p3.goto(BAZA + "/doneaza", { waitUntil: "networkidle" });
+  await p3.goto(BAZA + "/doneaza", { waitUntil: "load" });
+await p3.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await p3.locator('#transfer button:has-text("Copiază")').first().click();
   await p3.waitForTimeout(200);
   log("navigator.clipboard lipsă →", JSON.stringify(await p3.locator('#transfer button:has-text("Copiază")').first().evaluate((b) => b.parentElement.innerText.replace(/\s+/g, " "))), " erori:", JSON.stringify(erori3.filter((e) => e.includes("pageerror"))));
