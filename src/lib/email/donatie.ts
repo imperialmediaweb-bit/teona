@@ -4,6 +4,7 @@ import {
   EMAIL,
   RUTE,
   TELEFON_PRINCIPAL,
+  CATRE_ASOCIATIE,
 } from "@/date/asociatie";
 import { DESTINATII } from "@/date/plati";
 import { scrieSuma } from "@/lib/suma";
@@ -275,7 +276,7 @@ export function compuneAnuntDonatie(d: Date): Compus {
 
 export async function anuntaDonatia(d: Date): Promise<boolean> {
   return trimiteEmail({
-    catre: EMAIL.contact,
+    catre: CATRE_ASOCIATIE,
     raspundeLa: d.email,
     ...compuneAnuntDonatie(d),
   });

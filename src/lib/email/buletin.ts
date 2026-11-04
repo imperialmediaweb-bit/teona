@@ -1,5 +1,5 @@
 import { ADRESA_SITE } from "@/app/seo";
-import { ASOCIATIA, EMAIL } from "@/date/asociatie";
+import { CATRE_ASOCIATIE, ASOCIATIA, EMAIL } from "@/date/asociatie";
 import { curat, trimiteEmail } from "./trimite";
 import { MIC, P, buton, caseta, pagina, paginaInterna } from "./plic";
 import type { Compus } from "./campanie";
@@ -97,7 +97,7 @@ export async function anuntaAbonarea(d: {
   sursa: string;
 }): Promise<boolean> {
   return trimiteEmail({
-    catre: EMAIL.contact,
+    catre: CATRE_ASOCIATIE,
     raspundeLa: d.email,
     ...compuneAnuntAbonare(d),
   });

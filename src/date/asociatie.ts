@@ -38,6 +38,15 @@ export const EMAIL = {
   fundraising: "mihaela.sfichi@teona-ariana.ro",
 } as const;
 
+/**
+ * Cine primește anunțurile automate către asociație: donație nouă, transfer
+ * anunțat, mesaj de contact, voluntar nou, aniversare de aprobat, plată
+ * lunară eșuată, abonat nou. Adresa de contact și omul de strângere de
+ * fonduri, cerut în noiembrie 2026 („să primească și ea”). Un singur loc:
+ * un om nou pe rolul ăsta se schimbă aici, nu în șapte fișiere.
+ */
+export const CATRE_ASOCIATIE: string[] = [EMAIL.contact, EMAIL.fundraising];
+
 /** Persoanele de contact pentru firme (8.7). */
 export const CONTACT_FIRME = [
   {

@@ -1,4 +1,4 @@
-import { ASOCIATIA, EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
+import { CATRE_ASOCIATIE, ASOCIATIA, EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import { ADRESA_SITE } from "@/app/seo";
 import { curat, trimiteEmail } from "./trimite";
 import { MIC, P, buton, paginaInterna, pagina } from "./plic";
@@ -85,7 +85,7 @@ export function compuneAnunt(d: Anunt): Compus {
 }
 
 export async function anuntaAsociatia(d: Anunt): Promise<boolean> {
-  return trimiteEmail({ catre: EMAIL.contact, ...compuneAnunt(d) });
+  return trimiteEmail({ catre: CATRE_ASOCIATIE, ...compuneAnunt(d) });
 }
 
 type Hotarare = {

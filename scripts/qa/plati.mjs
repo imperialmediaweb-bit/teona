@@ -449,6 +449,12 @@ try {
     (e) => String(e.subject ?? "").startsWith("Abonat nou la buletin") && JSON.stringify(e).includes(en),
   );
   verifica(anuntAbonare.length === 1, "newsletter: asociația primește „Abonat nou la buletin”");
+  // Anunțurile către asociație pleacă și la omul de strângere de fonduri.
+  const interne = emailuri.filter((e) => /^(Donație nouă|Abonat nou la buletin|Mesaj nou|Voluntar nou|Transfer anunțat)/.test(String(e.subject ?? "")));
+  verifica(
+    interne.length > 0 && interne.every((e) => [].concat(e.to ?? []).includes("mihaela.sfichi@teona-ariana.ro")),
+    `anunțurile către asociație ajung și la Mihaela (${interne.length})`,
+  );
   verifica(notificari.length === notifNl + 1, `newsletter: notificare pe telefon (${notificari.length - notifNl})`);
   const abonatiPanou = await (await fetch(`${BAZA}/admin/abonati`, { headers: { cookie: cookieCont } })).text();
   verifica(abonatiPanou.includes(en), "newsletter: abonatul se vede la /admin/abonati");

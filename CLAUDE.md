@@ -1422,6 +1422,10 @@ antetele, subdomeniile și versiunile afișate. Ce s-a găsit și ce s-a făcut:
   notificare pe telefon. În panou: `/admin/abonati`, cu sursa fiecăruia și
   numărul întregii liste din MailerLite (cei de dinainte de 4 noiembrie sunt
   numai acolo). Dezabonarea din cont pune `dezabonat_la`.
+- **Anunțurile către asociație pleacă la două adrese** (`CATRE_ASOCIATIE` din
+  `date/asociatie.ts`): contact@ și mihaela.sfichi@ (fundraising). Donație
+  nouă, transfer anunțat, contact, voluntar, aniversare, plată eșuată, abonat
+  nou — toate. Omul de pe rol se schimbă într-un singur loc.
 - **Newsletterul trimite bun venit** (`src/lib/email/buletin.ts`). Abonarea
   merge prin API, cu starea „activ”, iar pe calea asta MailerLite nu trimite
   nimic; site-ul scria totuși „Verifică-ți emailul pentru a confirma” și

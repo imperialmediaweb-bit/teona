@@ -5,6 +5,7 @@ import {
   EMAIL,
   RUTE,
   TELEFON_PRINCIPAL,
+  CATRE_ASOCIATIE,
 } from "@/date/asociatie";
 import { CIFRE_DIN_COD, cifreSite, type Cifra } from "@/lib/cifre";
 
@@ -129,7 +130,7 @@ ${ASOCIATIA.motto}`,
 /** Mesajul către asociație. Întoarce `false` dacă n-a plecat. */
 export function trimiteMesajulDeContact(d: MesajDeContact): Promise<boolean> {
   return trimiteEmail({
-    catre: EMAIL.contact,
+    catre: CATRE_ASOCIATIE,
     raspundeLa: d.email,
     ...compuneMesajulDeContact(d),
   });

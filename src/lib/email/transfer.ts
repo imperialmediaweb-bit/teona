@@ -1,5 +1,5 @@
 import { ADRESA_SITE } from "@/app/seo";
-import { ASOCIATIA, EMAIL, RUTE, TELEFON_PRINCIPAL } from "@/date/asociatie";
+import { CATRE_ASOCIATIE, ASOCIATIA, EMAIL, RUTE, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import { DESTINATII } from "@/date/plati";
 import { scrieSuma } from "@/lib/suma";
 import { curat, tabel, trimiteEmail } from "./trimite";
@@ -140,7 +140,7 @@ ${ADRESA_SITE}/admin/donatii`,
  */
 export async function anuntaTransferulPeEmail(d: Anuntat): Promise<void> {
   await trimiteEmail({
-    catre: EMAIL.contact,
+    catre: CATRE_ASOCIATIE,
     raspundeLa: d.email,
     ...compuneAnuntTransfer(d),
   });

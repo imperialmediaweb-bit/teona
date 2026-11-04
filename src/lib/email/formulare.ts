@@ -7,6 +7,7 @@ import {
   EMAIL,
   RUTE,
   TELEFON_PRINCIPAL,
+  CATRE_ASOCIATIE,
 } from "@/date/asociatie";
 import { curat, tabel, trimiteEmail } from "./trimite";
 import { MIC, P, buton, caseta, paginaInterna, pagina, pasi } from "./plic";
@@ -168,7 +169,7 @@ export async function trimiteSponsorizare(
   // Întâi mesajul către asociație: dacă el nu pleacă, ruta îi spune omului,
   // în loc să-l lase să creadă că a scris cuiva.
   const catreAsociatie = await trimiteEmail({
-    catre: [EMAIL.contact, FUNDRAISING.email],
+    catre: [...new Set([...CATRE_ASOCIATIE, FUNDRAISING.email])],
     raspundeLa: d.email,
     ...compuneAnuntSponsorizare(d),
   });

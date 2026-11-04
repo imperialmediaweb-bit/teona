@@ -1,5 +1,5 @@
 import { ADRESA_SITE } from "@/app/seo";
-import { ASOCIATIA, EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
+import { CATRE_ASOCIATIE, ASOCIATIA, EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import { DESTINATII } from "@/date/plati";
 import { scrieSuma } from "@/lib/suma";
 import { linkCardNou } from "@/lib/card-nou";
@@ -152,7 +152,7 @@ Donatorul a primit un mesaj cu linkul de schimbat cardul. Un telefon în săptă
 
 export async function anuntaPlataEsuata(d: PlataEsuata): Promise<boolean> {
   return trimiteEmail({
-    catre: EMAIL.contact,
+    catre: CATRE_ASOCIATIE,
     raspundeLa: d.email,
     ...compuneAnuntPlataEsuata(d),
   });
