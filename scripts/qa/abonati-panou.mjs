@@ -65,6 +65,19 @@ const mentiune = createServer((req, res) => {
       return da({ message: "not found" }, 404);
     }
     if (req.url.startsWith("/subscribers")) return da({ data: { id: "s2" } }, 201);
+    // Lista grupului, cum o dă MailerLite: patru abonați de dinainte la persoane,
+    // niciunul la firme. Unul dintre ei e A1 (după încărcare, site-ul îl știe și el).
+    if (/^\/groups\/g-pers\/subscribers/.test(req.url))
+      return da({
+        data: [
+          { email: "vechi1@exemplu.ro", status: "active", source: "import", subscribed_at: "2025-03-01 10:00:00", fields: { name: "Ana", last_name: "Veche" } },
+          { email: "vechi2@exemplu.ro", status: "active", source: "form", subscribed_at: "2025-06-10 10:00:00", fields: { name: null } },
+          { email: "dezabonat@exemplu.ro", status: "unsubscribed", source: "form", subscribed_at: "2025-06-11 10:00:00", fields: {} },
+          { email: A1, status: "active", source: "api", subscribed_at: "2026-11-04 12:00:00", fields: {} },
+        ],
+        meta: { next_cursor: null },
+      });
+    if (/^\/groups\/g-firme\/subscribers/.test(req.url)) return da({ data: [], meta: { next_cursor: null } });
     if (req.url.startsWith("/groups"))
       return da({ data: [{ id: "g-pers", name: "Persoane", active_count: 412 }, { id: "g-firme", name: "Firme", active_count: 57 }] });
     da({}, 404);
@@ -164,6 +177,13 @@ try {
   verifica(pagina.includes(A1) && pagina.includes(`lista de la târgul de Crăciun ${RUL}`), "pagina arată adresa și de unde e acordul");
   verifica(pagina.includes(">412<") && pagina.includes(">57<") && pagina.includes(">469<"), "cifrele din MailerLite: 412 persoane, 57 firme, 469 total");
   verifica(/Încărcați manual/.test(pagina), "tabelul „De unde au venit” are rândul „Încărcați manual”");
+  // Cei din MailerLite pe care site-ul nu i-a văzut venind sunt în listă, nu doar în cifra de sus.
+  verifica(pagina.includes("vechi1@exemplu.ro") && pagina.includes("Ana Veche") && pagina.includes("vechi2@exemplu.ro"), "abonații de dinainte, din MailerLite, apar în listă cu nume și adresă");
+  verifica(!pagina.includes("dezabonat@exemplu.ro"), "un dezabonat din MailerLite nu apare");
+  // Numai HTML-ul văzut de om: datele React din <script> repetă conținutul.
+  const vizibil = pagina.replace(/<script[\s\S]*?<\/script>/g, "");
+  verifica((vizibil.match(new RegExp(A1, "g")) ?? []).length === 1, "o adresă știută și de site, și de MailerLite apare o singură dată");
+  verifica(/Din MailerLite, de dinainte/i.test(pagina) && /De dinainte de 4 noiembrie 2026[^<]*<\/a>\s*<\/td>\s*<td[^>]*>2</.test(pagina.replace(/<!-- -->/g, "")), "rândul „de dinainte” numără 2 (cei doi necunoscuți site-ului)");
   const incarca = await (await fetch(`${BAZA}/admin/abonati/incarca`, { headers: { cookie } })).text();
   verifica(incarca.includes("câte una pe rând") && incarca.includes("Firme (persoane juridice)"), "pagina „Încarcă abonați” se deschide, cu cele două liste");
 

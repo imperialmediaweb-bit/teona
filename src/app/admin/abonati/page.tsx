@@ -9,7 +9,7 @@ import {
 } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { NUMELE_SURSEI, type SursaAbonare, abonati, areBuletin } from "@/lib/buletin";
-import { grupuri } from "@/lib/email/mailerlite";
+import { type AbonatMailerLite, abonatiiGrupului, grupuri } from "@/lib/email/mailerlite";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
@@ -34,6 +34,8 @@ type Lista = "persoane" | "firme";
 type Cautare = { sursa?: string; lista?: string; gresit?: string };
 
 const SURSE: SursaAbonare[] = ["panou", "donatie", "formular", "cont"];
+type Sursa = SursaAbonare | "mailerlite";
+const NUME_SURSA: Record<Sursa, string> = { ...NUMELE_SURSEI, mailerlite: "Din MailerLite, de dinainte" };
 
 export default function PaginaAbonati({ searchParams }: { searchParams: Promise<Cautare> }) {
   return (
@@ -71,7 +73,32 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
     );
   }
 
-  const [toti, deLaMailerLite] = await Promise.all([abonati(5000), grupuri().catch(() => [])]);
+  const [aiNostri, deLaMailerLite, mlPersoane, mlFirme] = await Promise.all([
+    abonati(5000),
+    grupuri().catch(() => []),
+    abonatiiGrupului(process.env.MAILERLITE_GROUP_ID ?? "").catch(() => null),
+    abonatiiGrupului(process.env.MAILERLITE_GROUP_FIRME ?? "").catch(() => null),
+  ]);
+  /*
+    Lista de jos: ce știe site-ul, plus cine e în MailerLite și site-ul nu
+    l-a văzut venind — abonații de dinainte de 4 noiembrie 2026 sau puși
+    direct în MailerLite. Ei apar cu sursa „mailerlite”.
+  */
+  const stiuti = new Set(aiNostri.map((a) => a.email.toLowerCase()));
+  const dinMailerLite = (l: Lista, lista: AbonatMailerLite[] | null) =>
+    (lista ?? [])
+      .filter((a) => !stiuti.has(a.email))
+      .map((a) => ({
+        email: a.email,
+        nume: a.nume,
+        lista: l,
+        sursa: "mailerlite" as const,
+        creatLa: a.abonatLa ?? "",
+        dezabonatLa: null,
+        adaugatDe: null,
+        acordNota: a.sursa ? `în MailerLite: ${a.sursa}` : null,
+      }));
+  const toti = [...aiNostri, ...dinMailerLite("persoane", mlPersoane), ...dinMailerLite("firme", mlFirme)];
 
   // Cifrele adevărate, din MailerLite: grupul fiecărei liste, după identificatorul din Railway.
   const grupPersoane = deLaMailerLite.find((g) => g.id === process.env.MAILERLITE_GROUP_ID);
@@ -82,21 +109,20 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   };
 
   const activi = toti.filter((a) => !a.dezabonatLa);
-  const cati = (s: SursaAbonare | null, l: Lista) =>
+  const cati = (s: Sursa | null, l: Lista) =>
     activi.filter((a) => (s === null || a.sursa === s) && (a.lista === "firme" ? "firme" : "persoane") === l).length;
-  const deDinainte = (l: Lista) => {
-    const ml = inMailerLite[l];
-    return ml === null ? null : Math.max(0, ml - cati(null, l));
-  };
+  // „De dinainte”: cei citiți din MailerLite pe care site-ul nu i-a văzut venind.
+  const deDinainte = (l: Lista): number | null =>
+    (l === "persoane" ? mlPersoane : mlFirme) === null ? null : cati("mailerlite", l);
 
-  const sursaAleasa = sursa && sursa in NUMELE_SURSEI ? (sursa as SursaAbonare) : null;
+  const sursaAleasa = sursa && sursa in NUME_SURSA ? (sursa as Sursa) : null;
   const listaAleasa: Lista | null = listaCeruta === "firme" || listaCeruta === "persoane" ? listaCeruta : null;
   const lista = toti.filter(
     (a) =>
       (!sursaAleasa || a.sursa === sursaAleasa) &&
       (!listaAleasa || (a.lista === "firme" ? "firme" : "persoane") === listaAleasa),
   );
-  const leg = (s: SursaAbonare | null, l: Lista | null) => {
+  const leg = (s: Sursa | null, l: Lista | null) => {
     const q = new URLSearchParams();
     if (s) q.set("sursa", s);
     if (l) q.set("lista", l);
@@ -170,7 +196,11 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                 </tr>
               ))}
               <tr className="border-b border-hartie-umbra text-cerneala-moale">
-                <td className="py-2 pr-4">De dinainte de 4 noiembrie 2026 (numai în MailerLite)</td>
+                <td className="py-2 pr-4">
+                  <a href={leg("mailerlite", null)} className="underline-offset-2 hover:underline">
+                    De dinainte de 4 noiembrie 2026, sau puși direct în MailerLite
+                  </a>
+                </td>
                 <td className="py-2 pr-4 text-right">{nr(deDinainte("persoane"))}</td>
                 <td className="py-2 pr-4 text-right">{nr(deDinainte("firme"))}</td>
                 <td className="py-2 text-right">
@@ -200,10 +230,17 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
               {s === "panou" ? "Manual" : s === "donatie" ? "Donații" : s === "formular" ? "Newsletter" : "Cont"}
             </Filtru>
           ))}
+          <Filtru href={leg("mailerlite", listaAleasa)} activ={sursaAleasa === "mailerlite"}>
+            Din MailerLite
+          </Filtru>
         </div>
 
         {lista.length === 0 ? (
-          <p className="mt-6 text-amplu text-cerneala-moale">Nicio abonare aici.</p>
+          <p className="mt-6 text-amplu text-cerneala-moale">
+            {mlPersoane === null && mlFirme === null && areBuletin()
+              ? "MailerLite n-a răspuns acum, iar site-ul n-are încă nicio abonare notată aici."
+              : "Nicio abonare aici."}
+          </p>
         ) : (
           <ul className="mt-5 grid gap-2">
             {lista.slice(0, 500).map((a) => (
@@ -221,8 +258,8 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                 )}
                 <span className="text-nota text-cerneala-moale">
                   {a.lista === "firme" ? "Firmă" : "Persoană fizică"} ·{" "}
-                  {a.sursa === "panou" ? "încărcat manual" : NUMELE_SURSEI[a.sursa].toLowerCase()} ·{" "}
-                  {new Date(a.creatLa).toLocaleDateString("ro-RO", { day: "numeric", month: "long", year: "numeric" })}
+                  {a.sursa === "panou" ? "încărcat manual" : NUME_SURSA[a.sursa].toLowerCase()}
+                  {a.creatLa && ` · ${new Date(a.creatLa).toLocaleDateString("ro-RO", { day: "numeric", month: "long", year: "numeric" })}`}
                   {a.dezabonatLa && " · s-a dezabonat"}
                 </span>
                 {a.sursa === "panou" && (

@@ -166,3 +166,61 @@ export async function grupuri(): Promise<
       activi: Number(g.active_count ?? 0),
     }));
 }
+
+export type AbonatMailerLite = {
+  email: string;
+  nume: string | null;
+  abonatLa: string | null;
+  /** Cum a intrat, după MailerLite: „api” (site-ul), „manual”, „import”, „form”… */
+  sursa: string | null;
+};
+
+/**
+ * Abonații activi ai unui grup, de la MailerLite.
+ *
+ * Lista adevărată e acolo; panoul o arată ca să nu deschidă nimeni
+ * MailerLite doar ca să vadă cine e abonat. Pe 4 noiembrie 2026 pagina
+ * scria sus „4 abonați” și jos „nicio abonare”: site-ul știa numai de
+ * abonările făcute prin el, de atunci încolo, iar cei patru erau de
+ * dinainte. Se citesc pagină cu pagină (cursor), cel mult `maxim`.
+ */
+export async function abonatiiGrupului(
+  grup: string,
+  maxim = 2000,
+): Promise<AbonatMailerLite[]> {
+  const cheie = process.env.MAILERLITE_API_KEY;
+  if (!cheie || !grup) return [];
+  const toti: AbonatMailerLite[] = [];
+  let cursor: string | null = null;
+  for (let pagina = 0; pagina < 20 && toti.length < maxim; pagina++) {
+    const q = new URLSearchParams({ "filter[status]": "active", limit: "250" });
+    if (cursor) q.set("cursor", cursor);
+    const raspuns = await fetch(`${BAZA}/groups/${encodeURIComponent(grup)}/subscribers?${q}`, {
+      headers: { Authorization: `Bearer ${cheie}`, Accept: "application/json" },
+    });
+    if (!raspuns.ok) throw new Error(`MailerLite ${raspuns.status}`);
+    const corp = (await raspuns.json().catch(() => ({}))) as {
+      data?: Array<{
+        email?: string;
+        status?: string;
+        source?: string;
+        subscribed_at?: string | null;
+        fields?: { name?: string | null; last_name?: string | null };
+      }>;
+      meta?: { next_cursor?: string | null };
+    };
+    for (const a of corp.data ?? []) {
+      if (!a.email || (a.status && a.status !== "active")) continue;
+      const nume = [a.fields?.name, a.fields?.last_name].filter(Boolean).join(" ").trim();
+      toti.push({
+        email: a.email.toLowerCase(),
+        nume: nume || null,
+        abonatLa: a.subscribed_at ?? null,
+        sursa: a.source ?? null,
+      });
+    }
+    cursor = corp.meta?.next_cursor ?? null;
+    if (!cursor || !(corp.data ?? []).length) break;
+  }
+  return toti;
+}

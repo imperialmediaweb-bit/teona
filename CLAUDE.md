@@ -1503,6 +1503,12 @@ antetele, subdomeniile și versiunile afișate. Ce s-a găsit și ce s-a făcut:
   dinainte de 4 noiembrie” = MailerLite minus ce știm noi; jos, lista, cu
   filtre. **Site-ul nu ține o copie a listei**, doar urma fiecărei abonări.
   `/admin/abonati/incarca` (drept separat în `PAGINI`) are formularul.
+  **Lista de jos vine și din MailerLite** (`abonatiiGrupului`, pagină cu
+  pagină): cei pe care site-ul nu i-a văzut venind apar cu sursa
+  „mailerlite” și intră în rândul „de dinainte”. Fără asta, pe 4 noiembrie
+  pagina scria sus „4 abonați” și jos „nicio abonare” — site-ul știa numai
+  de abonările făcute prin el, de atunci încolo. Mențiunea din probă
+  răspunde și la `/groups/<id>/subscribers`.
 - **Adrese adăugate de mână, din panou** (`/admin/abonati/incarca`;
   `/api/admin/abonati`): una sau mai multe, despărțite prin virgulă,
   punct și virgulă sau rând nou, toate în lista aleasă (persoane fizice sau
