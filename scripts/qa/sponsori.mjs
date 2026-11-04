@@ -159,7 +159,10 @@ verifica(
 );
 verifica(
   laInceput.every((n) => dupaNume.has(n)),
-  "fiecare siglă din bandă se regăsește în panou",
+  `fiecare siglă din bandă se regăsește în panou${(() => {
+    const lipsa = laInceput.filter((n) => !dupaNume.has(n));
+    return lipsa.length ? ` (lipsesc: ${lipsa.join(", ")})` : "";
+  })()}`,
 );
 if (rele > 0) {
   console.log("\nNu pot merge mai departe.");
