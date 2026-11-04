@@ -1450,4 +1450,9 @@ npm run build    # verifică TypeScript și compilarea
 npm run start    # ascultă pe $PORT, cum cere Railway
 ```
 
+Pe Railway pornește direct `node_modules/.bin/next start` (`railway.json`), nu
+prin npm: la fiecare publicare containerul vechi primește SIGTERM, iar npm
+scria atunci cinci rânduri roșii „npm error signal SIGTERM” în jurnal — o
+oprire normală care arăta ca o cădere. `next start` citește singur `PORT`.
+
 Înainte de orice commit: `npm run build` trebuie să treacă.

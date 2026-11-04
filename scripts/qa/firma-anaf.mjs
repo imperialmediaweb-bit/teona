@@ -90,10 +90,12 @@ await pagina.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
     "calculatorul a răspuns la CUI",
   );
 
-  const valCifra = await cifra.inputValue();
-  const valImpozit = await pagina
-    .getByLabel(/Impozitul pe profit/i)
-    .inputValue();
+  // Câmpurile arată suma cu punct la mii („13.157.835.535”).
+  const caNumar = (t) => Number(String(t).replace(/\./g, "").replace(",", "."));
+  const valCifra = caNumar(await cifra.inputValue());
+  const valImpozit = caNumar(
+    await pagina.getByLabel(/Impozitul pe profit/i).inputValue(),
+  );
   verifica(Number(valCifra) > 0, `cifra de afaceri s-a completat (${valCifra})`);
   verifica(Number(valImpozit) > 0, `impozitul s-a completat (${valImpozit})`);
   verifica(
@@ -115,7 +117,7 @@ await pagina.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   // Suma maximă apare, și e cea mai mică dintre cele două praguri.
   verifica(
     /Suma maximă pe care o poți direcționa/i.test(text) &&
-      /Acesta e pragul care limitează suma/i.test(text),
+      /Pragul ăsta limitează suma/i.test(text),
     "suma maximă și pragul care o limitează se văd",
   );
 
