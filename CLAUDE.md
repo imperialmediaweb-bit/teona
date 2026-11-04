@@ -1112,8 +1112,16 @@ Trei apărări, în ordinea în care lucrează:
   un mesaj care spune că fișierul e probabil prea mare — niciodată „Cerere
   invalidă”.
 
-Probă, cu o „poză de telefon” de 19 MB făcută cu sharp, în browser și direct
-la rută: `BAZA=… PAROLA_ADMIN=… node scripts/qa/poza-mare.mjs` — 7 verificări.
+În aceeași zi, poza aleasă apărea **ruptă în previzualizarea de lângă
+formular**: cadrul primea o adresă `blob:` care se revoca și se refăcea la
+fiecare literă scrisă. Acum spre server pleacă doar un semn de loc, iar în
+HTML-ul primit semnul devine poza scrisă în pagină (`data:`), după ce a fost
+micșorată; `MicsoreazaPoza` trimite un `change` după înlocuire, ca
+previzualizarea să se redeseneze cu poza mică.
+
+Probă, cu o „poză de telefon” de 19 MB făcută cu sharp, în browser (inclusiv
+cadrul de previzualizare) și direct la rută:
+`BAZA=… PAROLA_ADMIN=… node scripts/qa/poza-mare.mjs` — 8 verificări.
 
 ## Site-ul nu face campanii de e-mail
 

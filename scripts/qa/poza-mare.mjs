@@ -66,6 +66,24 @@ const dimensiuni = await camp.evaluate(async (el) => {
   return { w: bmp.width, h: bmp.height };
 });
 verifica(dimensiuni.w === 2000 && dimensiuni.h === 1500, `latura mare e 2.000 px (${dimensiuni.w}×${dimensiuni.h})`);
+// Previzualizarea de lângă formular arată poza micșorată, scrisă în pagină
+// (`data:`), nu o adresă `blob:` care se poate rupe — cazul din 4 noiembrie.
+await page.fill('input[name="poza_alt"]', "Sala Unirii");
+await page
+  .waitForFunction(
+    () => {
+      const img = document.querySelector("iframe")?.contentDocument?.querySelector('img[alt="Sala Unirii"]');
+      return Boolean(img && img.complete && img.naturalWidth > 0 && img.getAttribute("src")?.startsWith("data:image/jpeg"));
+    },
+    null,
+    { timeout: 20000 },
+  )
+  .catch(() => {});
+const inCadru = await page.evaluate(() => {
+  const img = document.querySelector("iframe")?.contentDocument?.querySelector('img[alt="Sala Unirii"]');
+  return { src: img?.getAttribute("src")?.slice(0, 15) ?? "", latime: img?.naturalWidth ?? 0 };
+});
+verifica(inCadru.src === "data:image/jpeg" && inCadru.latime === 2000, `previzualizarea arată poza micșorată, scrisă în pagină (${inCadru.src}…, ${inCadru.latime} px)`);
 const cookie = (await ctx.cookies()).map((c) => `${c.name}=${c.value}`).join("; ");
 await b.close();
 

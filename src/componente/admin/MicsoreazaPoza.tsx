@@ -69,6 +69,9 @@ export default function MicsoreazaPoza() {
       const dt = new DataTransfer();
       for (const f of noi) dt.items.add(f);
       input.files = dt.files;
+      // Cine ascultă câmpul (previzualizarea) află că poza s-a schimbat.
+      // Poza mică nu mai trece de prag, deci schimbarea asta nu o ia de la capăt.
+      input.dispatchEvent(new Event("change", { bubbles: true }));
 
       let nota = input.parentElement?.querySelector<HTMLElement>("[data-nota-poza]") ?? null;
       if (!nota) {

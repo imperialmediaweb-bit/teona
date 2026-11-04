@@ -15,8 +15,14 @@ import { useEffect, useRef, useState } from "react";
  * de-a lui pusă în cadru rămâne albă. Un document scris direct în cadru nu
  * trece prin regula aia. `sandbox` fără scripturi: e-mailul n-are ce rula.
  *
- * Poza aleasă de pe calculator se arată din browser (`blob:`), fără s-o urce:
- * urcarea se face abia la trimitere.
+ * Poza aleasă de pe calculator se arată fără s-o urce: urcarea se face abia
+ * la trimitere. Spre server pleacă doar o adresă `blob:` ca semn de loc, iar
+ * în HTML-ul primit semnul se înlocuiește cu poza întreagă, scrisă în pagină
+ * (`data:`). Înainte cadrul primea chiar adresa `blob:`, iar ea se revoca și
+ * se refăcea la fiecare literă scrisă: pe 4 noiembrie 2026 fundraiserul a
+ * văzut în cadru o imagine ruptă în locul pozei. O poză scrisă în pagină nu
+ * depinde de nimic. Se scrie în pagină numai după ce a fost micșorată
+ * (`MicsoreazaPoza`, sub 2 MB); până atunci rămâne semnul de loc.
  *
  * Tot aici: când schimbi „Pentru cine”, lista potrivită se bifează singură și
  * cealaltă se debifează. Un e-mail pentru firme plecat la persoane fizice e
@@ -35,6 +41,8 @@ export default function PrevizualizareEmail({
   const [incarc, setIncarc] = useState(false);
   const blob = useRef<string | null>(null);
   const ultima = useRef(0);
+  /** Poza aleasă, scrisă `data:`, ca să nu se citească iar la fiecare literă. */
+  const inPagina = useRef<{ fisier: File; adresa: string } | null>(null);
 
   useEffect(() => {
     const f = document.getElementById(formular) as HTMLFormElement | null;
@@ -45,13 +53,24 @@ export default function PrevizualizareEmail({
       const date = new FormData(f);
       const fisier = date.get("poza_fisier");
       date.delete("poza_fisier");
+      let adresaInPagina: string | null = null;
       if (fisier instanceof File && fisier.size > 0) {
-        if (blob.current) URL.revokeObjectURL(blob.current);
-        blob.current = URL.createObjectURL(fisier);
+        if (!blob.current) blob.current = URL.createObjectURL(new Blob());
         date.set("poza_locala", blob.current);
-      } else if (blob.current) {
-        URL.revokeObjectURL(blob.current);
-        blob.current = null;
+        if (fisier.size <= 2 * 1024 * 1024) {
+          if (inPagina.current?.fisier !== fisier) {
+            const adresa = await new Promise<string>((r, nu) => {
+              const c = new FileReader();
+              c.onload = () => r(String(c.result));
+              c.onerror = () => nu(c.error);
+              c.readAsDataURL(fisier);
+            }).catch(() => null);
+            inPagina.current = adresa ? { fisier, adresa } : null;
+          }
+          adresaInPagina = inPagina.current?.adresa ?? null;
+        }
+      } else {
+        inPagina.current = null;
       }
       date.set("fac", "vezi");
       const nr = ++ultima.current;
@@ -76,7 +95,9 @@ export default function PrevizualizareEmail({
                 numai de pe adresa exactă a paginii, iar `www.` e alta; se
                 scriu deci relativ, din același site.
               */
-              .replace(/https?:\/\/(www\.)?teona-ariana\.ro\//g, "/"),
+              .replace(/https?:\/\/(www\.)?teona-ariana\.ro\//g, "/")
+              // Semnul de loc devine poza întreagă, scrisă în pagină.
+              .replaceAll(blob.current ?? "\u0000", adresaInPagina ?? blob.current ?? ""),
           );
         }
       } catch {
