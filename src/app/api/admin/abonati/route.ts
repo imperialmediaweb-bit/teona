@@ -27,7 +27,7 @@ export async function POST(cerere: Request) {
   });
   if (prea) return prea;
 
-  if (!(await arePermisiune("/admin/abonati"))) return raspuns("Nu ai acces.", 403);
+  if (!(await arePermisiune("/admin/abonati/incarca"))) return raspuns("Nu ai acces.", 403);
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
   if (!areBuletin()) return nuTrece("MailerLite nu e legat (MAILERLITE_API_KEY), deci adresele n-ar avea unde să ajungă.");
 
@@ -88,5 +88,5 @@ export async function POST(cerere: Request) {
   if (gresite.length) q.set("gresite", gresite.join(", ").slice(0, 400));
   if (ratate.length) q.set("ratate", ratate.join(", ").slice(0, 400));
   if (dezabonati.length) q.set("dezabonati", dezabonati.join(", ").slice(0, 400));
-  return trimiteLa(`/admin/abonati?${q}#adauga`);
+  return trimiteLa(`/admin/abonati/incarca?${q}#rezultat`);
 }

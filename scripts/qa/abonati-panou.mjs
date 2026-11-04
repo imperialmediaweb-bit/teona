@@ -65,7 +65,8 @@ const mentiune = createServer((req, res) => {
       return da({ message: "not found" }, 404);
     }
     if (req.url.startsWith("/subscribers")) return da({ data: { id: "s2" } }, 201);
-    if (req.url.startsWith("/groups")) return da({ data: [] });
+    if (req.url.startsWith("/groups"))
+      return da({ data: [{ id: "g-pers", name: "Persoane", active_count: 412 }, { id: "g-firme", name: "Firme", active_count: 57 }] });
     da({}, 404);
   });
 });
@@ -138,7 +139,7 @@ try {
     acord_nota: `lista de la târgul de Crăciun ${RUL}`,
   });
   const unde = decodeURIComponent(bun.headers.get("location") ?? "");
-  verifica(bun.status === 303 && unde.includes("adaugati=2"), `două adrese adăugate (${unde.slice(0, 120)})`);
+  verifica(bun.status === 303 && unde.startsWith("/admin/abonati/incarca") && unde.includes("adaugati=2"), `două adrese adăugate (${unde.slice(0, 120)})`);
   verifica(unde.includes("gresite=nu-e-adresa"), "adresa greșită e numită");
   verifica(unde.includes(`dezabonati=${PLECAT}`), "cea dezabonată nu e pusă înapoi, și e numită");
 
@@ -161,6 +162,10 @@ try {
 
   const pagina = (await (await fetch(`${BAZA}/admin/abonati`, { headers: { cookie } })).text()).replace(/<!-- -->/g, "");
   verifica(pagina.includes(A1) && pagina.includes(`lista de la târgul de Crăciun ${RUL}`), "pagina arată adresa și de unde e acordul");
+  verifica(pagina.includes(">412<") && pagina.includes(">57<") && pagina.includes(">469<"), "cifrele din MailerLite: 412 persoane, 57 firme, 469 total");
+  verifica(/Încărcați manual/.test(pagina), "tabelul „De unde au venit” are rândul „Încărcați manual”");
+  const incarca = await (await fetch(`${BAZA}/admin/abonati/incarca`, { headers: { cookie } })).text();
+  verifica(incarca.includes("câte una pe rând") && incarca.includes("Firme (persoane juridice)"), "pagina „Încarcă abonați” se deschide, cu cele două liste");
 
   jurnal.length = 0;
   const iar = await trimite({ adrese: A1, lista: "persoane", acord: "da", acord_nota: "a doua oară", bun_venit: "da" });
