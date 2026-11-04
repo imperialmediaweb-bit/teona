@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
-import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
+import {
+  areParolaConfigurata,
+  arePermisiune,
+  cineEsteConectat,
+  esteAutentificat,
+} from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { numeleMetodei, rezumat } from "@/lib/plati/donatori";
 import {
@@ -201,9 +206,12 @@ async function Continut({
       descriere="Cum stă asociația cu banii și ce așteaptă un răspuns."
       activ="/admin"
     >
-      <div className="mb-6 max-w-xl">
-        <Notificari cheiePublica={cheiaPublica()} />
-      </div>
+      {/* Notificările se pornesc numai din conturile cu nume (vezi /api/admin/push). */}
+      {(await cineEsteConectat())?.fel === "cont" && (
+        <div className="mb-6 max-w-xl">
+          <Notificari cheiePublica={cheiaPublica()} />
+        </div>
+      )}
       {/*
         Ce așteaptă un răspuns, înaintea oricărei cifre.
 

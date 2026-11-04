@@ -113,6 +113,10 @@ const mock = createServer((req, res) => {
       const sesiune = sesiuniStripe.get(s[1]);
       return sesiune ? json(200, sesiune) : json(404, { error: { message: "No such session" } });
     }
+    if (u.startsWith("/v1/notifications/verify-webhook-signature")) {
+      return json(200, { verification_status: "SUCCESS" });
+    }
+    if (u.startsWith("/subscribers")) return json(201, { data: { id: "sub_proba" } });
     if (u.startsWith("/v1/oauth2/token")) {
       return json(200, { access_token: "jeton-proba", expires_in: 3600 });
     }
@@ -188,6 +192,8 @@ const anunturi = (fragment) =>
       String(e.subject ?? "").includes(fragment),
   );
 
+const SECRET_SESIUNE = "secret-de-proba-pentru-plati-toate-1234567";
+
 // Chei de notificări de unică folosință: cele adevărate stau numai în Railway.
 const chei = webpush.generateVAPIDKeys();
 
@@ -202,7 +208,11 @@ const site = spawn("npm", ["run", "start"], {
     PAYPAL_CLIENT_ID: "proba",
     PAYPAL_CLIENT_SECRET: "proba",
     PAYPAL_API: `http://127.0.0.1:${MOCK}`,
-    SECRET_SESIUNE: "secret-de-proba-pentru-plati-toate-1234567",
+    PAYPAL_WEBHOOK_ID: "WH-PROBA",
+    MAILERLITE_API: `http://127.0.0.1:${MOCK}`,
+    MAILERLITE_API_KEY: "proba",
+    MAILERLITE_GROUP_ID: "g-pers",
+    SECRET_SESIUNE,
     EMAIL_API: `http://127.0.0.1:${MOCK}`,
     RESEND_API_KEY: "proba",
     VAPID_PUBLIC_KEY: chei.publicKey,
@@ -233,12 +243,31 @@ try {
   const cookie = (intra.headers.getSetCookie?.() ?? [])
     .map((c) => c.split(";")[0])
     .find((c) => c.startsWith("teona_verificare="));
+  /*
+    Notificările se pornesc numai dintr-un cont cu nume. Proba își face unul,
+    de strângere de fonduri, și își semnează singură sesiunea, cu aceeași
+    cheie pe care a dat-o site-ului (formatul din lib/admin.ts).
+  */
+  const cont = (
+    await baza.query(
+      "INSERT INTO utilizatori (email, nume, rol) VALUES ($1, 'Proba Plăți', 'fundraising') RETURNING id",
+      [`plati.${T}@exemplu.ro`],
+    )
+  ).rows[0].id;
+  const expira = Math.floor(Date.now() / 1000) + 3600;
+  const cookieCont = `teona_verificare=u:${cont}:${expira}:${createHmac("sha256", SECRET_SESIUNE).update(`panou:${cont}:${expira}`).digest("hex")}`;
+  const cuCheia = await fetch(`${BAZA}/api/admin/push`, {
+    method: "POST",
+    headers: { "content-type": "application/json", cookie, "x-forwarded-for": DE_LA() },
+    body: JSON.stringify({ fac: "aboneaza", abonament: { endpoint: "https://fcm.googleapis.com/x", keys: { p256dh: "a", auth: "b" } } }),
+  });
+  verifica(cuCheia.status === 403, `cu parola asociației notificările nu se pot porni (${cuCheia.status})`);
   const telefon = createECDH("prime256v1");
   telefon.generateKeys();
   const endpoint = `https://127.0.0.1:${PORT_PUSH}/push/telefon-${T}`;
   const abonare = await fetch(`${BAZA}/api/admin/push`, {
     method: "POST",
-    headers: { "content-type": "application/json", cookie, "x-forwarded-for": DE_LA() },
+    headers: { "content-type": "application/json", cookie: cookieCont, "x-forwarded-for": DE_LA() },
     body: JSON.stringify({
       fac: "aboneaza",
       abonament: {
@@ -253,7 +282,7 @@ try {
   verifica(abonare.ok, `telefonul se abonează la notificări (${abonare.status})`);
   const proba = await fetch(`${BAZA}/api/admin/push`, {
     method: "POST",
-    headers: { "content-type": "application/json", cookie, "x-forwarded-for": DE_LA() },
+    headers: { "content-type": "application/json", cookie: cookieCont, "x-forwarded-for": DE_LA() },
     body: JSON.stringify({ fac: "proba" }),
   });
   await asteapta(500);
@@ -373,6 +402,68 @@ try {
   await asteapta(500);
   verifica(catre(ep).length === 1, "PayPal: a doua confirmare (reîncărcarea paginii) nu dublează nimic");
 
+  // ─── PayPal: anunțul de încasare ajunge înaintea paginii ──────────────
+  const comanda2 = `ORDB${T}`.slice(0, 20);
+  const captura2 = `CAPB${T}`;
+  const ep2 = `paypal.doi.${T}@exemplu.ro`;
+  referinte.push(captura2);
+  comenziPayPal.set(comanda2, { captura: captura2, email: ep2, incasata: true });
+  const evPP = await fetch(`${BAZA}/api/donatii/paypal/webhook`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "paypal-auth-algo": "SHA256withRSA",
+      "paypal-cert-url": "https://api.paypal.com/cert",
+      "paypal-transmission-id": `tr-${T}`,
+      "paypal-transmission-sig": "semnatura",
+      "paypal-transmission-time": new Date().toISOString(),
+    },
+    body: JSON.stringify({
+      id: `WH-EV-${T}`,
+      event_type: "PAYMENT.CAPTURE.COMPLETED",
+      resource: {
+        id: captura2,
+        status: "COMPLETED",
+        amount: { value: "20.00", currency_code: "EUR" },
+        custom_id: "tabere|",
+        supplementary_data: { related_ids: { order_id: comanda2 } },
+      },
+    }),
+  });
+  await asteapta(1000);
+  verifica(evPP.ok && (await stare(captura2)) === "platita", `PayPal: anunțul de încasare înaintea paginii e primit (${evPP.status})`);
+  verifica(catre(ep2).length === 1, "PayPal: …și donatorul tot primește mulțumirea (adresa luată din comandă)");
+  await fetch(`${BAZA}/api/donatii/confirma`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-forwarded-for": DE_LA() },
+    body: JSON.stringify({ paypal: comanda2 }),
+  });
+  await asteapta(500);
+  verifica(catre(ep2).length === 1, "PayPal: pagina deschisă după anunț nu dublează mulțumirea");
+
+  // ─── Stripe: o plată abandonată se închide ────────────────────────────
+  const id7 = `cs_test_sapte${T}`;
+  await initiata(id7, `card.sapte.${T}@exemplu.ro`);
+  sesiuniStripe.set(id7, { ...sesiune(id7, `card.sapte.${T}@exemplu.ro`, "unpaid"), status: "expired" });
+  await fetch(`${BAZA}/api/admin/donatii/verifica`, {
+    method: "POST",
+    redirect: "manual",
+    headers: { cookie, "x-forwarded-for": DE_LA() },
+  });
+  verifica((await stare(id7)) === "expirata", `o plată abandonată (expirată la Stripe) se închide (${await stare(id7)})`);
+
+  // ─── Newsletterul: bun venit pe e-mail ────────────────────────────────
+  const en = `buletin.${T}@exemplu.ro`;
+  const nl = await fetch(`${BAZA}/api/newsletter`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-deschis": "30", "x-forwarded-for": DE_LA() },
+    body: JSON.stringify({ email: en, acord: true }),
+  });
+  const rn = await nl.json().catch(() => ({}));
+  await asteapta(500);
+  verifica(nl.ok && /bun venit/.test(rn.mesaj ?? ""), `newsletter: abonarea spune că a trimis bun venit (${rn.mesaj})`);
+  verifica(catre(en).length === 1, "newsletter: e-mailul de bun venit chiar pleacă");
+
   // ─── Transferul bancar ────────────────────────────────────────────────
   const et = `transfer.${T}@exemplu.ro`;
   const notif1 = notificari.length;
@@ -406,7 +497,7 @@ try {
   // ─── În panou și în contul donatorului ────────────────────────────────
   const tot = await (await fetch(`${BAZA}/admin/donatii`, { headers: { cookie } })).text();
   verifica([e1, e2, e3, e5, e6, ep, et].every((e) => tot.includes(e)), "toate donațiile se văd la /admin/donatii");
-  const bord = await (await fetch(`${BAZA}/admin`, { headers: { cookie } })).text();
+  const bord = await (await fetch(`${BAZA}/admin`, { headers: { cookie: cookieCont } })).text();
   verifica(bord.includes("Notificări pe telefon"), "tabloul de bord are butonul de notificări");
 
   const cere = await fetch(`${BAZA}/api/cont/intrare`, {
@@ -419,12 +510,13 @@ try {
   const intrare = link
     ? await fetch(`${BAZA}/contul-meu/intra?jeton=${link[1]}`, { redirect: "manual" })
     : null;
-  const cookieCont = (intrare?.headers.getSetCookie?.() ?? []).map((c) => c.split(";")[0]).join("; ");
-  const cont = await (await fetch(`${BAZA}/contul-meu`, { headers: { cookie: cookieCont } })).text();
-  verifica(cere.ok && Boolean(link) && /50(,00)? lei/.test(cont), "donatorul își vede donația în contul lui (/contul-meu)");
+  const cookieDonator = (intrare?.headers.getSetCookie?.() ?? []).map((c) => c.split(";")[0]).join("; ");
+  const contDonator = await (await fetch(`${BAZA}/contul-meu`, { headers: { cookie: cookieDonator } })).text();
+  verifica(cere.ok && Boolean(link) && /50(,00)? lei/.test(contDonator), "donatorul își vede donația în contul lui (/contul-meu)");
 } finally {
   await baza.query("DELETE FROM donatii WHERE referinta = ANY($1) OR id::text = ANY($1)", [referinte]).catch(() => {});
   await baza.query("DELETE FROM abonamente_push WHERE endpoint LIKE $1", [`%telefon-${T}`]).catch(() => {});
+  await baza.query("DELETE FROM utilizatori WHERE email = $1", [`plati.${T}@exemplu.ro`]).catch(() => {});
   await baza.end();
   mock.close();
   serviciuPush.close();

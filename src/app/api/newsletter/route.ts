@@ -7,6 +7,7 @@ import {
   textOptional,
 } from "@/lib/api";
 import { areBuletin, laBuletin } from "@/lib/buletin";
+import { trimiteBunVenit } from "@/lib/email/buletin";
 
 /**
  * Abonarea la newsletter.
@@ -39,10 +40,7 @@ export async function POST(cerere: Request) {
   const corp = citire.corp;
 
   if (esteRobot(corp)) {
-    return raspuns(
-      "Mulțumim! Verifică-ți emailul pentru a confirma abonarea.",
-      200,
-    );
+    return raspuns("Gata, te-ai abonat. Ți-am trimis un e-mail de bun venit.", 200);
   }
 
   if (!email(corp.email)) {
@@ -81,8 +79,11 @@ export async function POST(cerere: Request) {
     );
   }
 
-  return raspuns(
-    "Mulțumim! Verifică-ți emailul pentru a confirma abonarea.",
-    200,
+  // MailerLite nu trimite nimic pe calea asta (abonare prin API, starea
+  // „activ”), deci mesajul de bun venit pleacă de la noi.
+  await trimiteBunVenit({ email: adresa, nume, firma: lista === "firme" }).catch(
+    () => false,
   );
+
+  return raspuns("Gata, te-ai abonat. Ți-am trimis un e-mail de bun venit.", 200);
 }

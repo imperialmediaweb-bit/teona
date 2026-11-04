@@ -314,8 +314,7 @@ const ADAOSURI = `
   /*
     Telefoanele și calculatoarele care primesc notificări din panou (o donație
     nouă, un transfer anunțat). Un rând pe abonament al browserului; cheia e
-    adresa lui, pe care o dă browserul. utilizator_id e gol pentru cine a
-    intrat cu parola asociației.
+    adresa lui, pe care o dă browserul. Numai conturile cu nume se pot abona.
   */
   CREATE TABLE IF NOT EXISTS abonamente_push (
     endpoint        text PRIMARY KEY,

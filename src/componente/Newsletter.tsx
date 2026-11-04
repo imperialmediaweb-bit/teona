@@ -130,7 +130,7 @@ export default function Newsletter() {
             role="status"
             className="colt-a bg-hartie px-7 py-6 font-titlu font-semibold text-turcoaz-800 shadow-[0_18px_40px_-24px_rgba(42,159,163,0.6)]"
           >
-            Mulțumim! Verifică-ți emailul pentru a confirma abonarea.
+            Gata, te-ai abonat. Ți-am trimis un e-mail de bun venit.
           </p>
         ) : (
           <form

@@ -1371,8 +1371,16 @@ antetele, subdomeniile și versiunile afișate. Ce s-a găsit și ce s-a făcut:
   suma (apare pe ecranul blocat).
   Probă pe toate căile, cu Stripe, PayPal, Resend și serviciul de notificări
   de mențiune: `PAROLA_ADMIN=… DATABASE_URL=… node scripts/qa/plati.mjs`
-  (28 de verificări; `STRIPE_API` și `PAYPAL_API` îndreaptă clienții spre
-  mențiune, numai în probe).
+  (35 de verificări; `STRIPE_API` și `PAYPAL_API` îndreaptă clienții spre
+  mențiune, numai în probe). Notificările se pornesc **numai din conturile
+  cu nume**: un telefon abonat cu parola asociației n-ar avea cui să-i fie
+  oprit. Plățile abandonate (sesiune expirată la Stripe) trec pe `expirata`,
+  ca verificarea să nu le mai întrebe. La PayPal, anunțul
+  `PAYMENT.CAPTURE.COMPLETED` citește comanda, ca să aibă adresa donatorului.
+- **Newsletterul trimite bun venit** (`src/lib/email/buletin.ts`). Abonarea
+  merge prin API, cu starea „activ”, iar pe calea asta MailerLite nu trimite
+  nimic; site-ul scria totuși „Verifică-ți emailul pentru a confirma” și
+  fundraiserul a așteptat un e-mail care nu venea.
 - **Ce nu ține de cod** (DNS în Cloudflare, găzduirea veche) e în raportul din
   conversație: `ftp.teona-ariana.ro` arăta `phpinfo()`, WordPress-ul vechi se
   vede pe `mail.teona-ariana.ro` cu GiveWP 3.18.0 (vulnerabilitate critică

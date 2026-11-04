@@ -91,7 +91,7 @@ export async function notificaPanoul(n: {
     `SELECT a.endpoint, a.p256dh, a.auth
        FROM abonamente_push a
        LEFT JOIN utilizatori u ON u.id = a.utilizator_id
-      WHERE a.utilizator_id IS NULL OR u.activ = true`,
+      WHERE u.activ = true`,
   ).catch(() => []);
   const corp = JSON.stringify(n);
   let trimise = 0;

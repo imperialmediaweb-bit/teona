@@ -141,7 +141,9 @@ export async function sesiuneaDeLaStripe(
   id: string,
 ): Promise<Stripe.Checkout.Session | null> {
   if (!/^cs_(live|test)_[A-Za-z0-9]+$/.test(id)) return null;
-  return ia().checkout.sessions.retrieve(id);
+  // Cel mult cinci secunde, fără reîncercări: verificarea din panou nu
+  // trebuie să stea după un Stripe lent (implicit: 80 s și o reîncercare).
+  return ia().checkout.sessions.retrieve(id, {}, { timeout: 5000, maxNetworkRetries: 0 });
 }
 
 /** Verifică semnătura webhookului. Fără secret, nu acceptăm nimic. */

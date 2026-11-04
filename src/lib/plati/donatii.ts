@@ -37,7 +37,8 @@ export async function scrieInitiata(d: DonatieNoua): Promise<void> {
         email, prenume, nume, telefon, acord_buletin, campanie_slug,
         canal, sursa)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
-     ON CONFLICT (procesator, referinta) DO NOTHING`,
+     ON CONFLICT (procesator, referinta) DO UPDATE
+       SET email = COALESCE(donatii.email, EXCLUDED.email)`,
     [
       d.procesator,
       d.referinta,

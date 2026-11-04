@@ -31,7 +31,9 @@ self.addEventListener("notificationclick", (e) => {
   e.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((lista) => {
       for (const c of lista) {
-        if (c.url.includes("/admin") && "focus" in c) { c.navigate(adresa); return c.focus(); }
+        if (c.url.includes("/admin") && "focus" in c) {
+          return c.focus().then((w) => w.navigate(adresa)).catch(() => self.clients.openWindow(adresa));
+        }
       }
       return self.clients.openWindow(adresa);
     }),

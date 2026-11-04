@@ -33,8 +33,16 @@ export async function POST(cerere: Request) {
   const { fac, abonament } = citire.corp;
 
   if (fac === "aboneaza") {
+    /*
+      Numai conturile cu nume. Un telefon abonat cu parola asociației n-ar
+      avea cui să aparțină: nu s-ar opri odată cu un cont, iar pe un telefon
+      pierdut ar arăta donațiile pe ecranul blocat pentru totdeauna.
+    */
+    if (cine.fel !== "cont") {
+      return raspuns("Notificările se pornesc din contul tău, nu cu parola asociației.", 403);
+    }
     if (!abonamentValid(abonament)) return raspuns("Abonament invalid.", 400);
-    await salveazaAbonament(abonament, cine.fel === "cont" ? cine.utilizator.id : null);
+    await salveazaAbonament(abonament, cine.utilizator.id);
     return NextResponse.json({ ok: true });
   }
   if (fac === "dezaboneaza") {

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { citesteJson, limitaDeRata, raspuns } from "@/lib/api";
+import { citesteJson, limitaDeRata } from "@/lib/api";
 import { areBazaDeDate } from "@/lib/baza";
 import { areStripe } from "@/lib/plati/stripe";
 import { arePayPal } from "@/lib/plati/paypal";
@@ -42,8 +42,11 @@ export async function POST(cerere: Request) {
       return NextResponse.json({ stare: ok ? "platita" : "neplatita" });
     }
   } catch (e) {
+    // O sesiune pe care Stripe n-o cunoaște (o adresă scrisă de mână) sau un
+    // procesator care nu răspunde: „necunoscută”, cu 200. Un 502 ar fi
+    // înlocuit de Cloudflare cu pagina lui de eroare.
     console.error("Confirmarea plății:", e instanceof Error ? e.message : "eroare");
-    return raspuns("Nu am putut verifica plata acum.", 502);
+    return NextResponse.json({ stare: "necunoscuta" });
   }
   return NextResponse.json({ stare: "necunoscuta" });
 }

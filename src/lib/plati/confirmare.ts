@@ -109,6 +109,15 @@ export async function confirmaSesiuneaStripe(
 ): Promise<"platita" | "neplatita" | "necunoscuta"> {
   const sesiune = await sesiuneaDeLaStripe(id);
   if (!sesiune) return "necunoscuta";
+  // O plată abandonată (sesiunea a expirat la Stripe, după 24 de ore) se
+  // închide, ca verificarea din panou să n-o mai întrebe la nesfârșit.
+  if (sesiune.status === "expired" && sesiune.payment_status !== "paid") {
+    await intreaba(
+      "UPDATE donatii SET stare = 'expirata' WHERE procesator = 'stripe' AND referinta = $1 AND stare = 'initiata'",
+      [id],
+    );
+    return "neplatita";
+  }
   return (await inregistreazaSesiuneaStripe(sesiune)) ? "platita" : "neplatita";
 }
 
@@ -123,14 +132,24 @@ export async function confirmaSesiuneaStripe(
   cel mult o dată la cinci minute).
 */
 let ultimaVerificare = 0;
+let inCurs: Promise<{ verificate: number; confirmate: number }> | null = null;
 
 export async function verificaPlatileStripe(
   fortat = false,
 ): Promise<{ verificate: number; confirmate: number }> {
+  // Una singură odată: dacă Stripe e lent, verificările nu se adună.
+  if (inCurs) return inCurs;
   if (!fortat && Date.now() - ultimaVerificare < 5 * 60 * 1000) {
     return { verificate: 0, confirmate: 0 };
   }
   ultimaVerificare = Date.now();
+  inCurs = verificaAcum().finally(() => {
+    inCurs = null;
+  });
+  return inCurs;
+}
+
+async function verificaAcum(): Promise<{ verificate: number; confirmate: number }> {
   const randuri = await intreaba<{ referinta: string }>(
     `SELECT referinta FROM donatii
       WHERE procesator = 'stripe' AND stare = 'initiata'
