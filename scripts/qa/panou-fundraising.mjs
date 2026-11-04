@@ -116,7 +116,9 @@ for (const [lista, coloana] of [
     `${lista}: coloanele sunt despărțite cu punct și virgulă`,
   );
   // Niciun număr cu punct zecimal: Excel-ul românesc l-ar citi ca mii.
-  const cuPunct = text.match(/"\d+\.\d{2,}"/);
+  // Exact două zecimale, cum iese o sumă calculată. „5.000” scris de o firmă
+  // la „Sumă estimată” e text al ei (cinci mii), nu o zecimală.
+  const cuPunct = text.match(/"\d+\.\d{2}"/);
   verifica(
     cuPunct === null,
     `${lista}: sumele au virgulă zecimală${cuPunct ? ` (am găsit ${cuPunct[0]})` : ""}`,
