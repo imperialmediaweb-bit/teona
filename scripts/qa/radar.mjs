@@ -178,14 +178,40 @@ const site = spawn("npm", ["run", "start"], {
 
 const BAZA = `http://127.0.0.1:${PORT_SITE}`;
 
-/** Fiecare scanare de pe altă adresă IP: ruta are limită de 3 pe oră. */
+/**
+ * Fiecare scanare de pe altă adresă IP: ruta are limită de 3 pe oră.
+ *
+ * Scanarea rulează după răspuns (`after()`), ca proxy-ul Railway să n-o taie:
+ * ruta întoarce 202 „a pornit”, iar rezultatul ajunge în `radar_scanari`.
+ * Proba așteaptă rândul nou și îl traduce: 200 dacă scanarea s-a încheiat
+ * fără eroare, 502 dacă a scris o eroare — exact ce vede omul în panou.
+ */
 async function scaneaza(ip, secret = SECRET) {
+  const inainte = Number(
+    (await client.query("SELECT coalesce(max(id), 0) AS m FROM radar_scanari")).rows[0].m,
+  );
   const r = await fetch(`${BAZA}/api/radar`, {
     method: "POST",
     headers: { "x-radar": secret, "x-forwarded-for": ip },
     redirect: "manual",
   });
-  return { stare: r.status, mesaj: (await r.json().catch(() => ({}))).mesaj ?? "" };
+  const mesaj = (await r.json().catch(() => ({}))).mesaj ?? "";
+  if (r.status !== 202) return { stare: r.status, mesaj };
+  const pornit = Date.now();
+  while (Date.now() - pornit < 60_000) {
+    const { rows } = await client.query(
+      "SELECT gasite, noi, eroare FROM radar_scanari WHERE id > $1 ORDER BY id LIMIT 1",
+      [inainte],
+    );
+    if (rows[0]) {
+      return {
+        stare: rows[0].eroare ? 502 : 200,
+        mesaj: `${rows[0].gasite} găsite, ${rows[0].noi} noi${rows[0].eroare ? ` — ${rows[0].eroare}` : ""}`,
+      };
+    }
+    await new Promise((x) => setTimeout(x, 300));
+  }
+  return { stare: 504, mesaj: "scanarea n-a scris nimic în 60 de secunde" };
 }
 
 const randul = (url) =>
