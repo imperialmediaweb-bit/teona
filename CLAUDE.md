@@ -379,7 +379,7 @@ se aleg pozele, „Urcă pozele”. Folderul se face singur,
 
 Probele locale merg cu servicii de mențiune, deci nu pot prinde tocmai
 legătura adevărată (Cloudinary, Railway, Cloudflare). O cerere cu antetul
-`x-proba-token` egal cu `PROBA_TOKEN` din Railway (cel puțin 32 de semne)
+`x-proba-token` egal cu `PROBA_TOKEN` din Railway (cel puțin 15 semne)
 intră în panou ca „Probă automată” (`lib/admin.ts`, `fel: "proba"`).
 
 - **Numai pagini de conținut** (`PAGINI_PROBA`): scrie, poze, cifre, texte,

@@ -184,7 +184,7 @@ export type Conectat =
  * în afară (e-mail, Facebook, MailerLite) sau cheamă un model plătit.
  *
  * Antetul îl pune proxy-ul mediului de lucru; valoarea nu trece prin
- * conversație și nu e în depozit. Fără variabilă (sau sub 32 de semne) ușa
+ * conversație și nu e în depozit. Fără variabilă (sau sub 15 semne) ușa
  * nu există. Se închide ștergând variabila din Railway.
  */
 export const ANTET_PROBA = "x-proba-token";
@@ -203,7 +203,7 @@ const PAGINI_PROBA: readonly string[] = [
 
 function cheieProbaValida(primit: string | null): boolean {
   const asteptat = mediu("PROBA_TOKEN");
-  if (!asteptat || asteptat.length < 32 || !primit) return false;
+  if (!asteptat || asteptat.length < 15 || !primit) return false;
   return egale(primit.trim(), asteptat);
 }
 
