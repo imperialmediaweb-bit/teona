@@ -24,6 +24,14 @@ import { citesteSuma, laBan } from "@/lib/suma";
  * **Poza se urcă în Cloudinary, nu pe disc.** Discul containerului dispare la
  * fiecare publicare, iar o noutate de acum trei luni și-ar pierde fotografia.
  */
+/**
+ * Golire pe loc, nu „la următoarea cerere”. Cu profilul "max", primul om care
+ * deschidea lista după o publicare primea tot varianta veche (și abia al
+ * doilea pe cea nouă): cine publica o tabără și se uita imediat pe site n-o
+ * vedea. Prins de `scripts/qa/poze-tabara.mjs`.
+ */
+const ACUM = { expire: 0 };
+
 export const POST = cuBaza(posteaza);
 
 async function posteaza(cerere: Request) {
@@ -48,6 +56,9 @@ async function posteaza(cerere: Request) {
     if (!/^[0-9a-f-]{36}$/i.test(id)) return nuTrece("Text necunoscut.");
     const text = await textDupaId(id);
     await stergeText(id);
+    // Fără asta, tabăra ștearsă rămânea în lista de proiecte, cu un link
+    // care ducea la „pagina nu există”.
+    if (text?.fel === "proiect") revalidateTag(ETICHETA_PROIECTE_PANOU, ACUM);
     return inapoi(cerere, text?.fel ?? "noutate", "sters");
   }
 
@@ -162,7 +173,7 @@ async function posteaza(cerere: Request) {
     await schimbaText(id, date);
     // Descrierile taberelor se citesc dintr-un cache cu etichetă. Fără
     // golirea asta, omul publică și nu vede nimic schimbat pe site.
-    if (fel === "proiect") revalidateTag(ETICHETA_PROIECTE_PANOU, "max");
+    if (fel === "proiect") revalidateTag(ETICHETA_PROIECTE_PANOU, ACUM);
     return inapoi(
       cerere,
       fel,
@@ -176,7 +187,7 @@ async function posteaza(cerere: Request) {
     de pe lista de proiecte. Numai la proiecte: noutățile și campaniile nu
     înlocuiesc nicio pagină din cod, deci n-au de ce să-și aleagă adresa.
   */
-  if (fel === "proiect") revalidateTag(ETICHETA_PROIECTE_PANOU, "max");
+  if (fel === "proiect") revalidateTag(ETICHETA_PROIECTE_PANOU, ACUM);
   const nou = await creeazaText(
     { ...date, fel },
     fel === "proiect" ? camp("slug") : undefined,

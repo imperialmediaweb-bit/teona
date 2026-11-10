@@ -62,6 +62,10 @@ const api = createServer(async (cer, rasp) => {
     }).formData();
     const folder = String(f.get("folder") ?? "");
     const fisier = f.get("file");
+    // Planul gratuit Cloudinary refuză imaginile peste 10 MB.
+    if (fisier.size > 10 * 1024 * 1024) {
+      return json({ error: { message: `File size too large. Got ${fisier.size}. Maximum is 10485760.` } }, 400);
+    }
     const meta = await sharp(Buffer.from(await fisier.arrayBuffer())).metadata().catch(() => null);
     if (!meta) return json({ error: { message: "Invalid image file" } }, 400);
     const p = { public_id: `poza${++nr}`, width: meta.width, height: meta.height, bytes: fisier.size };
@@ -186,7 +190,7 @@ try {
     await stare.waitFor({ timeout: 120_000 });
     const text = await stare.textContent();
     verifica(/Gata: 2 poze urcate/.test(text), `${fel}: două poze urcate, cea falsă nu („${text}”)`);
-    const greseala = await pag.locator("ul li").allTextContents();
+    const greseala = await pag.locator("[data-greseli-poze] li").allTextContents();
     verifica(
       greseala.some((g) => g.includes("nu-e-poza-proba.jpg")),
       `${fel}: fișierul care nu e poză e numit pe față`,
@@ -235,6 +239,114 @@ try {
       headers: { cookie, origin: BAZA },
       redirect: "manual",
     });
+  }
+
+  // Multe poze mari, ca de pe telefon: tot ce e fotografie trebuie să urce.
+  {
+    const fs = await import("node:fs");
+    const dir = "/tmp/poze-multe-proba";
+    fs.rmSync(dir, { recursive: true, force: true });
+    fs.mkdirSync(dir);
+    const lista = [];
+    const zgomot = (w, h) => sharp({ create: { width: w, height: h, channels: 3, noise: { type: "gaussian", mean: 128, sigma: 70 } } });
+    for (let i = 0; i < Number(process.env.CATE ?? 110); i++) {
+      const p = `${dir}/IMG_${1000 + i}.jpg`;
+      await zgomot(4032, 3024).jpeg({ quality: 98 }).toFile(p);
+      lista.push(p);
+    }
+    for (let i = 0; i < 4; i++) {
+      const p = `${dir}/captura-${i}.png`;
+      await zgomot(2400, 1800).png({ compressionLevel: 0 }).toFile(p);
+      lista.push(p);
+    }
+    for (let i = 0; i < 3; i++) {
+      const p = `${dir}/poza-${i}.webp`;
+      await zgomot(4000, 3000).webp({ quality: 100 }).toFile(p);
+      lista.push(p);
+    }
+    const uriasa = `${dir}/48-megapixeli.jpg`;
+    await zgomot(8000, 6000).jpeg({ quality: 95 }).toFile(uriasa);
+    lista.push(uriasa);
+    const rotita = `${dir}/telefon-vertical.jpg`;
+    await zgomot(4032, 3024).jpeg({ quality: 98 }).withMetadata({ orientation: 6 }).toFile(rotita);
+    lista.push(rotita);
+    const marimi = lista.map((p) => fs.statSync(p).size);
+    console.log(
+      `     ${lista.length} poze, între ${(Math.min(...marimi) / 1e6).toFixed(1)} și ${(Math.max(...marimi) / 1e6).toFixed(1)} MB, în total ${(marimi.reduce((a, b) => a + b, 0) / 1e6).toFixed(0)} MB`,
+    );
+
+    const titlu = `Tabără multe poze ${Date.now()}`;
+    await pag.goto(`${BAZA}/admin/scrie/nou?fel=proiect`, { timeout: 120_000 });
+    await pag.waitForTimeout(1500);
+    verifica(
+      (await pag.inputValue("input[name=titlu]")) === "",
+      "un text nou se deschide gol, fără titlul celui salvat înainte",
+    );
+    await pag.fill("input[name=titlu]", titlu);
+    await pag.fill("textarea[name=continut]", "Un text de probă, destul de lung cât să treacă verificarea.");
+    await pag.fill("input[name=dataInceput]", "2026-07-06");
+    await pag.fill("input[name=dataCitita]", "6 – 10 iulie 2026");
+    await Promise.all([
+      pag.waitForURL(/\/admin\/scrie\/[0-9a-f-]{36}/, { timeout: 120_000 }),
+      pag.click("button[name=actiune][value=salveaza]"),
+    ]);
+    const id = pag.url().match(/scrie\/([0-9a-f-]{36})/)[1];
+    const buton = pag.getByRole("button", { name: "Urcă pozele" });
+    await buton.waitFor({ timeout: 120_000 });
+    await pag.setInputFiles("input[type=file][multiple]", lista);
+    const inceput = Date.now();
+    await buton.click();
+    const stare = pag.locator("[role=status]").filter({ hasText: /Gata|Nicio/ });
+    await stare.waitFor({ timeout: 900_000 });
+    const text = await stare.textContent();
+    const secunde = Math.round((Date.now() - inceput) / 1000);
+    verifica(text.includes(`Gata: ${lista.length} poze urcate`), `multe: toate ${lista.length} au urcat, în ${secunde} s („${text}”)`);
+    const greseli = await pag.locator("[data-greseli-poze] li").allTextContents();
+    verifica(greseli.length === 0, `multe: nicio eroare (${greseli.join(" | ") || "—"})`);
+    const dosar = [...urcate.keys()].find((k) => k.includes(titlu.toLocaleUpperCase("ro-RO")));
+    const cele = urcate.get(dosar) ?? [];
+    const maxim = Math.max(...cele.map((p) => p.bytes));
+    verifica(maxim < 10 * 1024 * 1024, `multe: cea mai mare poză trimisă are ${(maxim / 1e6).toFixed(1)} MB, sub limita Cloudinary`);
+    verifica(cele.every((p) => Math.max(p.width, p.height) <= 2000), "multe: toate micșorate la cel mult 2000 px");
+    const vert = cele.find((p) => p.height > p.width);
+    verifica(Boolean(vert), "multe: poza verticală de telefon a rămas verticală");
+
+    await Promise.all([
+      pag.waitForURL(/gata=publicat/, { timeout: 120_000 }),
+      pag.click("button[name=actiune][value=publica]"),
+    ]);
+    const lst = await (await fetch(`${BAZA}/proiecte`)).text();
+    const slug = (lst.match(/\/proiecte\/(tabara-multe-poze-\d+)/) ?? [])[1];
+    if (!slug) console.log("     în listă:", [...lst.matchAll(/\/proiecte\/([a-z0-9-]*(?:proba|multe)[a-z0-9-]*)/g)].map((m) => m[1]).slice(0, 6), lst.includes("multe poze"), lst.length);
+    const publica = await (await fetch(`${BAZA}/proiecte/${slug}`)).text();
+    const gasite = cele.filter((p) => publica.includes(p.public_id + "\"") || publica.includes(p.public_id + "&") || publica.includes(p.public_id + "?") || publica.includes(p.public_id));
+    verifica(gasite.length === lista.length, `multe: pagina publică are toate ${lista.length} poze (${gasite.length})`);
+
+    // Ștearsă, nu mai e în listă nici la prima deschidere.
+    {
+      const st = new FormData();
+      st.set("id", id);
+      st.set("actiune", "sterge");
+      const ck = (await pag.context().cookies()).map((c) => `${c.name}=${c.value}`).join("; ");
+      await fetch(`${BAZA}/api/admin/texte`, { method: "POST", body: st, headers: { cookie: ck, origin: BAZA }, redirect: "manual" });
+      const dupa = await (await fetch(`${BAZA}/proiecte`)).text();
+      verifica(!dupa.includes(slug), "tabăra ștearsă dispare din listă pe loc");
+    }
+
+    // Un fișier peste 25 MB, nemicșorabil (nu e imagine): mesaj clar, nu cădere.
+    const urias = `${dir}/arhiva.jpg`;
+    fs.writeFileSync(urias, Buffer.alloc(26 * 1024 * 1024, 7));
+    await pag.setInputFiles("input[type=file][multiple]", [urias]);
+    await buton.click();
+    await pag.locator("[role=status]").filter({ hasText: /Gata|Nicio/ }).waitFor({ timeout: 120_000 });
+    const g2 = await pag.locator("[data-greseli-poze] li").allTextContents();
+    verifica(g2.some((g) => g.includes("arhiva.jpg")), `fișier de 26 MB: mesaj cu numele lui (${g2.join(" | ")})`);
+
+    const sterge = new FormData();
+    sterge.set("id", id);
+    sterge.set("actiune", "sterge");
+    const cookie = (await pag.context().cookies()).map((c) => `${c.name}=${c.value}`).join("; ");
+    await fetch(`${BAZA}/api/admin/texte`, { method: "POST", body: sterge, headers: { cookie, origin: BAZA }, redirect: "manual" });
   }
 
   // Fără sesiune: nimic nu urcă.

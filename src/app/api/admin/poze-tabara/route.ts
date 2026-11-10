@@ -76,8 +76,8 @@ export async function POST(cerere: Request) {
       console.error(`[poze-tabara] n-am putut lega folderul de ${id}: ${(e as Error).message}`);
     });
   }
-  revalidateTag(ETICHETA_POZE_CLOUD, "max");
-  revalidateTag(ETICHETA_PROIECTE_PANOU, "max");
+  revalidateTag(ETICHETA_POZE_CLOUD, { expire: 0 });
+  revalidateTag(ETICHETA_PROIECTE_PANOU, { expire: 0 });
 
   return Response.json(
     { cale, id: urcata.id },

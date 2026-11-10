@@ -133,7 +133,9 @@ export function alegeDosar(
  * cereri la fiecare reconstruire.
  */
 async function pozeCuSubdosare(cale: string, adancime = 2): Promise<string[]> {
-  const aici = await pozeDinDosar(cale);
+  // 500 e maximul pe care îl dă Cloudinary într-o cerere; implicitul de 100
+  // tăia în tăcere galeria unei tabere cu mai multe poze.
+  const aici = await pozeDinDosar(cale, 500);
   const cai = aici.map((p) => `${PREFIX_CLOUD}${p.id}`);
   if (adancime <= 0) return cai;
 

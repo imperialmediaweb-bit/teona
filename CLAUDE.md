@@ -360,6 +360,17 @@ se aleg pozele, „Urcă pozele”. Folderul se face singur,
 - Noutățile și campaniile au acum galerie, sub text (`pozeDinDosarScris`).
 - Galeriile au eticheta `poze-cloud`; urcarea o golește, deci pozele apar fără
   să aștepte ora de cache.
+- **Oricâte poze deodată**: pleacă una câte una. Proba urcă 119 poze de
+  13–47 MB (1,7 GB), JPEG, PNG, WebP, una de 48 de megapixeli și una
+  verticală; toate ajung sub 2 MB, în sub un minut.
+- **Trei defecte prinse de proba grea, nu de citit:** (1) un text nou se
+  deschidea cu titlul și textul celui salvat înainte — `TineCiorna` ștergea
+  ciorna paginii pe care ajungea salvarea (`/admin/scrie/<id>`), nu a celei de
+  unde plecase (`/admin/scrie/nou`); (2) după „Publică”, primul om care
+  deschidea Proiecte vedea lista veche: `revalidateTag(…, "max")` servește o
+  dată varianta veche; la tabere e acum `{ expire: 0 }`; (3) o tabără ștearsă
+  rămânea în listă, cu link spre „pagina nu există” — ștergerea nu golea
+  nimic. Galeria tăia în tăcere la 100 de poze; acum 500, maximul Cloudinary.
 - Probă, în browser, cu Cloudinary de mențiune (poză de telefon de 9 MB, un
   fișier text redenumit în .jpg, publicare, pagina publică):
   `DATABASE_URL=… CHROMIUM=/opt/pw-browsers/chromium node scripts/qa/poze-tabara.mjs`

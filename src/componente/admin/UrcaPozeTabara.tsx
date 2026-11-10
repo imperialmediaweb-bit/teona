@@ -187,7 +187,7 @@ export default function UrcaPozeTabara({
         </p>
       )}
       {greseli.length > 0 && (
-        <ul className="grid gap-1 text-mic text-caramiziu-800">
+        <ul data-greseli-poze className="grid gap-1 text-mic text-caramiziu-800">
           {greseli.map((g, i) => (
             <li key={i}>{g}</li>
           ))}

@@ -45,7 +45,22 @@ export default function TineCiorna() {
     const parametri = new URLSearchParams(location.search);
     const salvat = SEMNE_DE_SALVARE.some((s) => parametri.has(s));
     const acum = Date.now();
+    /*
+      Un text nou se scrie la `/admin/scrie/nou` și, salvat, ajunge la
+      `/admin/scrie/<id>` — altă cale. Fără pagina de unde a venit salvarea,
+      ciorna de la „nou” rămânea, iar următorul text nou se deschidea cu
+      titlul și textul celui dinainte.
+    */
+    let deUnde = "";
+    try {
+      const r = document.referrer ? new URL(document.referrer) : null;
+      if (r && r.origin === location.origin) deUnde = r.pathname;
+    } catch {}
     for (const k of Object.keys(memorie)) {
+      if (salvat && deUnde && k.startsWith(`${PREFIX}${deUnde}:`)) {
+        memorie.removeItem(k);
+        continue;
+      }
       if (!k.startsWith(`${PREFIX}${location.pathname}:`)) continue;
       try {
         const { la } = JSON.parse(memorie.getItem(k) ?? "{}") as { la?: number };
