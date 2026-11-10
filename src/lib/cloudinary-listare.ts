@@ -272,3 +272,32 @@ export function pozaPentruEmail(id: string, latime = 1072): string {
   const cont = process.env.CLOUDINARY_CLOUD_NAME ?? "";
   return `https://res.cloudinary.com/${cont}/image/upload/c_limit,w_${latime},q_auto,f_jpg/${id}`;
 }
+
+/**
+ * Șterge un folder de probă, cu pozele din el. Numai pentru proba automată
+ * de pe site-ul adevărat (`/api/admin/poze-tabara`, `fel=sterge-proba`):
+ * calea trebuie să conțină „PROBĂ AUTOMATĂ”, altfel nu se șterge nimic.
+ */
+export async function stergeDosarDeProba(cale: string): Promise<number> {
+  if (!cale.includes("PROBĂ AUTOMATĂ")) return 0;
+  const a = acreditari();
+  if (!a) return 0;
+  const lista = await cere<{ resources?: { public_id: string }[] }>(
+    `resources/by_asset_folder?asset_folder=${encodeURIComponent(cale)}&max_results=500`,
+  );
+  const ids = (lista?.resources ?? []).map((r) => r.public_id);
+  if (ids.length > 0) {
+    const q = ids.map((i) => `public_ids[]=${encodeURIComponent(i)}`).join("&");
+    const r = await fetch(`${BAZA}/${a.cont}/resources/image/upload?${q}`, {
+      method: "DELETE",
+      headers: { Authorization: a.antet },
+    });
+    if (!r.ok) console.warn(`[cloudinary] ${r.status} la ștergerea pozelor de probă`);
+  }
+  const f = await fetch(
+    `${BAZA}/${a.cont}/folders/${cale.split("/").map(encodeURIComponent).join("/")}`,
+    { method: "DELETE", headers: { Authorization: a.antet } },
+  );
+  if (!f.ok) console.warn(`[cloudinary] ${f.status} la ștergerea folderului de probă`);
+  return ids.length;
+}

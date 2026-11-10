@@ -1,6 +1,7 @@
 import { revalidateTag } from "next/cache";
 import { formularAdmin, limitaDeRata, raspuns, sesiuneExpirata } from "@/lib/api";
-import { arePermisiune } from "@/lib/admin";
+import { arePermisiune, cineEsteConectat } from "@/lib/admin";
+import { stergeDosarDeProba } from "@/lib/cloudinary-listare";
 import { areCloudinary, tipDinOcteti, urcaPoza } from "@/lib/poza-urcata";
 import { puneDosarCloud } from "@/lib/texte";
 import { ETICHETA_PROIECTE_PANOU } from "@/date/proiecte";
@@ -40,6 +41,18 @@ export async function POST(cerere: Request) {
   const citit = await formularAdmin(cerere);
   if (citit.raspuns) return citit.raspuns;
   const f = citit.formular;
+
+  // Curățenia după proba automată: numai intrarea de probă, numai un folder
+  // „PROBĂ AUTOMATĂ”. Nicio altă cale nu șterge din Cloudinary.
+  if (String(f.get("fel") ?? "") === "sterge-proba") {
+    const cine = await cineEsteConectat();
+    const de = String(f.get("cale") ?? "");
+    if (cine?.fel !== "proba" || !de.startsWith(`${RADACINA}/`) || !de.includes("PROBĂ AUTOMATĂ")) {
+      return raspuns("Nu.", 403);
+    }
+    const sterse = await stergeDosarDeProba(de);
+    return Response.json({ sterse }, { headers: { "Cache-Control": "no-store" } });
+  }
 
   const cale = calePozeTabara(
     RADACINA,
