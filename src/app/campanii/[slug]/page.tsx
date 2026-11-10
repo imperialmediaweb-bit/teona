@@ -10,6 +10,7 @@ import { textPublicat } from "@/lib/texte";
 import { adresaPentruDistribuire } from "@/lib/poza-urcata";
 import { scrieSuma } from "@/lib/suma";
 import { Articol } from "@/app/noutati/[slug]/page";
+import { pozeDinDosarScris } from "@/date/proiecte-cloud";
 
 /**
  * Pagina unei campanii a asociației.
@@ -37,7 +38,6 @@ export async function generateMetadata({
       : undefined,
   });
 }
-
 export default function PaginaCampanie({
   params,
   searchParams,
@@ -54,9 +54,11 @@ async function Continut({ params }: PageProps<"/campanii/[slug]">) {
   const { slug } = await params;
   const text = areBazaDeDate() ? await textPublicat("campanie", slug) : null;
   if (!text) notFound();
+  const poze = text.dosarCloud ? await pozeDinDosarScris(text.dosarCloud) : [];
 
   return (
     <Articol
+      poze={poze}
       text={text}
       cale={RUTE.campanii}
       inapoi="Toate campaniile"

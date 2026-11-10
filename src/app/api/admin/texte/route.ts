@@ -153,7 +153,7 @@ async function posteaza(cerere: Request) {
     tintaBani,
     dataInceput: fel === "proiect" ? dataInceput : null,
     dataCitita: fel === "proiect" ? camp("dataCitita") || null : null,
-    dosarCloud: fel === "proiect" ? camp("dosarCloud") || null : null,
+    dosarCloud: camp("dosarCloud") || null,
     categorie: fel === "proiect" ? categorie : null,
     publicat: actiune === "publica",
   };

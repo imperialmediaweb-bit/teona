@@ -336,6 +336,34 @@ Ce înseamnă asta în practică:
 - proba `node scripts/qa/poze-cloud.mjs` verifică potrivirea fără cheile
   adevărate, cu un server care imită Cloudinary.
 
+## Pozele de galerie se urcă din panou, nu din Cloudinary
+
+Contul de Cloudinary e al dezvoltatorului; **asociația n-are cont acolo**.
+Până pe 10 noiembrie 2026 galeria unei tabere se putea doar *alege* dintr-un
+folder făcut în Cloudinary, deci o tabără nouă cerea tot un mesaj către mine.
+Asociația a scris: „la poze nu am nicăieri un buton adaugă”.
+
+Acum, în ciorna oricărui text (tabără, noutate, campanie), „Pozele …, pentru
+galerie” (`componente/admin/UrcaPozeTabara.tsx`): se scrie numele folderului,
+se aleg pozele, „Urcă pozele”. Folderul se face singur,
+`Teona/<an>/<NUME>`, și se leagă de text de la prima poză.
+
+- **O poză pe cerere** (`/api/admin/poze-tabara`): o sută de poze deodată
+  trec de limita de 30 MB și de răbdarea proxy-ului Railway. Fiecare se
+  micșorează în browser chiar înainte de trimitere (`micsoreaza`, exportat din
+  `MicsoreazaPoza`); câmpul are `data-fara-micsorare`, ca cele două să nu
+  lucreze deodată.
+- **Legătura se scrie în baza de date la prima poză** și, în pagină, în câmpul
+  `dosarCloud` al formularului. Altfel „Salvează ciorna” trimitea valoarea
+  veche din listă și ștergea legătura. Din același motiv, folderul ales
+  rămâne în listă chiar dacă lista (în cache un minut) încă nu-l are.
+- Noutățile și campaniile au acum galerie, sub text (`pozeDinDosarScris`).
+- Galeriile au eticheta `poze-cloud`; urcarea o golește, deci pozele apar fără
+  să aștepte ora de cache.
+- Probă, în browser, cu Cloudinary de mențiune (poză de telefon de 9 MB, un
+  fișier text redenumit în .jpg, publicare, pagina publică):
+  `DATABASE_URL=… CHROMIUM=/opt/pw-browsers/chromium node scripts/qa/poze-tabara.mjs`
+
 ## O fotografie nouă trebuie urcată și în Cloudinary
 
 Cu `CLOUDINARY_CLOUD_NAME` setat, `next.config.ts` montează un încărcător

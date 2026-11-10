@@ -74,6 +74,16 @@ export function numeDupaContinut(octeti: Uint8Array, prefix: string): string {
   return `${prefix}-${amprenta}`;
 }
 
+/**
+ * Adresa API-ului de urcare. `CLOUDINARY_API` o schimbă **numai în afara
+ * producției**, pentru proba `scripts/qa/poze-tabara.mjs` — ca la listare,
+ * în `cloudinary-listare.ts`: în producție ar fi o pârghie prin care cheile
+ * ar putea pleca în altă parte.
+ */
+const API_CLOUDINARY =
+  (process.env.NODE_ENV !== "production" && process.env.CLOUDINARY_API?.trim()) ||
+  "https://api.cloudinary.com/v1_1";
+
 export function areCloudinary(): boolean {
   return Boolean(
     process.env.CLOUDINARY_CLOUD_NAME &&
@@ -143,7 +153,7 @@ export async function urcaPoza(
 
   let raspuns: Response;
   try {
-    raspuns = await fetch(`https://api.cloudinary.com/v1_1/${cont}/image/upload`, {
+    raspuns = await fetch(`${API_CLOUDINARY}/${cont}/image/upload`, {
       method: "POST",
       body: corp,
       signal: AbortSignal.timeout(30_000),

@@ -53,7 +53,7 @@ async function deseneaza(f: File, tip: TipPoza): Promise<ImageBitmap | HTMLImage
 }
 
 /** Întoarce poza micșorată, `null` dacă nu e nevoie, sau aruncă dacă nu poate. */
-async function micsoreaza(f: File): Promise<File | null> {
+export async function micsoreaza(f: File): Promise<File | null> {
   if (f.size <= PESTE) return null;
   // Tipul din conținut, nu din eticheta sistemului: pe Windows poate fi gol.
   const tip = await tipulPozei(f);

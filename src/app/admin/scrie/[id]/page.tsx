@@ -20,6 +20,8 @@ import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 import Asistent from "@/componente/admin/Asistent";
 import CumScriem from "@/componente/admin/CumScriem";
+import UrcaPozeTabara from "@/componente/admin/UrcaPozeTabara";
+import { RADACINA } from "@/date/proiecte-cloud";
 
 export const metadata: Metadata = {
   title: "Scrie",
@@ -327,6 +329,16 @@ async function Continut({
                     className={camp}
                   >
                     <option value="">Fără folder ales — caută după dată</option>
+                    {/*
+                      Folderul ales deja rămâne în listă chiar dacă lista vine
+                      din cache-ul de un minut și încă nu-l are (tocmai s-a
+                      făcut, din urcarea de mai jos). Altfel alegerea cădea pe
+                      „fără folder”, iar salvarea ciornei ștergea legătura.
+                    */}
+                    {text?.dosarCloud &&
+                      !dosare.some((d) => d.cale === text.dosarCloud) && (
+                        <option value={text.dosarCloud}>{text.dosarCloud}</option>
+                      )}
                     {dosare.map((d) => (
                       <option key={d.cale} value={d.cale}>
                         {d.cale}
@@ -345,6 +357,33 @@ async function Continut({
             </label>
           </fieldset>
         )}
+
+        {/*
+          Pozele de galerie, pentru orice text: tabără, noutate, campanie.
+          Asociația n-are cont în Cloudinary, deci se urcă de aici, iar
+          folderul se face singur. La noutăți și campanii legătura stă într-un
+          câmp ascuns, la tabere în alegerea de mai sus.
+        */}
+        {fel !== "proiect" && (
+          <input type="hidden" name="dosarCloud" defaultValue={text?.dosarCloud ?? ""} />
+        )}
+        {areCloudinary() && (
+              <UrcaPozeTabara
+                id={text?.id ?? null}
+                dosarAles={
+                  text?.dosarCloud
+                    ? text.dosarCloud.startsWith(`${RADACINA}/`)
+                      ? text.dosarCloud
+                      : `${RADACINA}/${text.dosarCloud}`
+                    : null
+                }
+                numeImplicit={(text?.titlu ?? "").toLocaleUpperCase("ro-RO")}
+                fel={fel}
+                anImplicit={
+                  text?.dataInceput?.slice(0, 4) || String(new Date().getFullYear())
+                }
+              />
+            )}
 
         {fel === "campanie" && (
           <label className="grid gap-1.5">

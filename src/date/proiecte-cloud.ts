@@ -1,5 +1,5 @@
 import "server-only";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import {
   areCheiCloudinary,
   dosare,
@@ -49,7 +49,10 @@ const LUNI = [
 ];
 
 /** Rădăcina în care asociația ține folderele pe ani. */
-const RADACINA = (process.env.CLOUDINARY_FOLDER ?? "Teona").trim() || "Teona";
+export const RADACINA = (process.env.CLOUDINARY_FOLDER ?? "Teona").trim() || "Teona";
+
+/** Eticheta de cache a galeriilor din Cloudinary. */
+export const ETICHETA_POZE_CLOUD = "poze-cloud";
 
 /** Minuscule, fără diacritice, fără semne: „TABĂRĂ AUTISM 8-12” → „tabara autism 8 12”. */
 function fara(text: string): string {
@@ -160,6 +163,9 @@ export async function pozeCloudProiect(
 ): Promise<string[]> {
   "use cache";
   cacheLife("hours");
+  // Golită când asociația urcă poze din panou: altfel galeria taberei ar
+  // rămâne o oră goală după urcare, iar omul ar crede că n-a mers.
+  cacheTag(ETICHETA_POZE_CLOUD);
 
   if (!areCheiCloudinary()) return [];
 
@@ -233,6 +239,19 @@ export async function cuPozeDinCloud<T extends ProiectAfisat>(
   if (poze.length === 0) return proiect;
 
   return { ...proiect, coperta: poze[0], poze };
+}
+
+/**
+ * Pozele dintr-un folder ales în panou, pentru o noutate sau o campanie.
+ * Aceeași cale ca la tabere: cu rădăcina în față sau fără.
+ */
+export async function pozeDinDosarScris(dosar: string): Promise<string[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag(ETICHETA_POZE_CLOUD);
+  if (!areCheiCloudinary()) return [];
+  const cale = dosar.startsWith(`${RADACINA}/`) ? dosar : `${RADACINA}/${dosar}`;
+  return pozeCuSubdosare(cale).catch(() => []);
 }
 
 /** Același lucru, pentru o listă întreagă. */

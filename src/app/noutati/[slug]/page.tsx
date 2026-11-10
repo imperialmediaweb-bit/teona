@@ -12,6 +12,8 @@ import Pictograma from "@/componente/Pictograma";
 import TextScris from "@/componente/pagina/TextScris";
 import Distribuie from "@/componente/pagina/Distribuie";
 import IndemnFinal from "@/componente/IndemnFinal";
+import Galerie from "@/componente/pagina/Galerie";
+import { pozeDinDosarScris } from "@/date/proiecte-cloud";
 
 /**
  * Pagina unei noutăți.
@@ -63,7 +65,10 @@ async function Continut({ params }: PageProps<"/noutati/[slug]">) {
   const text = areBazaDeDate() ? await textPublicat("noutate", slug) : null;
   if (!text) notFound();
 
-  return <Articol text={text} cale={RUTE.noutati} inapoi="Toate noutățile" />;
+  const poze = text.dosarCloud ? await pozeDinDosarScris(text.dosarCloud) : [];
+  return (
+    <Articol text={text} cale={RUTE.noutati} inapoi="Toate noutățile" poze={poze} />
+  );
 }
 
 /** Folosit și de pagina unei campanii: aceeași formă, alt antet. */
@@ -72,12 +77,15 @@ export function Articol({
   cale,
   inapoi,
   sub,
+  poze = [],
 }: {
   text: Text;
   cale: string;
   inapoi: string;
   /** Un rând în plus sub titlu — la campanii, ținta. */
   sub?: React.ReactNode;
+  /** Pozele din folderul ales în panou, căi `/cloud/…`. */
+  poze?: readonly string[];
 }) {
   return (
     <>
@@ -146,6 +154,15 @@ export function Articol({
           </div>
         </div>
       </article>
+
+      <Galerie
+        scris="În fotografii"
+        titlu="Galerie"
+        poze={poze.map((p, i) => ({
+          cale: p,
+          alt: `${text.titlu}, fotografia ${i + 1} din ${poze.length}`,
+        }))}
+      />
 
       <IndemnFinal peste butoane="doua" titlu="Ajută și tu" />
     </>

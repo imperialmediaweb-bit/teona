@@ -358,6 +358,16 @@ export async function schimbaText(
   );
 }
 
+/** Leagă un proiect de folderul în care tocmai s-au urcat pozele lui. */
+export async function puneDosarCloud(id: string, cale: string): Promise<boolean> {
+  const r = await intreaba<{ id: string }>(
+    `UPDATE texte SET dosar_cloud = $2, schimbat_la = now()
+     WHERE id = $1 RETURNING id`,
+    [id, cale],
+  );
+  return r.length > 0;
+}
+
 export async function stergeText(id: string): Promise<void> {
   await intreaba(`DELETE FROM texte WHERE id = $1`, [id]);
 }
