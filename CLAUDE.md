@@ -375,6 +375,25 @@ se aleg pozele, „Urcă pozele”. Folderul se face singur,
   fișier text redenumit în .jpg, publicare, pagina publică):
   `DATABASE_URL=… CHROMIUM=/opt/pw-browsers/chromium node scripts/qa/poze-tabara.mjs`
 
+## Intrarea de probă: un browser automat pe site-ul adevărat
+
+Probele locale merg cu servicii de mențiune, deci nu pot prinde tocmai
+legătura adevărată (Cloudinary, Railway, Cloudflare). O cerere cu antetul
+`x-proba-token` egal cu `PROBA_TOKEN` din Railway (cel puțin 32 de semne)
+intră în panou ca „Probă automată” (`lib/admin.ts`, `fel: "proba"`).
+
+- **Numai pagini de conținut** (`PAGINI_PROBA`): scrie, poze, cifre, texte,
+  sponsori, documente, testimoniale, pagini, calendar, QR. **Nicio pagină cu
+  oameni** (donatori, donații, cereri, formulare, voluntari, abonați, firme,
+  căutare, export, conturi, tabloul de bord) și nimic care trimite în afară
+  sau cheamă un model plătit (șabloane, Facebook, radar, analiză, presă).
+  O pagină nouă e închisă până e adăugată în listă.
+- Antetul îl pune proxy-ul mediului de lucru; valoarea nu trece prin
+  conversație și nu e în depozit. Fără variabilă, ușa nu există; **se închide
+  ștergând `PROBA_TOKEN` din Railway**.
+- Ce se face cu ea pe site-ul viu se șterge la sfârșit (ciorna de probă,
+  pozele de probă). Nu se publică nimic.
+
 ## O fotografie nouă trebuie urcată și în Cloudinary
 
 Cu `CLOUDINARY_CLOUD_NAME` setat, `next.config.ts` montează un încărcător

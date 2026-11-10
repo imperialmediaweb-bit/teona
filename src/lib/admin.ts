@@ -1,7 +1,7 @@
 import { createHmac } from "node:crypto";
 import { mediu } from "@/lib/mediu";
 import { cache } from "react";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { connection } from "next/server";
 import { egale } from "./comparatie";
 import { cheiaDeSemnat } from "./cheie-semnare";
@@ -169,7 +169,43 @@ export function cititDispozitivul(brut: string | undefined): string | null {
 /** Cine e conectat: cheia asociației, un cont, sau nimeni. */
 export type Conectat =
   | { fel: "cheie"; rol: Rol; nume: string }
-  | { fel: "cont"; rol: Rol; nume: string; utilizator: Utilizator };
+  | { fel: "cont"; rol: Rol; nume: string; utilizator: Utilizator }
+  | { fel: "proba"; rol: Rol; nume: string };
+
+/**
+ * Intrarea de probă: un browser automat, pe site-ul adevărat.
+ *
+ * Probele locale folosesc servicii de mențiune; ce nu pot prinde e tocmai
+ * legătura adevărată (Cloudinary, Railway, Cloudflare). Pentru asta, cererea
+ * care poartă antetul `x-proba-token`, egal cu `PROBA_TOKEN` din Railway,
+ * intră în panou — **numai pe paginile de conținut** din `PAGINI_PROBA`.
+ * Nicio pagină cu oameni în ea: fără donatori, donații, cereri, formulare,
+ * voluntari, abonați, firme, căutare, export, conturi; și nimic care trimite
+ * în afară (e-mail, Facebook, MailerLite) sau cheamă un model plătit.
+ *
+ * Antetul îl pune proxy-ul mediului de lucru; valoarea nu trece prin
+ * conversație și nu e în depozit. Fără variabilă (sau sub 32 de semne) ușa
+ * nu există. Se închide ștergând variabila din Railway.
+ */
+export const ANTET_PROBA = "x-proba-token";
+const PAGINI_PROBA: readonly string[] = [
+  "/admin/scrie",
+  "/admin/poze",
+  "/admin/cifre",
+  "/admin/texte",
+  "/admin/sponsori",
+  "/admin/documente",
+  "/admin/testimoniale",
+  "/admin/pagini",
+  "/admin/calendar",
+  "/admin/qr",
+];
+
+function cheieProbaValida(primit: string | null): boolean {
+  const asteptat = mediu("PROBA_TOKEN");
+  if (!asteptat || asteptat.length < 32 || !primit) return false;
+  return egale(primit.trim(), asteptat);
+}
 
 /**
  * Scoate identificatorul din cookie-ul unui cont, dacă semnătura ține.
@@ -214,7 +250,12 @@ export const cineEsteConectat = cache(async (): Promise<Conectat | null> => {
   await connection();
   const borcan = await cookies();
   const gasit = borcan.get(COOKIE_ADMIN)?.value;
-  if (!gasit) return null;
+  if (!gasit) {
+    if (cheieProbaValida((await headers()).get(ANTET_PROBA))) {
+      return { fel: "proba", rol: "fundraising", nume: "Probă automată" };
+    }
+    return null;
+  }
 
   if (cookieCheieValid(gasit)) {
     return { fel: "cheie", rol: "administrator", nume: "Asociația" };
@@ -278,7 +319,9 @@ export async function rolulConectat(): Promise<Rol | null> {
  */
 export async function arePermisiune(cale: string): Promise<boolean> {
   const cine = await cineEsteConectat();
-  return cine ? poateVedea(cine.rol, cale) : false;
+  if (!cine) return false;
+  if (cine.fel === "proba" && !PAGINI_PROBA.includes(cale)) return false;
+  return poateVedea(cine.rol, cale);
 }
 
 /** Numele celui conectat, pentru rândurile de jurnal. */
