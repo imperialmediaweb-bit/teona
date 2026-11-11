@@ -1,4 +1,5 @@
 import { FELURI_INTERACTIUNE, type Interactiune } from "@/lib/crm";
+import TextCuAdrese from "./TextCuAdrese";
 
 /**
  * Jurnalul discuțiilor cu un om sau cu o firmă.
@@ -119,7 +120,9 @@ export default function Jurnal({
                 */}
                 {i.scrisDe ? ` · ${i.scrisDe}` : ""}
               </p>
-              <p className="text-cerneala-moale">{i.rezumat}</p>
+              <p className="text-cerneala-moale">
+                <TextCuAdrese>{i.rezumat}</TextCuAdrese>
+              </p>
             </li>
           ))}
         </ol>

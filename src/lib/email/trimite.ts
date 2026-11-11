@@ -86,7 +86,7 @@ export async function trimiteEmail(mesaj: {
       console.warn(`[email] probă fără PROBA_EMAIL; n-a plecat „${mesaj.subiect}”`);
       return true;
     }
-    mesaj = { ...mesaj, catre: proba, subiect: `[PROBĂ] ${mesaj.subiect}` };
+    mesaj = { ...mesaj, catre: proba, subiect: /^\[prob[ăa]\]/i.test(mesaj.subiect) ? mesaj.subiect.replace(/^\[prob[ăa]\]/i, "[PROBĂ]") : `[PROBĂ] ${mesaj.subiect}` };
   }
   const cheie = mediu("RESEND_API_KEY");
   if (!cheie) {

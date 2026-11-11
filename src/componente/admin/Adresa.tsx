@@ -14,7 +14,8 @@ const nimic = () => () => {};
  * `/admin/presa`, numai pe site-ul adevărat (local nu e Cloudflare).
  *
  * Așa că adresa nu se scrie în HTML-ul de la server: apare după hidratare.
- * Paginile din server (fără hidratare de text) n-au nevoie de asta.
+ * Într-o pagină de server ajunge ca adresa să aibă elementul ei, nu lipită
+ * de alt text: vezi `TextCuAdrese`.
  */
 export default function Adresa({ children }: { children: string }) {
   const inBrowser = useSyncExternalStore(nimic, () => true, () => false);

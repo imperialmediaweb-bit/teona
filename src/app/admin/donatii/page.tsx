@@ -13,6 +13,7 @@ import { DESTINATII_DONATIE } from "@/date/asociatie";
 import { scrieSuma } from "@/lib/suma";
 import { platiEsuate } from "@/lib/plati/esuate";
 import Cadru from "@/componente/admin/Cadru";
+import TextCuAdrese from "@/componente/admin/TextCuAdrese";
 import { verificaInainte } from "@/lib/plati/confirmare";
 import Descarca from "@/componente/admin/Descarca";
 import Intrare from "@/componente/admin/Intrare";
@@ -165,8 +166,13 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                   <p className="font-titlu font-bold text-cerneala">
-                    {[e.prenume, e.email].filter(Boolean).join(" · ") ||
-                      "fără nume"}
+                    {/* Adresa în nodul ei: Cloudflare o ascunde în HTML și o
+                        pune la loc ca nod separat, iar un text lipit de ea
+                        nu se mai potrivește la hidratare (eroarea React #418). */}
+                    {e.prenume}
+                    {e.prenume && e.email && " · "}
+                    {e.email && <span>{e.email}</span>}
+                    {!e.prenume && !e.email && "fără nume"}
                   </p>
                   <p className="font-titlu font-bold whitespace-nowrap text-caramiziu-800">
                     {scrieSuma(e.sumaBani / 100, e.moneda)} pe lună
@@ -224,12 +230,14 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                 </p>
                 {(t.email || t.telefon) && (
                   <p className="mt-1 text-mic break-all text-cerneala-moale">
-                    {[t.email, t.telefon].filter(Boolean).join(" · ")}
+                    {t.email && <span>{t.email}</span>}
+                    {t.email && t.telefon && " · "}
+                    {t.telefon}
                   </p>
                 )}
                 {t.observatii && (
                   <p className="mt-1 text-mic text-cerneala-moale">
-                    La detaliile plății: {t.observatii}
+                    La detaliile plății: <TextCuAdrese>{t.observatii}</TextCuAdrese>
                   </p>
                 )}
 
@@ -434,10 +442,10 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                     {numeleMetodei(d.procesator)}
                   </td>
                   <td className="py-2.5 text-nota break-all text-cerneala-slab">
-                    {d.referinta}
+                    <TextCuAdrese>{d.referinta}</TextCuAdrese>
                     {d.observatii && (
                       <span className="block text-cerneala-moale">
-                        {d.observatii}
+                        <TextCuAdrese>{d.observatii}</TextCuAdrese>
                       </span>
                     )}
                   </td>

@@ -13,6 +13,7 @@ import {
 } from "@/lib/crm";
 import { scrieSuma } from "@/lib/suma";
 import Cadru from "@/componente/admin/Cadru";
+import TextCuAdrese from "@/componente/admin/TextCuAdrese";
 import Descarca from "@/componente/admin/Descarca";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
@@ -230,7 +231,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
 
                 {f.mesaj && (
                   <p className="mt-3 rounded-moale bg-hartie-calda p-3 text-mic text-cerneala-moale">
-                    {f.mesaj}
+                    <TextCuAdrese>{f.mesaj}</TextCuAdrese>
                   </p>
                 )}
 

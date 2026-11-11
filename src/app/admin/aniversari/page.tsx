@@ -9,6 +9,7 @@ import { etichetaOcaziei } from "@/date/aniversari";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import Cadru from "@/componente/admin/Cadru";
+import TextCuAdrese from "@/componente/admin/TextCuAdrese";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 
@@ -116,6 +117,16 @@ async function Continut({
           nu află nimeni.
         </p>
       )}
+      {(gata === "publicata" || gata === "respinsa") && faraEmail === undefined && (
+        <p
+          role="status"
+          className="mb-6 colt-mic-b border-t-4 border-turcoaz-600 bg-turcoaz-50 p-4 text-mic text-turcoaz-900"
+        >
+          {gata === "publicata"
+            ? "Campania e publicată. Omul a primit pe e-mail linkul de distribuit."
+            : "Campania e respinsă. Omul a primit vestea pe e-mail."}
+        </p>
+      )}
       {campanii.length === 0 && (
         <p className="text-amplu text-cerneala-moale">
           Nimic de verificat acum.
@@ -190,7 +201,7 @@ async function Continut({
             )}
 
             <p className="mt-5 max-w-3xl whitespace-pre-line text-cerneala-moale">
-              {c.mesaj}
+              <TextCuAdrese>{c.mesaj}</TextCuAdrese>
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3 border-t border-hartie-umbra pt-5">

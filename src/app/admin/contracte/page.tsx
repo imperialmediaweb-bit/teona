@@ -5,6 +5,7 @@ import Link from "next/link";
 import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import Cadru from "@/componente/admin/Cadru";
+import TextCuAdrese from "@/componente/admin/TextCuAdrese";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 import { scrieSuma } from "@/lib/suma";
@@ -242,7 +243,7 @@ async function Continut({
                 <span className="font-titlu font-bold text-cerneala">
                   {f.firmaId ? (
                     <Link
-                      href={`/admin/firme/${f.firmaId}`}
+                      href={`/admin/firme?deschis=${f.firmaId}#${f.firmaId}`}
                       className="underline underline-offset-2"
                     >
                       {f.denumire}
@@ -320,7 +321,7 @@ function Rand({ c, an }: { c: Contract; an: number }) {
         </summary>
 
         {c.observatii && (
-          <p className="mt-3 text-mic text-cerneala-moale">{c.observatii}</p>
+          <p className="mt-3 text-mic text-cerneala-moale"><TextCuAdrese>{c.observatii}</TextCuAdrese></p>
         )}
 
         <form

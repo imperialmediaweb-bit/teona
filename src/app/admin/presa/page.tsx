@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import Cadru from "@/componente/admin/Cadru";
+import TextCuAdrese from "@/componente/admin/TextCuAdrese";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 import CopiazaAdrese from "@/componente/admin/CopiazaAdrese";
@@ -366,7 +367,7 @@ function Rand({ c }: { c: ContactPresa }) {
         </summary>
 
         {c.notite && (
-          <p className="mt-3 text-mic text-cerneala-moale">{c.notite}</p>
+          <p className="mt-3 text-mic text-cerneala-moale"><TextCuAdrese>{c.notite}</TextCuAdrese></p>
         )}
 
         <form

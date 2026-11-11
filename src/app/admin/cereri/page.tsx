@@ -18,6 +18,7 @@ import {
   esteStadiuCerere,
 } from "@/lib/crm";
 import Cadru from "@/componente/admin/Cadru";
+import TextCuAdrese from "@/componente/admin/TextCuAdrese";
 import Descarca from "@/componente/admin/Descarca";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
@@ -195,7 +196,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                     <div key={k} className="contents">
                       <dt className="text-cerneala-slab">{k}</dt>
                       <dd className="whitespace-pre-wrap text-cerneala-moale">
-                        {v}
+                        <TextCuAdrese>{String(v)}</TextCuAdrese>
                       </dd>
                     </div>
                   ))}
