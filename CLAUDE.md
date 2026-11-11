@@ -227,7 +227,12 @@ publicare. Acum **rezerva nu se ține**: ramura care întoarce rezerva cheamă
 și `cacheRezerva()` (reîmprospătare la 10 secunde; `expire` rămâne 300, sub
 atât Next o socotește dinamică și build-ul cade), iar Next ia minimul dintre
 apelurile `cacheLife` din aceeași funcție. Deci cel mult primul vizitator de
-după publicare mai vede rezerva; cererea lui o reîmprospătează. **Probele care citesc o pagină publică
+după publicare mai vede rezerva; cererea lui o reîmprospătează. **Golirea se face cu `{ expire: 0 }`, nu cu `"max"`**: `revalidateTag(…, "max")`
+servește încă o dată varianta veche. Proba din 11 noiembrie 2026 a prins-o la
+texte: după „Salvează” pagina publică arăta textul vechi, iar după „Textul de
+la început” arăta încă textul de probă — site-ul rămânea cu un pas în urmă
+față de panou. Același defect fusese reparat la tabere; acum e peste tot.
+**Probele care citesc o pagină publică
 după o salvare trebuie să aștepte**, sau să golească întâi eticheta cu o
 salvare care nu schimbă nimic.
 

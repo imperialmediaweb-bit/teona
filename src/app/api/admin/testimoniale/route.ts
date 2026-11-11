@@ -53,7 +53,7 @@ export async function POST(cerere: Request) {
       id,
       fel === "porneste",
     ).catch(() => false);
-    if (schimbat) revalidateTag(ETICHETA_TESTIMONIALE, "max");
+    if (schimbat) revalidateTag(ETICHETA_TESTIMONIALE, { expire: 0 });
     return gata(cerere, schimbat ? "stare" : "necunoscut");
   }
 
@@ -93,7 +93,7 @@ export async function POST(cerere: Request) {
       sursa,
       textLung,
     }).catch(() => false);
-    if (schimbat) revalidateTag(ETICHETA_TESTIMONIALE, "max");
+    if (schimbat) revalidateTag(ETICHETA_TESTIMONIALE, { expire: 0 });
     return gata(cerere, schimbat ? "schimbat" : "necunoscut");
   }
 
@@ -103,7 +103,7 @@ export async function POST(cerere: Request) {
     sursa,
     textLung,
   }).catch(() => false);
-  if (facut) revalidateTag(ETICHETA_TESTIMONIALE, "max");
+  if (facut) revalidateTag(ETICHETA_TESTIMONIALE, { expire: 0 });
   return gata(cerere, facut ? "facut" : "necunoscut");
 }
 

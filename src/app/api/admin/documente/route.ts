@@ -76,7 +76,7 @@ export async function POST(cerere: Request) {
     există. Fără golire, omul urcă declarația și butonul rămâne stins încă o
     oră — adică exact purtarea care îl face să creadă că n-a urcat nimic.
   */
-  if (urcat) revalidateTag(ETICHETA_DOCUMENTE, "max");
+  if (urcat) revalidateTag(ETICHETA_DOCUMENTE, { expire: 0 });
   return gata(cerere, urcat ? "urcat" : "necunoscut");
 }
 

@@ -65,7 +65,7 @@ export async function POST(cerere: Request) {
   }
 
   const schimbat = await schimbaCifrele(cifre).catch(() => false);
-  if (schimbat) revalidateTag(ETICHETA_CIFRE, "max");
+  if (schimbat) revalidateTag(ETICHETA_CIFRE, { expire: 0 });
   return gata(cerere, schimbat ? "schimbat" : "necunoscut");
 }
 

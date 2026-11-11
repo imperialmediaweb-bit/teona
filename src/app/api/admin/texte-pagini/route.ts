@@ -47,7 +47,7 @@ export async function POST(cerere: Request) {
 
   if (String(formular.get("fel") ?? "") === "inapoi") {
     const readus = await readuTextPagina(cheie).catch(() => false);
-    if (readus) revalidateTag(ETICHETA_TEXTE_PAGINI, "max");
+    if (readus) revalidateTag(ETICHETA_TEXTE_PAGINI, { expire: 0 });
     return gata(cerere, readus ? "readus" : "necunoscut", pagina);
   }
 
@@ -61,7 +61,7 @@ export async function POST(cerere: Request) {
   if (continut.trim().length < 3) return gata(cerere, "gol", pagina);
 
   const schimbat = await schimbaTextPagina(cheie, continut).catch(() => false);
-  if (schimbat) revalidateTag(ETICHETA_TEXTE_PAGINI, "max");
+  if (schimbat) revalidateTag(ETICHETA_TEXTE_PAGINI, { expire: 0 });
   return gata(cerere, schimbat ? "schimbat" : "necunoscut", pagina);
 }
 

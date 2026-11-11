@@ -47,13 +47,13 @@ export async function POST(cerere: Request) {
       id,
       fel === "porneste",
     ).catch(() => false);
-    if (schimbat) revalidateTag(ETICHETA_SPONSORI, "max");
+    if (schimbat) revalidateTag(ETICHETA_SPONSORI, { expire: 0 });
     return gata(cerere, schimbat ? "stare" : "necunoscut");
   }
 
   if (fel === "sus" || fel === "jos") {
     const mutat = await mutaSponsor(id, fel).catch(() => false);
-    if (mutat) revalidateTag(ETICHETA_SPONSORI, "max");
+    if (mutat) revalidateTag(ETICHETA_SPONSORI, { expire: 0 });
     return gata(cerere, mutat ? "mutat" : "necunoscut");
   }
 
@@ -73,7 +73,7 @@ export async function POST(cerere: Request) {
     const schimbat = await schimbaSponsor(id, { nume, adresa }).catch(
       () => false,
     );
-    if (schimbat) revalidateTag(ETICHETA_SPONSORI, "max");
+    if (schimbat) revalidateTag(ETICHETA_SPONSORI, { expire: 0 });
     return gata(cerere, schimbat ? "schimbat" : "necunoscut");
   }
 
@@ -107,7 +107,7 @@ export async function POST(cerere: Request) {
     pozaId: urcata.id,
     adresa,
   }).catch(() => false);
-  if (facut) revalidateTag(ETICHETA_SPONSORI, "max");
+  if (facut) revalidateTag(ETICHETA_SPONSORI, { expire: 0 });
   return gata(cerere, facut ? "facut" : "necunoscut");
 }
 
