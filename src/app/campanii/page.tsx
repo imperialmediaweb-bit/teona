@@ -6,6 +6,7 @@ import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
 import { RUTE } from "@/date/asociatie";
 import { areBazaDeDate } from "@/lib/baza";
 import { textePublicate } from "@/lib/texte";
+import { slugEticheta } from "@/lib/etichete";
 import AntetPagina from "@/componente/pagina/AntetPagina";
 import ListaScrise from "@/componente/pagina/ListaScrise";
 import IndemnFinal from "@/componente/IndemnFinal";
@@ -23,7 +24,11 @@ export const metadata: Metadata = metadate({
  * Sunt scrise din panou și stau în baza de date: o campanie pornește când
  * decide asociația, nu când are dezvoltatorul timp să publice.
  */
-export default function PaginaCampanii() {
+export default function PaginaCampanii({
+  searchParams,
+}: {
+  searchParams: Promise<{ eticheta?: string }>;
+}) {
   return (
     <>
       <JsonLd date={jsonLdFir([{ nume: "Campanii", cale: RUTE.campanii }])} />
@@ -64,7 +69,7 @@ export default function PaginaCampanii() {
               </p>
             }
           >
-            <Lista />
+            <Lista searchParams={searchParams} />
           </Suspense>
         </div>
       </section>
@@ -74,15 +79,49 @@ export default function PaginaCampanii() {
   );
 }
 
-async function Lista() {
+async function Lista({
+  searchParams,
+}: {
+  searchParams: Promise<{ eticheta?: string }>;
+}) {
   await connection();
   if (!areBazaDeDate()) return null;
-  const texte = await textePublicate("campanie");
+  const { eticheta } = await searchParams;
+  const toate = await textePublicate("campanie");
+  const cautata = eticheta ? slugEticheta(eticheta) : "";
+  const texte = cautata
+    ? toate.filter((t) => t.etichete.some((e) => slugEticheta(e) === cautata))
+    : toate;
+  const numele = cautata
+    ? (toate
+        .flatMap((t) => t.etichete)
+        .find((e) => slugEticheta(e) === cautata) ?? cautata)
+    : "";
   return (
-    <ListaScrise
-      texte={texte}
-      cale={RUTE.campanii}
-      gol="Nu e nicio campanie deschisă chiar acum. Poți să ne ajuți oricând printr-o donație."
-    />
+    <>
+      {cautata && (
+        <p className="mb-8 flex flex-wrap items-center gap-3 text-amplu text-cerneala">
+          <span>
+            Cu cuvântul cheie{" "}
+            <strong className="font-titlu font-bold">#{numele}</strong>
+          </span>
+          <Link
+            href={RUTE.campanii}
+            className="font-titlu text-mic font-semibold text-caramiziu-700 underline underline-offset-4"
+          >
+            Vezi tot
+          </Link>
+        </p>
+      )}
+      <ListaScrise
+        texte={texte}
+        cale={RUTE.campanii}
+        gol={
+          cautata
+            ? "Nimic publicat cu acest cuvânt cheie."
+            : "Nu e nicio campanie deschisă chiar acum. Poți să ne ajuți oricând printr-o donație."
+        }
+      />
+    </>
   );
 }

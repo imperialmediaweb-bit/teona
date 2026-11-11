@@ -577,6 +577,9 @@ const ADAOSURI = `
   ALTER TABLE texte ADD COLUMN IF NOT EXISTS facebook_id text;
   ALTER TABLE texte ADD COLUMN IF NOT EXISTS facebook_la timestamptz;
 
+  /* Etichetele unui text (cuvintele cheie), scrise in panou. */
+  ALTER TABLE texte ADD COLUMN IF NOT EXISTS etichete text[] NOT NULL DEFAULT '{}';
+
   /*
     Cine a scris rândul de jurnal.
 

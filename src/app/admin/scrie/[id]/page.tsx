@@ -232,6 +232,23 @@ async function Continut({
           <EditorText name="continut" defaultValue={text?.continut ?? ""} />
         </div>
 
+        <label className="grid gap-1.5">
+          <span className="font-titlu text-mic font-bold text-cerneala">
+            Cuvinte cheie
+          </span>
+          <span className="text-mic text-cerneala-moale">
+            Despărțite prin virgulă. Pe site apar sub text și duc la toate
+            textele cu același cuvânt.
+          </span>
+          <input
+            name="etichete"
+            maxLength={500}
+            defaultValue={text?.etichete.join(", ") ?? ""}
+            placeholder="de ex. tabără, autism, voluntari"
+            className={camp}
+          />
+        </label>
+
         {fel === "proiect" && (
           <label className="grid gap-1.5">
             <span className="text-mic font-semibold text-cerneala">

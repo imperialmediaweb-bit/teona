@@ -316,7 +316,7 @@ export async function deFacutAcum(): Promise<
       unde: "/admin/firme?uitate=1",
     },
     {
-      eticheta: "ciorne nepublicate",
+      eticheta: "texte nepublicate",
       nr: Number(ciorne[0]?.nr ?? 0),
       unde: "/admin/scrie",
     },

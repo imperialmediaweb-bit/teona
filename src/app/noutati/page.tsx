@@ -6,6 +6,7 @@ import { JsonLd, jsonLdFir, metadate } from "@/app/seo";
 import { RUTE } from "@/date/asociatie";
 import { areBazaDeDate } from "@/lib/baza";
 import { textePublicate } from "@/lib/texte";
+import { slugEticheta } from "@/lib/etichete";
 import AntetPagina from "@/componente/pagina/AntetPagina";
 import ListaScrise from "@/componente/pagina/ListaScrise";
 import IndemnFinal from "@/componente/IndemnFinal";
@@ -24,7 +25,11 @@ export const metadata: Metadata = metadate({
  * cod: o noutate nu trebuie să treacă prin dezvoltator. De aceea pagina se
  * randează la cerere — ce s-a publicat acum un minut se vede acum.
  */
-export default function PaginaNoutati() {
+export default function PaginaNoutati({
+  searchParams,
+}: {
+  searchParams: Promise<{ eticheta?: string }>;
+}) {
   return (
     <>
       <JsonLd date={jsonLdFir([{ nume: "Noutăți", cale: RUTE.noutati }])} />
@@ -65,7 +70,7 @@ export default function PaginaNoutati() {
               </p>
             }
           >
-            <Lista />
+            <Lista searchParams={searchParams} />
           </Suspense>
         </div>
       </section>
@@ -78,15 +83,49 @@ export default function PaginaNoutati() {
   );
 }
 
-async function Lista() {
+async function Lista({
+  searchParams,
+}: {
+  searchParams: Promise<{ eticheta?: string }>;
+}) {
   await connection();
   if (!areBazaDeDate()) return null;
-  const texte = await textePublicate("noutate");
+  const { eticheta } = await searchParams;
+  const toate = await textePublicate("noutate");
+  const cautata = eticheta ? slugEticheta(eticheta) : "";
+  const texte = cautata
+    ? toate.filter((t) => t.etichete.some((e) => slugEticheta(e) === cautata))
+    : toate;
+  const numele = cautata
+    ? (toate
+        .flatMap((t) => t.etichete)
+        .find((e) => slugEticheta(e) === cautata) ?? cautata)
+    : "";
   return (
-    <ListaScrise
-      texte={texte}
-      cale={RUTE.noutati}
-      gol="Încă n-am publicat nimic aici. Până atunci, ne găsești pe Facebook."
-    />
+    <>
+      {cautata && (
+        <p className="mb-8 flex flex-wrap items-center gap-3 text-amplu text-cerneala">
+          <span>
+            Cu cuvântul cheie{" "}
+            <strong className="font-titlu font-bold">#{numele}</strong>
+          </span>
+          <Link
+            href={RUTE.noutati}
+            className="font-titlu text-mic font-semibold text-caramiziu-700 underline underline-offset-4"
+          >
+            Vezi tot
+          </Link>
+        </p>
+      )}
+      <ListaScrise
+        texte={texte}
+        cale={RUTE.noutati}
+        gol={
+          cautata
+            ? "Nimic publicat cu acest cuvânt cheie."
+            : "Încă n-am publicat nimic aici. Până atunci, ne găsești pe Facebook."
+        }
+      />
+    </>
   );
 }

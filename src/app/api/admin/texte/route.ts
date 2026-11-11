@@ -1,3 +1,4 @@
+import { citesteEtichete } from "@/lib/etichete";
 import { curataHtml } from "@/lib/curata-html";
 import { esteHtml, textSimplu } from "@/lib/text-bogat";
 import { NextResponse } from "next/server";
@@ -184,6 +185,7 @@ async function posteaza(cerere: Request) {
     dosarCloud: camp("dosarCloud") || null,
     categorie: fel === "proiect" ? categorie : null,
     publicat: actiune === "publica",
+    etichete: citesteEtichete(camp("etichete")),
   };
 
   if (/^[0-9a-f-]{36}$/i.test(id)) {

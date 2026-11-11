@@ -6,10 +6,12 @@ import { notFound } from "next/navigation";
 import { JsonLd, absoluta, jsonLdFir, metadate } from "@/app/seo";
 import { ASOCIATIA, RUTE } from "@/date/asociatie";
 import { areBazaDeDate } from "@/lib/baza";
+import { textSimplu } from "@/lib/text-bogat";
 import { textPublicat, type Text } from "@/lib/texte";
 import { adresaPentruDistribuire, adresaPoza } from "@/lib/poza-urcata";
 import Pictograma from "@/componente/Pictograma";
 import TextScris from "@/componente/pagina/TextScris";
+import Etichete from "@/componente/pagina/Etichete";
 import Distribuie from "@/componente/pagina/Distribuie";
 import IndemnFinal from "@/componente/IndemnFinal";
 import Galerie from "@/componente/pagina/Galerie";
@@ -37,15 +39,18 @@ export async function generateMetadata({
   if (!text)
     return { title: "Noutate", robots: { index: false, follow: false } };
 
-  return metadate({
+  const meta = metadate({
     titlu: text.titlu,
     descriere:
-      text.rezumat || `${text.titlu} — o noutate de la ${ASOCIATIA.denumire}.`,
+      text.rezumat ||
+      textSimplu(text.continut)[0] ||
+      `${text.titlu} — o noutate de la ${ASOCIATIA.denumire}.`,
     cale: `${RUTE.noutati}/${text.slug}`,
     imagine: text.poza
       ? { cale: adresaPentruDistribuire(text.poza.id), alt: text.poza.alt }
       : undefined,
   });
+  return text.etichete.length ? { ...meta, keywords: text.etichete } : meta;
 }
 
 export default function PaginaNoutate({
@@ -146,8 +151,15 @@ export function Articol({
             <TextScris continut={text.continut} />
           </div>
 
+          {text.etichete.length > 0 && (
+            <div className="mt-10">
+              <Etichete etichete={text.etichete} cale={cale} />
+            </div>
+          )}
+
           <div className="mt-12 border-t border-hartie-umbra pt-7">
             <Distribuie
+              ce={text.fel === "campanie" ? "campania" : "articolul"}
               adresa={absoluta(`${cale}/${text.slug}`)}
               titlu={text.titlu}
             />

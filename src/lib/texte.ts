@@ -85,6 +85,8 @@ export type Text = {
   facebookLa: string | null;
   /** Ziua în care se vrea publicat, dacă s-a pus una. */
   planificatLa: string | null;
+  /** Cuvintele cheie, scrise în panou: „tabără, autism”. */
+  etichete: string[];
 };
 
 type Rand = {
@@ -109,6 +111,7 @@ type Rand = {
   facebook_id: string | null;
   facebook_la: Date | null;
   planificat_la: Date | string | null;
+  etichete: string[] | null;
 };
 
 function dinRand(r: Rand): Text {
@@ -147,13 +150,14 @@ function dinRand(r: Rand): Text {
       r.planificat_la instanceof Date
         ? r.planificat_la.toISOString().slice(0, 10)
         : (r.planificat_la ?? null),
+    etichete: r.etichete ?? [],
   };
 }
 
 const COLOANE = `id, fel, slug, titlu, rezumat, continut, poza_id, poza_latime,
   poza_inaltime, poza_alt, tinta_bani, data_inceput, data_citita, dosar_cloud,
   categorie, stare, publicat_la, schimbat_la, facebook_id, facebook_la,
-  planificat_la`;
+  planificat_la, etichete`;
 
 /**
  * Textele publicate, cele mai noi primele.
@@ -244,6 +248,7 @@ export type DateText = {
   dosarCloud: string | null;
   categorie: string | null;
   publicat: boolean;
+  etichete: string[];
 };
 
 /** Scrie un text nou. Întoarce identificatorul lui. */
@@ -287,8 +292,8 @@ export async function creeazaText(
     `INSERT INTO texte
        (fel, slug, titlu, rezumat, continut, poza_id, poza_latime,
         poza_inaltime, poza_alt, tinta_bani, data_inceput, data_citita,
-        dosar_cloud, categorie, stare, publicat_la)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+        dosar_cloud, categorie, stare, publicat_la, etichete)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
      RETURNING id`,
     [
       date.fel,
@@ -307,6 +312,7 @@ export async function creeazaText(
       date.categorie,
       date.publicat ? "publicat" : "ciorna",
       date.publicat ? new Date() : null,
+      date.etichete,
     ],
   );
   return randuri[0].id;
@@ -337,6 +343,7 @@ export async function schimbaText(
        data_citita = $12,
        dosar_cloud = $13,
        categorie = $14,
+       etichete = $15,
        stare = $10,
        publicat_la = CASE
          WHEN $10 = 'publicat' AND publicat_la IS NULL THEN now()
@@ -359,6 +366,7 @@ export async function schimbaText(
       date.dataCitita,
       date.dosarCloud,
       date.categorie,
+      date.etichete,
     ],
   );
 }

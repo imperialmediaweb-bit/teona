@@ -214,6 +214,7 @@ function dinText(t: TextPanou): ProiectAfisat {
     areDataScrisa: Boolean(t.dataInceput),
     areCategorieScrisa: Boolean(t.categorie),
     continut: t.continut,
+    etichete: t.etichete,
     // Fără formatare: aici e text curat, pentru rezumate.
     descriere: textSimplu(t.continut),
   };
@@ -329,6 +330,7 @@ function peste(
     dataCitita: p.dataCitita ?? vechi.dataCitita,
     descriere: p.descriere?.length ? p.descriere : vechi.descriere,
     continut: p.descriere?.length ? p.continut : undefined,
+    etichete: p.etichete?.length ? p.etichete : vechi.etichete,
   };
 }
 

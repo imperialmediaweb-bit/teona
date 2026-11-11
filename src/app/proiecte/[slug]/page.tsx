@@ -1,4 +1,5 @@
 import TextScris from "@/componente/pagina/TextScris";
+import Etichete from "@/componente/pagina/Etichete";
 import type { Metadata } from "next";
 import { JsonLd, jsonLdFir, jsonLdGalerie, metadate } from "@/app/seo";
 import Image from "next/image";
@@ -203,6 +204,11 @@ export default async function PaginaProiect({
                   {proiect.descriere.map((paragraf) => (
                     <p key={paragraf.slice(0, 40)}>{paragraf}</p>
                   ))}
+                </div>
+              )}
+              {proiect.etichete && proiect.etichete.length > 0 && (
+                <div className="mt-10">
+                  <Etichete etichete={proiect.etichete} />
                 </div>
               )}
             </div>

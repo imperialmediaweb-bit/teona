@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { metadate } from "@/app/seo";
 import { ASOCIATIA, RUTE } from "@/date/asociatie";
 import { areBazaDeDate } from "@/lib/baza";
+import { textSimplu } from "@/lib/text-bogat";
 import { textPublicat } from "@/lib/texte";
 import { adresaPentruDistribuire } from "@/lib/poza-urcata";
 import { scrieSuma } from "@/lib/suma";
@@ -28,15 +29,18 @@ export async function generateMetadata({
   if (!text)
     return { title: "Campanie", robots: { index: false, follow: false } };
 
-  return metadate({
+  const meta = metadate({
     titlu: text.titlu,
     descriere:
-      text.rezumat || `${text.titlu} — campanie a ${ASOCIATIA.denumire}.`,
+      text.rezumat ||
+      textSimplu(text.continut)[0] ||
+      `${text.titlu} — campanie a ${ASOCIATIA.denumire}.`,
     cale: `${RUTE.campanii}/${text.slug}`,
     imagine: text.poza
       ? { cale: adresaPentruDistribuire(text.poza.id), alt: text.poza.alt }
       : undefined,
   });
+  return text.etichete.length ? { ...meta, keywords: text.etichete } : meta;
 }
 export default function PaginaCampanie({
   params,

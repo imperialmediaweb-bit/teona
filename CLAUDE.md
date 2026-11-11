@@ -1871,6 +1871,19 @@ Un text nou n-are „Salvează ciorna”: e „Publică”; pe unul publicat ră
   `simplu` — îngroșat, culoare, link, nimic de bloc. Frazele din capul
   paginilor rămân text simplu: stau în titluri și în descrierile pentru
   Google. Paginile le citesc prin `paragrafeBogate` / `intrUnParagraf`.
+- **Cuvinte cheie** (`texte.etichete text[]`, în `ADAOSURI`;
+  `lib/etichete.ts`): un câmp sub text, despărțite prin virgulă, fără
+  dubluri, cel mult zece, `#` din față se scoate. Pe site apar sub text;
+  la Blog și Campanii duc la `/noutati?eticheta=…` (lista filtrată), la
+  tabere sunt doar de citit. Intră și în `<meta name="keywords">`; descrierea
+  pentru Google ia primul paragraf când nu e scris un rezumat.
+- **Pagina se umple după `load`**: conținutul unui articol vine din
+  `Suspense`, deci o probă așteaptă `main h1`, nu doar codul 200. Click pe
+  un cuvânt cheie e navigare fără reîncărcare: `waitForURL`.
+- Probă pe tot drumul (scrie, formatează, poză în text, poză principală,
+  galerie, cuvinte cheie, listă, schimbare, scoate de pe site, publică iar,
+  șterge), pe toate trei: `scratchpad/tot.mjs`, local fără poze, pe site
+  cu poze.
 - **Fără asistent pe pagina de scris**: asociația, aceeași zi, „lasă cu
   ciorna, nu-i înțeleg sensul”. Componenta `Asistent` a rămas în cod.
 - Probă în browser, pe toate trei: `scratchpad/editor2.mjs` (în afara

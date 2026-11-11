@@ -15,9 +15,12 @@ import { PictogramaRetea } from "../Retele";
 export default function Distribuie({
   adresa,
   titlu,
+  ce = "campania",
 }: {
   adresa: string;
   titlu: string;
+  /** „campania” sau „articolul”: pe un articol de blog nu scrie „campania”. */
+  ce?: "campania" | "articolul";
 }) {
   const [copiat, setCopiat] = useState(false);
 
@@ -46,7 +49,7 @@ export default function Distribuie({
 
   return (
     <div className="colt-a border border-hartie-umbra bg-hartie p-6 text-center shadow-[0_20px_44px_-26px_rgba(35,35,35,0.35)] sm:p-7">
-      <h2 className="text-h3 text-cerneala">Distribuie campania</h2>
+      <h2 className="text-h3 text-cerneala">Distribuie {ce}</h2>
       <p className="mx-auto mt-2 max-w-xl text-cerneala-moale">
         Fiecare om care vede pagina e un copil mai aproape de o tabără.
       </p>

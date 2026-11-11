@@ -76,6 +76,8 @@ export type ProiectAfisat = {
    * pe paragrafe, pentru rezumate.
    */
   continut?: string;
+  /** Cuvintele cheie scrise în panou. */
+  etichete?: string[];
   areDataScrisa?: boolean;
   areCategorieScrisa?: boolean;
 };
