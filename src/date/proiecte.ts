@@ -8,7 +8,7 @@ import { CATEGORII as CATEGORIILE } from "./proiecte-tipuri";
 import type { IdCategorie, ProiectAfisat } from "./proiecte-tipuri";
 import { cacheLife, cacheTag } from "next/cache";
 import { areBazaDeDate } from "@/lib/baza";
-import { textePublicate } from "@/lib/texte";
+import { textePublicate, textPublicat, type Text as TextPanou } from "@/lib/texte";
 import { PREFIX_CLOUD } from "@/lib/cloud";
 
 export { CATEGORII } from "./proiecte-tipuri";
@@ -194,7 +194,12 @@ async function dinPanou(): Promise<ProiectAfisat[]> {
     cacheRezerva();
     return [];
   }
-  return texte.map((t) => ({
+  return texte.map(dinText);
+}
+
+/** Un text de fel „proiect”, din panou, în forma pe care o afișează site-ul. */
+function dinText(t: TextPanou): ProiectAfisat {
+  return {
     slug: t.slug,
     titlu: t.titlu,
     // Fără dată de început, data publicării ține locul doar la ordonare.
@@ -211,7 +216,7 @@ async function dinPanou(): Promise<ProiectAfisat[]> {
       .split(/(?:\r?\n){2,}/)
       .map((p) => p.trim())
       .filter(Boolean),
-  }));
+  };
 }
 
 /**
@@ -279,7 +284,20 @@ export async function proiectDupaSlugPeste(
   const alLor = areBazaDeDate()
     ? (await dinPanou()).find((p) => p.slug === slug)
     : undefined;
-  return alLor ? peste(alLor, proiectDupaSlug(slug)) : proiectDupaSlug(slug);
+  if (alLor) return peste(alLor, proiectDupaSlug(slug));
+  const dinCod = proiectDupaSlug(slug);
+  if (dinCod) return dinCod;
+  /*
+    Nici în lista ținută, nici în cod — dar `proxy.ts` a lăsat cererea să
+    treacă, deci în bază e publicat. Lista e în urmă: pe site, prima
+    deschidere a unei tabere abia publicate arăta „Pagina nu a fost găsită”
+    și abia a doua mergea (prins pe 11 noiembrie 2026, apăsând „Vezi pe
+    site” imediat după „Publică”). Se citește direct, fără cache; se ajunge
+    aici numai pentru sluguri care nu se pregenerează.
+  */
+  if (!areBazaDeDate()) return undefined;
+  const proaspat = await textPublicat("proiect", slug).catch(() => null);
+  return proaspat ? dinText(proaspat) : undefined;
 }
 
 /**
