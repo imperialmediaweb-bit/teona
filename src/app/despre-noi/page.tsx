@@ -7,6 +7,7 @@ import Aparitie from "@/componente/Aparitie";
 import Buton from "@/componente/Buton";
 import Cifre from "@/componente/Cifre";
 import { cifreSite } from "@/lib/cifre";
+import { intrUnParagraf, paragrafeBogate } from "@/componente/pagina/paragrafe-bogate";
 import { textelePaginilor } from "@/lib/texte-pagini";
 
 /**
@@ -15,12 +16,7 @@ import { textelePaginilor } from "@/lib/texte-pagini";
  * Nu se folosește `TextScris` aici: blocul are clasele lui, din așezarea
  * paginii, iar componenta aia își aduce ale ei. Se desparte doar textul.
  */
-function paragrafe(text: string): string[] {
-  return (text ?? "")
-    .split(/(?:\r?\n){2,}/)
-    .map((p) => p.trim())
-    .filter(Boolean);
-}
+const paragrafe = paragrafeBogate;
 import Decor from "@/componente/Decor";
 import Fotografie from "@/componente/Fotografie";
 import IndemnFinal from "@/componente/IndemnFinal";
@@ -253,8 +249,8 @@ export default async function DespreNoi() {
                       {bloc.titlu}
                     </h3>
                     <div className="relative mt-5 grid gap-4 text-cerneala-moale">
-                      {paragrafe(texte[bloc.cheie]).map((paragraf) => (
-                        <p key={paragraf.slice(0, 40)}>{paragraf}</p>
+                      {paragrafe(texte[bloc.cheie]).map((paragraf, i) => (
+                        <p key={i}>{paragraf}</p>
                       ))}
                     </div>
                   </div>
@@ -303,7 +299,7 @@ export default async function DespreNoi() {
                     {MISIUNE[0].titlu}
                   </h3>
                   <p className="relative mt-3 text-corp text-hartie/90">
-                    {texte[MISIUNE[0].cheie!]}
+                    {intrUnParagraf(texte[MISIUNE[0].cheie!])}
                   </p>
                 </article>
               </Aparitie>
@@ -328,7 +324,7 @@ export default async function DespreNoi() {
                     {MISIUNE[1].titlu}
                   </h3>
                   <p className="relative mt-3 text-corp text-cerneala-moale">
-                    {texte[MISIUNE[1].cheie!]}
+                    {intrUnParagraf(texte[MISIUNE[1].cheie!])}
                   </p>
                 </article>
               </Aparitie>
@@ -518,7 +514,7 @@ export default async function DespreNoi() {
               culoare="miere"
             />
             <div className="mt-5 grid gap-4 text-cerneala-moale">
-              <p>{texte["despre.voluntari"]}</p>
+              <p>{intrUnParagraf(texte["despre.voluntari"])}</p>
               <p>
                 Dacă vrei să faci parte din echipă, te așteptăm. Alătură-te
                 Culegătorilor de Zâmbete.

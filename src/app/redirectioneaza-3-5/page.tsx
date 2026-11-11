@@ -15,15 +15,11 @@ import Buton from "@/componente/Buton";
 import Cifre from "@/componente/Cifre";
 import { cifreSite } from "@/lib/cifre";
 import { documenteGata } from "@/lib/documente-gata";
+import { paragrafeBogate } from "@/componente/pagina/paragrafe-bogate";
 import { completeazaCifrele, textelePaginilor } from "@/lib/texte-pagini";
 
 /** Rând gol = paragraf nou, ca în panou. */
-function paragrafe(text: string): string[] {
-  return (text ?? "")
-    .split(/(?:\r?\n){2,}/)
-    .map((p) => p.trim())
-    .filter(Boolean);
-}
+const paragrafe = paragrafeBogate;
 import Decor from "@/componente/Decor";
 import Fotografie from "@/componente/Fotografie";
 import IndemnFinal from "@/componente/IndemnFinal";
@@ -492,8 +488,8 @@ export default async function Redirectioneaza35() {
                 */}
                 {paragrafe(
                   completeazaCifrele(texte["redirectionare.de-ce"], cifre),
-                ).map((paragraf) => (
-                  <p key={paragraf.slice(0, 40)}>{paragraf}</p>
+                ).map((paragraf, i) => (
+                  <p key={i}>{paragraf}</p>
                 ))}
               </div>
             </div>

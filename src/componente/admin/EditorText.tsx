@@ -1,13 +1,23 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { EditorContent, useEditor, useEditorState, type Editor } from "@tiptap/react";
+import {
+  EditorContent,
+  useEditor,
+  useEditorState,
+  type Editor,
+} from "@tiptap/react";
 import { Node, mergeAttributes } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import { Color, TextStyle } from "@tiptap/extension-text-style";
 import { micsoreaza } from "@/componente/admin/MicsoreazaPoza";
-import { adresaVideo, esteHtml, semneInHtml, textSimplu } from "@/lib/text-bogat";
+import {
+  adresaVideo,
+  esteHtml,
+  semneInHtml,
+  textSimplu,
+} from "@/lib/text-bogat";
 
 /**
  * Editorul de text din panou: se scrie ca într-un document, iar bara de sus
@@ -35,9 +45,14 @@ const Video = Node.create({
     return [
       {
         tag: "div[data-video]",
-        getAttrs: (el) => ({ src: (el as HTMLElement).querySelector("iframe")?.getAttribute("src") }),
+        getAttrs: (el) => ({
+          src: (el as HTMLElement).querySelector("iframe")?.getAttribute("src"),
+        }),
       },
-      { tag: "iframe[src]", getAttrs: (el) => ({ src: (el as HTMLElement).getAttribute("src") }) },
+      {
+        tag: "iframe[src]",
+        getAttrs: (el) => ({ src: (el as HTMLElement).getAttribute("src") }),
+      },
     ];
   },
   renderHTML({ HTMLAttributes }) {
@@ -87,7 +102,9 @@ function Buton({
       onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
       className={`min-h-9 min-w-9 rounded-moale px-2.5 py-1.5 text-mic font-semibold transition-colors disabled:opacity-40 ${
-        activ ? "bg-cerneala text-hartie" : "text-cerneala hover:bg-hartie-umbra"
+        activ
+          ? "bg-cerneala text-hartie"
+          : "text-cerneala hover:bg-hartie-umbra"
       }`}
     >
       {children}
@@ -96,10 +113,20 @@ function Buton({
 }
 
 function Separator() {
-  return <span aria-hidden className="mx-1 h-6 w-px self-center bg-hartie-umbra" />;
+  return (
+    <span aria-hidden className="mx-1 h-6 w-px self-center bg-hartie-umbra" />
+  );
 }
 
-function Bara({ editor, puneStare }: { editor: Editor; puneStare: (s: string) => void }) {
+function Bara({
+  editor,
+  puneStare,
+  simplu,
+}: {
+  editor: Editor;
+  puneStare: (s: string) => void;
+  simplu?: boolean;
+}) {
   const fisier = useRef<HTMLInputElement>(null);
   const [culori, setCulori] = useState(false);
   const s = useEditorState({
@@ -114,7 +141,8 @@ function Bara({ editor, puneStare }: { editor: Editor; puneStare: (s: string) =>
       ol: e.isActive("orderedList"),
       citat: e.isActive("blockquote"),
       link: e.isActive("link"),
-      culoare: (e.getAttributes("textStyle").color as string | undefined) ?? null,
+      culoare:
+        (e.getAttributes("textStyle").color as string | undefined) ?? null,
       inapoi: e.can().undo(),
       inainte: e.can().redo(),
     }),
@@ -125,33 +153,54 @@ function Bara({ editor, puneStare }: { editor: Editor; puneStare: (s: string) =>
       editor.chain().focus().extendMarkRange("link").unsetLink().run();
       return;
     }
-    const scris = window.prompt("Lipește adresa linkului (de ex. teona-ariana.ro/doneaza):");
+    const scris = window.prompt(
+      "Lipește adresa linkului (de ex. teona-ariana.ro/doneaza):",
+    );
     if (!scris?.trim()) return;
     let adresa = scris.trim();
     if (!/^(https?:\/\/|\/|mailto:|tel:)/i.test(adresa)) {
-      adresa = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adresa) ? `mailto:${adresa}` : `https://${adresa}`;
+      adresa = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adresa)
+        ? `mailto:${adresa}`
+        : `https://${adresa}`;
     }
     const { empty } = editor.state.selection;
     if (empty) {
       editor
         .chain()
         .focus()
-        .insertContent({ type: "text", text: scris.trim(), marks: [{ type: "link", attrs: { href: adresa } }] })
+        .insertContent({
+          type: "text",
+          text: scris.trim(),
+          marks: [{ type: "link", attrs: { href: adresa } }],
+        })
         .run();
     } else {
-      editor.chain().focus().extendMarkRange("link").setLink({ href: adresa }).run();
+      editor
+        .chain()
+        .focus()
+        .extendMarkRange("link")
+        .setLink({ href: adresa })
+        .run();
     }
   }
 
   function video() {
-    const scris = window.prompt("Lipește linkul filmării de pe YouTube sau Facebook:");
+    const scris = window.prompt(
+      "Lipește linkul filmării de pe YouTube sau Facebook:",
+    );
     if (!scris?.trim()) return;
     const src = adresaVideo(scris);
     if (!src) {
-      puneStare("Linkul nu e de pe YouTube sau Facebook. Copiază-l din bara de adrese a filmării.");
+      puneStare(
+        "Linkul nu e de pe YouTube sau Facebook. Copiază-l din bara de adrese a filmării.",
+      );
       return;
     }
-    editor.chain().focus().insertContent([{ type: "video", attrs: { src } }, { type: "paragraph" }]).run();
+    editor
+      .chain()
+      .focus()
+      .insertContent([{ type: "video", attrs: { src } }, { type: "paragraph" }])
+      .run();
     puneStare("");
   }
 
@@ -161,17 +210,36 @@ function Bara({ editor, puneStare }: { editor: Editor; puneStare: (s: string) =>
       const mica = (await micsoreaza(f)) ?? f;
       const corp = new FormData();
       corp.append("poza", mica);
-      const r = await fetch("/api/admin/poza-in-text", { method: "POST", body: corp });
-      const date = (await r.json().catch(() => ({}))) as { adresa?: string; mesaj?: string };
+      const r = await fetch("/api/admin/poza-in-text", {
+        method: "POST",
+        body: corp,
+      });
+      const date = (await r.json().catch(() => ({}))) as {
+        adresa?: string;
+        mesaj?: string;
+      };
       if (!r.ok || !date.adresa) {
-        puneStare(date.mesaj ?? (r.status === 403 ? "Ai ieșit din panou. Intră din nou și încearcă." : "Poza n-a putut fi urcată. Încearcă din nou."));
+        puneStare(
+          date.mesaj ??
+            (r.status === 403
+              ? "Ai ieșit din panou. Intră din nou și încearcă."
+              : "Poza n-a putut fi urcată. Încearcă din nou."),
+        );
         return;
       }
-      const titlu = (document.querySelector('[name="titlu"]') as HTMLInputElement | null)?.value?.trim();
+      const titlu = (
+        document.querySelector('[name="titlu"]') as HTMLInputElement | null
+      )?.value?.trim();
       editor
         .chain()
         .focus()
-        .insertContent([{ type: "image", attrs: { src: date.adresa, alt: titlu || "Fotografie" } }, { type: "paragraph" }])
+        .insertContent([
+          {
+            type: "image",
+            attrs: { src: date.adresa, alt: titlu || "Fotografie" },
+          },
+          { type: "paragraph" },
+        ])
         .run();
       puneStare("");
     } catch (e) {
@@ -185,19 +253,39 @@ function Bara({ editor, puneStare }: { editor: Editor; puneStare: (s: string) =>
       aria-label="Formatarea textului"
       className="sticky top-0 z-20 flex flex-wrap items-center gap-0.5 rounded-t-moale border border-b-0 border-hartie-umbra bg-hartie-umbra/40 p-1.5 backdrop-blur"
     >
-      <Buton titlu="Îngroșat" activ={s.bold} onClick={() => editor.chain().focus().toggleBold().run()}>
+      <Buton
+        titlu="Îngroșat"
+        activ={s.bold}
+        onClick={() => editor.chain().focus().toggleBold().run()}
+      >
         <span className="font-bold">B</span>
       </Buton>
-      <Buton titlu="Cursiv" activ={s.italic} onClick={() => editor.chain().focus().toggleItalic().run()}>
+      <Buton
+        titlu="Cursiv"
+        activ={s.italic}
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+      >
         <span className="italic">I</span>
       </Buton>
-      <Buton titlu="Subliniat" activ={s.underline} onClick={() => editor.chain().focus().toggleUnderline().run()}>
+      <Buton
+        titlu="Subliniat"
+        activ={s.underline}
+        onClick={() => editor.chain().focus().toggleUnderline().run()}
+      >
         <span className="underline">U</span>
       </Buton>
       <div className="relative">
-        <Buton titlu="Culoare" activ={Boolean(s.culoare)} onClick={() => setCulori((c) => !c)}>
+        <Buton
+          titlu="Culoare"
+          activ={Boolean(s.culoare)}
+          onClick={() => setCulori((c) => !c)}
+        >
           <span className="flex items-center gap-1">
-            <span aria-hidden className="inline-block size-3.5 rounded-full border border-cerneala/20" style={{ background: s.culoare ?? "#232323" }} />
+            <span
+              aria-hidden
+              className="inline-block size-3.5 rounded-full border border-cerneala/20"
+              style={{ background: s.culoare ?? "#232323" }}
+            />
             Culoare
           </span>
         </Buton>
@@ -214,8 +302,14 @@ function Bara({ editor, puneStare }: { editor: Editor; puneStare: (s: string) =>
                 }}
                 className="flex items-center gap-2 rounded px-2 py-1.5 text-left text-mic hover:bg-hartie-umbra"
               >
-                <span aria-hidden className="inline-block size-4 rounded-full" style={{ background: c.cod }} />
-                <span style={{ color: c.cod }} className="font-semibold">{c.nume}</span>
+                <span
+                  aria-hidden
+                  className="inline-block size-4 rounded-full"
+                  style={{ background: c.cod }}
+                />
+                <span style={{ color: c.cod }} className="font-semibold">
+                  {c.nume}
+                </span>
               </button>
             ))}
             <button
@@ -232,37 +326,81 @@ function Bara({ editor, puneStare }: { editor: Editor; puneStare: (s: string) =>
           </div>
         )}
       </div>
+      {!simplu && (
+        <>
+          <Separator />
+          <Buton
+            titlu="Titlu de secțiune"
+            activ={s.h2}
+            onClick={() =>
+              editor.chain().focus().toggleHeading({ level: 2 }).run()
+            }
+          >
+            Titlu
+          </Buton>
+          <Buton
+            titlu="Subtitlu mic"
+            activ={s.h3}
+            onClick={() =>
+              editor.chain().focus().toggleHeading({ level: 3 }).run()
+            }
+          >
+            Subtitlu
+          </Buton>
+          <Buton
+            titlu="Listă cu puncte"
+            activ={s.ul}
+            onClick={() => editor.chain().focus().toggleBulletList().run()}
+          >
+            • Listă
+          </Buton>
+          <Buton
+            titlu="Listă numerotată"
+            activ={s.ol}
+            onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          >
+            1. Listă
+          </Buton>
+          <Buton
+            titlu="Citat"
+            activ={s.citat}
+            onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          >
+            „Citat”
+          </Buton>
+        </>
+      )}
       <Separator />
-      <Buton titlu="Titlu de secțiune" activ={s.h2} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
-        Titlu
-      </Buton>
-      <Buton titlu="Subtitlu mic" activ={s.h3} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
-        Subtitlu
-      </Buton>
-      <Buton titlu="Listă cu puncte" activ={s.ul} onClick={() => editor.chain().focus().toggleBulletList().run()}>
-        • Listă
-      </Buton>
-      <Buton titlu="Listă numerotată" activ={s.ol} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
-        1. Listă
-      </Buton>
-      <Buton titlu="Citat" activ={s.citat} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
-        „Citat”
-      </Buton>
-      <Separator />
-      <Buton titlu={s.link ? "Scoate linkul" : "Link"} activ={s.link} onClick={link}>
+      <Buton
+        titlu={s.link ? "Scoate linkul" : "Link"}
+        activ={s.link}
+        onClick={link}
+      >
         {s.link ? "Scoate linkul" : "Link"}
       </Buton>
-      <Buton titlu="Poză în text" onClick={() => fisier.current?.click()}>
-        Poză
-      </Buton>
-      <Buton titlu="Video de pe YouTube sau Facebook" onClick={video}>
-        Video
-      </Buton>
+      {!simplu && (
+        <>
+          <Buton titlu="Poză în text" onClick={() => fisier.current?.click()}>
+            Poză
+          </Buton>
+          <Buton titlu="Video de pe YouTube sau Facebook" onClick={video}>
+            Video
+          </Buton>
+        </>
+      )}
       <Separator />
-      <Buton titlu="Anulează" dezactivat={!s.inapoi} onClick={() => editor.chain().focus().undo().run()}>
+      <Buton
+        titlu="Anulează"
+        dezactivat={!s.inapoi}
+        onClick={() => editor.chain().focus().undo().run()}
+      >
         ↶
       </Buton>
-      <Buton titlu="Refă" dezactivat={!s.inainte} onClick={() => editor.chain().focus().redo().run()}>
+      <Buton
+        titlu="Refă"
+        dezactivat={!s.inainte}
+        onClick={() => editor.chain().focus().redo().run()}
+      >
         ↷
       </Buton>
       <input
@@ -286,40 +424,59 @@ function Bara({ editor, puneStare }: { editor: Editor; puneStare: (s: string) =>
 export default function EditorText({
   name,
   defaultValue,
+  simplu = false,
+  minim = 20,
 }: {
   name: string;
   defaultValue: string;
+  /** Numai îngroșat, culoare și link, paragrafe simple: pentru textele paginilor fixe. */
+  simplu?: boolean;
+  /** Câte semne trebuie scrise înainte de trimitere. */
+  minim?: number;
 }) {
   const camp = useRef<HTMLTextAreaElement>(null);
   const [stare, setStare] = useState("");
-  const initial = esteHtml(defaultValue) ? defaultValue : semneInHtml(defaultValue);
+  const initial = esteHtml(defaultValue)
+    ? defaultValue
+    : semneInHtml(defaultValue);
 
   const scrie = (html: string) => {
     const c = camp.current;
     if (!c) return;
     c.value = textSimplu(html).length ? html : "";
     // Pentru `TineCiorna`: textul nesalvat rămâne în filă.
-    c.dispatchEvent(new CustomEvent("input", { bubbles: true, detail: "editor" }));
+    c.dispatchEvent(
+      new CustomEvent("input", { bubbles: true, detail: "editor" }),
+    );
   };
 
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
       StarterKit.configure({
-        heading: { levels: [2, 3] },
+        heading: simplu ? false : { levels: [2, 3] },
         code: false,
         codeBlock: false,
+        ...(simplu
+          ? {
+              bulletList: false,
+              orderedList: false,
+              listItem: false,
+              listKeymap: false,
+              blockquote: false,
+              horizontalRule: false,
+            }
+          : {}),
         link: { openOnClick: false, autolink: true, defaultProtocol: "https" },
       }),
       TextStyle,
       Color,
-      Image.configure({ allowBase64: false }),
-      Video,
+      ...(simplu ? [] : [Image.configure({ allowBase64: false }), Video]),
     ],
     content: initial,
     editorProps: {
       attributes: {
-        class: "text-bogat min-h-80 rounded-b-moale border border-hartie-umbra bg-hartie px-5 py-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-turcoaz-500",
+        class: `text-bogat ${simplu ? "min-h-32" : "min-h-80"} rounded-b-moale border border-hartie-umbra bg-hartie px-5 py-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-turcoaz-500`,
         "aria-label": "Textul",
         "data-editor": "",
       },
@@ -335,12 +492,17 @@ export default function EditorText({
     const dinAfara = (e: Event) => {
       if ((e as CustomEvent).detail === "editor") return;
       const v = c.value;
-      editor.commands.setContent(esteHtml(v) ? v : semneInHtml(v), { emitUpdate: false });
+      editor.commands.setContent(esteHtml(v) ? v : semneInHtml(v), {
+        emitUpdate: false,
+      });
     };
     c.addEventListener("input", dinAfara);
     const t = window.setTimeout(() => {
       if (c.value && c.value !== initial && c.value !== editor.getHTML()) {
-        editor.commands.setContent(esteHtml(c.value) ? c.value : semneInHtml(c.value), { emitUpdate: false });
+        editor.commands.setContent(
+          esteHtml(c.value) ? c.value : semneInHtml(c.value),
+          { emitUpdate: false },
+        );
       }
     }, 60);
     // Textul prea scurt se spune înainte de trimitere, nu după o pagină de eroare.
@@ -348,9 +510,13 @@ export default function EditorText({
     const laTrimitere = (e: SubmitEvent) => {
       const btn = e.submitter as HTMLButtonElement | null;
       if (btn?.name === "actiune" && btn.value === "sterge") return;
-      if (textSimplu(editor.getHTML()).join(" ").length < 20) {
+      if (textSimplu(editor.getHTML()).join(" ").length < minim) {
         e.preventDefault();
-        setStare("Scrie textul: cel puțin câteva fraze.");
+        setStare(
+          minim > 5
+            ? "Scrie textul: cel puțin câteva fraze."
+            : "Textul nu poate rămâne gol.",
+        );
         editor.commands.focus();
       }
     };
@@ -360,7 +526,7 @@ export default function EditorText({
       window.clearTimeout(t);
       form?.removeEventListener("submit", laTrimitere);
     };
-  }, [editor, initial]);
+  }, [editor, initial, minim]);
 
   return (
     <div className="grid">
@@ -373,7 +539,7 @@ export default function EditorText({
       />
       {editor ? (
         <>
-          <Bara editor={editor} puneStare={setStare} />
+          <Bara editor={editor} puneStare={setStare} simplu={simplu} />
           <EditorContent editor={editor} />
         </>
       ) : (
@@ -382,7 +548,10 @@ export default function EditorText({
         </div>
       )}
       {stare && (
-        <p role="status" className="mt-2 text-mic font-semibold text-caramiziu-800">
+        <p
+          role="status"
+          className="mt-2 text-mic font-semibold text-caramiziu-800"
+        >
           {stare}
         </p>
       )}

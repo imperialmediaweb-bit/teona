@@ -869,3 +869,14 @@ body:has(#panou-admin),
     color: var(--color-cerneala-slab);
   }
 }
+
+@layer components {
+  .text-in-rand strong {
+    font-weight: 700;
+  }
+  .text-in-rand a {
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}

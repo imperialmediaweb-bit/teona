@@ -41,7 +41,7 @@ const RATAT: Record<string, string> = {
   "fara-pagina":
     "Nu e legată nicio pagină. Faceți pașii de mai jos și trimiteți-ne jetonul — îl punem noi.",
   nepublicat:
-    "Textul e încă ciornă. Publică-l întâi pe site — altfel linkul din postare duce la o pagină care nu există.",
+    "Textul nu e publicat încă. Publică-l întâi pe site — altfel linkul din postare duce la o pagină care nu există.",
   deja: "Textul ăsta a plecat deja pe pagină. N-a mai fost trimis a doua oară.",
   "prea-lung":
     "Mesajul e prea lung pentru o postare. Scurtează-l sub 2.000 de semne.",

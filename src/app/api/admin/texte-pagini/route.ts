@@ -1,8 +1,11 @@
+import { curataHtml } from "@/lib/curata-html";
+import { esteHtml, textSimplu } from "@/lib/text-bogat";
 import { revalidateTag } from "next/cache";
 import { formularAdmin, limitaDeRata, raspuns, sesiuneExpirata, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import {
   ETICHETA_TEXTE_PAGINI,
+  esteBogat,
   paginiCuTexte,
   readuTextPagina,
   schimbaTextPagina,
@@ -51,14 +54,20 @@ export async function POST(cerere: Request) {
     return gata(cerere, readus ? "readus" : "necunoscut", pagina);
   }
 
-  const continut = text(formular.get("continut"), 6000) ?? "";
+  const scris = text(formular.get("continut"), 20_000) ?? "";
+  // Blocurile lungi vin din editorul cu bară, ca HTML: se curăță aici.
+  const continut =
+    esteBogat(cheie) && esteHtml(scris) ? curataHtml(scris) : scris;
+  if (textSimplu(continut).join(" ").length > 6000) {
+    return raspuns("Textul e prea lung (peste 6.000 de semne).", 413);
+  }
   /*
     Un text gol ar lăsa un paragraf alb în mijlocul paginii, între o
     fotografie și un titlu — adică ar arăta ca o pagină stricată, nu ca o
     alegere. Cine vrea textul scurtat îl scurtează; cine vrea secțiunea goală
     îmi spune, fiindcă atunci dispare și fotografia de lângă ea.
   */
-  if (continut.trim().length < 3) return gata(cerere, "gol", pagina);
+  if (textSimplu(continut).join(" ").trim().length < 3) return gata(cerere, "gol", pagina);
 
   const schimbat = await schimbaTextPagina(cheie, continut).catch(() => false);
   if (schimbat) revalidateTag(ETICHETA_TEXTE_PAGINI, { expire: 0 });

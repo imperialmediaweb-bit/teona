@@ -197,6 +197,28 @@ Redirecționarea ta ajunge exact aici: în zilele de tabără și în fiecare zi
   },
 ] as const;
 
+/**
+ * Blocurile lungi de proză se scriu în editorul cu bară (îngroșat, culoare,
+ * link); frazele din capul paginilor rămân text simplu, fiindcă stau în
+ * titluri și în descrierile pentru Google, unde formatarea n-are ce căuta.
+ */
+const BOGATE = new Set([
+  "despre.poveste.1",
+  "despre.poveste.2",
+  "despre.poveste.3",
+  "despre.misiune",
+  "despre.viziune",
+  "despre.voluntari",
+  "casa.bloc.1",
+  "casa.bloc.2",
+  "casa.bloc.3",
+  "redirectionare.de-ce",
+]);
+
+export function esteBogat(cheie: string): boolean {
+  return BOGATE.has(cheie);
+}
+
 export function slotDupaCheie(cheie: string): Slot | undefined {
   return SLOTURI.find((s) => s.cheie === cheie);
 }

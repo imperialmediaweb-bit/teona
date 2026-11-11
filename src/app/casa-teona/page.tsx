@@ -9,15 +9,11 @@ import IndemnFinal from "@/componente/IndemnFinal";
 import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
 import Val, { VAL_PESTE } from "@/componente/Val";
 import AntetPagina from "@/componente/pagina/AntetPagina";
+import { paragrafeBogate } from "@/componente/pagina/paragrafe-bogate";
 import { textelePaginilor } from "@/lib/texte-pagini";
 
 /** Rând gol = paragraf nou, ca în panou. */
-function paragrafe(text: string): string[] {
-  return (text ?? "")
-    .split(/(?:\r?\n){2,}/)
-    .map((p) => p.trim())
-    .filter(Boolean);
-}
+const paragrafe = paragrafeBogate;
 import Galerie from "@/componente/pagina/Galerie";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
 
@@ -237,8 +233,8 @@ export default async function CasaTeona() {
                     </span>
                     <h2 className="mt-6 text-h3 text-cerneala">{bloc.titlu}</h2>
                     <div className="mt-4 grid gap-4 text-cerneala-moale">
-                      {paragrafe(texte[bloc.cheie]).map((paragraf) => (
-                        <p key={paragraf.slice(0, 40)}>{paragraf}</p>
+                      {paragrafe(texte[bloc.cheie]).map((paragraf, i) => (
+                        <p key={i}>{paragraf}</p>
                       ))}
                     </div>
                   </div>

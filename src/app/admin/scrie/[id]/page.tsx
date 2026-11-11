@@ -15,11 +15,9 @@ import { adresaPoza, areCloudinary } from "@/lib/poza-urcata";
 import { areCheiCloudinary, toateDosarele } from "@/lib/cloudinary-listare";
 import { CATEGORII } from "@/date/proiecte-tipuri";
 
-import { areAsistent } from "@/lib/asistent";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
-import Asistent from "@/componente/admin/Asistent";
 import CumScriem from "@/componente/admin/CumScriem";
 import UrcaPozeTabara from "@/componente/admin/UrcaPozeTabara";
 import { RADACINA } from "@/date/proiecte-cloud";
@@ -188,14 +186,6 @@ async function Continut({
         </p>
       )}
 
-      {/*
-        Asistentul scrie o primă ciornă în câmpurile de mai jos. Apare doar cu
-        `ANTHROPIC_API_KEY` în Railway, ca orice altceva care depinde de un
-        serviciu din afară, și nu trimite nimic nicăieri: completează două
-        câmpuri, atât. Stătea pe pagina de e-mail, care a dispărut — aici e
-        locul lui, pentru că aici se scrie.
-      */}
-      {nou && areAsistent() && <Asistent />}
 
       <CumScriem deschis={false} />
 

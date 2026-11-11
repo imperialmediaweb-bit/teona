@@ -195,7 +195,7 @@ async function Continut({
                     }`}
                   >
                     <Link href={`/admin/scrie/${x.text.id}`}>
-                      {x.text.publicat ? "" : "ciornă · "}
+                      {x.text.publicat ? "" : "nepublicat · "}
                       {x.text.titlu}
                     </Link>
                   </p>
@@ -256,7 +256,7 @@ async function Continut({
         </div>
         {ciorne.length === 0 ? (
           <p className="max-w-2xl text-amplu text-cerneala-moale">
-            Nicio ciornă încă. Scrie textul la{" "}
+            Nimic plănuit încă. Scrie textul la{" "}
             <Link
               href="/admin/scrie"
               className="font-titlu font-semibold text-caramiziu-700 underline underline-offset-2"

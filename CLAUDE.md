@@ -1865,6 +1865,14 @@ Un text nou n-are „Salvează ciorna”: e „Publică”; pe unul publicat ră
 - O probă scrie în `[data-editor]` cu tastatura; câmpul `continut` e ascuns.
   O probă care caută `<script>` în `main` găsește scripturile lui Next:
   caută în `.text-bogat`.
+- **Textele paginilor fixe** (`/admin/texte`): cele zece blocuri lungi
+  (`esteBogat` din `lib/texte-pagini.ts`: povestea, misiunea, viziunea,
+  voluntarii, Casa Teona, „De ce” de la 3,5%) au editorul în varianta
+  `simplu` — îngroșat, culoare, link, nimic de bloc. Frazele din capul
+  paginilor rămân text simplu: stau în titluri și în descrierile pentru
+  Google. Paginile le citesc prin `paragrafeBogate` / `intrUnParagraf`.
+- **Fără asistent pe pagina de scris**: asociația, aceeași zi, „lasă cu
+  ciorna, nu-i înțeleg sensul”. Componenta `Asistent` a rămas în cod.
 - Probă în browser, pe toate trei: `scratchpad/editor2.mjs` (în afara
   depozitului) — formatare, culoare, link, video, link de video greșit,
   cod rău trimis pe lângă editor, ștergere.

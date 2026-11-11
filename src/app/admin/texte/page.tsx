@@ -13,9 +13,12 @@ import { cifreSite } from "@/lib/cifre";
 import {
   LOCURI,
   completeazaCifrele,
+  esteBogat,
   paginiCuTexte,
   textePanou,
 } from "@/lib/texte-pagini";
+import EditorText from "@/componente/admin/EditorText";
+import { textSimplu } from "@/lib/text-bogat";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
@@ -79,7 +82,11 @@ async function Continut({
   if (!(await esteAutentificat())) {
     return (
       <Cadru titlu="Intră în panou" activ="/admin/texte" faraMeniu>
-        <Intrare gresit={Boolean(gresit)} bazaCazuta={gresit === "baza"} unde="/admin/texte" />
+        <Intrare
+          gresit={Boolean(gresit)}
+          bazaCazuta={gresit === "baza"}
+          unde="/admin/texte"
+        />
       </Cadru>
     );
   }
@@ -99,7 +106,8 @@ async function Continut({
   }
 
   const sloturi = await textePanou().catch(() => null);
-  if (sloturi === null) return (
+  if (sloturi === null)
+    return (
       <Cadru titlu="Textele paginilor" activ="/admin/texte">
         <BazaCazuta ce="textele" />
       </Cadru>
@@ -241,17 +249,26 @@ async function Continut({
                         </p>
                       )}
 
-                      <textarea
-                        name="continut"
-                        rows={Math.min(
-                          16,
-                          Math.max(3, Math.ceil(s.continut.length / 90)),
-                        )}
-                        required
-                        maxLength={6000}
-                        defaultValue={s.continut}
-                        className="colt-mic-a w-full resize-y border-2 border-hartie-umbra bg-hartie px-4 py-3 font-mono text-mic transition outline-none focus:border-turcoaz-400"
-                      />
+                      {esteBogat(s.cheie) ? (
+                        <EditorText
+                          name="continut"
+                          defaultValue={s.continut}
+                          simplu
+                          minim={3}
+                        />
+                      ) : (
+                        <textarea
+                          name="continut"
+                          rows={Math.min(
+                            16,
+                            Math.max(3, Math.ceil(s.continut.length / 90)),
+                          )}
+                          required
+                          maxLength={6000}
+                          defaultValue={s.continut}
+                          className="colt-mic-a w-full resize-y border-2 border-hartie-umbra bg-hartie px-4 py-3 font-mono text-mic transition outline-none focus:border-turcoaz-400"
+                        />
+                      )}
 
                       {necunoscute.length > 0 && (
                         <p className="colt-mic-b border-l-4 border-caramiziu-600 bg-caramiziu-50 px-4 py-2.5 text-mic text-caramiziu-900">
@@ -270,7 +287,10 @@ async function Continut({
                           Pe site se va citi:{" "}
                           <em>
                             „
-                            {completeazaCifrele(s.continut, cifre)
+                            {completeazaCifrele(
+                              textSimplu(s.continut).join(" "),
+                              cifre,
+                            )
                               .replace(/\s+/g, " ")
                               .slice(0, 180)}
                             …”
