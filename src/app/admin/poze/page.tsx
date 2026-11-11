@@ -10,7 +10,7 @@ import {
   pozeDinDosar,
   type PozaCloud,
 } from "@/lib/cloudinary-listare";
-import { proiecteAfisate } from "@/date/proiecte";
+import { proiecteAfisate, proiecteleToate } from "@/date/proiecte";
 import { alegeDosar } from "@/date/proiecte-cloud";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
@@ -171,7 +171,21 @@ async function Continut({
   */
   const numeleDosarelor = subdosare.map((d) => d.nume);
   const legatura = new Map<string, { titlu: string; slug: string }>();
-  for (const proiect of proiecteAfisate()) {
+  const toate = await proiecteleToate().catch(() => proiecteAfisate());
+  // Întâi folderele alese anume în panou: alea bat potrivirea pe dată.
+  for (const proiect of toate) {
+    if (!proiect.dosarCloud) continue;
+    const ales = proiect.dosarCloud.startsWith(`${RADACINA}/`)
+      ? proiect.dosarCloud
+      : `${RADACINA}/${proiect.dosarCloud}`;
+    for (const nume of numeleDosarelor) {
+      if (`${cale}/${nume}` === ales && !legatura.has(nume)) {
+        legatura.set(nume, { titlu: proiect.titlu, slug: proiect.slug });
+      }
+    }
+  }
+  for (const proiect of toate) {
+    if (proiect.dosarCloud) continue;
     const dosar = alegeDosar(numeleDosarelor, proiect.dataCitita ?? "");
     if (dosar && !legatura.has(dosar)) {
       legatura.set(dosar, { titlu: proiect.titlu, slug: proiect.slug });

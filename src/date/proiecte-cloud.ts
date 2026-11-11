@@ -231,7 +231,15 @@ export async function pozeCloudProiect(
 export async function cuPozeDinCloud<T extends ProiectAfisat>(
   proiect: T,
 ): Promise<T> {
-  if (proiect.poze.length > 0 || proiect.coperta) return proiect;
+  /*
+    Poza principală nu ține locul galeriei. Pe 11 noiembrie 2026 asociația a
+    publicat „Tabăra Eu pot” cu poza principală pusă și 34 de poze urcate în
+    folderul ei — iar pe site apărea numai poza principală, fiindcă orice
+    copertă oprea citirea folderului. Acum se oprește numai la pozele de pe
+    disc (proiectele din exportul WordPress), și nici atunci când folderul
+    e ales anume.
+  */
+  if (proiect.poze.length > 0 && !proiect.dosarCloud) return proiect;
 
   const poze = await pozeCloudProiect(
     proiect.data.slice(0, 4),
@@ -240,7 +248,7 @@ export async function cuPozeDinCloud<T extends ProiectAfisat>(
   );
   if (poze.length === 0) return proiect;
 
-  return { ...proiect, coperta: poze[0], poze };
+  return { ...proiect, coperta: proiect.coperta ?? poze[0], poze };
 }
 
 /**
