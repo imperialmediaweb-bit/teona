@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Adresa from "./Adresa";
 
 /**
  * Adresele redacțiilor, de copiat dintr-o apăsare.
@@ -53,7 +54,7 @@ export default function CopiazaAdrese({ adrese }: { adrese: string[] }) {
         </p>
       )}
       <p className="mt-3 break-all colt-mic-a bg-hartie-umbra/60 px-3 py-2 font-mono text-nota text-cerneala-moale select-all">
-        {sir}
+        <Adresa>{sir}</Adresa>
       </p>
     </div>
   );

@@ -155,7 +155,7 @@ export default function TrimiteComunicat({
           />
           Am citit comunicatul. Fiecare redacție bifată îl primește separat, de
           la adresa asociației, iar răspunsurile vin la{" "}
-          contact@teona-ariana.ro.
+          <Adresa>contact@teona-ariana.ro</Adresa>.
         </label>
         <div>
           <button

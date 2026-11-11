@@ -1,5 +1,6 @@
 "use client";
 
+import Adresa from "@/componente/admin/Adresa";
 import { useEffect, useId, useState } from "react";
 import { atribuireaCurenta } from "@/lib/atribuire-browser";
 import { DESTINATII_DONATIE, EMAIL } from "@/date/asociatie";
@@ -295,7 +296,7 @@ export default function AnuntTransfer() {
           <p className="text-nota text-cerneala-slab">
             Anunțul nu e o plată și nu intră în totalurile asociației până când
             transferul e găsit în extrasul de cont. Datele rămân la asociație;
-            întrebări, la {EMAIL.contact}.
+            întrebări, la <Adresa>{EMAIL.contact}</Adresa>.
           </p>
 
           {stare.fel === "eroare" && (
