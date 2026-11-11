@@ -248,7 +248,13 @@ export async function cuPozeDinCloud<T extends ProiectAfisat>(
   );
   if (poze.length === 0) return proiect;
 
-  return { ...proiect, coperta: proiect.coperta ?? poze[0], poze };
+  // O tabără veche, cu pozele ei de pe disc, la care asociația mai urcă: cele
+  // noi se pun în față, cele vechi rămân — nu se înlocuiesc.
+  return {
+    ...proiect,
+    coperta: proiect.coperta ?? poze[0],
+    poze: [...poze, ...proiect.poze.filter((p) => !poze.includes(p))],
+  };
 }
 
 /**

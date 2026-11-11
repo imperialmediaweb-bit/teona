@@ -225,10 +225,17 @@ export async function proiecteleToate(): Promise<ProiectAfisat[]> {
   // Un slug scris din panou îl bate pe cel din cod: dacă asociația rescrie o
   // tabără, versiunea ei e cea bună.
   const ale = new Set(panou.map((p) => p.slug));
+  const dinCod = proiecteAfisate();
+  /*
+    Ce scrie panoul se pune peste tabăra veche (`peste`, mai jos).
+  */
+  const imbinate = panou.map((p) =>
+    peste(p, dinCod.find((v) => v.slug === p.slug)),
+  );
   // Aceeași ordine ca în `proiecteAfisate`: cele cu `inFata` primele, restul
   // cronologic. Sortarea era scrisă de două ori, iar a doua rămăsese fără
   // `inFata` — pagina Proiecte, care trece pe aici, nu-l asculta deloc.
-  return [...panou, ...proiecteAfisate().filter((p) => !ale.has(p.slug))].sort(
+  return [...imbinate, ...dinCod.filter((p) => !ale.has(p.slug))].sort(
     inOrdine,
   );
 }
@@ -270,7 +277,29 @@ export async function proiectDupaSlugPeste(
   const alLor = areBazaDeDate()
     ? (await dinPanou()).find((p) => p.slug === slug)
     : undefined;
-  return alLor ?? proiectDupaSlug(slug);
+  return alLor ? peste(alLor, proiectDupaSlug(slug)) : proiectDupaSlug(slug);
+}
+
+/**
+ * Textul din panou pus **peste** tabăra veche cu același slug, nu în locul ei.
+ *
+ * Butonul „Scrie descrierea” de la taberele moștenite face un text cu același
+ * slug, fără poze. Înlocuită întreagă, tabăra și-ar fi pierdut fotografiile
+ * din exportul WordPress în clipa publicării descrierii.
+ */
+function peste(
+  p: ProiectAfisat,
+  vechi: ProiectAfisat | undefined,
+): ProiectAfisat {
+  if (!vechi) return p;
+  return {
+    ...vechi,
+    ...p,
+    coperta: p.coperta ?? vechi.coperta,
+    poze: p.poze.length > 0 ? p.poze : vechi.poze,
+    dataCitita: p.dataCitita ?? vechi.dataCitita,
+    descriere: p.descriere?.length ? p.descriere : vechi.descriere,
+  };
 }
 
 /**
