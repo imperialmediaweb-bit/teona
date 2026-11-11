@@ -130,9 +130,9 @@ export async function contractDeSponsorizare(
   rand("CUI/CIF", `${date.cui}     Nr. Reg. Com.  ${sau(date.regCom, 30)}`);
   rand(
     "reprezentată legal prin",
-    `${date.reprezentant}     în calitate de  ${sau(date.calitate, 24)}`,
+    `${sau(date.reprezentant, 30)}     în calitate de  ${sau(date.calitate, 24)}`,
   );
-  rand("telefon", `${date.telefon}     e-mail  ${sau(date.email, 30)}`);
+  rand("telefon", `${sau(date.telefon, 24)}     e-mail  ${sau(date.email, 30)}`);
 
   c.spatiu(4);
   c.scrie("denumită în continuare SPONSOR", { spatiuDupa: 8 });
