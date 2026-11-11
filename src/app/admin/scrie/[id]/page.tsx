@@ -168,6 +168,21 @@ async function Continut({
           className="mb-7 colt-mic-a border border-turcoaz-200 bg-turcoaz-50 px-5 py-4 text-turcoaz-900"
         >
           {gata === "publicat" && "Publicat. E pe site."}
+          {/* Omul vrea să vadă ce a publicat: fără link, trebuia să-și caute
+              singur pagina prin site. */}
+          {gata === "publicat" && text?.publicat && (
+            <>
+              {" "}
+              <a
+                href={`/${fel === "proiect" ? "proiecte" : fel === "campanie" ? "campanii" : "noutati"}/${text.slug}`}
+                target="_blank"
+                rel="noopener"
+                className="font-bold underline underline-offset-2"
+              >
+                Vezi pe site →
+              </a>
+            </>
+          )}
           {gata === "salvat" && "Salvat ca ciornă."}
         </p>
       )}
