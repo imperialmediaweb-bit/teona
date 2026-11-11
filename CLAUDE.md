@@ -365,6 +365,13 @@ se aleg pozele, „Urcă pozele”. Folderul se face singur,
 - Noutățile și campaniile au acum galerie, sub text (`pozeDinDosarScris`).
 - Galeriile au eticheta `poze-cloud`; urcarea o golește, deci pozele apar fără
   să aștepte ora de cache.
+- **Poza principală nu ține locul galeriei.** Pe 11 noiembrie 2026 asociația
+  a publicat „Tabăra Eu pot” cu poza principală și 34 de poze în folderul ei;
+  pe site apărea doar poza principală, fiindcă `cuPozeDinCloud` nu mai citea
+  folderul când proiectul avea copertă. Proba de dinainte urcase pozele pe o
+  ciornă **fără** poză principală, deci n-a prins-o. Acum citirea se oprește
+  numai la pozele de pe disc (exportul WordPress), iar `/admin/poze` leagă
+  folderul și după alegerea din panou, nu doar după dată.
 - **Oricâte poze deodată**: pleacă una câte una. Proba urcă 119 poze de
   13–47 MB (1,7 GB), JPEG, PNG, WebP, una de 48 de megapixeli și una
   verticală; toate ajung sub 2 MB, în sub un minut.
