@@ -1,5 +1,6 @@
 "use client";
 
+import Adresa from "./Adresa";
 import { useState } from "react";
 
 /**
@@ -55,7 +56,7 @@ function Actiune({
           : "border-hartie-umbra text-cerneala hover:border-caramiziu-400"
       }`}
     >
-      {eticheta}
+      {eticheta.includes("@") ? <Adresa>{eticheta}</Adresa> : eticheta}
       {preferat && <span className="sr-only"> (cum preferă)</span>}
     </a>
   );

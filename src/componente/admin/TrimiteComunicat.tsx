@@ -1,5 +1,6 @@
 "use client";
 
+import Adresa from "./Adresa";
 import { useState } from "react";
 
 /**
@@ -91,7 +92,7 @@ export default function TrimiteComunicat({
                   </span>
                   <span className="block truncate text-nota text-cerneala-slab">
                     {c.persoana ? `${c.persoana} · ` : ""}
-                    {c.email}
+                    <Adresa>{c.email}</Adresa>
                   </span>
                 </span>
               </label>

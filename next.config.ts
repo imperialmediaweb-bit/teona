@@ -163,6 +163,13 @@ const nextConfig: NextConfig = {
     return [{ source: "/(.*)", headers: ANTETE_DE_SECURITATE }];
   },
 
+  // Browserele cer singure `/favicon.ico`, pe fiecare pagină, oricare ar fi
+  // iconița declarată în HTML. Fără fișierul ăsta, fiecare pagină lăsa în
+  // consolă un 404 (prins de verificarea panoului pe 11 noiembrie 2026).
+  async rewrites() {
+    return [{ source: "/favicon.ico", destination: "/icon.png" }];
+  },
+
   /*
     Calitatea la care se comprimă fotografiile.
 
