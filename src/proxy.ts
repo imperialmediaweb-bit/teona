@@ -236,15 +236,14 @@ export default async function proxy(cerere: NextRequest) {
     `/api/admin` care nu e una dintre rutele de conținut, și exportul, chiar
     dacă e GET (listele pentru Excel au nume și adrese).
   */
-  if (cerere.headers.has("x-proba-token") && cerere.nextUrl.pathname.startsWith("/api/")) {
+  if (cerere.headers.has("x-proba-token") && cerere.nextUrl.pathname.startsWith("/api/admin/")) {
     const cale = cerere.nextUrl.pathname;
-    const scriere = metoda !== "GET" && metoda !== "HEAD";
     // Previzualizarea șablonului de e-mail doar desenează: nimic nu urcă,
     // nimic nu pleacă (vezi `api/admin/sablon`).
     const voie =
       RUTE_PROBA.includes(cale) ||
       (cale === "/api/admin/sablon" && cerere.nextUrl.searchParams.get("previzualizare") === "1");
-    if (cale.startsWith("/api/admin/export") || (scriere && !voie) || (!scriere && cale.startsWith("/api/admin/") && !voie)) {
+    if (cale.startsWith("/api/admin/export") || !voie) {
       return new NextResponse("Cheia de probă nu are voie aici.", {
         status: 403,
         headers: { "content-type": "text/plain; charset=utf-8" },
