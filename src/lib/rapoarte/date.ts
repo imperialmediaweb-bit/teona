@@ -27,17 +27,13 @@ import { intreaba } from "@/lib/baza";
 /** Marginile unei luni: `2026-10` → ['2026-10-01', '2026-11-01'). */
 function marginileLunii(luna: string): [string, string] {
   const [an, nr] = luna.split("-").map(Number);
-  return [
-    new Date(Date.UTC(an, nr - 1, 1)).toISOString(),
-    new Date(Date.UTC(an, nr, 1)).toISOString(),
-  ];
+  // Fără fus în text: baza le citește la ora României (vezi `baza.ts`).
+  const urmatoarea = nr === 12 ? `${an + 1}-01` : `${an}-${String(nr + 1).padStart(2, "0")}`;
+  return [`${an}-${String(nr).padStart(2, "0")}-01 00:00:00`, `${urmatoarea}-01 00:00:00`];
 }
 
 function marginileAnului(an: number): [string, string] {
-  return [
-    new Date(Date.UTC(an, 0, 1)).toISOString(),
-    new Date(Date.UTC(an + 1, 0, 1)).toISOString(),
-  ];
+  return [`${an}-01-01 00:00:00`, `${an + 1}-01-01 00:00:00`];
 }
 
 export type Felie = { eticheta: string; bani: number; nr: number };
@@ -282,8 +278,12 @@ export async function raportAnual(an: number): Promise<RaportAnual> {
       [de, pana],
     ),
     intreaba<{ nr: string; bani: string | null }>(
+      // Numai firmele trecute la „bani încasați” în anul raportului: fără
+      // filtru, raportul pe 2026 și cel pe 2027 arătau aceleași firme.
       `SELECT COUNT(*) AS nr, SUM(suma_bani) AS bani
-         FROM firme WHERE stadiu = 'incasat'`,
+         FROM firme
+        WHERE stadiu = 'incasat' AND schimbat_la >= $1 AND schimbat_la < $2`,
+      [de, pana],
     ),
     intreaba<{ stadiu: string; nr: string }>(
       `SELECT stadiu, COUNT(*) AS nr FROM firme GROUP BY stadiu`,

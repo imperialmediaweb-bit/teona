@@ -278,6 +278,8 @@ export async function adaugaDonatieManuala(date: {
   metoda: MetodaManuala;
   referinta: string;
   sumaBani: number;
+  /** RON sau EUR: asociația are și cont în euro. */
+  moneda?: string;
   destinatie: string;
   data: string;
   email?: string;
@@ -301,7 +303,7 @@ export async function adaugaDonatieManuala(date: {
         date.referinta,
         date.sumaBani,
         date.destinatie,
-        date.email ?? null,
+        date.email?.trim().toLowerCase() || null,
         date.prenume ?? null,
         date.nume ?? null,
         date.telefon ?? null,
@@ -344,6 +346,7 @@ export const TRANSFER_ANUNTAT = "transfer-anuntat";
 export async function anuntaTransfer(date: {
   referinta: string;
   sumaBani: number;
+  moneda?: string;
   destinatie: string;
   data: string;
   email?: string;
@@ -360,7 +363,7 @@ export async function anuntaTransfer(date: {
          (procesator, referinta, suma_bani, moneda, frecventa, destinatie,
           email, prenume, nume, telefon, stare, platita_la,
           observatii, adaugat_de, canal, sursa)
-       VALUES ($1,$2,$3,'RON','o-data',$4,$5,NULL,$6,$7,'anuntata',$8,$9,'donator',$10,$11)
+       VALUES ($1,$2,$3,$12,'o-data',$4,$5,NULL,$6,$7,'anuntata',$8,$9,'donator',$10,$11)
        -- Un anunț respins („N-am găsit-o”) și trimis din nou se redeschide:
        -- transferul de vineri intră luni, iar omul care anunța a doua oară
        -- primea „e deja notat” și rândul nu mai apărea nicăieri în panou.
@@ -373,13 +376,14 @@ export async function anuntaTransfer(date: {
         date.referinta,
         date.sumaBani,
         date.destinatie,
-        date.email ?? null,
+        date.email?.trim().toLowerCase() || null,
         date.nume ?? null,
         date.telefon ?? null,
         date.data,
         date.observatii ?? null,
         date.canal ?? null,
         date.sursa ?? null,
+        date.moneda === "EUR" ? "EUR" : "RON",
       ],
     );
     return randuri.length > 0 ? { ok: true } : { ok: false, motiv: "duplicat" };
@@ -392,6 +396,7 @@ export type TransferAnuntat = {
   id: string;
   sumaBani: number;
   destinatie: string;
+  moneda: string;
   email: string | null;
   nume: string | null;
   telefon: string | null;
@@ -405,6 +410,7 @@ export async function transferuriAnuntate(): Promise<TransferAnuntat[]> {
   const randuri = await intreaba<{
     id: string;
     suma_bani: string;
+    moneda: string;
     destinatie: string;
     email: string | null;
     nume: string | null;
@@ -413,7 +419,7 @@ export async function transferuriAnuntate(): Promise<TransferAnuntat[]> {
     platita_la: Date | null;
     creat_la: Date;
   }>(
-    `SELECT id, suma_bani, destinatie, email, nume, telefon, observatii,
+    `SELECT id, suma_bani, moneda, destinatie, email, nume, telefon, observatii,
             platita_la, creat_la
        FROM donatii
       WHERE stare = 'anuntata'
@@ -423,6 +429,7 @@ export async function transferuriAnuntate(): Promise<TransferAnuntat[]> {
   return randuri.map((r) => ({
     id: r.id,
     sumaBani: Number(r.suma_bani),
+    moneda: r.moneda,
     destinatie: r.destinatie,
     email: r.email,
     nume: r.nume,
@@ -460,6 +467,7 @@ export async function hotarasteTransfer(
   email: string | null;
   nume: string | null;
   sumaBani: number;
+  moneda: string;
   destinatie: string;
   cand: string;
 } | null> {
@@ -467,6 +475,7 @@ export async function hotarasteTransfer(
     email: string | null;
     nume: string | null;
     suma_bani: string;
+    moneda: string;
     destinatie: string;
     platita_la: Date | null;
   }>(
@@ -476,7 +485,7 @@ export async function hotarasteTransfer(
                               THEN COALESCE(platita_la, now())
                               ELSE platita_la END
       WHERE id = $1 AND stare = 'anuntata'
-      RETURNING email, nume, suma_bani, destinatie, platita_la`,
+      RETURNING email, nume, suma_bani, moneda, destinatie, platita_la`,
     [id, confirmat ? "platita" : "respinsa"],
   );
   const r = randuri[0];
@@ -485,6 +494,7 @@ export async function hotarasteTransfer(
     email: r.email,
     nume: r.nume,
     sumaBani: Number(r.suma_bani),
+    moneda: r.moneda,
     destinatie: r.destinatie,
     cand: r.platita_la?.toISOString() ?? new Date().toISOString(),
   };

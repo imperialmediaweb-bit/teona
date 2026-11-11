@@ -169,6 +169,19 @@ export async function schimbaContract(
       WHERE id = $1`,
     [id, d.stadiu, d.valoareBani, d.dataContract, d.observatii],
   );
+  // Și invers: contractul semnat sau încasat în registru duce firma cu el,
+  // numai înainte (o firmă „încasată” nu se întoarce la „semnat”).
+  if (d.stadiu === "semnat" || d.stadiu === "incasat") {
+    await intreaba(
+      `UPDATE firme SET stadiu = $2,
+              suma_bani = CASE WHEN $2 = 'incasat' THEN COALESCE($3, suma_bani) ELSE suma_bani END,
+              schimbat_la = now()
+        WHERE id = (SELECT firma_id FROM contracte WHERE id = $1)
+          AND (stadiu IN ('cerere', 'contract_trimis')
+               OR (stadiu = 'semnat' AND $2 = 'incasat'))`,
+      [id, d.stadiu, d.valoareBani],
+    ).catch(() => undefined);
+  }
 }
 
 export type TotaluriContracte = {

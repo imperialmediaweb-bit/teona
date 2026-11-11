@@ -33,7 +33,10 @@ export async function cautaPeste(text: string): Promise<Gasit[]> {
 
   // Numai cifrele, pentru CUI și telefon: cineva scrie „RO 2816464" sau
   // „0754 510 167", iar în baza de date stau altfel.
-  const cifre = q.replace(/\D/g, "");
+  // Fără prefixul de țară și fără zeroul din față: „+40 754 510 167” trebuie
+  // să găsească „0754 510 167”. Și fără diacritice: „Stefan” îl găsește pe
+  // „Ștefan”, scris cu virgulă sau cu sedilă (`translate` din interogări).
+  const cifre = q.replace(/\D/g, "").replace(/^(0040|40|0)(?=\d{6,})/, "");
   const caCifre = cifre.length >= 4 ? `%${cifre}%` : null;
 
   /*
@@ -60,8 +63,8 @@ export async function cautaPeste(text: string): Promise<Gasit[]> {
               COUNT(*) AS cate
          FROM donatii d
         WHERE d.email IS NOT NULL
-          AND (d.email ILIKE $1
-               OR CONCAT_WS(' ', d.prenume, d.nume) ILIKE $1
+          AND (translate(lower(d.email), 'ăâîșşțţ', 'aaisstt') LIKE translate(lower($1), 'ăâîșşțţ', 'aaisstt')
+               OR translate(lower(CONCAT_WS(' ', d.prenume, d.nume)), 'ăâîșşțţ', 'aaisstt') LIKE translate(lower($1), 'ăâîșşțţ', 'aaisstt')
                OR ($2::text IS NOT NULL AND regexp_replace(COALESCE(d.telefon,''), '\\D', '', 'g') ILIKE $2::text))
         GROUP BY d.email
         ORDER BY MAX(d.platita_la) DESC NULLS LAST
@@ -77,7 +80,7 @@ export async function cautaPeste(text: string): Promise<Gasit[]> {
     }>(
       `SELECT id, denumire, cui, persoana, stadiu
          FROM firme
-        WHERE denumire ILIKE $1 OR persoana ILIKE $1 OR email ILIKE $1
+        WHERE translate(lower(denumire), 'ăâîșşțţ', 'aaisstt') LIKE translate(lower($1), 'ăâîșşțţ', 'aaisstt') OR translate(lower(persoana), 'ăâîșşțţ', 'aaisstt') LIKE translate(lower($1), 'ăâîșşțţ', 'aaisstt') OR translate(lower(email), 'ăâîșşțţ', 'aaisstt') LIKE translate(lower($1), 'ăâîșşțţ', 'aaisstt')
            OR ($2::text IS NOT NULL AND cui ILIKE $2::text)
            OR ($2::text IS NOT NULL AND regexp_replace(COALESCE(telefon,''), '\\D', '', 'g') ILIKE $2::text)
         ORDER BY schimbat_la DESC
@@ -93,7 +96,7 @@ export async function cautaPeste(text: string): Promise<Gasit[]> {
     }>(
       `SELECT id, fel, nume, email, stadiu
          FROM cereri
-        WHERE nume ILIKE $1 OR email ILIKE $1
+        WHERE translate(lower(nume), 'ăâîșşțţ', 'aaisstt') LIKE translate(lower($1), 'ăâîșşțţ', 'aaisstt') OR translate(lower(email), 'ăâîșşțţ', 'aaisstt') LIKE translate(lower($1), 'ăâîșşțţ', 'aaisstt')
            OR ($2::text IS NOT NULL AND regexp_replace(COALESCE(telefon,''), '\\D', '', 'g') ILIKE $2::text)
         ORDER BY creat_la DESC
         LIMIT 12`,

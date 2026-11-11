@@ -294,6 +294,28 @@ export default async function proxy(cerere: NextRequest) {
     );
   }
 
+  /*
+    Paginile „de ziua ta”: una care nu există răspundea 200 cu „Campanie
+    negăsită” în titlu — același soft-404 ca la proiecte. Cu `jeton` în
+    adresă trece mai departe: e previzualizarea omului, pe care o hotărăște
+    pagina.
+  */
+  const ziua = cerere.nextUrl.pathname.match(/^\/ziua-ta\/([^/]+)$/);
+  if (ziua && !cerere.nextUrl.searchParams.has("jeton") && areBazaDeDate()) {
+    let slugZi = ziua[1];
+    try {
+      slugZi = decodeURIComponent(slugZi);
+    } catch {}
+    const gasite = await intreaba<{ unu: number }>(
+      "SELECT 1 AS unu FROM campanii_aniversare WHERE slug = $1 AND stare = 'publicata' LIMIT 1",
+      [slugZi],
+    ).catch(() => null);
+    if (gasite !== null && gasite.length === 0) {
+      return await paginaDe404(cerere, "campanie");
+    }
+    return NextResponse.next();
+  }
+
   const potriveste = cerere.nextUrl.pathname.match(
     /^\/(proiecte|noutati|campanii)\/(.+)$/,
   );

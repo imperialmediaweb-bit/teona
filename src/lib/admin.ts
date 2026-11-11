@@ -118,21 +118,38 @@ export function areParolaConfigurata(): boolean {
   Identificatorul, nu adresa de e-mail: o adresă se schimbă, iar un rând de
   jurnal legat de ea ar rămâne în urmă.
 */
-function semneazaSesiunea(id: string, expira: number): string | null {
+function semneazaSesiunea(id: string, expira: number, versiune = 0): string | null {
   const c = cheieSesiune();
   if (!c) return null;
+  // Versiunea 0 semnează ca înainte, ca sesiunile deja date să rămână bune
+  // până la prima schimbare de parolă a contului.
   return createHmac("sha256", c)
-    .update(`panou:${id}:${expira}`)
+    .update(versiune > 0 ? `panou:${id}:${expira}:${versiune}` : `panou:${id}:${expira}`)
     .digest("hex");
 }
 
 export function valoareaCookieuluiUtilizator(
   id: string,
   viataS: number = VIATA_S,
+  versiune = 0,
 ): string | null {
   const expira = Math.floor(Date.now() / 1000) + viataS;
-  const sem = semneazaSesiunea(id, expira);
+  const sem = semneazaSesiunea(id, expira, versiune);
   return sem ? `u:${id}:${expira}:${sem}` : null;
+}
+
+/**
+ * Aceeași sesiune, semnată din nou cu versiunea de acum a contului.
+ * După ce omul își schimbă parola, dispozitivul de pe care a făcut-o rămâne
+ * înăuntru, cu aceeași expirare; celelalte ies.
+ */
+export function sesiuneaResemnata(brut: string | undefined, versiune: number): string | null {
+  const parti = (brut ?? "").split(":");
+  if (parti.length !== 4 || parti[0] !== "u") return null;
+  const expira = Number(parti[2]);
+  if (!Number.isInteger(expira) || expira * 1000 <= Date.now()) return null;
+  const sem = semneazaSesiunea(parti[1], expira, versiune);
+  return sem ? `u:${parti[1]}:${expira}:${sem}` : null;
 }
 
 /*
@@ -200,7 +217,10 @@ export function cheieProbaValida(primit: string | null): boolean {
  * Nu atinge baza de date: partea care chiar poate greși e verificarea
  * semnăturii, și trebuie să poată fi pusă la probă fără server.
  */
-export function cititSesiuneaUtilizator(brut: string | undefined): string | null {
+export function cititSesiuneaUtilizator(
+  brut: string | undefined,
+  versiune = 0,
+): string | null {
   if (!brut || !brut.startsWith("u:")) return null;
   const parti = brut.split(":");
   if (parti.length !== 4) return null;
@@ -209,7 +229,7 @@ export function cititSesiuneaUtilizator(brut: string | undefined): string | null
   const expira = Number(expiraText);
   if (!Number.isInteger(expira) || expira * 1000 <= Date.now()) return null;
 
-  const asteptat = semneazaSesiunea(id, expira);
+  const asteptat = semneazaSesiunea(id, expira, versiune);
   if (!asteptat) return null;
   return egale(sem, asteptat) ? id : null;
 }
@@ -248,11 +268,12 @@ export const cineEsteConectat = cache(async (): Promise<Conectat | null> => {
     return { fel: "cheie", rol: "administrator", nume: "Asociația" };
   }
 
-  const id = cititSesiuneaUtilizator(gasit);
-  if (!id) return null;
-
-  const utilizator = await utilizatorDupaId(id).catch(() => null);
+  // Semnătura depinde de versiunea contului, deci contul se citește întâi
+  // (după un identificator încă neverificat) și abia apoi se verifică.
+  const banuit = gasit.startsWith("u:") ? (gasit.split(":")[1] ?? "") : "";
+  const utilizator = await utilizatorDupaId(banuit).catch(() => null);
   if (!utilizator || !utilizator.activ) return null;
+  if (!cititSesiuneaUtilizator(gasit, utilizator.versiuneSesiune)) return null;
 
   return {
     fel: "cont",
@@ -282,7 +303,7 @@ export async function sesiuneProaspata(): Promise<boolean> {
   const brut = (await cookies()).get(COOKIE_ADMIN)?.value;
   if (!brut) return cheieProbaValida((await headers()).get(ANTET_PROBA));
   if (cookieCheieValid(brut)) return true;
-  if (!cititSesiuneaUtilizator(brut)) return false;
+  if ((await cineEsteConectat())?.fel !== "cont") return false;
   const ramas = Number(brut.split(":")[2]) - Math.floor(Date.now() / 1000);
   return ramas <= VIATA_S || ramas >= VIATA_LUNGA_S - PROASPAT_S;
 }

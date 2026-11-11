@@ -28,6 +28,7 @@ type Anuntat = {
   email?: string;
   telefon?: string;
   sumaBani: number;
+  moneda?: string;
   destinatie: string;
   /** Ziua scrisă de donator, în format ISO. */
   data: string;
@@ -55,7 +56,7 @@ function pentruCe(destinatie: string): string {
 
 /** Către donator: am notat, urmează controlul în extras. */
 export function compuneTransferAnuntat(d: Anuntat): Compus {
-  const suma = scrieSuma(d.sumaBani / 100);
+  const suma = scrieSuma(d.sumaBani / 100, d.moneda ?? "RON");
   const titlu = "Am notat transferul tău";
   const deschidere =
     "Îți mulțumim pentru anunț. Am înregistrat datele transferului și îl verificăm în extrasul de cont. Îți scriem imediat ce îl identificăm.";
@@ -102,7 +103,7 @@ ${ASOCIATIA.motto}`,
 
 /** Către asociație: un transfer de căutat în extras. */
 export function compuneAnuntTransfer(d: Anuntat): Compus {
-  const suma = scrieSuma(d.sumaBani / 100);
+  const suma = scrieSuma(d.sumaBani / 100, d.moneda ?? "RON");
   const titlu = "Un transfer de căutat în extras";
   const campuri = tabel([
     ["Nume pe transfer", d.nume],

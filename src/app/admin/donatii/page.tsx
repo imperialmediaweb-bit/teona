@@ -217,7 +217,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                 className="rounded-card border border-turcoaz-200 bg-hartie p-4"
               >
                 <p className="font-titlu text-amplu font-bold text-cerneala">
-                  {scrieSuma(t.sumaBani / 100)}
+                  {scrieSuma(t.sumaBani / 100, t.moneda)}
                   <span className="ml-2 font-normal text-cerneala-moale">
                     {t.nume}
                   </span>

@@ -102,6 +102,7 @@ export async function POST(cerere: Request) {
     return raspuns("Data e mai veche de un an. Verifică anul.", 400);
   }
 
+  const moneda = camp("moneda") === "EUR" ? "EUR" : "RON";
   const adresa = camp("email");
   if (adresa && !emailValid(adresa)) {
     return raspuns(
@@ -127,13 +128,14 @@ export async function POST(cerere: Request) {
   const referinta =
     // Destinația intră și ea: două transferuri în aceeași zi, de aceeași
     // sumă, unul pentru tabere și unul pentru Casa Teona, sunt două.
-    `${data} · ${suma} lei · ${adresa || camp("telefon") || nume}${
+    `${data} · ${suma} ${moneda === "EUR" ? "€" : "lei"} · ${adresa || camp("telefon") || nume}${
       destinatie === "oriunde" ? "" : ` · ${destinatie}`
     }`.slice(0, 120);
 
   const rezultat = await anuntaTransfer({
     referinta,
     sumaBani: inBani(suma),
+    moneda,
     destinatie,
     data: cand.toISOString(),
     email: emailValid(adresa) ?? undefined,
@@ -162,13 +164,14 @@ export async function POST(cerere: Request) {
       email: emailValid(adresa) ?? undefined,
       telefon: text(camp("telefon"), 40) ?? undefined,
       sumaBani: inBani(suma),
+    moneda,
       destinatie,
       data: cand.toISOString(),
       observatii: text(camp("observatii"), 1_000) ?? undefined,
     }).catch(() => false);
     await notificaPanoul({
       titlu: "Transfer anunțat",
-      text: `${nume.split(/\s+/)[0]} spune că a trimis ${scrieSuma(suma)}. Caută-l în extras.`,
+      text: `${nume.split(/\s+/)[0]} spune că a trimis ${scrieSuma(suma, moneda)}. Caută-l în extras.`,
       adresa: "/admin/donatii",
     }).catch(() => 0);
   }

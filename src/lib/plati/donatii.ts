@@ -46,7 +46,9 @@ export async function scrieInitiata(d: DonatieNoua): Promise<void> {
       d.moneda,
       d.frecventa,
       d.destinatie,
-      d.email,
+      // Litere mici: „Maria@Gmail.com” și „maria@gmail.com” sunt același om,
+      // iar contul lui îl caută după adresa scrisă la intrare.
+      d.email?.trim().toLowerCase() || null,
       d.prenume,
       d.nume,
       d.telefon,
@@ -113,4 +115,33 @@ export async function evenimentNou(
     [procesator, eveniment],
   );
   return randuri.length > 0;
+}
+
+/**
+ * O donație rambursată iese din toate socotelile.
+ *
+ * Până pe 11 noiembrie 2026 o rambursare făcută din Stripe nu ajungea la
+ * noi: donația rămânea `platita` în total, în raportul anual, în progresul
+ * campaniei și în insignele donatorului. Întreagă, trece pe `rambursata`
+ * (toate interogările cer `platita`, deci dispare singură de peste tot);
+ * parțială, rămâne plătită cu suma rămasă.
+ */
+export async function marcheazaRambursata(
+  procesator: string,
+  referinte: readonly string[],
+  ramasBani: number,
+): Promise<number> {
+  if (referinte.length === 0) return 0;
+  const randuri = await intreaba<{ id: string }>(
+    ramasBani > 0
+      ? `UPDATE donatii SET suma_bani = $3
+          WHERE procesator = $1 AND referinta = ANY($2) AND stare = 'platita'
+          RETURNING id`
+      : `UPDATE donatii SET stare = 'rambursata'
+          WHERE procesator = $1 AND referinta = ANY($2) AND stare = 'platita'
+            AND $3 = 0
+          RETURNING id`,
+    [procesator, referinte, ramasBani],
+  );
+  return randuri.length;
 }

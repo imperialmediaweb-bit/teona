@@ -73,7 +73,7 @@ export async function POST(cerere: Request) {
       prenume: donatia.nume?.trim().split(/\s+/)[0] ?? null,
       nume: donatia.nume,
       sumaBani: donatia.sumaBani,
-      moneda: "RON",
+      moneda: donatia.moneda,
       frecventa: "o-data",
       destinatie: donatia.destinatie,
       cand: donatia.cand,

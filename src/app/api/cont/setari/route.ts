@@ -2,7 +2,12 @@ import { limitaDeRata, raspuns, trimiteLa } from "@/lib/api";
 import { donatorulConectat } from "@/lib/sesiune";
 import { schimbaAcordul, uitaDonatorul } from "@/lib/plati/donatori";
 import { daJosDinBuletin, laBuletin } from "@/lib/buletin";
-import { opresteAbonamentul } from "@/lib/plati/stripe";
+import {
+  abonamenteleLui,
+  areStripe,
+  opresteAbonamentul,
+  opresteAbonamentulDupaId,
+} from "@/lib/plati/stripe";
 import { inchideSesiunea } from "@/lib/sesiune";
 
 /**
@@ -79,6 +84,22 @@ export async function POST(cerere: Request) {
     // dispărea din baza noastră și ar primi buletinul mai departe.
     const scos = await daJosDinBuletin(email).catch(() => false);
     if (!scos) return trimiteLa("/contul-meu?eroare=stergere");
+    /*
+      Donația lunară se oprește odată cu ștergerea. Lăsată pornită, plata
+      următoare scria la loc adresa, prenumele și telefonul din metadatele
+      abonamentului — datele „șterse” reapăreau peste o lună (audit 11 nov.
+      2026). Dacă Stripe nu răspunde sau o oprire nu merge, nu se șterge
+      nimic: omul află și încearcă din nou, în loc să rămână cu un abonament
+      pe care nu-l mai poate vedea.
+    */
+    if (areStripe()) {
+      const aleLui = await abonamenteleLui(email).catch(() => null);
+      if (aleLui === null) return trimiteLa("/contul-meu?eroare=stergere");
+      for (const a of aleLui) {
+        const oprit = await opresteAbonamentulDupaId(a.id).catch(() => false);
+        if (!oprit) return trimiteLa("/contul-meu?eroare=stergere");
+      }
+    }
     await uitaDonatorul(email);
     await inchideSesiunea();
     return trimiteLa("/?sters=1");

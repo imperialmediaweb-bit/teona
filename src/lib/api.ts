@@ -431,7 +431,9 @@ export function textOptional(valoare: unknown, maxim: number): boolean {
 export function email(valoare: unknown): string | null {
   const curat = text(valoare, 254);
   if (!curat || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(curat)) return null;
-  return curat;
+  // Litere mici, peste tot: altfel același om apare de două ori în panou și
+  // nu-și găsește donațiile când intră în cont cu adresa scrisă altfel.
+  return curat.toLowerCase();
 }
 
 /**

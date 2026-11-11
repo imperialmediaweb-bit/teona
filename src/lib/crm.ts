@@ -154,18 +154,37 @@ export async function salveazaFirma(date: {
   return r ? { id: r.id, eraDeja: r.era_deja } : null;
 }
 
+/**
+ * Firmele uitate: pe „cerere” sau „contract trimis” de peste două săptămâni,
+ * **fără nicio notiță în jurnal** în tot timpul ăsta. Cu numai `schimbat_la`,
+ * tabloul de bord număra ca uitată și firma sunată ieri (audit 11 nov. 2026).
+ * Scrisă o dată: din ea iese și cifra din „De făcut acum”, și lista la care
+ * duce linkul ei (`/admin/firme?uitate=1`).
+ */
+export const FIRME_UITATE_SQL = `stadiu IN ('cerere', 'contract_trimis')
+  AND schimbat_la < now() - interval '14 days'
+  AND NOT EXISTS (SELECT 1 FROM interactiuni i
+                   WHERE i.firma_id = firme.id
+                     AND i.cand > now() - interval '14 days')`;
+
 export async function firme(
   stadiu?: StadiuFirma,
   cautare = "",
   limita = 200,
+  numaiUitate = false,
 ): Promise<Firma[]> {
+  const fd = (x: string) => `translate(lower(${x}), 'ăâîșşțţ', 'aaisstt')`;
   const randuri = await intreaba<RandFirma>(
     `SELECT * FROM firme
       WHERE ($1::text IS NULL OR stadiu = $1)
-        AND ($2 = '' OR denumire ILIKE '%' || $2 || '%'
-             OR cui ILIKE '%' || $2 || '%'
-             OR persoana ILIKE '%' || $2 || '%'
-             OR email ILIKE '%' || $2 || '%')
+        AND ($2 = '' OR ${fd("denumire")} LIKE '%' || ${fd("$2")} || '%'
+             OR cui ILIKE '%' || regexp_replace($2, '^\\s*ro\\s*|[\\s.\\-]', '', 'gi') || '%'
+             OR ${fd("persoana")} LIKE '%' || ${fd("$2")} || '%'
+             OR email ILIKE '%' || $2 || '%'
+             OR (length(regexp_replace($2, '\\D', '', 'g')) >= 6
+                 AND regexp_replace(COALESCE(telefon, ''), '\\D', '', 'g')
+                     LIKE '%' || regexp_replace(regexp_replace($2, '\\D', '', 'g'), '^(0040|40|0)', '') || '%'))
+        ${numaiUitate ? `AND ${FIRME_UITATE_SQL}` : ""}
       ORDER BY schimbat_la DESC
       LIMIT $3`,
     [stadiu ?? null, cautare, limita],
@@ -195,6 +214,24 @@ export async function schimbaStadiulFirmei(
       RETURNING *`,
     [id, stadiu, sumaBani ?? null],
   );
+  /*
+    Registrul de contracte merge odată cu firma. Mutată la „semnat” sau „bani
+    încasați” aici, contractul ei rămânea „generat” în registru: „Încasat”
+    arăta 0 și „semnate, bani neintrați” nu-l vedea (audit 11 nov. 2026).
+    Se mută cel mai nou contract neanulat al firmei, și numai înainte.
+  */
+  if (randuri[0] && (stadiu === "semnat" || stadiu === "incasat")) {
+    await intreaba(
+      `UPDATE contracte SET stadiu = $2,
+              valoare_bani = CASE WHEN $2 = 'incasat' THEN COALESCE($3, valoare_bani) ELSE valoare_bani END,
+              schimbat_la = now()
+        WHERE id = (SELECT id FROM contracte
+                     WHERE firma_id = $1 AND stadiu IN ('generat', 'semnat')
+                     ORDER BY an DESC, numar DESC LIMIT 1)
+          AND stadiu <> $2`,
+      [id, stadiu, sumaBani ?? null],
+    ).catch(() => undefined);
+  }
   return randuri[0] ? laFirma(randuri[0]) : null;
 }
 

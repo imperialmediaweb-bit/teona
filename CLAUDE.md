@@ -1783,14 +1783,45 @@ formă, rulându-le. Reparate (lista întreagă e în istoricul depozitului):
   (`probaAreVoie` din `lib/proba.ts`) și nu mai confirmă plățile oamenilor
   când deschide panoul (`verificaInainte`).
 
-**Rămase, nereparate** (hotărâri sau lucru mai mare): rambursările Stripe nu
-scad donația; transferul în euro se anunță ca lei; granițele de lună sunt în
-UTC; raportul anual numără firmele încasate din toți anii; schimbarea parolei
-nu închide celelalte sesiuni și nici codul rapid; stadiul firmei și al
-contractului din registru nu se leagă; „firme fără răspuns” nu ține seama de
-jurnal; căutarea fără diacritice; e-mailul comparat cu majuscule; cele două
-e-mailuri despre Formularul 230 spun lucruri diferite despre hârtie;
-`/ziua-ta/<inexistent>` răspunde 200; „Fac alt folder” înlocuiește galeria.
+**Al treilea lot, aceeași zi:**
+
+- **Rambursările** (`charge.refunded` în webhook-ul Stripe): donația trece pe
+  `rambursata` și iese singură din toate socotelile; parțială, rămâne cu suma
+  rămasă. Donația se caută prin `referinteleIncasarii()` (sesiunea după
+  `payment_intent`, factura după încasare). **Evenimentul trebuie bifat în
+  Stripe**, la destinația webhook-ului; fără el nu rulează nimic.
+- **Transferul în euro** se anunță cu moneda lui (`moneda` în formular, în
+  rând, în e-mailuri și la confirmare).
+- **Lunile și anii se taie la ora României**: conexiunea la bază pornește cu
+  `-c timezone=Europe/Bucharest` (`lib/baza.ts`), iar marginile rapoartelor
+  sunt scrise fără fus. Pusă ca interogare la `connect`, se călca cu prima
+  interogare a clientului — de aceea e opțiune de conexiune.
+- **Raportul anual** numără firmele încasate în anul lui.
+- **Parola schimbată închide celelalte sesiuni și codul rapid**:
+  `utilizatori.versiune_sesiune` intră în semnătura cookie-ului (versiunea 0
+  semnează ca înainte, deci nimeni n-a fost dat afară la publicare). Crește
+  la schimbarea parolei, la invitația folosită și la oprirea contului, care
+  golește și `invitat_la`. Dispozitivul de pe care s-a schimbat parola
+  primește aceeași sesiune semnată din nou (`sesiuneaResemnata`).
+- **Firma și contractul merg împreună**: firma mutată la „semnat” sau „bani
+  încasați” își mută contractul din registru, și invers, numai înainte.
+- **„Firme fără răspuns”** ține seama de jurnal (`FIRME_UITATE_SQL` din
+  `lib/crm.ts`), iar cifra duce la `/admin/firme?uitate=1`, făcută din
+  aceeași condiție. „Cereri noi” duce la `?stadiu=nou`.
+- **Căutarea** nu mai ține de diacritice (`translate` în interogări), de
+  prefixul telefonului sau de „RO” la CUI.
+- **Adresele de e-mail se țin cu litere mici** (`email()`, inserările de
+  donații, un `UPDATE` de normalizare în `ADAOSURI`).
+- **„Șterge-mi datele” oprește întâi donația lunară**; dacă Stripe nu
+  răspunde, nu se șterge nimic.
+- `/ziua-ta/<inexistent>` răspunde 404; „Fac alt folder” spune că înlocuiește.
+
+**Rămase**: cele două e-mailuri despre Formularul 230 spun lucruri diferite
+despre hârtia semnată (întrebare pentru asociație); exportul pentru Excel are
+datele în UTC și pierde zeroul din telefoane; un voluntar înscris de două ori
+primește apelul de două ori; numărul de contract scris de mână ocolește
+registrul; `sesiuneProaspata` socotește proaspete ultimele 12 ore ale unei
+sesiuni lungi; o eroare Cloudinary se ține o oră ca galerie goală.
 
 ## Decizii încă deschise
 

@@ -184,6 +184,13 @@ export type Utilizator = {
   areParola: boolean;
   /** Clipa invitației în aer, sau `null` dacă nu e niciuna. */
   invitatLa: Date | null;
+  /**
+   * Crește la fiecare schimbare de parolă și la oprirea contului. Intră în
+   * semnătura sesiunii, deci cookie-urile date înainte nu mai sunt bune:
+   * până pe 11 noiembrie 2026, o parolă schimbată lăsa deschise sesiunile
+   * de 30 de zile de pe celelalte dispozitive.
+   */
+  versiuneSesiune: number;
 };
 
 /*
@@ -313,6 +320,7 @@ const DEFINITIE = `
   */
   ALTER TABLE utilizatori ADD COLUMN IF NOT EXISTS pin text;
   ALTER TABLE utilizatori ADD COLUMN IF NOT EXISTS pin_gresit integer NOT NULL DEFAULT 0;
+  ALTER TABLE utilizatori ADD COLUMN IF NOT EXISTS versiune_sesiune integer NOT NULL DEFAULT 0;
 `;
 
 let gata: Promise<void> | null = null;
@@ -344,6 +352,7 @@ type Rand = {
   creat_la: Date;
   intrat_la: Date | null;
   invitat_la: Date | null;
+  versiune_sesiune: number;
 };
 
 /**
@@ -364,11 +373,12 @@ function cites(rand: Rand): Utilizator {
     intratLa: rand.intrat_la,
     areParola: Boolean(rand.parola),
     invitatLa: rand.invitat_la,
+    versiuneSesiune: Number(rand.versiune_sesiune ?? 0),
   };
 }
 
 const COLOANE =
-  "id, email, nume, rol, parola, activ, creat_la, intrat_la, invitat_la";
+  "id, email, nume, rol, parola, activ, creat_la, intrat_la, invitat_la, versiune_sesiune";
 
 export async function utilizatorDupaId(id: string): Promise<Utilizator | null> {
   if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
@@ -541,7 +551,11 @@ export async function schimbaParola(
   await pregateste();
   const trecuta = await pregatesteParola(parola);
   const randuri = await intreaba<{ id: string }>(
-    `UPDATE utilizatori SET parola = $2, schimbat_la = now()
+    // Parola nouă închide celelalte sesiuni și codul rapid: cine a schimbat-o
+    // fiindcă i-a scăpat nu vrea ca telefonul vechi să intre cu patru cifre.
+    `UPDATE utilizatori
+        SET parola = $2, schimbat_la = now(),
+            versiune_sesiune = versiune_sesiune + 1, pin = NULL, pin_gresit = 0
       WHERE id = $1 RETURNING id`,
     [id, trecuta],
   );
@@ -598,7 +612,12 @@ export async function schimbaStarea(
 ): Promise<boolean> {
   await pregateste();
   const randuri = await intreaba<{ id: string }>(
-    `UPDATE utilizatori SET activ = $2, schimbat_la = now()
+    // Oprirea omoară și invitația în aer, și sesiunile: un cont repornit
+    // peste o lună nu învie cookie-urile vechi.
+    `UPDATE utilizatori
+        SET activ = $2, schimbat_la = now(),
+            invitat_la = CASE WHEN $2 THEN invitat_la ELSE NULL END,
+            versiune_sesiune = versiune_sesiune + CASE WHEN $2 THEN 0 ELSE 1 END
       WHERE id = $1 RETURNING id`,
     [id, activ],
   );
@@ -657,7 +676,8 @@ export async function puneParolaDinInvitatie(
   */
   const randuri = await intreaba<{ id: string }>(
     `UPDATE utilizatori
-        SET parola = $3, invitat_la = NULL, schimbat_la = now()
+        SET parola = $3, invitat_la = NULL, schimbat_la = now(),
+            versiune_sesiune = versiune_sesiune + 1, pin = NULL, pin_gresit = 0
       WHERE id = $1 AND activ
         AND invitat_la IS NOT NULL
         AND floor(extract(epoch FROM invitat_la) * 1000) = $2

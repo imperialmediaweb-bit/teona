@@ -176,7 +176,7 @@ export default function UrcaPozeTabara({
             onClick={() => setCale(null)}
             className="text-mic text-cerneala-moale underline underline-offset-4"
           >
-            Fac alt folder
+            Fac alt folder (îl înlocuiește pe cel de acum în galerie)
           </button>
         )}
       </div>

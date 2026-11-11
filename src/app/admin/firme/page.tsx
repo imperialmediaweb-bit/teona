@@ -30,6 +30,7 @@ type Cautare = {
   gresit?: string;
   deschis?: string;
   eroare?: string;
+  uitate?: string;
 };
 
 export default function PaginaFirme({
@@ -56,7 +57,7 @@ function cand(iso: string): string {
 
 async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   await connection();
-  const { stadiu, cauta = "", gresit, deschis, eroare } = await searchParams;
+  const { stadiu, cauta = "", gresit, deschis, eroare, uitate } = await searchParams;
 
   if (!areParolaConfigurata()) {
     return (
@@ -96,7 +97,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   const ales: StadiuFirma | undefined = esteStadiuFirma(stadiu)
     ? stadiu
     : undefined;
-  const lista = await firme(ales, cauta);
+  const lista = await firme(ales, cauta, 200, uitate === "1");
 
   /*
     Jurnalul se încarcă doar pentru firma deschisă: altfel fiecare pagină ar
@@ -139,6 +140,15 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
         ))}
       </div>
 
+      {uitate === "1" && (
+        <p className="mt-5 max-w-2xl rounded-card border border-caramiziu-200 bg-caramiziu-50 p-4 text-mic text-caramiziu-900">
+          Numai firmele fără răspuns: pe „Cerere nouă” sau „Contract trimis” de
+          peste două săptămâni, fără nicio notiță scrisă între timp.{" "}
+          <a href="/admin/firme" className="font-bold underline underline-offset-2">
+            Arată toate firmele
+          </a>
+        </p>
+      )}
       <form method="get" className="mt-5 flex max-w-md gap-2">
         {ales && <input type="hidden" name="stadiu" value={ales} />}
         <input

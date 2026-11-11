@@ -1,3 +1,4 @@
+import { utilizatorDupaId } from "@/lib/utilizatori";
 import { limitaDeRata, raspuns, text, trimiteLa, formularCuLimita } from "@/lib/api";
 import { dinLinkulDeInvitatie } from "@/lib/invitatie";
 import { MINIM_PAROLA, puneParolaDinInvitatie } from "@/lib/utilizatori";
@@ -77,7 +78,13 @@ export async function POST(cerere: Request) {
     sunt deja dovada că e el, deci i se deschide sesiunea pe loc, exact ca
     la intrarea cu parola (același cookie, aceleași reguli).
   */
-  const sesiune = valoareaCookieuluiUtilizator(invitatie.id);
+  // Parola pusă a crescut versiunea sesiunii; cookie-ul se semnează cu cea nouă.
+  const cont = await utilizatorDupaId(invitatie.id).catch(() => null);
+  const sesiune = valoareaCookieuluiUtilizator(
+    invitatie.id,
+    undefined,
+    cont?.versiuneSesiune ?? 0,
+  );
   // Fără cheie de semnat nu se poate face sesiunea; atunci rămâne intrarea obișnuită.
   if (!sesiune) return trimiteLa("/admin?parola=pusa");
   const raspunsul = trimiteLa("/admin");

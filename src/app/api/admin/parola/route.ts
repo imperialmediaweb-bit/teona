@@ -1,3 +1,6 @@
+import { cookies } from "next/headers";
+import { COOKIE_ADMIN, sesiuneaResemnata } from "@/lib/admin";
+import { utilizatorDupaId } from "@/lib/utilizatori";
 import { formularAdmin, limitaDeRata, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
 import { arePermisiune, cineEsteConectat } from "@/lib/admin";
 import { MINIM_PAROLA, schimbaParolaProprie } from "@/lib/utilizatori";
@@ -58,7 +61,28 @@ export async function POST(cerere: Request) {
 
   if (cum === "veche-greșită") return gata(cerere, "veche");
   if (cum !== "ok") return gata(cerere, "necunoscut");
-  return gata(cerere, "schimbata");
+  /*
+    Parola nouă a închis toate sesiunile contului, și pe asta. Dispozitivul
+    de pe care s-a schimbat rămâne înăuntru: i se semnează din nou aceeași
+    sesiune, cu versiunea nouă. Celelalte ies la următoarea cerere.
+  */
+  const raspunsul = gata(cerere, "schimbata");
+  const cont = await utilizatorDupaId(cine.utilizator.id).catch(() => null);
+  const borcan = await cookies();
+  const noua_sesiune = cont
+    ? sesiuneaResemnata(borcan.get(COOKIE_ADMIN)?.value, cont.versiuneSesiune)
+    : null;
+  if (noua_sesiune) {
+    const expira = Number(noua_sesiune.split(":")[2]);
+    raspunsul.cookies.set(COOKIE_ADMIN, noua_sesiune, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: Math.max(60, expira - Math.floor(Date.now() / 1000)),
+    });
+  }
+  return raspunsul;
 }
 
 export const GET = () => raspuns("Metodă nepermisă.", 405);

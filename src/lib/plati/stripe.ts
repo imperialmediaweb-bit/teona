@@ -303,3 +303,71 @@ export async function adresaPortalului(
     return null;
   }
 }
+
+/**
+ * Referințele sub care poate sta în baza noastră donația unei încasări.
+ *
+ * O donație o dată stă sub identificatorul sesiunii de plată; o reînnoire
+ * lunară, sub al facturii; prima plată a unui abonament, tot sub al sesiunii.
+ * O rambursare vine cu încasarea (`charge`), care nu poartă niciuna din ele,
+ * deci se caută: sesiunea după `payment_intent`, factura după încasare, iar
+ * pentru prima factură a unui abonament, sesiunea după abonament.
+ * Orice cădere pe drum lasă lista mai scurtă, nu oprește restul.
+ */
+export async function referinteleIncasarii(incasare: {
+  payment_intent?: string | { id: string } | null;
+  invoice?: string | { id: string } | null;
+}): Promise<string[]> {
+  if (!areStripe()) return [];
+  const stripe = ia();
+  const gasite = new Set<string>();
+  const pi =
+    typeof incasare.payment_intent === "string"
+      ? incasare.payment_intent
+      : (incasare.payment_intent?.id ?? null);
+
+  if (pi) {
+    const sesiuni = await stripe.checkout.sessions
+      .list({ payment_intent: pi, limit: 1 })
+      .catch(() => null);
+    for (const s of sesiuni?.data ?? []) gasite.add(s.id);
+  }
+
+  let factura =
+    typeof incasare.invoice === "string"
+      ? incasare.invoice
+      : (incasare.invoice?.id ?? null);
+  if (!factura && pi) {
+    // Din 2025 legătura încasare–factură stă la `invoice_payments`.
+    const plati = await (
+      stripe as unknown as {
+        invoicePayments?: {
+          list(p: unknown): Promise<{ data: { invoice?: string | { id: string } }[] }>;
+        };
+      }
+    ).invoicePayments
+      ?.list({ payment: { type: "payment_intent", payment_intent: pi }, limit: 1 })
+      .catch(() => null);
+    const f = plati?.data?.[0]?.invoice;
+    factura = typeof f === "string" ? f : (f?.id ?? null);
+  }
+  if (factura) {
+    gasite.add(factura);
+    const intreaga = await stripe.invoices.retrieve(factura).catch(() => null);
+    if (intreaga?.billing_reason === "subscription_create") {
+      const brut = intreaga as unknown as {
+        subscription?: string | { id: string } | null;
+        parent?: { subscription_details?: { subscription?: string | { id: string } } };
+      };
+      const a = brut.subscription ?? brut.parent?.subscription_details?.subscription;
+      const abonament = typeof a === "string" ? a : (a?.id ?? null);
+      if (abonament) {
+        const sesiuni = await stripe.checkout.sessions
+          .list({ subscription: abonament, limit: 1 })
+          .catch(() => null);
+        for (const s of sesiuni?.data ?? []) gasite.add(s.id);
+      }
+    }
+  }
+  return [...gasite];
+}

@@ -1,3 +1,4 @@
+import { FIRME_UITATE_SQL } from "@/lib/crm";
 import { intreaba } from "./baza";
 
 /**
@@ -54,10 +55,18 @@ function eticheta(luna: string): string {
 
 /** Lista lunilor, de acum înapoi, inclusiv cele fără nicio donație. */
 function ultimeleLuni(cate: number): string[] {
-  const azi = new Date();
+  // Luna de acum, la ora României: în noaptea de 1 spre 2 UTC e deja luna nouă.
+  const [anulAcum, lunaAcum] = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Bucharest",
+    year: "numeric",
+    month: "2-digit",
+  })
+    .format(new Date())
+    .split("-")
+    .map(Number);
   const luni: string[] = [];
   for (let i = cate - 1; i >= 0; i--) {
-    const d = new Date(Date.UTC(azi.getUTCFullYear(), azi.getUTCMonth() - i, 1));
+    const d = new Date(Date.UTC(anulAcum, lunaAcum - 1 - i, 1));
     luni.push(
       `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`,
     );
@@ -267,9 +276,7 @@ export async function deFacutAcum(): Promise<
     // O firmă căreia i s-a trimis contractul acum trei săptămâni și care
     // n-a semnat nu e „în lucru”, e uitată.
     intreaba<{ nr: string }>(
-      `SELECT count(*) AS nr FROM firme
-        WHERE stadiu IN ('cerere', 'contract_trimis')
-          AND schimbat_la < now() - interval '14 days'`,
+      `SELECT count(*) AS nr FROM firme WHERE ${FIRME_UITATE_SQL}`,
     ),
     // Transferurile anunțate de donatori: cineva trebuie să se uite în
     // extras. Până atunci banii lor nu sunt în niciun total.
@@ -292,7 +299,7 @@ export async function deFacutAcum(): Promise<
       nr: Number(esuate[0]?.nr ?? 0),
       unde: "/admin/donatii",
     },
-    { eticheta: "cereri noi", nr: Number(cereri[0]?.nr ?? 0), unde: "/admin/cereri" },
+    { eticheta: "cereri noi", nr: Number(cereri[0]?.nr ?? 0), unde: "/admin/cereri?stadiu=nou" },
     {
       eticheta: "transferuri de căutat în extras",
       nr: Number(transferuri[0]?.nr ?? 0),
@@ -306,7 +313,7 @@ export async function deFacutAcum(): Promise<
     {
       eticheta: "firme fără răspuns de două săptămâni",
       nr: Number(firme[0]?.nr ?? 0),
-      unde: "/admin/firme",
+      unde: "/admin/firme?uitate=1",
     },
     {
       eticheta: "ciorne nepublicate",

@@ -190,7 +190,7 @@ export default function AnuntTransfer() {
           <div className="grid gap-4 sm:grid-cols-2">
             <Camp
               id={`${id}-suma`}
-              eticheta="Suma (lei)"
+              eticheta="Suma"
               obligatoriu
               eroare={erori.suma}
             >
@@ -204,6 +204,17 @@ export default function AnuntTransfer() {
                 aria-describedby={erori.suma ? `${id}-suma-eroare` : undefined}
                 className={erori.suma ? claseControlGresit : claseControl}
               />
+              {/* Contul în euro e pe aceeași pagină: 50 € anunțați ca 50 de
+                  lei intrau greșit în totaluri și în mulțumire. */}
+              <select
+                name="moneda"
+                defaultValue="RON"
+                aria-label="Moneda transferului"
+                className={`${claseControl} mt-2`}
+              >
+                <option value="RON">lei</option>
+                <option value="EUR">euro</option>
+              </select>
             </Camp>
 
             <Camp

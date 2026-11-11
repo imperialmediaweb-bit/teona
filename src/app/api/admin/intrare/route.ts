@@ -76,7 +76,7 @@ export async function POST(cerere: Request) {
       r.cookies.set("teona_cod_blocat", "1", { ...optiuni(60), httpOnly: true });
       return r;
     }
-    const valoare = valoareaCookieuluiUtilizator(rez.id, VIATA_LUNGA_S);
+    const valoare = valoareaCookieuluiUtilizator(rez.id, VIATA_LUNGA_S, rez.versiuneSesiune);
     const r = trimiteLa(unde(formular, rez.rol));
     if (valoare) r.cookies.set(COOKIE_ADMIN, valoare, optiuni(VIATA_LUNGA_S));
     return r;
@@ -107,6 +107,7 @@ export async function POST(cerere: Request) {
       ? valoareaCookieuluiUtilizator(
           intrat.id,
           tineMinte ? VIATA_LUNGA_S : undefined,
+          intrat.versiuneSesiune,
         )
       : null
     : parolaCorecta(parola)

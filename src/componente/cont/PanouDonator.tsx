@@ -408,8 +408,8 @@ export default function PanouDonator({
             contabilitatea, iar o donație ștearsă ar lăsa o gaură în ea.
           </p>
           <p className="mt-2 max-w-2xl text-mic text-cerneala-moale">
-            După asta nu mai poți intra în contul ăsta, și nu se poate întoarce
-            înapoi.
+            Dacă ai o donație lunară, se oprește acum. După asta nu mai poți
+            intra în contul ăsta, și nu se poate întoarce înapoi.
           </p>
           <form
             action="/api/cont/setari"

@@ -49,7 +49,16 @@ function ia(): Pool {
       max: 4,
       idleTimeoutMillis: 30_000,
       connectionTimeoutMillis: 8_000,
+      options: "-c timezone=Europe/Bucharest",
     });
+    /*
+      Lunile și anii se taie la ora României, nu la UTC. Baza e pe UTC, deci
+      `date_trunc('month', now())` punea o donație din 1 ianuarie, ora 01:30,
+      în raportul anului trecut și în „luna trecută” (audit 11 nov. 2026).
+      Coloanele sunt `timestamptz`, deci clipele rămân aceleași; se schimbă
+      numai unde cade miezul nopții. Pusă ca opțiune de conexiune, nu ca
+      interogare la `connect`: aia se călca cu prima interogare a clientului.
+    */
   }
   return rezervor;
 }
@@ -585,6 +594,8 @@ const ADAOSURI = `
   ALTER TABLE donatii ADD COLUMN IF NOT EXISTS sursa text;
   CREATE INDEX IF NOT EXISTS donatii_dupa_canal
     ON donatii (canal, platita_la DESC);
+
+  UPDATE donatii SET email = lower(email) WHERE email IS NOT NULL AND email <> lower(email);
 `;
 
 async function pregateste(): Promise<void> {

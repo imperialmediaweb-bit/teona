@@ -4,10 +4,11 @@ import { octetiCuLimita, raspuns } from "@/lib/api";
 import { areBazaDeDate } from "@/lib/baza";
 import {
   evenimentNou,
+  marcheazaRambursata,
   marcheazaPlatita,
   scrieInitiata,
 } from "@/lib/plati/donatii";
-import { citesteEveniment } from "@/lib/plati/stripe";
+import { citesteEveniment, referinteleIncasarii } from "@/lib/plati/stripe";
 import { dupaIncasare, inregistreazaSesiuneaStripe } from "@/lib/plati/confirmare";
 import { trimiteVesteaReinnoirii } from "@/lib/email/reinnoire";
 import {
@@ -238,6 +239,27 @@ async function prelucreaza(eveniment: Stripe.Event) {
         ).toISOString(),
         abonament,
       }).catch(() => undefined);
+      return;
+    }
+
+    /*
+      Rambursarea, făcută din contul Stripe. Evenimentul trebuie bifat acolo,
+      la destinația webhook-ului (`charge.refunded`); fără el, nimic din ce e
+      mai jos nu rulează. Dacă donația nu se găsește, se scrie în jurnal: o
+      rambursare care nu scade nimic trebuie să se vadă undeva.
+    */
+    case "charge.refunded": {
+      const incasare = eveniment.data.object as Stripe.Charge;
+      const referinte = await referinteleIncasarii(
+        incasare as unknown as Parameters<typeof referinteleIncasarii>[0],
+      );
+      const ramas = Math.max(0, incasare.amount - incasare.amount_refunded);
+      const cate = await marcheazaRambursata("stripe", referinte, ramas);
+      if (cate === 0) {
+        console.warn(
+          `[stripe] rambursarea ${incasare.id} n-a găsit nicio donație (${referinte.join(", ") || "fără referințe"})`,
+        );
+      }
       return;
     }
 
