@@ -323,3 +323,44 @@ export async function numarPentruContract(d: {
   if (gasite[0]) return dinRand(gasite[0]);
   return inregistreazaContract(d);
 }
+
+/**
+ * Un număr scris de mână în formularul din panou (un contract vechi, refăcut).
+ *
+ * Până aici, numărul scris de mână trecea pe lângă registru: contractul ieșea
+ * „12/2026”, dar în registru nu exista, iar următorul generat automat putea
+ * primi tot 12. Acum numărul scris intră și el în registru; dacă e deja luat
+ * de altă firmă, se spune, în loc să iasă două contracte cu același număr.
+ */
+export async function numarScrisDeMana(
+  scris: string,
+  d: { firmaId: string | null; denumire: string; cui: string | null; valoareBani: number | null },
+): Promise<
+  | { fel: "bun"; scris: string }
+  | { fel: "luat"; scris: string; deCine: string }
+  | { fel: "necitit" }
+> {
+  const m = scris.trim().match(/^(\d{1,5})(?:\s*\/\s*(\d{4}))?$/);
+  if (!m) return { fel: "necitit" };
+  const numar = Number(m[1]);
+  const an = m[2] ? Number(m[2]) : new Date().getFullYear();
+  const existente = await intreaba<Rand>(
+    `SELECT ${COLOANE} FROM contracte WHERE an = $1 AND numar = $2 LIMIT 1`,
+    [an, numar],
+  );
+  const e = existente[0] ? dinRand(existente[0]) : null;
+  if (e) {
+    const aceeasi =
+      (d.firmaId && e.firmaId === d.firmaId) ||
+      (d.cui && e.cui === d.cui) ||
+      e.denumire === d.denumire;
+    return aceeasi ? { fel: "bun", scris: e.scris } : { fel: "luat", scris: e.scris, deCine: e.denumire };
+  }
+  await intreaba(
+    `INSERT INTO contracte (an, numar, firma_id, denumire, cui, valoare_bani, data_contract)
+     VALUES ($1, $2, $3, $4, $5, $6, current_date)
+     ON CONFLICT (an, numar) DO NOTHING`,
+    [an, numar, d.firmaId, d.denumire, d.cui, d.valoareBani],
+  );
+  return { fel: "bun", scris: `${numar}/${an}` };
+}

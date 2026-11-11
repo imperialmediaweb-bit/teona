@@ -95,6 +95,26 @@ export async function totiVoluntarii(): Promise<Voluntar[]> {
   return (await cereri("voluntariat", undefined, 2000)).map(laVoluntar);
 }
 
+/**
+ * Același om înscris de două ori (a completat formularul din nou) apare de
+ * două ori în listă; la un apel primește un singur e-mail. Se păstrează
+ * fișa cea mai nouă — lista vine cu cele noi primele.
+ */
+export function faraDubluri(lista: Voluntar[]): Voluntar[] {
+  const vazuti = new Set<string>();
+  return lista.filter((v) => {
+    const chei = [
+      v.email ? `e:${v.email.trim().toLowerCase()}` : "",
+      (v.telefon ?? "").replace(/\D/g, "").slice(-9).length === 9
+        ? `t:${(v.telefon ?? "").replace(/\D/g, "").slice(-9)}`
+        : "",
+    ].filter(Boolean);
+    if (chei.some((k) => vazuti.has(k))) return false;
+    for (const k of chei) vazuti.add(k);
+    return true;
+  });
+}
+
 export function filtreaza(lista: Voluntar[], f: FiltreVoluntari): Voluntar[] {
   const q = simplu(f.q ?? "");
   const loc = simplu(f.localitate ?? "");

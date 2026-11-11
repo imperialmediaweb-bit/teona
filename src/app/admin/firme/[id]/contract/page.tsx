@@ -177,7 +177,10 @@ async function Continut({
             <span className="font-titlu text-mic font-bold text-cerneala">
               Număr contract
             </span>
-            <input name="numar" className={camp} placeholder="12" />
+            <span className="text-nota text-cerneala-slab">
+              Lasă gol: se pune singur, următorul din registru.
+            </span>
+            <input name="numar" className={camp} placeholder="se pune singur" />
           </label>
           <label className="grid gap-1.5">
             <span className="font-titlu text-mic font-bold text-cerneala">

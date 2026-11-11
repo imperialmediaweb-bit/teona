@@ -2,10 +2,12 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import {
   areCheiCloudinary,
+  cateEroriCloudinary,
   dosare,
   pozeDinDosar,
 } from "@/lib/cloudinary-listare";
 import { PREFIX_CLOUD } from "@/lib/cloud";
+import { cacheRezerva } from "@/lib/cache-panou";
 import type { ProiectAfisat } from "./proiecte-tipuri";
 
 /**
@@ -171,6 +173,19 @@ export async function pozeCloudProiect(
 
   if (!areCheiCloudinary()) return [];
 
+  // O eroare de la Cloudinary (rețea, limită) nu ține galeria goală o oră:
+  // rezultatul se reîncearcă în câteva secunde.
+  const inainte = cateEroriCloudinary();
+  const poze = await gasestePoze(an, dataCitita, dosarScris).catch(() => [] as string[]);
+  if (cateEroriCloudinary() !== inainte) cacheRezerva();
+  return poze;
+}
+
+async function gasestePoze(
+  an: string,
+  dataCitita: string,
+  dosarScris?: string,
+): Promise<string[]> {
   const anul = `${RADACINA}/${an}`;
 
   // Folder scris de mână: nu mai are rost să citim lista și să potrivim.
@@ -267,7 +282,10 @@ export async function pozeDinDosarScris(dosar: string): Promise<string[]> {
   cacheTag(ETICHETA_POZE_CLOUD);
   if (!areCheiCloudinary()) return [];
   const cale = dosar.startsWith(`${RADACINA}/`) ? dosar : `${RADACINA}/${dosar}`;
-  return pozeCuSubdosare(cale).catch(() => []);
+  const inainte = cateEroriCloudinary();
+  const poze = await pozeCuSubdosare(cale).catch(() => [] as string[]);
+  if (cateEroriCloudinary() !== inainte) cacheRezerva();
+  return poze;
 }
 
 /** Același lucru, pentru o listă întreagă. */

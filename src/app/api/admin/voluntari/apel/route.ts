@@ -8,6 +8,7 @@ import {
   creeazaApel,
   linkRaspuns,
   scrieIntrebat,
+  faraDubluri,
   totiVoluntarii,
 } from "@/lib/voluntari";
 
@@ -50,7 +51,7 @@ export async function POST(cerere: Request) {
   const peEmail = formular.get("pe_email") === "da";
 
   const alese = new Set(formular.getAll("voluntar").map(String));
-  const voluntari = (await totiVoluntarii()).filter((v) => alese.has(v.id));
+  const voluntari = faraDubluri((await totiVoluntarii()).filter((v) => alese.has(v.id)));
   if (!voluntari.length) return nuTrece("Bifează cel puțin un voluntar.");
   if (peEmail && !areEmail()) return nuTrece("Trimiterea de e-mailuri nu e configurată pe site.");
   // Un apel e o întrebare către câțiva oameni, nu o campanie.

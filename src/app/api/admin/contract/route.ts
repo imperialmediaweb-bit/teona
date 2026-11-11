@@ -12,7 +12,7 @@ import {
   numeleFisierului,
   type DateContract,
 } from "@/lib/contract";
-import { numarPentruContract } from "@/lib/contracte";
+import { numarPentruContract, numarScrisDeMana } from "@/lib/contracte";
 import { citesteSuma } from "@/lib/suma";
 import { inBani } from "@/date/plati";
 import { contractWord } from "@/lib/contract-word";
@@ -58,6 +58,25 @@ export async function POST(cerere: Request) {
     mai bine un contract fără număr decât o firmă care așteaptă.
   */
   let numar = camp("numar");
+  const pentruRegistru = {
+    firmaId: id,
+    denumire: camp("denumire") || firma.denumire,
+    cui: normalizeazaCui(camp("cui")) || firma.cui,
+    valoareBani: (() => {
+      const { suma } = citesteSuma(camp("valoare"));
+      return suma === null ? null : inBani(suma);
+    })(),
+  };
+  if (numar) {
+    // Scris de mână: intră și el în registru, iar unul luat de altă firmă e oprit.
+    const scris = await numarScrisDeMana(numar, pentruRegistru).catch(() => null);
+    if (scris?.fel === "luat") {
+      return nuTrece(
+        `Numărul ${scris.scris} e deja în registru, la ${scris.deCine}. Lasă câmpul gol și numărul se pune singur.`,
+      );
+    }
+    if (scris?.fel === "bun") numar = scris.scris;
+  }
   if (!numar) {
     const inregistrat = await numarPentruContract({
       firmaId: id,

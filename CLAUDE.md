@@ -1817,11 +1817,19 @@ formă, rulându-le. Reparate (lista întreagă e în istoricul depozitului):
 - `/ziua-ta/<inexistent>` răspunde 404; „Fac alt folder” spune că înlocuiește.
 
 **Rămase**: cele două e-mailuri despre Formularul 230 spun lucruri diferite
-despre hârtia semnată (întrebare pentru asociație); exportul pentru Excel are
-datele în UTC și pierde zeroul din telefoane; un voluntar înscris de două ori
-primește apelul de două ori; numărul de contract scris de mână ocolește
-registrul; `sesiuneProaspata` socotește proaspete ultimele 12 ore ale unei
-sesiuni lungi; o eroare Cloudinary se ține o oră ca galerie goală.
+despre hârtia semnată (întrebare pentru asociație); `sesiuneProaspata`
+socotește proaspete ultimele 12 ore ale unei sesiuni lungi.
+
+**Reparate pe 11 noiembrie, seara**: exportul pentru Excel scrie datele la
+ora României și telefonul ca `="0754…"` (Excel îi păstrează zeroul); un
+voluntar înscris de două ori primește un singur apel (`faraDubluri`, după
+e-mail sau ultimele nouă cifre ale telefonului); un număr de contract scris
+de mână intră în registru, iar unul luat de altă firmă e refuzat
+(`numarScrisDeMana`); o eroare Cloudinary (nu un 404) nu mai ține galeria
+goală o oră — `cateEroriCloudinary()` crește, iar citirea cheamă
+`cacheRezerva()`. Răspunsurile HTML ale șablonului și ale mesajelor din
+panou au `Cache-Control: no-transform`: altfel Cloudflare înlocuia adresele
+de e-mail din ele cu „[email protected]” și un script.
 
 ## Formularul de scris pe site: titlu, text, poze, „Publică”
 

@@ -35,12 +35,35 @@ function bani(valoare: unknown): string {
 }
 
 /** O dată, scrisă scurt. ISO fără milisecunde: se sortează corect ca text. */
+const ORA_RO = new Intl.DateTimeFormat("sv-SE", {
+  timeZone: "Europe/Bucharest",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+});
+
+/** Data și ora la ora României („2026-11-11 18:05:00”), nu în UTC. */
 function cand(valoare: unknown): string {
   if (!valoare) return "";
   const data = valoare instanceof Date ? valoare : new Date(String(valoare));
-  return Number.isNaN(data.getTime())
-    ? String(valoare)
-    : data.toISOString().slice(0, 19).replace("T", " ");
+  return Number.isNaN(data.getTime()) ? String(valoare) : ORA_RO.format(data);
+}
+
+/**
+ * Un telefon scris ca text pentru Excel. Citit ca număr, „0754 510 167”
+ * devine 754510167: zeroul din față dispare. Scris `="0754510167"`, Excel îl
+ * ține întreg.
+ */
+class TextExcel {
+  constructor(readonly text: string) {}
+}
+
+function telefon(valoare: unknown): unknown {
+  if (valoare === null || valoare === undefined || valoare === "") return "";
+  return new TextExcel(String(valoare));
 }
 
 /** Da/nu, nu `true`/`false`: fișierul se citește de oameni. */
@@ -54,6 +77,13 @@ function celula(valoare: unknown): string {
   if (valoare === null || valoare === undefined) return "";
 
   if (valoare instanceof Date) return `"${cand(valoare)}"`;
+
+  if (valoare instanceof TextExcel) {
+    const t = valoare.text.trim();
+    // Numai cifre, spații și „+” din față: altceva trece pe calea obișnuită.
+    if (/^\+?[0-9 ./-]+$/.test(t)) return `"=""${t}"""`;
+    return celula(t);
+  }
 
   const text = String(valoare);
   /*
@@ -122,7 +152,7 @@ const COLOANE: Record<ListaExport, Coloana[]> = {
     { titlu: "Prenume", cheie: "prenume" },
     { titlu: "Nume", cheie: "nume" },
     { titlu: "E-mail", cheie: "email" },
-    { titlu: "Telefon", cheie: "telefon" },
+    { titlu: "Telefon", cheie: "telefon", cum: telefon },
     { titlu: "Acord buletin", cheie: "acord_buletin", cum: daNu },
     { titlu: "Adăugată de", cheie: "adaugat_de" },
     { titlu: "Observații", cheie: "observatii" },
@@ -131,7 +161,7 @@ const COLOANE: Record<ListaExport, Coloana[]> = {
     { titlu: "E-mail", cheie: "email" },
     { titlu: "Prenume", cheie: "prenume" },
     { titlu: "Nume", cheie: "nume" },
-    { titlu: "Telefon", cheie: "telefon" },
+    { titlu: "Telefon", cheie: "telefon", cum: telefon },
     { titlu: "Câte donații", cheie: "donatii" },
     { titlu: "Total lei", cheie: "total_lei", cum: bani },
     { titlu: "Prima donație", cheie: "prima", cum: cand },
@@ -148,7 +178,7 @@ const COLOANE: Record<ListaExport, Coloana[]> = {
     { titlu: "Stadiu", cheie: "stadiu" },
     { titlu: "Persoană", cheie: "persoana" },
     { titlu: "E-mail", cheie: "email" },
-    { titlu: "Telefon", cheie: "telefon" },
+    { titlu: "Telefon", cheie: "telefon", cum: telefon },
     { titlu: "Sumă estimată", cheie: "suma_estimata" },
     { titlu: "Încasat (lei)", cheie: "incasat_lei", cum: bani },
     { titlu: "De pe pagina", cheie: "cale" },
@@ -161,7 +191,7 @@ const COLOANE: Record<ListaExport, Coloana[]> = {
     { titlu: "Stadiu", cheie: "stadiu" },
     { titlu: "Nume", cheie: "nume" },
     { titlu: "E-mail", cheie: "email" },
-    { titlu: "Telefon", cheie: "telefon" },
+    { titlu: "Telefon", cheie: "telefon", cum: telefon },
     {
       titlu: "Detalii",
       cheie: "detalii",
@@ -231,6 +261,6 @@ export async function dateleListei(
 
 /** Numele fișierului: lista și ziua, ca să nu se suprascrie în Descărcări. */
 export function numeleFisierului(lista: ListaExport): string {
-  const zi = new Date().toISOString().slice(0, 10);
+  const zi = ORA_RO.format(new Date()).slice(0, 10);
   return `teona-${lista}-${zi}.csv`;
 }

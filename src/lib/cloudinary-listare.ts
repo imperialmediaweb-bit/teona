@@ -81,6 +81,17 @@ function acreditari() {
  * în jurnalul Railway, cu codul și calea cerută. Nici cheia, nici secretul nu
  * ajung în jurnal: antetul nu e scris niciodată.
  */
+let erori = 0;
+
+/**
+ * Câte cereri la Cloudinary au căzut de la pornire. O galerie citită în timp
+ * ce numărul a crescut e goală din cauza unei erori, nu fiindcă folderul e
+ * gol: n-are voie să stea o oră în cache (`pozeCloudProiect`).
+ */
+export function cateEroriCloudinary(): number {
+  return erori;
+}
+
 async function cere<T>(cale: string): Promise<T | null> {
   const a = acreditari();
   if (!a) {
@@ -96,10 +107,13 @@ async function cere<T>(cale: string): Promise<T | null> {
     });
     if (!raspuns.ok) {
       console.warn(`[cloudinary] ${raspuns.status} la /${cale}`);
+      // 404 = folderul nu există: răspuns adevărat, nu eroare.
+      if (raspuns.status !== 404) erori++;
       return null;
     }
     return (await raspuns.json()) as T;
   } catch (eroare) {
+    erori++;
     console.warn(
       `[cloudinary] cererea la /${cale} a căzut:`,
       eroare instanceof Error ? eroare.message : eroare,
