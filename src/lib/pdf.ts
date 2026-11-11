@@ -29,6 +29,8 @@ function fonturi() {
   return octeti;
 }
 
+export type Culoare = ReturnType<typeof rgb>;
+
 export const CERNEALA = rgb(0.14, 0.14, 0.14);
 export const MOALE = rgb(0.38, 0.38, 0.38);
 
@@ -70,9 +72,11 @@ export class Cursor {
   constructor(
     private doc: Document,
     private latime = A4.latime - 2 * MARGINE,
+    /** Loc lăsat sus pe fiecare pagină, pentru un antet desenat după. */
+    private sus = 0,
   ) {
     this.pagina = doc.pdf.addPage([A4.latime, A4.inaltime]);
-    this.y = A4.inaltime - MARGINE;
+    this.y = A4.inaltime - MARGINE - sus;
   }
 
   /** Taie textul în rânduri care încap pe lățimea dată. */
@@ -98,7 +102,7 @@ export class Cursor {
   private locPentru(inaltime: number) {
     if (this.y - inaltime < MARGINE) {
       this.pagina = this.doc.pdf.addPage([A4.latime, A4.inaltime]);
-      this.y = A4.inaltime - MARGINE;
+      this.y = A4.inaltime - MARGINE - this.sus;
     }
   }
 
@@ -280,6 +284,144 @@ export class Cursor {
       height: inaltime,
     });
     this.y -= 6;
+    return this;
+  }
+
+  /**
+   * Text din bucăți cu înfățișări diferite — „Art. 4.” îngroșat și portocaliu,
+   * apoi clauza —, tăiat în rânduri ca unul singur.
+   *
+   * `justificat` întinde rândurile pline până la marginea din dreapta, ca în
+   * contractul tipărit al asociației; ultimul rând al paragrafului rămâne la
+   * stânga, altfel ar avea goluri de un deget între cuvinte.
+   */
+  scrieBogat(
+    bucati: ReadonlyArray<{ text: string; gros?: boolean; culoare?: Culoare }>,
+    {
+      marime = 10,
+      spatiuDupa = 6,
+      indent = 0,
+      latime,
+      justificat = false,
+      centrat = false,
+      interlinie = 1.45,
+    }: {
+      marime?: number;
+      spatiuDupa?: number;
+      indent?: number;
+      latime?: number;
+      justificat?: boolean;
+      centrat?: boolean;
+      interlinie?: number;
+    } = {},
+  ): this {
+    type Cuvant = { text: string; font: PDFFont; culoare: Culoare; lat: number; lipit: boolean };
+    const cuvinte: Cuvant[] = [];
+    // Un spațiu la capătul unei bucăți desparte și de bucata următoare.
+    let dupaSpatiu = true;
+    for (const b of bucati) {
+      const font = b.gros ? this.doc.gros : this.doc.normal;
+      const parti = b.text.split(/(\s+)/);
+      let lipit = !dupaSpatiu && !/^\s/.test(b.text);
+      dupaSpatiu = /\s$/.test(b.text) || (dupaSpatiu && b.text.trim() === "");
+      for (const p of parti) {
+        if (!p) continue;
+        if (/^\s+$/.test(p)) {
+          lipit = false;
+          continue;
+        }
+        cuvinte.push({ text: p, font, culoare: b.culoare ?? CERNEALA, lat: font.widthOfTextAtSize(p, marime), lipit });
+        lipit = true;
+      }
+    }
+    const spatiu = this.doc.normal.widthOfTextAtSize(" ", marime);
+    const loc = latime ?? this.latime - indent;
+    const randuri: Cuvant[][] = [];
+    let rand: Cuvant[] = [];
+    let ocupat = 0;
+    for (const c of cuvinte) {
+      const adaos = rand.length && !c.lipit ? spatiu + c.lat : c.lat;
+      if (rand.length && !c.lipit && ocupat + adaos > loc) {
+        randuri.push(rand);
+        rand = [{ ...c, lipit: false }];
+        ocupat = c.lat;
+      } else {
+        rand.push(c);
+        ocupat += adaos;
+      }
+    }
+    if (rand.length) randuri.push(rand);
+
+    const inaltimeRand = marime * interlinie;
+    randuri.forEach((r, i) => {
+      this.locPentru(inaltimeRand);
+      this.y -= inaltimeRand;
+      const goluri = r.filter((c, k) => k > 0 && !c.lipit).length;
+      const latRand = r.reduce((s, c, k) => s + c.lat + (k > 0 && !c.lipit ? spatiu : 0), 0);
+      const ultimul = i === randuri.length - 1;
+      const extra = justificat && !ultimul && goluri > 0 ? (loc - latRand) / goluri : 0;
+      let x = MARGINE + indent + (centrat ? (loc - latRand) / 2 : 0);
+      r.forEach((c, k) => {
+        if (k > 0 && !c.lipit) x += spatiu + extra;
+        this.pagina.drawText(c.text, { x, y: this.y, size: marime, font: c.font, color: c.culoare });
+        x += c.lat;
+      });
+    });
+    this.y -= spatiuDupa;
+    return this;
+  }
+
+  /** Un titlu cu literele rărite, centrat sau la stânga. */
+  scrieRarit(
+    text: string,
+    {
+      marime = 15,
+      culoare = CERNEALA,
+      rarire = 2,
+      centrat = false,
+      spatiuDupa = 6,
+    }: { marime?: number; culoare?: Culoare; rarire?: number; centrat?: boolean; spatiuDupa?: number } = {},
+  ): this {
+    const font = this.doc.gros;
+    const litere = [...text];
+    const lat =
+      litere.reduce((s, l) => s + font.widthOfTextAtSize(l, marime), 0) +
+      rarire * (litere.length - 1);
+    const inaltimeRand = marime * 1.45;
+    this.locPentru(inaltimeRand);
+    this.y -= inaltimeRand;
+    let x = centrat ? MARGINE + (this.latime - lat) / 2 : MARGINE;
+    for (const l of litere) {
+      this.pagina.drawText(l, { x, y: this.y, size: marime, font, color: culoare });
+      x += font.widthOfTextAtSize(l, marime) + rarire;
+    }
+    this.y -= spatiuDupa;
+    return this;
+  }
+
+  /**
+   * Un chenar cu fundal și bară în stânga, desenat **înainte** de textul din
+   * el: pdf-lib pictează în ordinea apelurilor, deci un fundal pus după ar
+   * acoperi scrisul. De aceea înălțimea se dă dinainte, iar blocul întreg se
+   * mută pe pagina următoare dacă n-ar încăpea.
+   */
+  chenar(
+    inaltime: number,
+    { fundal, bara, latimeBara = 3 }: { fundal?: Culoare; bara?: Culoare; latimeBara?: number } = {},
+  ): this {
+    this.locPentru(inaltime);
+    if (fundal) {
+      this.pagina.drawRectangle({ x: MARGINE, y: this.y - inaltime, width: this.latime, height: inaltime, color: fundal });
+    }
+    if (bara) {
+      this.pagina.drawRectangle({ x: MARGINE, y: this.y - inaltime, width: latimeBara, height: inaltime, color: bara });
+    }
+    return this;
+  }
+
+  /** O bară verticală în stânga, de la `y` până unde a ajuns cursorul (aceeași pagină). */
+  baraDeLa(y: number, culoare: Culoare, latime = 3): this {
+    this.pagina.drawRectangle({ x: MARGINE, y: this.y, width: latime, height: y - this.y, color: culoare });
     return this;
   }
 

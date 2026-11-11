@@ -1,5 +1,7 @@
 import { ASOCIATIA, ADRESE, JURIDIC, TELEFON_PRINCIPAL } from "@/date/asociatie";
-import { Cursor, MOALE, documentNou } from "./pdf";
+import { A4, Cursor, MARGINE, MOALE, documentNou } from "./pdf";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { rgb } from "pdf-lib";
 
 /**
@@ -89,175 +91,241 @@ function sau(valoare: string, lungime = 1): string {
 }
 
 const PORTOCALIU = rgb(0.84, 0.27, 0.08);
+const PIERSICA = rgb(0.995, 0.955, 0.925);
 
 export async function contractDeSponsorizare(
   date: DateContract,
 ): Promise<Uint8Array> {
   const doc = await documentNou();
-  const c = new Cursor(doc);
+  // 46 de puncte sus pentru antetul cu siglă, desenat pe fiecare pagină la final.
+  const c = new Cursor(doc, undefined, 46);
+  const normal = doc.normal;
 
-  c.scrie(ASOCIATIA.denumire, { gros: true, marime: 13, spatiuDupa: 2 });
-  c.scrie(
-    `${ADRESE.sediuSocial.strada}, ${ADRESE.sediuSocial.oras} · ${TELEFON_PRINCIPAL.afisat} · ${JURIDIC.email}`,
-    { marime: 8.5, culoare: MOALE, spatiuDupa: 14 },
-  );
-
-  c.scrie("CONTRACT DE SPONSORIZARE", {
-    gros: true,
+  c.scrieRarit("CONTRACT DE SPONSORIZARE", {
     marime: 15,
     culoare: PORTOCALIU,
+    rarire: 2.2,
+    centrat: true,
+    spatiuDupa: 2,
+  });
+  c.scrieBogat(
+    [
+      { text: "Nr. ", culoare: MOALE },
+      { text: sau(date.numar) },
+      { text: "   din data de ", culoare: MOALE },
+      { text: sau(date.data) },
+    ],
+    { marime: 9.5, centrat: true, spatiuDupa: 14 },
+  );
+
+  const titlu = (text: string) => {
+    // Un titlu nu rămâne singur jos pe pagină: trece cu primul rând după el.
+    c.rezerva(60);
+    c.scrieRarit(text, { marime: 10.5, culoare: PORTOCALIU, rarire: 1.1, spatiuDupa: 0 });
+    c.linie();
+  };
+  const articol = (nr: string, text: string, spatiuDupa = 7) =>
+    c.scrieBogat(
+      [{ text: `Art. ${nr}. `, gros: true, culoare: PORTOCALIU }, { text }],
+      { justificat: true, spatiuDupa, marime: 9.5 },
+    );
+  const punct = (text: string, spatiuDupa = 3) =>
+    c.scrieBogat(
+      [{ text: "•  ", gros: true, culoare: PORTOCALIU }, { text }],
+      { justificat: true, spatiuDupa, marime: 9.5, indent: 14 },
+    );
+
+  titlu("I. PĂRȚILE CONTRACTANTE");
+  c.scrieBogat([{ text: "Art. 1. ", gros: true, culoare: PORTOCALIU }, { text: "Între:" }], {
+    marime: 9.5,
+    spatiuDupa: 5,
+  });
+
+  // Firma: rândurile din contractul lor, cu bară portocalie în stânga.
+  const eticheta = (text: string, gros = false) => ({ text, culoare: MOALE, gros });
+  const susFirma = c.pozitia();
+  const randFirma = (bucati: Parameters<Cursor["scrieBogat"]>[0]) =>
+    c.scrieBogat(bucati, { marime: 9.5, indent: 14, spatiuDupa: 4 });
+  c.rezerva(110);
+  c.spatiu(2);
+  randFirma([eticheta("Denumire: ", true), { text: sau(date.denumire, 60) }]);
+  randFirma([
+    eticheta("cu sediul în "),
+    { text: sau(date.sediu, 50) },
+    eticheta("   jud. "),
+    { text: sau(date.judet, 16) },
+  ]);
+  randFirma([
+    eticheta("CUI/CIF "),
+    { text: sau(date.cui, 20) },
+    eticheta("   Nr. Reg. Com. "),
+    { text: sau(date.regCom, 30) },
+  ]);
+  randFirma([
+    eticheta("reprezentată legal prin "),
+    { text: sau(date.reprezentant, 30) },
+    eticheta("   în calitate de "),
+    { text: sau(date.calitate, 24) },
+  ]);
+  randFirma([
+    eticheta("telefon "),
+    { text: sau(date.telefon, 24) },
+    eticheta("   e-mail "),
+    { text: sau(date.email, 30) },
+  ]);
+  c.baraDeLa(susFirma - 2, PORTOCALIU, 2.5);
+  c.spatiu(6);
+  c.scrieBogat([{ text: "denumită în continuare " }, { text: "SPONSOR", gros: true }], {
+    marime: 9.5,
+    spatiuDupa: 6,
+  });
+  c.scrieBogat([{ text: "și", culoare: MOALE }], { marime: 9.5, centrat: true, spatiuDupa: 8 });
+
+  // Asociația: tabel în chenar, cu fundal, ca în contractul lor.
+  const COLOANA = 112;
+  const MARIME_TABEL = 8.8;
+  const randuriAsociatie: Array<[string, string]> = [
+    ["Sediul", `${ADRESE.sediuSocial.strada}, ${ADRESE.sediuSocial.oras}, jud. Suceava`],
+    ["CIF", ASOCIATIA.cif],
+    ["Registrul special", JURIDIC.registru],
+    ["Telefon / e-mail", `${TELEFON_PRINCIPAL.afisat} · ${JURIDIC.email}`],
+    ...JURIDIC.conturi.map((cont): [string, string] => [`Cont ${cont.moneda}`, `${cont.iban} – ${cont.banca}`]),
+    ["Reprezentant legal", `${JURIDIC.reprezentant}, ${JURIDIC.calitate}`],
+  ];
+  const latValoare = A4.latime - 2 * MARGINE - COLOANA - 10;
+  const linii = (text: string) => {
+    let n = 1;
+    let rand = "";
+    for (const cuv of text.split(" ")) {
+      const inc = rand ? `${rand} ${cuv}` : cuv;
+      if (normal.widthOfTextAtSize(inc, MARIME_TABEL) > latValoare && rand) {
+        n++;
+        rand = cuv;
+      } else rand = inc;
+    }
+    return n;
+  };
+  const inaltimeRand = MARIME_TABEL * 1.45;
+  const inaltimeChenar =
+    10 + 9.5 * 1.45 + 5 + randuriAsociatie.reduce((s, [, v]) => s + linii(v) * inaltimeRand + 1.5, 0) + 9;
+  c.chenar(inaltimeChenar, { fundal: PIERSICA, bara: PORTOCALIU, latimeBara: 2.5 });
+  c.spatiu(10);
+  c.scrie(ASOCIATIA.denumireLegala, { gros: true, marime: 9.5, spatiuDupa: 5, indent: 14 });
+  for (const [et, val] of randuriAsociatie) {
+    const y0 = c.pozitia();
+    c.scrieBogat([{ text: val }], {
+      marime: MARIME_TABEL,
+      indent: COLOANA,
+      latime: latValoare,
+      spatiuDupa: 1.5,
+    });
+    c.pozitie.pagina.drawText(et, {
+      x: MARGINE + 14,
+      y: y0 - inaltimeRand,
+      size: MARIME_TABEL,
+      font: normal,
+      color: MOALE,
+    });
+  }
+  c.spatiu(9 + 8);
+
+  c.scrieBogat([{ text: "denumită în continuare " }, { text: "BENEFICIAR", gros: true }], {
+    marime: 9.5,
     spatiuDupa: 4,
   });
-  c.scrie(`Nr. ${sau(date.numar)}   din data de ${sau(date.data)}`, {
-    marime: 10,
-    culoare: MOALE,
-    spatiuDupa: 13,
-  });
-
-  c.scrie("I. PĂRȚILE CONTRACTANTE", {
-    gros: true,
-    marime: 11,
-    culoare: PORTOCALIU,
-  });
-  c.linie();
-  c.scrie("Art. 1. Între:", { gros: true, spatiuDupa: 8 });
-
-  const rand = (eticheta: string, valoare: string) =>
-    c.scrie(`${eticheta}  ${sau(valoare, 60)}`, { spatiuDupa: 5, indent: 14 });
-
-  rand("Denumire:", date.denumire);
-  rand("cu sediul în", `${date.sediu}${date.judet ? `, jud. ${date.judet}` : ""}`);
-  rand("CUI/CIF", `${date.cui}     Nr. Reg. Com.  ${sau(date.regCom, 30)}`);
-  rand(
-    "reprezentată legal prin",
-    `${sau(date.reprezentant, 30)}     în calitate de  ${sau(date.calitate, 24)}`,
-  );
-  rand("telefon", `${sau(date.telefon, 24)}     e-mail  ${sau(date.email, 30)}`);
-
-  c.spatiu(4);
-  c.scrie("denumită în continuare SPONSOR", { spatiuDupa: 8 });
-  c.scrie("și", { marime: 10, culoare: MOALE, spatiuDupa: 8, indent: 230 });
-
-  c.scrie(ASOCIATIA.denumireLegala, { gros: true, spatiuDupa: 7 });
-  const rand2 = (eticheta: string, valoare: string) =>
-    c.scrie(`${eticheta.padEnd(18, " ")} ${valoare}`, {
-      marime: 9.5,
-      spatiuDupa: 3,
-      indent: 14,
-    });
-  rand2(
-    "Sediul",
-    `${ADRESE.sediuSocial.strada}, ${ADRESE.sediuSocial.oras}, jud. Suceava`,
-  );
-  rand2("CIF", ASOCIATIA.cif);
-  rand2("Registrul special", JURIDIC.registru);
-  rand2("Telefon / e-mail", `${TELEFON_PRINCIPAL.afisat} · ${JURIDIC.email}`);
-  for (const cont of JURIDIC.conturi) {
-    rand2(`Cont ${cont.moneda}`, `${cont.iban} – ${cont.banca}`);
-  }
-  rand2("Reprezentant legal", `${JURIDIC.reprezentant}, ${JURIDIC.calitate}`);
-
-  c.spatiu(6);
-  c.scrie("denumită în continuare BENEFICIAR", { spatiuDupa: 6 });
-  c.scrie(
-    "au convenit încheierea prezentului contract de sponsorizare, în următoarele condiții.",
-    { spatiuDupa: 9 },
+  c.scrieBogat(
+    [{ text: "au convenit încheierea prezentului contract de sponsorizare, în următoarele condiții." }],
+    { marime: 9.5, spatiuDupa: 10 },
   );
 
-  c.scrie("II. OBIECTUL ȘI VALOAREA CONTRACTULUI", {
-    gros: true,
-    marime: 11,
-    culoare: PORTOCALIU,
-  });
-  c.linie();
-  c.scrie(
-    "Art. 2. Având în vedere că Asociația Teona Ariana Suceava este o organizație de sine stătătoare, neguvernamentală, apolitică și fără scop patrimonial, cu patrimoniu și scop determinat, cu personalitate juridică conform legii, având ca scop identificarea și ajutorarea copiilor, tinerilor și adulților cu probleme de sănătate și a celor cu dizabilități, a vârstnicilor neajutorați, integrarea acestora în standardele unei societăți civilizate, precum și ajutorarea familiilor nevoiașe și a altor persoane care necesită ajutor, inclusiv prin activități de voluntariat,",
-    { spatiuDupa: 8 },
+  titlu("II. OBIECTUL ȘI VALOAREA CONTRACTULUI");
+  articol(
+    "2",
+    "Având în vedere că Asociația Teona Ariana Suceava este o organizație de sine stătătoare, neguvernamentală, apolitică și fără scop patrimonial, cu patrimoniu și scop determinat, cu personalitate juridică conform legii, având ca scop identificarea și ajutorarea copiilor, tinerilor și adulților cu probleme de sănătate și a celor cu dizabilități, a vârstnicilor neajutorați, integrarea acestora în standardele unei societăți civilizate, precum și ajutorarea familiilor nevoiașe și a altor persoane care necesită ajutor, inclusiv prin activități de voluntariat,",
   );
-  c.scrie(
-    "obiectul prezentului contract îl constituie sponsorizarea de către SPONSOR a proiectelor desfășurate de BENEFICIAR.",
-    { spatiuDupa: 8 },
+  c.scrieBogat(
+    [{ text: "obiectul prezentului contract îl constituie sponsorizarea de către SPONSOR a proiectelor desfășurate de BENEFICIAR." }],
+    { marime: 9.5, justificat: true, spatiuDupa: 7 },
   );
-  c.scrie(`Art. 3. Valoarea contractului este de ${sau(date.valoare, 24)} lei`, {
-    spatiuDupa: 9,
-  });
+  c.scrieBogat(
+    [
+      { text: "Art. 3. ", gros: true, culoare: PORTOCALIU },
+      { text: "Valoarea contractului este de " },
+      { text: `${sau(date.valoare, 24)} lei`, gros: true },
+    ],
+    { marime: 9.5, spatiuDupa: 10 },
+  );
 
-  c.scrie("III. OBLIGAȚIILE PĂRȚILOR", {
-    gros: true,
-    marime: 11,
-    culoare: PORTOCALIU,
-  });
-  c.linie();
+  titlu("III. OBLIGAȚIILE PĂRȚILOR");
   const clauze = CLAUZE_PLATA[date.fel ?? "direct"];
-  c.scrie(`Art. 4. ${clauze.art4}`, { spatiuDupa: 8 });
-  c.scrie("Art. 5. BENEFICIARUL se obligă:", { spatiuDupa: 6 });
-  c.scrie(
-    "•  să aducă la cunoștința publicului larg numele SPONSORULUI, prin diverse modalități;",
-    { spatiuDupa: 4, indent: 14 },
-  );
-  c.scrie(
-    "•  să folosească sumele primite exclusiv în scop caritabil și pentru ajutorarea persoanelor aflate în nevoie.",
-    { spatiuDupa: clauze.obligatiaSponsorului ? 6 : 9, indent: 14 },
+  articol("4", clauze.art4);
+  articol("5", "BENEFICIARUL se obligă:", 4);
+  punct("să aducă la cunoștința publicului larg numele SPONSORULUI, prin diverse modalități;");
+  punct(
+    "să folosească sumele primite exclusiv în scop caritabil și pentru ajutorarea persoanelor aflate în nevoie.",
+    clauze.obligatiaSponsorului ? 5 : 10,
   );
   if (clauze.obligatiaSponsorului) {
-    c.scrie(clauze.obligatiaSponsorului, { spatiuDupa: 9, indent: 14 });
+    c.scrieBogat([{ text: clauze.obligatiaSponsorului }], {
+      marime: 9.5,
+      justificat: true,
+      indent: 14,
+      spatiuDupa: 10,
+    });
   }
 
-  c.scrie("IV. DURATA CONTRACTULUI", {
-    gros: true,
-    marime: 11,
-    culoare: PORTOCALIU,
-  });
-  c.linie();
-  c.scrie(
-    "Art. 6. Prezentul contract intră în vigoare la data semnării și este valabil până la îndeplinirea obligațiilor de către ambele părți.",
-    { spatiuDupa: 9 },
+  titlu("IV. DURATA CONTRACTULUI");
+  articol(
+    "6",
+    "Prezentul contract intră în vigoare la data semnării și este valabil până la îndeplinirea obligațiilor de către ambele părți.",
+    10,
   );
 
-  c.scrie("V. FORȚA MAJORĂ", { gros: true, marime: 11, culoare: PORTOCALIU });
-  c.linie();
-  c.scrie(
-    "Art. 7. Forța majoră exonerează părțile de răspundere în cazul neexecutării parțiale sau totale a obligațiilor asumate prin prezentul contract. Prin forță majoră se înțelege un eveniment independent de voința părților, imprevizibil și insurmontabil, apărut după încheierea contractului, care împiedică părțile să își execute total sau parțial obligațiile asumate.",
-    { spatiuDupa: 9 },
+  titlu("V. FORȚA MAJORĂ");
+  articol(
+    "7",
+    "Forța majoră exonerează părțile de răspundere în cazul neexecutării parțiale sau totale a obligațiilor asumate prin prezentul contract. Prin forță majoră se înțelege un eveniment independent de voința părților, imprevizibil și insurmontabil, apărut după încheierea contractului, care împiedică părțile să își execute total sau parțial obligațiile asumate.",
+    10,
   );
 
-  c.scrie("VI. NOTIFICĂRI", { gros: true, marime: 11, culoare: PORTOCALIU });
-  c.linie();
-  c.scrie(
-    "Art. 8. Orice notificare adresată de una dintre părți celeilalte se va face prin scrisoare recomandată (prin poștă sau curier) cu confirmare de primire sau prin e-mail cu confirmare de primire.",
-    { spatiuDupa: 9 },
+  titlu("VI. NOTIFICĂRI");
+  articol(
+    "8",
+    "Orice notificare adresată de una dintre părți celeilalte se va face prin scrisoare recomandată (prin poștă sau curier) cu confirmare de primire sau prin e-mail cu confirmare de primire.",
+    10,
   );
 
-  c.scrie("VII. CLAUZA DE CONTINUITATE", {
-    gros: true,
-    marime: 11,
-    culoare: PORTOCALIU,
-  });
-  c.linie();
-  c.scrie(
-    "Art. 9. Prezentul contract poate fi continuat de succesorii legali ai semnatarilor, cu acordul expres al celeilalte părți.",
-    { spatiuDupa: 9 },
+  titlu("VII. CLAUZA DE CONTINUITATE");
+  articol(
+    "9",
+    "Prezentul contract poate fi continuat de succesorii legali ai semnatarilor, cu acordul expres al celeilalte părți.",
+    10,
   );
 
-  c.scrie("VIII. ÎNCETAREA CONTRACTULUI", {
-    gros: true,
-    marime: 11,
-    culoare: PORTOCALIU,
-  });
-  c.linie();
-  c.scrie(
-    "Art. 10. Contractul poate înceta numai cu acordul scris al ambelor părți, cu excepția următoarelor situații:",
-    { spatiuDupa: 6 },
+  titlu("VIII. ÎNCETAREA CONTRACTULUI");
+  articol(
+    "10",
+    "Contractul poate înceta numai cu acordul scris al ambelor părți, cu excepția următoarelor situații:",
+    4,
   );
-  c.scrie("a)  realizarea obiectului contractului devine în mod evident imposibilă;", {
-    spatiuDupa: 4,
+  c.scrieBogat([{ text: "a)  ", gros: true, culoare: PORTOCALIU }, { text: "realizarea obiectului contractului devine în mod evident imposibilă;" }], {
+    marime: 9.5,
     indent: 20,
+    spatiuDupa: 3,
   });
-  c.scrie("b)  intervine un caz de forță majoră.", { spatiuDupa: 11, indent: 20 });
+  c.scrieBogat([{ text: "b)  ", gros: true, culoare: PORTOCALIU }, { text: "intervine un caz de forță majoră." }], {
+    marime: 9.5,
+    indent: 20,
+    spatiuDupa: 11,
+  });
 
-  c.scrie(
-    `Prezentul contract s-a încheiat și semnat astăzi, ${sau(date.dataSemnarii, 22)}, în două exemplare originale, cu aceeași valoare juridică, câte unul pentru fiecare parte.`,
-    { spatiuDupa: 26 },
+  c.scrieBogat(
+    [
+      {
+        text: `Prezentul contract s-a încheiat și semnat astăzi, ${sau(date.dataSemnarii, 22)}, în două exemplare originale, cu aceeași valoare juridică, câte unul pentru fiecare parte.`,
+      },
+    ],
+    { marime: 9.5, justificat: true, spatiuDupa: 26 },
   );
 
   /*
@@ -293,7 +361,48 @@ export async function contractDeSponsorizare(
 
   c.laPozitia(Math.min(dupaSponsor, c.pozitia()));
 
+  await antetSiSubsol(doc);
   return doc.pdf.save();
+}
+
+/**
+ * Sigla și datele de contact sus, numărul paginii jos — pe fiecare pagină,
+ * ca în contractul tipărit al asociației. Sigla e cea scoasă din PDF-ul lor
+ * (`continut/sigla-contract.jpg`), aceeași pe care o pune și varianta Word.
+ */
+async function antetSiSubsol(doc: Awaited<ReturnType<typeof documentNou>>) {
+  let sigla = null;
+  try {
+    sigla = await doc.pdf.embedJpg(readFileSync(join(process.cwd(), "continut", "sigla-contract.jpg")));
+  } catch {
+    // Fără siglă, contractul tot se poate semna: rămâne numele scris.
+  }
+  const pagini = doc.pdf.getPages();
+  const contact = `${ADRESE.sediuSocial.strada}, ${ADRESE.sediuSocial.oras} · ${TELEFON_PRINCIPAL.afisat} · ${JURIDIC.email}`;
+  pagini.forEach((p, i) => {
+    const susY = A4.inaltime - 30;
+    if (sigla) {
+      const lat = 104;
+      const inalt = (lat * sigla.height) / sigla.width;
+      p.drawImage(sigla, { x: MARGINE - 4, y: susY - inalt, width: lat, height: inalt });
+    } else {
+      p.drawText(ASOCIATIA.denumire, { x: MARGINE, y: susY - 20, size: 12, font: doc.gros, color: PORTOCALIU });
+    }
+    const lc = doc.normal.widthOfTextAtSize(contact, 7.5);
+    p.drawText(contact, { x: A4.latime - MARGINE - lc, y: susY - 30, size: 7.5, font: doc.normal, color: MOALE });
+
+    p.drawLine({
+      start: { x: MARGINE, y: 40 },
+      end: { x: A4.latime - MARGINE, y: 40 },
+      thickness: 0.5,
+      color: rgb(0.85, 0.82, 0.8),
+    });
+    const stanga = `Contract de sponsorizare · ${ASOCIATIA.denumire}`;
+    p.drawText(stanga, { x: MARGINE, y: 28, size: 7.5, font: doc.normal, color: MOALE });
+    const dreapta = `Pagina ${i + 1} din ${pagini.length}`;
+    const ld = doc.normal.widthOfTextAtSize(dreapta, 7.5);
+    p.drawText(dreapta, { x: A4.latime - MARGINE - ld, y: 28, size: 7.5, font: doc.normal, color: MOALE });
+  });
 }
 
 /** Numele fișierului: se vede în inbox-ul firmei, deci spune ce e. */
