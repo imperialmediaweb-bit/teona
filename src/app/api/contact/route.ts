@@ -256,7 +256,7 @@ export async function POST(cerere: Request) {
     }
     return raspuns(
       "Nu am putut trimite mesajul acum. Încearcă din nou peste câteva minute sau scrie-ne direct:",
-      502,
+      503,
     );
   }
 

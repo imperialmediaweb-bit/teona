@@ -41,7 +41,7 @@ export async function POST(cerere: Request) {
 
   const indreptat = await indreaptaTextul(text);
   if (!indreptat) {
-    return raspuns("N-am putut îndrepta textul acum. Încearcă din nou.", 502);
+    return raspuns("N-am putut îndrepta textul acum. Încearcă din nou.", 503);
   }
 
   return Response.json({ text: indreptat });

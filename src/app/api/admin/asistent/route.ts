@@ -56,7 +56,7 @@ export async function POST(cerere: Request) {
   if (!ciorna) {
     return raspuns(
       "Nu am putut scrie ciorna acum. Încearcă din nou peste un minut.",
-      502,
+      503,
     );
   }
 

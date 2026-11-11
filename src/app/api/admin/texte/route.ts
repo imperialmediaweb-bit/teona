@@ -121,7 +121,7 @@ async function posteaza(cerere: Request) {
     }
     const urcata = await urcaPoza(octeti, tipPoza, "noutati");
     if (!urcata)
-      return nuTrece("Nu am putut urca poza. Încearcă din nou.", 502);
+      return nuTrece("Nu am putut urca poza. Încearcă din nou.", 503);
     poza = { ...urcata, alt };
   } else if (camp("poza_alt")) {
     // Fără fișier nou, dar cu descriere schimbată: se păstrează poza și i se

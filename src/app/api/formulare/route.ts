@@ -207,7 +207,7 @@ export async function POST(cerere: Request) {
     if (!catreAsociatie && !inCrm) {
       return raspuns(
         `Nu am putut trimite cererea acum. Încearcă din nou peste câteva minute sau scrie-ne la ${EMAIL.contact}.`,
-        502,
+        503,
       );
     }
 
@@ -258,7 +258,7 @@ export async function POST(cerere: Request) {
   if (!catreOm) {
     return raspuns(
       `Nu am putut trimite e-mailul acum. Încearcă din nou peste câteva minute sau scrie-ne la ${EMAIL.redirectionare}.`,
-      502,
+      503,
     );
   }
 

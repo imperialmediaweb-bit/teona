@@ -48,7 +48,7 @@ export async function POST(cerere: Request) {
     if (!areR2()) return nuTrece("Depozitul de fișiere nu e configurat.", 503);
 
     const urcat = await urcaInR2(CHEIE_FORMULAR, octeti, "application/pdf");
-    if (!urcat) return nuTrece("N-am putut urca fișierul.", 502);
+    if (!urcat) return nuTrece("N-am putut urca fișierul.", 503);
     return inapoi(cerere, "urcat");
   }
 

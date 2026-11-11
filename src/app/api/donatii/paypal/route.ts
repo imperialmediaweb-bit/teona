@@ -78,9 +78,20 @@ export async function POST(cerere: Request) {
       "PayPal:",
       eroare instanceof Error ? eroare.message : "eroare necunoscută",
     );
+    /*
+      Nu 502: Cloudflare înlocuiește un 502 venit de la server cu pagina lui
+      de eroare, deci butonul primea HTML în loc de mesaj și scria „încearcă
+      din nou”. Așa a arătat, pe 11 noiembrie 2026, contul PayPal restricționat
+      (PAYEE_ACCOUNT_RESTRICTED): „încearcă din nou” nu ajuta pe nimeni.
+      Donatorul află ce altă cale are.
+    */
+    const restrictionat =
+      eroare instanceof Error && /ACCOUNT_RESTRICTED|PAYEE_ACCOUNT/i.test(eroare.message);
     return raspuns(
-      "Nu am putut porni plata prin PayPal. Încearcă din nou peste câteva minute.",
-      502,
+      restrictionat
+        ? "PayPal nu primește donații pentru asociație în acest moment. Poți dona cu cardul (merge și cu un card din străinătate) sau prin transfer bancar, mai sus pe pagină."
+        : "Nu am putut porni plata prin PayPal. Încearcă din nou peste câteva minute sau donează cu cardul, mai sus pe pagină.",
+      503,
     );
   }
 }

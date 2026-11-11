@@ -79,7 +79,7 @@ export async function POST(cerere: Request) {
   }
 
   const urcata = await urcaPoza(octeti, tip, cale.slice(RADACINA.length + 1));
-  if (!urcata) return raspuns(`„${fisier.name}” n-a putut fi urcată în Cloudinary. Încearcă din nou.`, 502);
+  if (!urcata) return raspuns(`„${fisier.name}” n-a putut fi urcată în Cloudinary. Încearcă din nou.`, 503);
 
   // Legătura cu tabăra se scrie de la prima poză: dacă omul închide fila la
   // jumătate, ce s-a urcat apare totuși pe pagina taberei.

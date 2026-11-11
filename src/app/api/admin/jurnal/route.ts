@@ -75,7 +75,7 @@ async function posteaza(cerere: Request) {
     rezumat,
     scrisDe: (await numeleConectat()) ?? undefined,
   });
-  if (!scris) return nuTrece("Nu am putut salva.", 502);
+  if (!scris) return nuTrece("Nu am putut salva.", 503);
 
   const cheie = firmaId ?? email ?? "";
   const separator = inapoi.includes("?") ? "&" : "?";

@@ -121,7 +121,7 @@ export async function POST(cerere: Request) {
     console.error(`[stripe] nu s-a putut deschide sesiunea: ${(e as Error).message}`);
     return raspuns(
       "Nu am putut porni plata. Încearcă din nou peste câteva minute.",
-      502,
+      503,
     );
   }
 }

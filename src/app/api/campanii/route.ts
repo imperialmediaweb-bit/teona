@@ -125,7 +125,7 @@ export async function POST(cerere: Request) {
     if (!urcata) {
       return raspuns(
         "Nu am putut încărca poza. Încearcă din nou sau trimite campania fără ea.",
-        502,
+        503,
       );
     }
     pozaId = urcata.id;

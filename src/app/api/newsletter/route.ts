@@ -75,7 +75,7 @@ export async function POST(cerere: Request) {
   if (!dus) {
     return raspuns(
       "Nu am putut finaliza abonarea acum. Încearcă din nou peste câteva minute sau scrie-ne direct:",
-      502,
+      503,
     );
   }
 
