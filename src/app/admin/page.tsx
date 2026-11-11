@@ -226,7 +226,7 @@ async function Continut({
         {deFacut.length === 0 ? (
           <p className="text-amplu text-cerneala-moale">
             Nimic nu așteaptă un răspuns. Toate cererile sunt rezolvate,
-            aniversările aprobate și nu e nicio ciornă nepublicată.
+            aniversările aprobate și nu e niciun text nepublicat.
           </p>
         ) : (
           <>
