@@ -136,11 +136,17 @@ function inapoi(cerere: Request, parametri: Record<string, string>) {
   return trimiteLa(unde);
 }
 
+/*
+  `no-transform`: Cloudflare ascunde adresele de e-mail din orice HTML care
+  trece prin el (le face „[email protected]” și lipește un script). Pe
+  șablonul de campanie asta strica previzualizarea și fișierul descărcat
+  pentru MailerLite. Cu `no-transform`, Cloudflare nu atinge răspunsul.
+*/
 function paginaHtml(html: string) {
   return new Response(html, {
     headers: {
       "content-type": "text/html; charset=utf-8",
-      "cache-control": "no-store",
+      "cache-control": "no-store, no-transform",
     },
   });
 }
@@ -229,7 +235,7 @@ export async function POST(cerere: Request) {
       headers: {
         "content-type": "text/html; charset=utf-8",
         "content-disposition": `attachment; filename="${nume}"`,
-        "cache-control": "no-store",
+        "cache-control": "no-store, no-transform",
       },
     });
   }

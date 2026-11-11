@@ -9,6 +9,7 @@ import {
 } from "@/lib/admin";
 import { areR2 } from "@/lib/r2";
 import { DOCUMENTE } from "@/lib/documente";
+import { documenteGata } from "@/lib/documente-gata";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
@@ -84,6 +85,7 @@ async function Continut({
 
   const mesaj = stare ? STARI[stare] : undefined;
   const depozit = areR2();
+  const gata = await documenteGata().catch(() => [] as ReadonlyArray<string>);
 
   return (
     <Cadru
@@ -154,14 +156,22 @@ async function Continut({
                 >
                   {d.unde}
                 </Link>{" "}
-                · adresa fișierului:{" "}
-                <Link
-                  href={`/documente/${d.slug}`}
-                  className="font-semibold text-caramiziu-700 hover:underline"
-                >
-                  /documente/{d.slug}
-                </Link>
               </p>
+              {gata.includes(d.slug) ? (
+                <p className="mt-2 text-mic font-semibold text-turcoaz-800">
+                  Pe site: se descarcă.{" "}
+                  <a
+                    href={`/documente/${d.slug}`}
+                    className="text-caramiziu-700 underline underline-offset-2"
+                  >
+                    Deschide fișierul
+                  </a>
+                </p>
+              ) : (
+                <p className="mt-2 text-mic font-semibold text-caramiziu-800">
+                  Lipsește. Butonul de pe site e inactiv până îl urci aici.
+                </p>
+              )}
             </div>
 
             <form

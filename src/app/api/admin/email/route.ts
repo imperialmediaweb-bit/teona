@@ -23,7 +23,7 @@ export async function GET(cerere: Request) {
       "content-type": text
         ? "text/plain; charset=utf-8"
         : "text/html; charset=utf-8",
-      "cache-control": "no-store",
+      "cache-control": "no-store, no-transform",
     },
   });
 }
