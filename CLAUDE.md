@@ -382,12 +382,13 @@ legătura adevărată (Cloudinary, Railway, Cloudflare). O cerere cu antetul
 `x-proba-token` egal cu `PROBA_TOKEN` din Railway (cel puțin 15 semne)
 intră în panou ca „Probă automată” (`lib/admin.ts`, `fel: "proba"`).
 
-- **Numai pagini de conținut** (`PAGINI_PROBA`): scrie, poze, cifre, texte,
-  sponsori, documente, testimoniale, pagini, calendar, QR. **Nicio pagină cu
-  oameni** (donatori, donații, cereri, formulare, voluntari, abonați, firme,
-  căutare, export, conturi, tabloul de bord) și nimic care trimite în afară
-  sau cheamă un model plătit (șabloane, Facebook, radar, analiză, presă).
-  O pagină nouă e închisă până e adăugată în listă.
+- **Vede toate paginile panoului** (afară de Utilizatori), ca să fie verificate
+  pe site-ul adevărat; **scrie numai pe rutele de conținut** (`RUTE_PROBA` din
+  `src/proxy.ts`): scrie, poze, cifre, texte,
+  sponsori, documente, testimoniale, pagini, calendar, QR. Orice altă rută din
+  `/api/admin` primește 403 de la proxy, **exportul pentru Excel și la GET**:
+  nimic nu trimite în afară, nu atinge plăți și nu cheamă un model plătit.
+  O rută nouă e închisă până e adăugată în listă.
 - Antetul îl pune proxy-ul mediului de lucru; valoarea nu trece prin
   conversație și nu e în depozit. Fără variabilă, ușa nu există; **se închide
   ștergând `PROBA_TOKEN` din Railway**.

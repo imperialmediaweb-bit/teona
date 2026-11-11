@@ -178,9 +178,9 @@ export type Conectat =
  * Probele locale folosesc servicii de mențiune; ce nu pot prinde e tocmai
  * legătura adevărată (Cloudinary, Railway, Cloudflare). Pentru asta, cererea
  * care poartă antetul `x-proba-token`, egal cu `PROBA_TOKEN` din Railway,
- * intră în panou — **numai pe paginile de conținut** din `PAGINI_PROBA`.
- * Nicio pagină cu oameni în ea: fără donatori, donații, cereri, formulare,
- * voluntari, abonați, firme, căutare, export, conturi; și nimic care trimite
+ * intră în panou. **Vede** toate paginile, ca să fie verificate toate (afară
+ * de conturi); **scrie** numai pe rutele de conținut din `RUTE_PROBA`
+ * (`src/proxy.ts`), care taie și exportul pentru Excel. Nimic care trimite
  * în afară (e-mail, Facebook, MailerLite) sau cheamă un model plătit.
  *
  * Antetul îl pune proxy-ul mediului de lucru; valoarea nu trece prin
@@ -188,19 +188,6 @@ export type Conectat =
  * nu există. Se închide ștergând variabila din Railway.
  */
 export const ANTET_PROBA = "x-proba-token";
-const PAGINI_PROBA: readonly string[] = [
-  "/admin/scrie",
-  "/admin/poze",
-  "/admin/cifre",
-  "/admin/texte",
-  "/admin/sponsori",
-  "/admin/documente",
-  "/admin/testimoniale",
-  "/admin/pagini",
-  "/admin/calendar",
-  "/admin/qr",
-];
-
 function cheieProbaValida(primit: string | null): boolean {
   const asteptat = mediu("PROBA_TOKEN");
   if (!asteptat || asteptat.length < 15 || !primit) return false;
@@ -320,7 +307,12 @@ export async function rolulConectat(): Promise<Rol | null> {
 export async function arePermisiune(cale: string): Promise<boolean> {
   const cine = await cineEsteConectat();
   if (!cine) return false;
-  if (cine.fel === "proba" && !PAGINI_PROBA.includes(cale)) return false;
+  /*
+    Cheia de probă vede toate paginile panoului, ca să poată fi verificate
+    toate pe site-ul adevărat; scrie numai unde lasă `src/proxy.ts`
+    (rutele de conținut). Conturile rămân închise.
+  */
+  if (cine.fel === "proba" && cale === "/admin/utilizatori") return false;
   return poateVedea(cine.rol, cale);
 }
 

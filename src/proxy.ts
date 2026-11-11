@@ -193,6 +193,19 @@ async function estePublicat(fel: string, slug: string): Promise<boolean | null> 
   }
 }
 
+/** Rutele pe care intrarea de probă are voie să scrie: numai conținut. */
+const RUTE_PROBA = [
+  "/api/admin/texte",
+  "/api/admin/poze-tabara",
+  "/api/admin/cifre",
+  "/api/admin/sponsori",
+  "/api/admin/documente",
+  "/api/admin/testimoniale",
+  "/api/admin/texte-pagini",
+  "/api/admin/calendar",
+  "/api/admin/qr",
+];
+
 export default async function proxy(cerere: NextRequest) {
   const gazda =
     cerere.headers.get("x-forwarded-host") ?? cerere.headers.get("host") ?? "";
@@ -215,6 +228,24 @@ export default async function proxy(cerere: NextRequest) {
       status: 308,
       headers: { Location: `https://${GAZDA}${pathname}${search}` },
     });
+  }
+
+  /*
+    Intrarea de probă (vezi `lib/admin.ts`) citește tot panoul, dar scrie
+    numai pe paginile de conținut. Aici se taie tot restul: orice cerere din
+    `/api/admin` care nu e una dintre rutele de conținut, și exportul, chiar
+    dacă e GET (listele pentru Excel au nume și adrese).
+  */
+  if (cerere.headers.has("x-proba-token") && cerere.nextUrl.pathname.startsWith("/api/")) {
+    const cale = cerere.nextUrl.pathname;
+    const scriere = metoda !== "GET" && metoda !== "HEAD";
+    const voie = RUTE_PROBA.includes(cale);
+    if (cale.startsWith("/api/admin/export") || (scriere && !voie) || (!scriere && cale.startsWith("/api/admin/") && !voie)) {
+      return new NextResponse("Cheia de probă nu are voie aici.", {
+        status: 403,
+        headers: { "content-type": "text/plain; charset=utf-8" },
+      });
+    }
   }
 
   if (originStrain(cerere)) {
