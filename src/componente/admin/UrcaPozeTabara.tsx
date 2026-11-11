@@ -32,8 +32,8 @@ export default function UrcaPozeTabara({
   const radacina = useRef<HTMLDivElement>(null);
   const fisiere = useRef<HTMLInputElement>(null);
   const [cale, setCale] = useState(dosarAles);
-  const [nume, setNume] = useState(numeImplicit);
-  const [an, setAn] = useState(anImplicit);
+  const [nume] = useState(numeImplicit);
+  const [an] = useState(anImplicit);
   const [lucreaza, setLucreaza] = useState(false);
   const [stare, setStare] = useState<string | null>(null);
   const [greseli, setGreseli] = useState<string[]>([]);
@@ -55,8 +55,18 @@ export default function UrcaPozeTabara({
       setStare("Alege întâi pozele.");
       return;
     }
-    if (!cale && !nume.trim()) {
-      setStare("Scrie numele folderului.");
+    /*
+      Folderul nu se mai cere: se numește după titlu, în anul primei zile.
+      „Numele folderului” și „Anul” erau două câmpuri despre un lucru pe care
+      omul nu-l vede niciodată (asociația, 11 noiembrie 2026: „mai simplu”).
+    */
+    const formular = radacina.current?.closest("form");
+    const titlu = formular?.querySelector<HTMLInputElement>("[name=titlu]")?.value.trim() ?? "";
+    const primaZi = formular?.querySelector<HTMLInputElement>("[name=dataInceput]")?.value ?? "";
+    const numeFolder = (nume.trim() || titlu).toLocaleUpperCase("ro-RO");
+    const anFolder = /^\d{4}/.test(primaZi) ? primaZi.slice(0, 4) : an;
+    if (!cale && !numeFolder) {
+      setStare("Scrie întâi titlul, sus. Pozele se pun într-un folder cu numele lui.");
       return;
     }
     setLucreaza(true);
@@ -79,8 +89,8 @@ export default function UrcaPozeTabara({
       if (id) corp.append("id", id);
       if (unde) corp.append("cale", unde);
       else {
-        corp.append("nume", nume);
-        corp.append("an", an);
+        corp.append("nume", numeFolder);
+        corp.append("an", anFolder);
       }
       corp.append("poza", deTrimis, f.name);
       try {
@@ -111,8 +121,8 @@ export default function UrcaPozeTabara({
     setStare(
       urcate === 0
         ? "Nicio poză n-a fost urcată."
-        : `Gata: ${urcate} ${urcate === 1 ? "poză urcată" : "poze urcate"} în ${unde}.` +
-            (id ? ` Apar pe pagina ${ce} în câteva minute (după publicare).` : " Salvează ciorna ca să rămână legate de text."),
+        : `Gata: ${urcate} ${urcate === 1 ? "poză urcată" : "poze urcate"}.` +
+            (id ? ` Se văd pe pagina ${ce} după „Publică”.` : " Apasă „Publică” jos, ca să apară pe site."),
     );
   }
 
@@ -124,33 +134,10 @@ export default function UrcaPozeTabara({
       <span className="font-titlu text-mic font-bold text-cerneala">Pozele {ce}, pentru galerie</span>
       <span className="text-mic text-cerneala-moale">
         {cale
-          ? `Pozele se adaugă în folderul ${cale}.`
-          : `Se face un folder nou și pozele intră în el. Poți alege mai multe deodată. Apar pe pagina ${ce}, sub text.`}
+          ? "Poți adăuga și altele: se pun lângă cele urcate deja."
+          : `Alege pozele (oricâte deodată) și apasă „Urcă pozele”. Apar pe pagina ${ce}, sub text.`}
       </span>
 
-      {!cale && (
-        <div className="grid gap-3 sm:grid-cols-[1fr_7rem]">
-          <label className="grid gap-1.5">
-            <span className="text-mic text-cerneala">Numele folderului</span>
-            <input
-              value={nume}
-              onChange={(e) => setNume(e.target.value)}
-              placeholder="TABĂRĂ AUTISM 8-12 IUNIE 2026"
-              className={camp}
-            />
-          </label>
-          <label className="grid gap-1.5">
-            <span className="text-mic text-cerneala">Anul</span>
-            <input
-              value={an}
-              onChange={(e) => setAn(e.target.value)}
-              inputMode="numeric"
-              maxLength={4}
-              className={camp}
-            />
-          </label>
-        </div>
-      )}
 
       <input
         ref={fisiere}
@@ -170,15 +157,6 @@ export default function UrcaPozeTabara({
         >
           {lucreaza ? "Se urcă…" : "Urcă pozele"}
         </button>
-        {cale && !lucreaza && (
-          <button
-            type="button"
-            onClick={() => setCale(null)}
-            className="text-mic text-cerneala-moale underline underline-offset-4"
-          >
-            Fac alt folder (îl înlocuiește pe cel de acum în galerie)
-          </button>
-        )}
       </div>
 
       {stare && (

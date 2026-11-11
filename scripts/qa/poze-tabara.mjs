@@ -168,7 +168,6 @@ try {
     await pag.fill("textarea[name=continut]", "Un text de probă, destul de lung cât să treacă verificarea.");
     if (fel === "proiect") {
       await pag.fill("input[name=dataInceput]", "2026-06-08");
-      await pag.fill("input[name=dataCitita]", "8 – 12 iunie 2026");
     }
     // Ciorna întâi, ca să aibă id.
     await Promise.all([
@@ -285,7 +284,6 @@ try {
     await pag.fill("input[name=titlu]", titlu);
     await pag.fill("textarea[name=continut]", "Un text de probă, destul de lung cât să treacă verificarea.");
     await pag.fill("input[name=dataInceput]", "2026-07-06");
-    await pag.fill("input[name=dataCitita]", "6 – 10 iulie 2026");
     await Promise.all([
       pag.waitForURL(/\/admin\/scrie\/[0-9a-f-]{36}/, { timeout: 120_000 }),
       pag.click("button[name=actiune][value=salveaza]"),

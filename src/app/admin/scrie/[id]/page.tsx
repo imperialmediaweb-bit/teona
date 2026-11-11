@@ -147,7 +147,7 @@ async function Continut({
       titlu={nou ? acesta.butonNou : text!.titlu}
       descriere={
         nou
-          ? "Scrie, salvează ca ciornă, iar când e gata apasă „Publică”."
+          ? "Scrie titlul și textul, pune pozele și apasă „Publică”."
           : text!.publicat
             ? `Publicat. Se vede la ${acesta.cale}/${text!.slug}`
             : "Ciornă. Nu se vede pe site."
@@ -196,7 +196,7 @@ async function Continut({
       */}
       {nou && areAsistent() && <Asistent />}
 
-      <CumScriem deschis={nou} />
+      <CumScriem deschis={false} />
 
       <form
         action="/api/admin/texte"
@@ -231,28 +231,10 @@ async function Continut({
 
         <label className="grid gap-1.5">
           <span className="font-titlu text-mic font-bold text-cerneala">
-            Rezumatul — o frază, cea care apare în listă și pe Facebook
-          </span>
-          <textarea
-            name="rezumat"
-            rows={2}
-            maxLength={400}
-            defaultValue={text?.rezumat ?? ""}
-            className={`${camp} resize-y`}
-          />
-        </label>
-
-        <label className="grid gap-1.5">
-          <span className="font-titlu text-mic font-bold text-cerneala">
             Textul
           </span>
           <span className="text-mic text-cerneala-moale">
-            Un rând gol desparte paragrafele. Un rând care începe cu{" "}
-            <code className="rounded bg-hartie-umbra px-1">##</code> e un
-            subtitlu, unul care începe cu{" "}
-            <code className="rounded bg-hartie-umbra px-1">-</code> e un punct
-            de listă. Altceva nu e nevoie: felul în care arată textul îl dă
-            site-ul.
+            Un rând gol desparte paragrafele.
           </span>
           <textarea
             name="continut"
@@ -265,27 +247,118 @@ async function Continut({
         </label>
 
         {fel === "proiect" && (
-          <fieldset className="grid gap-5 colt-a border border-hartie-umbra bg-hartie p-5">
-            <legend className="px-2 font-titlu text-mic font-bold text-cerneala">
-              Când a fost și unde-i sunt pozele
-            </legend>
+          <label className="grid gap-1.5">
+            <span className="text-mic font-semibold text-cerneala">
+              Prima zi
+            </span>
+            <span className="text-mic text-cerneala-moale">
+              După ea se așază proiectul în listă.
+            </span>
+            <input
+              type="date"
+              name="dataInceput"
+              defaultValue={text?.dataInceput ?? ""}
+              className={camp}
+            />
+          </label>
+        )}
 
-            <div className="grid gap-5 sm:grid-cols-2">
+        <fieldset className="grid gap-4 colt-a border border-hartie-umbra bg-hartie p-5">
+          <legend className="px-2 font-titlu text-mic font-bold text-cerneala">
+            Poza principală
+          </legend>
+
+          {text?.poza && (
+            <div className="flex items-center gap-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={adresaPoza(text.poza.id, 320)}
+                alt={text.poza.alt}
+                className="h-24 w-32 shrink-0 colt-mic-a object-cover"
+              />
+              <p className="text-mic text-cerneala-moale">
+                Poza de acum. Dacă alegi alta mai jos, o înlocuiește.
+              </p>
+            </div>
+          )}
+
+          {areCloudinary() ? (
+            <>
               <label className="grid gap-1.5">
                 <span className="text-mic font-semibold text-cerneala">
-                  Prima zi
-                </span>
-                <span className="text-mic text-cerneala-moale">
-                  După ea se așază proiectul în listă.
+                  Alege o fotografie (JPG, PNG sau WebP)
                 </span>
                 <input
-                  type="date"
-                  name="dataInceput"
-                  defaultValue={text?.dataInceput ?? ""}
-                  className={camp}
+                  type="file"
+                  name="poza"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="text-mic"
                 />
               </label>
+            </>
+          ) : (
+            <p className="text-mic text-cerneala-moale">
+              Lipsesc cheile Cloudinary, deci nu se pot urca poze. Textul se
+              poate scrie oricum.
+            </p>
+          )}
+        </fieldset>
 
+
+        {/*
+          Pozele de galerie, pentru orice text: tabără, noutate, campanie.
+          Asociația n-are cont în Cloudinary, deci se urcă de aici, iar
+          folderul se face singur. La noutăți și campanii legătura stă într-un
+          câmp ascuns, la tabere în alegerea de mai sus.
+        */}
+        {fel !== "proiect" && (
+          <input type="hidden" name="dosarCloud" defaultValue={text?.dosarCloud ?? ""} />
+        )}
+        {areCloudinary() && (
+              <UrcaPozeTabara
+                id={text?.id ?? null}
+                dosarAles={
+                  text?.dosarCloud
+                    ? text.dosarCloud.startsWith(`${RADACINA}/`)
+                      ? text.dosarCloud
+                      : `${RADACINA}/${text.dosarCloud}`
+                    : null
+                }
+                numeImplicit={(text?.titlu ?? "").toLocaleUpperCase("ro-RO")}
+                fel={fel}
+                anImplicit={
+                  text?.dataInceput?.slice(0, 4) || String(new Date().getFullYear())
+                }
+              />
+            )}
+
+        {/*
+          Tot ce nu e nevoie de obicei. Formularul cerea rezumat, două feluri
+          de dată, categorie, folder și descrierea pozei înainte de „Publică”;
+          asociația a spus-o pe 11 noiembrie 2026: „mai simplu”. Sus au rămas
+          titlul, textul, poza și pozele. Ce e aici se completează singur dacă
+          e lăsat gol.
+        */}
+        <details className="colt-a border border-hartie-umbra bg-hartie p-5">
+          <summary className="cursor-pointer font-titlu text-mic font-bold text-cerneala">
+            Mai multe opțiuni (nu e nevoie de ele)
+          </summary>
+          <div className="mt-5 grid gap-6">
+        <label className="grid gap-1.5">
+          <span className="font-titlu text-mic font-bold text-cerneala">
+            Rezumatul — o frază, cea care apare în listă și pe Facebook
+          </span>
+          <textarea
+            name="rezumat"
+            rows={2}
+            maxLength={400}
+            defaultValue={text?.rezumat ?? ""}
+            className={`${camp} resize-y`}
+          />
+        </label>
+
+          {fel === "proiect" && (
+            <>
               <label className="grid gap-1.5">
                 <span className="text-mic font-semibold text-cerneala">
                   Cum se citește data
@@ -300,8 +373,6 @@ async function Continut({
                   className={camp}
                 />
               </label>
-            </div>
-
             <label className="grid gap-1.5">
               <span className="text-mic font-semibold text-cerneala">
                 La ce categorie apare
@@ -370,36 +441,8 @@ async function Continut({
                 />
               )}
             </label>
-          </fieldset>
-        )}
-
-        {/*
-          Pozele de galerie, pentru orice text: tabără, noutate, campanie.
-          Asociația n-are cont în Cloudinary, deci se urcă de aici, iar
-          folderul se face singur. La noutăți și campanii legătura stă într-un
-          câmp ascuns, la tabere în alegerea de mai sus.
-        */}
-        {fel !== "proiect" && (
-          <input type="hidden" name="dosarCloud" defaultValue={text?.dosarCloud ?? ""} />
-        )}
-        {areCloudinary() && (
-              <UrcaPozeTabara
-                id={text?.id ?? null}
-                dosarAles={
-                  text?.dosarCloud
-                    ? text.dosarCloud.startsWith(`${RADACINA}/`)
-                      ? text.dosarCloud
-                      : `${RADACINA}/${text.dosarCloud}`
-                    : null
-                }
-                numeImplicit={(text?.titlu ?? "").toLocaleUpperCase("ro-RO")}
-                fel={fel}
-                anImplicit={
-                  text?.dataInceput?.slice(0, 4) || String(new Date().getFullYear())
-                }
-              />
-            )}
-
+            </>
+          )}
         {fel === "campanie" && (
           <label className="grid gap-1.5">
             <span className="font-titlu text-mic font-bold text-cerneala">
@@ -419,47 +462,13 @@ async function Continut({
           </label>
         )}
 
-        <fieldset className="grid gap-4 colt-a border border-hartie-umbra bg-hartie p-5">
-          <legend className="px-2 font-titlu text-mic font-bold text-cerneala">
-            Fotografia
-          </legend>
-
-          {text?.poza && (
-            <div className="flex items-center gap-4">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={adresaPoza(text.poza.id, 320)}
-                alt={text.poza.alt}
-                className="h-24 w-32 shrink-0 colt-mic-a object-cover"
-              />
-              <p className="text-mic text-cerneala-moale">
-                Poza de acum. Dacă alegi alta mai jos, o înlocuiește.
-              </p>
-            </div>
-          )}
-
-          {areCloudinary() ? (
-            <>
-              <label className="grid gap-1.5">
-                <span className="text-mic font-semibold text-cerneala">
-                  Alege o fotografie (JPG, PNG sau WebP)
-                </span>
-                <input
-                  type="file"
-                  name="poza"
-                  accept="image/jpeg,image/png,image/webp"
-                  className="text-mic"
-                />
-              </label>
-
+          {areCloudinary() && (
               <label className="grid gap-1.5">
                 <span className="text-mic font-semibold text-cerneala">
                   Ce se vede în poză
                 </span>
                 <span className="text-mic text-cerneala-moale">
-                  Obligatoriu dacă pui o poză. E ce aude cineva care nu vede
-                  ecranul, și ce citește Google. „Copii și voluntari la masa de
-                  prânz, în tabăra de la Vama”, nu „poza 1”.
+                  Lăsat gol, se folosește titlul.
                 </span>
                 <input
                   name="poza_alt"
@@ -468,32 +477,31 @@ async function Continut({
                   className={camp}
                 />
               </label>
-            </>
-          ) : (
-            <p className="text-mic text-cerneala-moale">
-              Lipsesc cheile Cloudinary, deci nu se pot urca poze. Textul se
-              poate scrie oricum.
-            </p>
           )}
-        </fieldset>
+          </div>
+        </details>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            type="submit"
-            name="actiune"
-            value="salveaza"
-            className="colt-mic-a border-2 border-cerneala/15 bg-hartie px-5 py-2.5 font-titlu text-mic font-bold text-cerneala transition-colors hover:border-caramiziu-500"
-          >
-            {/* Pe un text publicat, butonul ăsta îl scoate de pe site: se spune pe față. */}
-            {text?.publicat ? "Scoate de pe site (ciornă)" : "Salvează ciorna"}
-          </button>
+        {/*
+          „Publică” e butonul. Salvarea fără publicare rămâne, mică, pentru
+          cine vrea să termine mai târziu; pe un text publicat ea îl scoate de
+          pe site și o spune.
+        */}
+        <div className="flex flex-wrap items-center gap-5">
           <button
             type="submit"
             name="actiune"
             value="publica"
-            className="colt-mic-a bg-caramiziu-700 px-6 py-2.5 font-titlu text-mic font-bold text-hartie transition-colors hover:bg-caramiziu-800"
+            className="colt-mic-a bg-caramiziu-700 px-8 py-3 font-titlu text-corp font-bold text-hartie transition-colors hover:bg-caramiziu-800"
           >
             {text?.publicat ? "Publică schimbările" : "Publică"}
+          </button>
+          <button
+            type="submit"
+            name="actiune"
+            value="salveaza"
+            className="font-titlu text-mic text-cerneala-moale underline underline-offset-4 hover:text-cerneala"
+          >
+            {text?.publicat ? "Scoate de pe site" : "Salvează fără să publici"}
           </button>
         </div>
       </form>

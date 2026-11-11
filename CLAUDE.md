@@ -1823,6 +1823,25 @@ primește apelul de două ori; numărul de contract scris de mână ocolește
 registrul; `sesiuneProaspata` socotește proaspete ultimele 12 ore ale unei
 sesiuni lungi; o eroare Cloudinary se ține o oră ca galerie goală.
 
+## Formularul de scris pe site: titlu, text, poze, „Publică”
+
+Asociația, 11 noiembrie 2026: „e complicat mult… mai simplu”. Formularul
+cerea rezumat, două feluri de dată, categorie, folder, numele folderului de
+poze, anul lui și descrierea pozei, cu „Salvează ciorna” pus înaintea lui
+„Publică”. Acum sus sunt numai **titlul, textul, (prima zi, la tabere), poza
+principală și pozele pentru galerie**, iar butonul e **„Publică”**.
+
+- Restul stă sub „Mai multe opțiuni (nu e nevoie de ele)” și se completează
+  singur dacă e lăsat gol: descrierea pozei ia titlul, „cum se citește data”
+  se scrie din prima zi, categoria din an.
+- Folderul de poze nu se mai cere: se numește după titlu, în anul primei
+  zile (`UrcaPozeTabara`). Fără titlu, spune „scrie întâi titlul”.
+- „Salvează fără să publici” rămâne, mic, lângă buton; pe un text publicat
+  se cheamă „Scoate de pe site”.
+- După „Publică”, mesajul are linkul „Vezi pe site →”.
+- **O probă completează ce completează omul**: câmpurile din „Mai multe
+  opțiuni” sunt închise, deci `fill` pe ele cade — și bine face.
+
 ## Decizii încă deschise
 
 1. **Donațiile.** Acum merg prin GiveWP + Stripe pe WordPress, în lei, cu plată

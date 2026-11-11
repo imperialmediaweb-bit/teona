@@ -110,10 +110,10 @@ async function posteaza(cerere: Request) {
     if (fisier.size > POZA_MAXIM) {
       return nuTrece("Poza e prea mare.");
     }
-    const alt = camp("poza_alt");
-    if (alt.length < 5) {
-      return nuTrece("Scrie ce se vede în poză. Fără descriere, poza nu există pentru cineva care nu vede.");
-    }
+    // Descrierea pozei nu mai oprește publicarea: lăsată goală, ține locul
+    // titlul. Mai puțin bun decât una scrisă, dar mai bun decât o poză pe
+    // care omul n-a mai urcat-o fiindcă formularul l-a întors din drum.
+    const alt = camp("poza_alt").length >= 5 ? camp("poza_alt") : titlu;
     const octeti = new Uint8Array(await fisier.arrayBuffer());
     const tipPoza = tipDinOcteti(octeti);
     if (!tipPoza) {
@@ -163,7 +163,19 @@ async function posteaza(cerere: Request) {
     poza,
     tintaBani,
     dataInceput: fel === "proiect" ? dataInceput : null,
-    dataCitita: fel === "proiect" ? camp("dataCitita") || null : null,
+    // Fără „cum se citește data”, se scrie prima zi: „5 ianuarie 2026”.
+    dataCitita:
+      fel === "proiect"
+        ? camp("dataCitita") ||
+          (dataInceput
+            ? new Intl.DateTimeFormat("ro-RO", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+                timeZone: "UTC",
+              }).format(new Date(`${dataInceput}T12:00:00Z`))
+            : null)
+        : null,
     dosarCloud: camp("dosarCloud") || null,
     categorie: fel === "proiect" ? categorie : null,
     publicat: actiune === "publica",
