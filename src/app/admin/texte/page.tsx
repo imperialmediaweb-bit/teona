@@ -266,7 +266,7 @@ async function Continut({
                           required
                           maxLength={6000}
                           defaultValue={s.continut}
-                          className="colt-mic-a w-full resize-y border-2 border-hartie-umbra bg-hartie px-4 py-3 font-mono text-mic transition outline-none focus:border-turcoaz-400"
+                          className="colt-mic-a w-full resize-y border-2 border-hartie-umbra bg-hartie px-4 py-3 text-amplu transition outline-none focus:border-turcoaz-400"
                         />
                       )}
 
