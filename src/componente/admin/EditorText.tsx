@@ -173,6 +173,8 @@ function Bara({
           text: scris.trim(),
           marks: [{ type: "link", attrs: { href: adresa } }],
         })
+        // Ce scrie omul după link nu mai e link.
+        .unsetMark("link")
         .run();
     } else {
       editor
