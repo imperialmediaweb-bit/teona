@@ -197,6 +197,7 @@ async function estePublicat(fel: string, slug: string): Promise<boolean | null> 
 const RUTE_PROBA = [
   "/api/admin/texte",
   "/api/admin/poze-tabara",
+  "/api/admin/poza-in-text",
   "/api/admin/cifre",
   "/api/admin/sponsori",
   "/api/admin/documente",

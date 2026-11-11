@@ -1,3 +1,5 @@
+import { curataHtml } from "@/lib/curata-html";
+import { esteHtml, textSimplu } from "@/lib/text-bogat";
 import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { ETICHETA_PROIECTE_PANOU, proiecteAfisate } from "@/date/proiecte";
@@ -69,14 +71,17 @@ async function posteaza(cerere: Request) {
   if (titlu.length < 3) {
     return nuTrece("Scrie un titlu de cel puțin trei litere.");
   }
-  const continut = camp("continut");
-  if (continut.length < 20) {
+  const scris = camp("continut");
+  // Din editor vine HTML: se curăță aici, ca în baza de date să nu stea
+  // nimic ce n-ar putea face bara editorului.
+  const continut = esteHtml(scris) ? curataHtml(scris) : scris;
+  if (textSimplu(continut).join(" ").length < 20) {
     return nuTrece("Scrie textul: cel puțin câteva fraze.");
   }
   if (titlu.length > 200 || camp("rezumat").length > 400) {
     return nuTrece("Titlul sau rezumatul e prea lung.");
   }
-  if (continut.length > 40_000) {
+  if (continut.length > 80_000) {
     return nuTrece("Textul e prea lung.");
   }
 

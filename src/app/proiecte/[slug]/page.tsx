@@ -1,3 +1,4 @@
+import TextScris from "@/componente/pagina/TextScris";
 import type { Metadata } from "next";
 import { JsonLd, jsonLdFir, jsonLdGalerie, metadate } from "@/app/seo";
 import Image from "next/image";
@@ -193,11 +194,17 @@ export default async function PaginaProiect({
           <Val culoare="text-hartie-calda" className={VAL_PESTE} />
           <section className="relative bg-hartie-calda pt-6 pb-16 lg:pt-10 lg:pb-20">
             <div className="relative mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-              <div className="grid gap-5 text-amplu text-cerneala-moale">
-                {proiect.descriere.map((paragraf) => (
-                  <p key={paragraf.slice(0, 40)}>{paragraf}</p>
-                ))}
-              </div>
+              {/* Textele din panou au subtitluri, liste, îngroșat și linkuri
+                  (butoanele editorului); cele din cod sunt paragrafe simple. */}
+              {proiect.continut ? (
+                <TextScris continut={proiect.continut} />
+              ) : (
+                <div className="grid gap-5 text-amplu text-cerneala-moale">
+                  {proiect.descriere.map((paragraf) => (
+                    <p key={paragraf.slice(0, 40)}>{paragraf}</p>
+                  ))}
+                </div>
+              )}
             </div>
           </section>
         </>

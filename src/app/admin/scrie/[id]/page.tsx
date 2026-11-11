@@ -1,3 +1,4 @@
+import EditorText from "@/componente/admin/EditorText";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
@@ -150,7 +151,7 @@ async function Continut({
           ? "Scrie titlul și textul, pune pozele și apasă „Publică”."
           : text!.publicat
             ? `Publicat. Se vede la ${acesta.cale}/${text!.slug}`
-            : "Ciornă. Nu se vede pe site."
+            : "Nepublicat. Nu se vede pe site până nu apeși „Publică”."
       }
       activ={`/admin/scrie?fel=${fel}`}
       actiuni={
@@ -183,7 +184,7 @@ async function Continut({
               </a>
             </>
           )}
-          {gata === "salvat" && "Salvat ca ciornă."}
+          {gata === "salvat" && "Scos de pe site. Îl poți publica din nou oricând."}
         </p>
       )}
 
@@ -229,22 +230,17 @@ async function Continut({
           />
         </label>
 
-        <label className="grid gap-1.5">
+        <div className="grid gap-1.5">
           <span className="font-titlu text-mic font-bold text-cerneala">
             Textul
           </span>
           <span className="text-mic text-cerneala-moale">
-            Un rând gol desparte paragrafele.
+            Scrii ca într-un document. Alegi cuvintele și apeși un buton din
+            bară: îngroșat, culoare, link. Poza și filmarea intră unde e
+            cursorul.
           </span>
-          <textarea
-            name="continut"
-            required
-            minLength={20}
-            rows={16}
-            defaultValue={text?.continut ?? ""}
-            className={`${camp} resize-y font-mono text-mic`}
-          />
-        </label>
+          <EditorText name="continut" defaultValue={text?.continut ?? ""} />
+        </div>
 
         {fel === "proiect" && (
           <label className="grid gap-1.5">
@@ -495,14 +491,18 @@ async function Continut({
           >
             {text?.publicat ? "Publică schimbările" : "Publică"}
           </button>
-          <button
-            type="submit"
-            name="actiune"
-            value="salveaza"
-            className="font-titlu text-mic text-cerneala-moale underline underline-offset-4 hover:text-cerneala"
-          >
-            {text?.publicat ? "Scoate de pe site" : "Salvează fără să publici"}
-          </button>
+          {/* Fără ciorne: un text nou se publică. Rămâne numai scoaterea de
+              pe site a unuia publicat, spusă pe nume. */}
+          {text?.publicat && (
+            <button
+              type="submit"
+              name="actiune"
+              value="salveaza"
+              className="font-titlu text-mic text-cerneala-moale underline underline-offset-4 hover:text-cerneala"
+            >
+              Scoate de pe site
+            </button>
+          )}
         </div>
       </form>
 

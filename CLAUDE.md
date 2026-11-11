@@ -1842,6 +1842,33 @@ principală și pozele pentru galerie**, iar butonul e **„Publică”**.
 - **O probă completează ce completează omul**: câmpurile din „Mai multe
   opțiuni” sunt închise, deci `fill` pe ele cade — și bine face.
 
+### Editorul: scrii ca într-un document (11 noiembrie 2026)
+
+Asociația: „un editor sus, să pună un link, să evidențieze ceva, poze în
+text, video de pe YouTube, Facebook”, „fără ciorni”. În meniu, sub Site:
+**Blog** („Adaugă articol”), **Campanii**, **Tabere**, mereu la vedere.
+Un text nou n-are „Salvează ciorna”: e „Publică”; pe unul publicat rămâne
+„Scoate de pe site”.
+
+- `componente/admin/EditorText.tsx` (TipTap): îngroșat, cursiv, subliniat,
+  culoare (patru, din paleta site-ului), titlu, subtitlu, liste, citat,
+  link, **poză în text** (`/api/admin/poza-in-text`, în Cloudinary
+  `texte/`) și **video** YouTube sau Facebook (`adresaVideo`).
+- Se salvează **HTML**, trecut prin `curataHtml` (`lib/curata-html.ts`,
+  sanitize-html) **și la salvare, și la afișare**: script, `on…`,
+  `javascript:`, stiluri lipite din Word, poze din afara Cloudinary, cadre
+  spre alte site-uri — aruncate. YouTube merge pe `youtube-nocookie.com`
+  (adăugat în CSP la `frame-src`).
+- Textele vechi, cu semne (`##`, `- `, `**`), se afișează ca înainte și se
+  transformă în HTML la prima deschidere în editor (`semneInHtml` din
+  `lib/text-bogat.ts`); `textSimplu` scoate textul curat pentru rezumate.
+- O probă scrie în `[data-editor]` cu tastatura; câmpul `continut` e ascuns.
+  O probă care caută `<script>` în `main` găsește scripturile lui Next:
+  caută în `.text-bogat`.
+- Probă în browser, pe toate trei: `scratchpad/editor2.mjs` (în afara
+  depozitului) — formatare, culoare, link, video, link de video greșit,
+  cod rău trimis pe lângă editor, ștergere.
+
 ## Decizii încă deschise
 
 1. **Donațiile.** Acum merg prin GiveWP + Stripe pe WordPress, în lei, cu plată

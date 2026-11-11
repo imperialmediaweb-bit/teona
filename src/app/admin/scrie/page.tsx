@@ -4,7 +4,7 @@ import { connection } from "next/server";
 import Link from "next/link";
 import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
-import { FELURI, esteFel, felul, toateTextele } from "@/lib/texte";
+import { esteFel, felul, toateTextele } from "@/lib/texte";
 import { adresaPoza } from "@/lib/poza-urcata";
 import { proiecteAfisate } from "@/date/proiecte";
 import Cadru from "@/componente/admin/Cadru";
@@ -120,8 +120,8 @@ async function Continut({
 
   return (
     <Cadru
-      titlu="Scrie pe site"
-      descriere="Noutăți și campanii, scrise de aici. Nimic nu se vede public până nu apeși „Publică”."
+      titlu={acesta.plural}
+      descriere={`Apasă „${acesta.butonNou}”: titlu, text, poze, „Publică”. Ca să schimbi ceva, apasă pe el în listă.`}
       activ={`/admin/scrie?fel=${fel}`}
       actiuni={
         <Link
@@ -138,43 +138,21 @@ async function Continut({
           className="mb-7 colt-mic-a border border-turcoaz-200 bg-turcoaz-50 px-5 py-4 text-turcoaz-900"
         >
           {gata === "publicat" && "Publicat. E pe site."}
-          {gata === "salvat" && "Salvat ca ciornă. Nu se vede pe site."}
+          {gata === "salvat" && "Scos de pe site."}
           {gata === "sters" && "Șters."}
         </p>
       )}
 
-      {/* Felurile, ca două file. */}
-      <div className="flex flex-wrap gap-2">
-        {FELURI.map((f) => (
-          <Link
-            key={f.id}
-            href={`/admin/scrie?fel=${f.id}`}
-            aria-current={f.id === fel ? "page" : undefined}
-            className={`colt-mic-a px-4 py-2 font-titlu text-mic font-semibold transition-colors ${
-              f.id === fel
-                ? "bg-cerneala text-hartie"
-                : "border border-hartie-umbra bg-hartie text-cerneala hover:border-caramiziu-400"
-            }`}
-          >
-            {f.plural}
-          </Link>
-        ))}
-      </div>
-
       {texte.length === 0 ? (
         <div className="mt-8 max-w-2xl colt-a border border-hartie-umbra bg-hartie p-7">
           <p className="text-amplu text-cerneala-moale">
-            Nu e scris nimic încă. {acesta.plural} apar pe{" "}
-            <code className="rounded bg-hartie-umbra px-1.5">
-              {acesta.cale}
-            </code>{" "}
-            în ordinea publicării.
+            Nu e nimic aici încă. Apasă „{acesta.butonNou}”, sus.
           </p>
         </div>
       ) : (
         <div className="mt-8 grid gap-10">
           {ciorne.length > 0 && (
-            <Sectiune titlu="Ciorne" texte={ciorne} cale={acesta.cale} />
+            <Sectiune titlu="Nepublicate" texte={ciorne} cale={acesta.cale} />
           )}
           {publicate.length > 0 && (
             <Sectiune titlu="Publicate" texte={publicate} cale={acesta.cale} />
@@ -264,7 +242,7 @@ function Sectiune({
                   {text.titlu}
                 </Link>
                 <p className="mt-0.5 truncate text-mic text-cerneala-moale">
-                  {text.rezumat || "fără rezumat"}
+                  {text.rezumat}
                 </p>
               </div>
 

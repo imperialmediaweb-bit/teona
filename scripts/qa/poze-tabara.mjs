@@ -165,14 +165,22 @@ try {
     const titlu = `Tabără de probă ${fel} ${Date.now()}`;
     await pag.goto(`${BAZA}/admin/scrie/nou?fel=${fel}`, { timeout: 120_000 });
     await pag.fill("input[name=titlu]", titlu);
-    await pag.fill("textarea[name=continut]", "Un text de probă, destul de lung cât să treacă verificarea.");
+    await pag.locator("[data-editor]").click(); await pag.keyboard.type("Un text de probă, destul de lung cât să treacă verificarea.");
     if (fel === "proiect") {
       await pag.fill("input[name=dataInceput]", "2026-06-08");
     }
     // Ciorna întâi, ca să aibă id.
     await Promise.all([
       pag.waitForURL(/\/admin\/scrie\/[0-9a-f-]{36}/, { timeout: 120_000 }),
-      pag.click("button[name=actiune][value=salveaza]"),
+      // Panoul nu mai are buton de ciornă pentru un text nou (se publică
+      // direct); ruta primește încă `salveaza`, iar proba are nevoie de un
+      // text nepublicat ca să urce pozele înainte de „Publică”.
+      pag.evaluate(() => {
+        const f = document.querySelector('form[action="/api/admin/texte"]');
+        const i = document.createElement("input");
+        i.type = "hidden"; i.name = "actiune"; i.value = "salveaza";
+        f.append(i); f.submit();
+      }),
     ]);
     const id = pag.url().match(/scrie\/([0-9a-f-]{36})/)[1];
 
@@ -282,11 +290,19 @@ try {
       "un text nou se deschide gol, fără titlul celui salvat înainte",
     );
     await pag.fill("input[name=titlu]", titlu);
-    await pag.fill("textarea[name=continut]", "Un text de probă, destul de lung cât să treacă verificarea.");
+    await pag.locator("[data-editor]").click(); await pag.keyboard.type("Un text de probă, destul de lung cât să treacă verificarea.");
     await pag.fill("input[name=dataInceput]", "2026-07-06");
     await Promise.all([
       pag.waitForURL(/\/admin\/scrie\/[0-9a-f-]{36}/, { timeout: 120_000 }),
-      pag.click("button[name=actiune][value=salveaza]"),
+      // Panoul nu mai are buton de ciornă pentru un text nou (se publică
+      // direct); ruta primește încă `salveaza`, iar proba are nevoie de un
+      // text nepublicat ca să urce pozele înainte de „Publică”.
+      pag.evaluate(() => {
+        const f = document.querySelector('form[action="/api/admin/texte"]');
+        const i = document.createElement("input");
+        i.type = "hidden"; i.name = "actiune"; i.value = "salveaza";
+        f.append(i); f.submit();
+      }),
     ]);
     const id = pag.url().match(/scrie\/([0-9a-f-]{36})/)[1];
     const buton = pag.getByRole("button", { name: "Urcă pozele" });

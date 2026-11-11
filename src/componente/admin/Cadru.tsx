@@ -92,7 +92,7 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
         si: ["/admin/scrie"],
       },
       { href: "/admin/scrie?fel=campanie", eticheta: "Campanii", pictograma: "inima" },
-      { href: "/admin/scrie?fel=proiect", eticheta: "Tabere și proiecte", pictograma: "harta" },
+      { href: "/admin/scrie?fel=proiect", eticheta: "Tabere", pictograma: "harta" },
       {
         href: "/admin/pagini",
         eticheta: "Pagini",
@@ -222,7 +222,10 @@ async function Nav({ activ }: { activ?: string }) {
   return (
     <div className="grid gap-1">
       {grupuri.map((grup, i) => {
-        const deschis = grup.pagini.some(eAici) || (!areActiv && i === 0);
+        // „Site” stă mereu deschis: Blog, Campanii și Tabere sunt ce caută
+        // asociația cel mai des, iar închise într-o grupă nu le găsea.
+        const deschis =
+          grup.titlu === "Site" || grup.pagini.some(eAici) || (!areActiv && i === 0);
         return (
           <details key={grup.titlu} open={deschis} className="group/grupa">
             <summary className="flex cursor-pointer list-none items-center gap-2 rounded-lg px-3 py-2 font-titlu text-mic font-bold text-hartie/85 transition-colors hover:bg-hartie/10 hover:text-hartie [&::-webkit-details-marker]:hidden">

@@ -1,6 +1,7 @@
 import { cacheRezerva } from "@/lib/cache-panou";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { textSimplu } from "@/lib/text-bogat";
 import { pozaLocala, proiecte as proiecteBrute } from "@/lib/continut";
 import { curataTitlu, faSlug } from "@/lib/slug-proiecte.mjs";
 import { PROIECTE_SCRISE } from "./proiecte-scrise";
@@ -212,10 +213,9 @@ function dinText(t: TextPanou): ProiectAfisat {
     dosarCloud: t.dosarCloud ?? undefined,
     areDataScrisa: Boolean(t.dataInceput),
     areCategorieScrisa: Boolean(t.categorie),
-    descriere: t.continut
-      .split(/(?:\r?\n){2,}/)
-      .map((p) => p.trim())
-      .filter(Boolean),
+    continut: t.continut,
+    // Fără formatare: aici e text curat, pentru rezumate.
+    descriere: textSimplu(t.continut),
   };
 }
 
@@ -328,6 +328,7 @@ function peste(
     dosarCloud: p.dosarCloud ?? vechi.dosarCloud,
     dataCitita: p.dataCitita ?? vechi.dataCitita,
     descriere: p.descriere?.length ? p.descriere : vechi.descriere,
+    continut: p.descriere?.length ? p.continut : undefined,
   };
 }
 

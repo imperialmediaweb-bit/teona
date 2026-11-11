@@ -70,6 +70,12 @@ export type ProiectAfisat = {
    * acolo, sau sunt puse din oficiu (data publicării, „2026”). Cele puse din
    * oficiu nu au voie să treacă peste ale unei tabere vechi (`peste`).
    */
+  /**
+   * Textul întreg scris în panou, cu semnele lui (`##`, `-`, `**`, linkuri).
+   * Pagina îl desenează cu `TextScris`; `descriere` rămâne varianta curată,
+   * pe paragrafe, pentru rezumate.
+   */
+  continut?: string;
   areDataScrisa?: boolean;
   areCategorieScrisa?: boolean;
 };

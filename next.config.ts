@@ -101,7 +101,7 @@ const politicaDeContinut = [
   `connect-src 'self'${dezvoltare ? " ws: wss:" : ""} ${GOOGLE_DATE} ${CLOUDFLARE_DATE}`,
   // Playerul Facebook din „Suntem în presă” (`VideoIncorporat`) se montează la
   // apăsare; fără el, butonul lăsa un cadru gol (auditul din 4 noiembrie 2026).
-  `frame-src ${FORMULAR230} https://www.facebook.com`,
+  `frame-src ${FORMULAR230} https://www.facebook.com https://www.youtube-nocookie.com`,
   "frame-ancestors 'none'",
   "object-src 'none'",
   "base-uri 'self'",
