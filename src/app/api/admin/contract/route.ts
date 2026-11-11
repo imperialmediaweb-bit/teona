@@ -1,3 +1,4 @@
+import { probaAreVoie } from "@/lib/proba";
 import { formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata } from "@/lib/api";
 import { arePermisiune, numeleConectat } from "@/lib/admin";
 import {
@@ -41,6 +42,7 @@ export async function POST(cerere: Request) {
 
   const camp = (nume: string) => String(formular.get(nume) ?? "").trim();
   const id = camp("id");
+  if (!(await probaAreVoie("firme", id))) return new Response("Proba lucrează numai pe rândurile ei.", { status: 403 });
   if (!/^[0-9a-f-]{36}$/i.test(id)) return nuTrece("Firmă necunoscută.");
 
   const firma = await iaFirma(id);

@@ -68,9 +68,20 @@ export default function CalculatorSponsorizare() {
 
   /** Completează cele două câmpuri din ultimul bilanț depus. */
   function completeaza(gasita: Firma) {
+    /*
+      Altă firmă decât cea de dinainte: cifrele celei vechi se șterg. Altfel
+      CUI-ul firmei A (cu profit), apoi al firmei B (pe pierdere sau fără
+      bilanț) lăsa maximul calculat cu impozitul lui A, iar „Generează
+      contractul” pleca cu CUI-ul lui B și suma lui A (audit 11 nov. 2026).
+    */
+    const altaFirma = firma !== null && firma.cui !== gasita.cui;
     setFirma(gasita);
-    const firma = gasita;
-    const bilant = firma.bilant;
+    if (altaFirma) {
+      setCifraText("");
+      setImpozitText("");
+      setSumaContract("");
+    }
+    const bilant = gasita.bilant;
     if (!bilant) {
       setDinBilant(null);
       return;
@@ -82,7 +93,7 @@ export default function CalculatorSponsorizare() {
       setImpozitText(scrieCifre(bilant.impozitEstimat));
     }
     setDinBilant({
-      denumire: firma.denumire,
+      denumire: gasita.denumire,
       an: bilant.an,
       cifra: bilant.cifraDeAfaceri !== null,
       impozit: bilant.impozitEstimat !== null,

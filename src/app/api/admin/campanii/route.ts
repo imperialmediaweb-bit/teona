@@ -1,3 +1,4 @@
+import { probaAreVoie } from "@/lib/proba";
 import { formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { hotaraste, stergeSpam } from "@/lib/campanii";
@@ -19,6 +20,7 @@ export async function POST(cerere: Request) {
   const { formular } = citit;
 
   const id = String(formular.get("id") ?? "");
+  if (!(await probaAreVoie("campanii_aniversare", id))) return new Response("Proba lucrează numai pe rândurile ei.", { status: 403 });
   const hotarare = String(formular.get("hotarare") ?? "");
   if (!/^[0-9a-f-]{36}$/i.test(id))
     return nuTrece("Campanie necunoscută.");

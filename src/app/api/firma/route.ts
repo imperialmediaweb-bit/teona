@@ -1,5 +1,5 @@
 import { limitaDeRata, raspuns } from "@/lib/api";
-import { cautaFirma, cuiValid, curataCui } from "@/lib/anaf";
+import { AnafMut, cautaFirma, cuiValid, curataCui } from "@/lib/anaf";
 
 /**
  * Caută o firmă după CUI, în datele publice ale ANAF.
@@ -29,7 +29,16 @@ export async function GET(cerere: Request) {
     return raspuns("CUI-ul nu pare bun. Verifică cifrele.", 400);
   }
 
-  const firma = await cautaFirma(cui);
+  let firma;
+  try {
+    firma = await cautaFirma(cui);
+  } catch (e) {
+    if (!(e instanceof AnafMut)) throw e;
+    return raspuns(
+      "ANAF nu răspunde acum. Completați datele firmei de mână sau încercați din nou peste un minut.",
+      503,
+    );
+  }
   if (!firma) {
     return raspuns("Nu am găsit nicio firmă cu CUI-ul ăsta la ANAF.", 404);
   }

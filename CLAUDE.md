@@ -1751,6 +1751,47 @@ antetele, subdomeniile și versiunile afișate. Ce s-a găsit și ce s-a făcut:
   vede pe `mail.teona-ariana.ro` cu GiveWP 3.18.0 (vulnerabilitate critică
   publică), lipsesc CAA, DNSSEC, MTA-STS.
 
+## Auditul de logică din 11 noiembrie 2026
+
+Asociația a publicat o tabără cu poză principală și galeria n-a apărut; proba
+urcase pozele numai pe o ciornă **fără** poză principală. De aici regula:
+**o funcție se probează pe combinațiile pe care le face omul, nu pe drumul pe
+care l-am scris eu.** Cinci agenți au căutat restul defectelor de aceeași
+formă, rulându-le. Reparate (lista întreagă e în istoricul depozitului):
+
+- **Conținut.** Browserul trimite rândurile ca `\r\n`: paragrafele scrise
+  din panou se lipeau (`split(/(?:\r?\n){2,}/)`, iar `text()` normalizează).
+  Textul din panou se pune **peste** tabăra veche (`peste()` din
+  `date/proiecte.ts`), câmp cu câmp: data, categoria și folderul trec numai
+  dacă au fost scrise (`areDataScrisa`, `areCategorieScrisa`). O tabără nouă
+  nu ia slugul uneia din cod. „Salvează ciorna” pe un text publicat se cheamă
+  „Scoate de pe site” și nu-i mai șterge data publicării.
+- **Bani.** Reînnoirea lunară nu mai cheamă `laBuletin` (reabona pe cine se
+  dezabonase). „Vine lunar” ia ultima plată a fiecăruia. Transferul respins
+  și anunțat din nou se redeschide; destinația intră în referință. Linkul de
+  pe pagina „de ziua ta” poartă `frecventa=o-data`. O pană Stripe răspunde
+  500, nu 503 (503 înseamnă „plata nu e pornită”). Abonamentele `past_due`
+  se văd și se opresc din cont.
+- **Firme.** Totalul registrului și „au sponsorizat înainte” numără numai
+  `semnat` și `incasat`. O firmă pe „A renunțat”, sau încasată într-un an
+  trecut, care scrie din nou devine „Cerere nouă”. `normalizeazaCui` scoate
+  și punctele și liniuțele. `pasulUrmatorSponsorizare()` (`date/formulare.ts`)
+  scrie o dată ce urmează, după calea aleasă: ecran, e-mail, anunț intern.
+  `cautaFirma` aruncă `AnafMut` când ANAF tace, în loc să țină o zi „nu
+  există”. Calculatorul șterge cifrele firmei de dinainte.
+- **Cheia de probă** lucrează numai pe rândurile cu adresa de probă
+  (`probaAreVoie` din `lib/proba.ts`) și nu mai confirmă plățile oamenilor
+  când deschide panoul (`verificaInainte`).
+
+**Rămase, nereparate** (hotărâri sau lucru mai mare): rambursările Stripe nu
+scad donația; transferul în euro se anunță ca lei; granițele de lună sunt în
+UTC; raportul anual numără firmele încasate din toți anii; schimbarea parolei
+nu închide celelalte sesiuni și nici codul rapid; stadiul firmei și al
+contractului din registru nu se leagă; „firme fără răspuns” nu ține seama de
+jurnal; căutarea fără diacritice; e-mailul comparat cu majuscule; cele două
+e-mailuri despre Formularul 230 spun lucruri diferite despre hârtie;
+`/ziua-ta/<inexistent>` răspunde 200; „Fac alt folder” înlocuiește galeria.
+
 ## Decizii încă deschise
 
 1. **Donațiile.** Acum merg prin GiveWP + Stripe pe WordPress, în lei, cu plată

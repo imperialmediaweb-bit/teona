@@ -1,3 +1,4 @@
+import { probaAreVoie } from "@/lib/proba";
 import { cuBaza, formularAdmin, limitaDeRata, nuTrece, text, trimiteLa } from "@/lib/api";
 import { arePermisiune, esteAutentificat, numeleConectat } from "@/lib/admin";
 import { esteFelInteractiune, scrieInteractiune } from "@/lib/crm";
@@ -58,6 +59,9 @@ async function posteaza(cerere: Request) {
     return nuTrece("Firmă necunoscută.");
   }
   if (!email && !firmaId) return nuTrece("Cerere invalidă.");
+  if (!(await probaAreVoie(firmaId ? "firme" : "email", firmaId ?? email ?? ""))) {
+    return new Response("Proba lucrează numai pe rândurile ei.", { status: 403 });
+  }
 
   /*
     Cine a scris rândul.

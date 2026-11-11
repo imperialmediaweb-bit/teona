@@ -1,3 +1,4 @@
+import { probaAreVoie } from "@/lib/proba";
 import { cuBaza, formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { scrieNotita, uitaDonatorul } from "@/lib/plati/donatori";
@@ -20,6 +21,7 @@ async function posteaza(cerere: Request) {
   const { formular } = citit;
 
   const email = String(formular.get("email") ?? "").trim();
+  if (!(await probaAreVoie("email", email))) return new Response("Proba lucrează numai pe rândurile ei.", { status: 403 });
   const fapta = String(formular.get("fapta") ?? "");
   if (!email) return nuTrece("Lipsește adresa.");
 

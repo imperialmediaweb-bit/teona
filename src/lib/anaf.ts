@@ -150,7 +150,14 @@ async function bilantulCelMaiNou(cui: number): Promise<Bilant | null> {
   return null;
 }
 
-/** Firma, sau `null` dacă ANAF n-o are. */
+/** ANAF n-a răspuns: nu se știe dacă firma există. */
+export class AnafMut extends Error {
+  constructor() {
+    super("ANAF nu a răspuns");
+  }
+}
+
+/** Firma, sau `null` dacă ANAF n-o are. Aruncă `AnafMut` dacă ANAF tace. */
 export async function cautaFirma(cui: number): Promise<Firma | null> {
   const tinut = MEMORIE.get(cui);
   if (tinut && Date.now() - tinut.cand < O_ZI) return tinut.firma;
@@ -161,6 +168,14 @@ export async function cautaFirma(cui: number): Promise<Firma | null> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify([{ cui, data: azi }]),
   });
+
+  /*
+    „ANAF n-a răspuns” nu e „firma nu există”. `ia()` dă `null` și la o
+    cădere sau la timpul depășit, iar răspunsul greșit se ținea o zi: firma
+    citea „nu am găsit nicio firmă cu CUI-ul ăsta” despre propriul CUI, până
+    a doua zi (audit 11 nov. 2026). O cădere se aruncă și nu se ține minte.
+  */
+  if (date === null) throw new AnafMut();
 
   const gasita = date?.found?.[0]?.date_generale;
   if (!gasita?.denumire) {

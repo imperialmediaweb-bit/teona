@@ -1,3 +1,4 @@
+import { probaAreVoie } from "@/lib/proba";
 import { email as citesteEmail, formularAdmin, limitaDeRata, raspuns, sesiuneExpirata, text, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { adaugaDonatieManuala, esteMetodaManuala } from "@/lib/plati/donatori";
@@ -58,6 +59,11 @@ export async function POST(cerere: Request) {
   }
 
   const adresa = String(formular.get("email") ?? "").trim();
+  // Proba poate trece de mână numai o donație cu adresa ei: `curata-proba` o
+  // găsește după adresă, iar una fără ar rămâne în totalurile asociației.
+  if (!(await probaAreVoie("email", adresa))) {
+    return new Response("Proba lucrează numai pe rândurile ei.", { status: 403 });
+  }
   if (adresa && !citesteEmail(adresa)) {
     return inapoi("Adresa de e-mail nu e validă. Lasă câmpul gol dacă n-o ai.");
   }

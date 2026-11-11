@@ -1,3 +1,4 @@
+import { probaAreVoie } from "@/lib/proba";
 import { cuBaza, formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import {
@@ -74,6 +75,7 @@ async function posteaza(cerere: Request) {
   }
 
   const id = String(formular.get("id") ?? "");
+  if (!(await probaAreVoie("cereri", id))) return new Response("Proba lucrează numai pe rândurile ei.", { status: 403 });
   if (!/^[0-9a-f-]{36}$/i.test(id)) return nuTrece("Cerere necunoscută.");
 
   const stadiu = formular.get("stadiu");

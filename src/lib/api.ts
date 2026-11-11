@@ -450,8 +450,10 @@ export function email(valoare: unknown): string | null {
  * orice limbă cu alfabet latin, are o vocală.
  */
 export function pareText(valoare: string): boolean {
-  return /[a-zăâîșțáéíóúäëïöüyà-ÿ]/i.test(valoare) &&
-    /[aeiouăâîyáéíóúäëïöüàèìòù]/i.test(valoare);
+  // Și chirilice și grecești: „Олена Коваль” era respinsă ca „nu e nume”,
+  // iar la Suceava sunt mulți ucraineni (audit 11 nov. 2026).
+  return /\p{L}/u.test(valoare) &&
+    /[aeiouăâîyáéíóúäëïöüàèìòùаеёиоуыэюяіїєαεηιουω]/i.test(valoare);
 }
 
 export function esteRobot(corp: Record<string, unknown>): boolean {

@@ -1,3 +1,4 @@
+import { probaAreVoie } from "@/lib/proba";
 import { formularAdmin, limitaDeRata, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { hotarasteTransfer } from "@/lib/plati/donatori";
@@ -32,6 +33,7 @@ export async function POST(cerere: Request) {
     trimiteLa(`/admin/donatii?${parametru}`);
 
   const id = String(formular.get("id") ?? "");
+  if (!(await probaAreVoie("donatii", id))) return new Response("Proba lucrează numai pe rândurile ei.", { status: 403 });
   if (!/^[0-9a-f-]{36}$/i.test(id)) {
     return inapoi(`eroare=${encodeURIComponent("Transfer necunoscut.")}`);
   }
