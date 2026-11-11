@@ -1,4 +1,5 @@
 import { ASOCIATIA, EMAIL } from "@/date/asociatie";
+import { adresaDeProba, esteProba } from "@/lib/proba";
 import { mediu } from "@/lib/mediu";
 
 /**
@@ -77,6 +78,15 @@ export async function trimiteEmail(mesaj: {
   if (mesaj.masa && !locInMasa()) {
     console.error(`[email] limita de ${LIMITA_MASA} pe oră atinsă; n-a plecat „${mesaj.subiect}”`);
     return false;
+  }
+  // O probă automată nu scrie nimănui adevărat: totul merge la adresa de probă.
+  if (await esteProba()) {
+    const proba = adresaDeProba();
+    if (!proba) {
+      console.warn(`[email] probă fără PROBA_EMAIL; n-a plecat „${mesaj.subiect}”`);
+      return true;
+    }
+    mesaj = { ...mesaj, catre: proba, subiect: `[PROBĂ] ${mesaj.subiect}` };
   }
   const cheie = mediu("RESEND_API_KEY");
   if (!cheie) {

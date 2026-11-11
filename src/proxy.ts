@@ -206,6 +206,28 @@ const RUTE_PROBA = [
   "/api/admin/qr",
   "/api/admin/echipa",
   "/api/admin/aparitii",
+  /*
+    Munca de fundraiser, pe rândurile făcute de probă. În modul de probă
+    (`lib/proba.ts`) orice e-mail pleacă numai la `PROBA_EMAIL`, nu sună
+    telefoane și nu atinge MailerLite; la sfârșit `curata-proba` șterge
+    rândurile cu adresa de probă.
+  */
+  "/api/admin/cereri",
+  "/api/admin/firme",
+  "/api/admin/jurnal",
+  "/api/admin/donatii",
+  "/api/admin/donatii/confirma",
+  "/api/admin/donatori",
+  "/api/admin/campanii",
+  "/api/admin/contract",
+  "/api/admin/contracte",
+  "/api/admin/raport",
+  "/api/admin/presa",
+  "/api/admin/presa/trimite",
+  "/api/admin/voluntari/apel",
+  "/api/admin/sablon",
+  "/api/admin/email",
+  "/api/admin/curata-proba",
 ];
 
 export default async function proxy(cerere: NextRequest) {
@@ -243,8 +265,7 @@ export default async function proxy(cerere: NextRequest) {
     // Previzualizarea șablonului de e-mail doar desenează: nimic nu urcă,
     // nimic nu pleacă (vezi `api/admin/sablon`).
     const voie =
-      RUTE_PROBA.includes(cale) ||
-      (cale === "/api/admin/sablon" && cerere.nextUrl.searchParams.get("previzualizare") === "1");
+      RUTE_PROBA.includes(cale);
     if (cale.startsWith("/api/admin/export") || !voie) {
       return new NextResponse("Cheia de probă nu are voie aici.", {
         status: 403,

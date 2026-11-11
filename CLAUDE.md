@@ -392,8 +392,19 @@ intră în panou ca „Probă automată” (`lib/admin.ts`, `fel: "proba"`).
 - Antetul îl pune proxy-ul mediului de lucru; valoarea nu trece prin
   conversație și nu e în depozit. Fără variabilă, ușa nu există; **se închide
   ștergând `PROBA_TOKEN` din Railway**.
-- Ce se face cu ea pe site-ul viu se șterge la sfârșit (ciorna de probă,
-  pozele de probă). Nu se publică nimic.
+- **Modul de probă** (`lib/proba.ts`), din 11 noiembrie 2026: o cerere cu
+  cheia trimite **orice** e-mail numai la `PROBA_EMAIL` (din Railway), cu
+  „[PROBĂ]” în subiect; nu sună telefoanele (`notificaPanoul`), nu pune
+  adrese în MailerLite (`laBuletin`), iar șablonul nu face ciorne și nu
+  trimite în MailerLite. Așa se pot încerca pe site-ul adevărat și
+  formularele publice, și munca de fundraiser (cereri, firme, jurnal,
+  contract, transfer confirmat, apel la voluntari, comunicat, proba
+  șablonului) — proxy-ul pune antetul pe toate cererile spre site.
+- **Curățenia**: `POST /api/admin/curata-proba` (numai cu cheia) șterge
+  rândurile cu adresa de probă din cereri, firme (cu contractele și jurnalul
+  lor), donații, aniversări, contacte de presă etc. Panoul nu șterge
+  dinadins rândurile oamenilor adevărați; ruta asta atinge numai adresa de
+  probă. Ce se face cu cheia pe site se curăță la sfârșit.
 
 ## O fotografie nouă trebuie urcată și în Cloudinary
 

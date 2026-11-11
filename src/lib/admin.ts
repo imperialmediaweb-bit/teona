@@ -188,7 +188,7 @@ export type Conectat =
  * nu există. Se închide ștergând variabila din Railway.
  */
 export const ANTET_PROBA = "x-proba-token";
-function cheieProbaValida(primit: string | null): boolean {
+export function cheieProbaValida(primit: string | null): boolean {
   const asteptat = mediu("PROBA_TOKEN");
   if (!asteptat || asteptat.length < 15 || !primit) return false;
   return egale(primit.trim(), asteptat);
@@ -280,7 +280,7 @@ const PROASPAT_S = 12 * 60 * 60;
 export async function sesiuneProaspata(): Promise<boolean> {
   await connection();
   const brut = (await cookies()).get(COOKIE_ADMIN)?.value;
-  if (!brut) return false;
+  if (!brut) return cheieProbaValida((await headers()).get(ANTET_PROBA));
   if (cookieCheieValid(brut)) return true;
   if (!cititSesiuneaUtilizator(brut)) return false;
   const ramas = Number(brut.split(":")[2]) - Math.floor(Date.now() / 1000);

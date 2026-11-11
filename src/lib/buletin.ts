@@ -1,4 +1,5 @@
 import { intreaba } from "./baza";
+import { esteProba } from "./proba";
 import { mediu } from "@/lib/mediu";
 import { anuntaAbonarea } from "./email/buletin";
 import { notificaPanoul } from "./notificari";
@@ -48,6 +49,8 @@ export async function laBuletin(
   sursa: SursaAbonare = "formular",
   dinPanou?: DinPanou,
 ): Promise<boolean> {
+  // O probă automată nu pune adrese în lista adevărată (vezi `lib/proba.ts`).
+  if (await esteProba()) return true;
   const cheie = mediu("MAILERLITE_API_KEY");
   if (!cheie) return false;
 

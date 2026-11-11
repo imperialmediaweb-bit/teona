@@ -1,4 +1,5 @@
 import webpush from "web-push";
+import { esteProba } from "./proba";
 import { mediu } from "@/lib/mediu";
 import { areBazaDeDate, intreaba } from "./baza";
 
@@ -88,6 +89,8 @@ export async function notificaPanoul(n: {
   adresa: string;
 }): Promise<number> {
   if (!pregateste() || !areBazaDeDate()) return 0;
+  // O probă automată nu sună telefoanele asociației (vezi `lib/proba.ts`).
+  if (await esteProba()) return 0;
   const randuri = await intreaba<{ endpoint: string; p256dh: string; auth: string }>(
     `SELECT a.endpoint, a.p256dh, a.auth
        FROM abonamente_push a

@@ -1,4 +1,5 @@
 import { formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, text as curataText, trimiteLa } from "@/lib/api";
+import { esteProba } from "@/lib/proba";
 import { email as emailValid } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import { ASOCIATIA, EMAIL } from "@/date/asociatie";
@@ -287,6 +288,10 @@ export async function POST(cerere: Request) {
     return inapoi(cerere, { ratat: "proba-nu", fel });
   }
 
+  // O probă automată nu atinge MailerLite: de acolo pleacă la toată lista.
+  if ((fac === "ciorna" || fac === "trimite") && (await esteProba())) {
+    return raspuns("Proba nu face ciorne și nu trimite în MailerLite.", 403);
+  }
   if (fac === "ciorna" || fac === "trimite") {
     const grupuri = formular
       .getAll("grup")
