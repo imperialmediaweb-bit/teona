@@ -205,8 +205,10 @@ async function dinPanou(): Promise<ProiectAfisat[]> {
     coperta: t.poza ? `${PREFIX_CLOUD}${t.poza.id}` : null,
     poze: [],
     dosarCloud: t.dosarCloud ?? undefined,
+    areDataScrisa: Boolean(t.dataInceput),
+    areCategorieScrisa: Boolean(t.categorie),
     descriere: t.continut
-      .split(/\n{2,}/)
+      .split(/(?:\r?\n){2,}/)
       .map((p) => p.trim())
       .filter(Boolean),
   }));
@@ -297,6 +299,15 @@ function peste(
     ...p,
     coperta: p.coperta ?? vechi.coperta,
     poze: p.poze.length > 0 ? p.poze : vechi.poze,
+    /*
+      „Scrie descrierea” trimite numai titlul și textul. Data publicării și
+      categoria „2026”, puse din oficiu, ar fi mutat o tabără din 2023 în
+      capul listei și i-ar fi căutat pozele în folderul anului greșit; un
+      `dosarCloud` lipsă l-ar fi șters pe cel din cod (Banca pentru Alimente).
+    */
+    data: p.areDataScrisa ? p.data : vechi.data,
+    categorie: p.areCategorieScrisa ? p.categorie : vechi.categorie,
+    dosarCloud: p.dosarCloud ?? vechi.dosarCloud,
     dataCitita: p.dataCitita ?? vechi.dataCitita,
     descriere: p.descriere?.length ? p.descriere : vechi.descriere,
   };

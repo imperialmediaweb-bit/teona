@@ -21,7 +21,7 @@ export function compuneBunVenit(d: { nume?: string | null; firma: boolean }): Co
   const corp = d.firma
     ? `
     <p style="${P}">${salut}</p>
-    <p style="${P}">Ați intrat pe lista de vești pentru firme a ${curat(ASOCIATIA.denumire)}. Vă scriem rar: despre tabere, despre Casa Teona și despre cum poate o firmă să sprijine copiii, inclusiv prin direcționarea a 20% din impozitul pe profit.</p>
+    <p style="${P}">Ați intrat pe lista de vești pentru firme a Asociației Teona Ariana Suceava. Vă scriem rar: despre tabere, despre Casa Teona și despre cum poate o firmă să sprijine copiii, inclusiv prin direcționarea a 20% din impozitul pe profit.</p>
     ${buton("Vedeți cum poate ajuta o firmă", `${ADRESA_SITE}/directioneaza-20`)}
     <p style="${MIC}">Vă puteți dezabona oricând, din linkul de la sfârșitul fiecărui buletin. Dacă nu v-ați abonat dumneavoastră, ignorați mesajul.</p>`
     : `
@@ -32,7 +32,7 @@ export function compuneBunVenit(d: { nume?: string | null; firma: boolean }): Co
   return {
     subiect: d.firma ? "V-ați abonat la veștile noastre" : titlu,
     html: pagina(titlu, corp, d.firma ? "Lista de vești pentru firme." : "Îți scriem rar, despre tabere și Casa Teona."),
-    text: `${d.firma ? "Ați intrat pe lista de vești pentru firme" : "Gata, ești pe lista noastră"} a ${ASOCIATIA.denumire}. Dezabonarea se face din linkul de la sfârșitul fiecărui buletin.\n\n${ADRESA_SITE}`,
+    text: `${d.firma ? "Ați intrat pe lista de vești pentru firme" : "Gata, ești pe lista noastră"}${d.firma ? " a Asociației Teona Ariana Suceava" : ""}. Dezabonarea se face din linkul de la sfârșitul fiecărui buletin.\n\n${ADRESA_SITE}`,
   };
 }
 

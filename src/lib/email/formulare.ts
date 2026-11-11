@@ -1,3 +1,4 @@
+import { pasulUrmatorSponsorizare } from "@/date/formulare";
 import { ADRESA_SITE } from "@/app/seo";
 import {
   ADRESE,
@@ -83,11 +84,7 @@ export function compuneSponsorizare(d: CerereSponsorizare): Compus {
     <p style="${P}">Am primit cererea trimisă în numele <strong>${curat(d.firma)}</strong> și vă mulțumim. Ați ales calea <strong>${curat(d.cale)}</strong>.</p>
     <p style="${P}">Mai departe arată așa:</p>
     ${pasi([
-      "Vă scrie <strong>" +
-        curat(FUNDRAISING.nume) +
-        "</strong>, " +
-        curat(FUNDRAISING.rol.toLowerCase()) +
-        ", cu contractul de sponsorizare completat cu datele noastre.",
+      curat(pasulUrmatorSponsorizare(d.cale, `${FUNDRAISING.nume}, ${FUNDRAISING.rol.toLowerCase()},`)),
       "Contabilitatea dumneavoastră confirmă suma și termenul de depunere — ele depind de situația fiscală a firmei, așa că nu le putem calcula noi de aici.",
       "Semnați contractul și, după caz, depuneți Declarația 177 la ANAF.",
       "Vă trimitem dovada că suma a ajuns și, dacă doriți, vă trecem printre sponsorii de pe site.",
@@ -113,7 +110,7 @@ export function compuneSponsorizare(d: CerereSponsorizare): Compus {
 Am primit cererea trimisă în numele ${d.firma}. Ați ales calea: ${d.cale}.
 
 Mai departe:
-1. Vă scrie ${FUNDRAISING.nume}, ${FUNDRAISING.rol.toLowerCase()}, cu contractul de sponsorizare completat cu datele noastre.
+1. ${pasulUrmatorSponsorizare(d.cale, `${FUNDRAISING.nume}, ${FUNDRAISING.rol.toLowerCase()},`)}
 2. Contabilitatea dumneavoastră confirmă suma și termenul de depunere — depind de situația fiscală a firmei.
 3. Semnați contractul și, după caz, depuneți Declarația 177 la ANAF.
 4. Vă trimitem dovada că suma a ajuns.
@@ -150,7 +147,7 @@ export function compuneAnuntSponsorizare(d: CerereSponsorizare): Compus {
   const corp = `
     <p style="${P}">A completat formularul de pe pagina pentru firme. Răspunde direct la mesajul ăsta și ajungi la persoana de contact.</p>
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 16px;">${campuri.html}</table>
-    <p style="${MIC}margin-bottom:0;">Pasul următor, așa cum i l-am scris: contractul de sponsorizare completat cu datele noastre.</p>`;
+    <p style="${MIC}margin-bottom:0;">Pasul următor, așa cum i l-am scris: ${curat(pasulUrmatorSponsorizare(d.cale, FUNDRAISING.nume))}</p>`;
 
   return {
     subiect: `${titlu} — ${d.firma}`,
@@ -165,7 +162,7 @@ export function compuneAnuntSponsorizare(d: CerereSponsorizare): Compus {
 
 export async function trimiteSponsorizare(
   d: CerereSponsorizare,
-): Promise<{ catreAsociatie: boolean }> {
+): Promise<{ catreAsociatie: boolean; catreFirma: boolean }> {
   // Întâi mesajul către asociație: dacă el nu pleacă, ruta îi spune omului,
   // în loc să-l lase să creadă că a scris cuiva.
   const catreAsociatie = await trimiteEmail({
@@ -173,14 +170,14 @@ export async function trimiteSponsorizare(
     raspundeLa: d.email,
     ...compuneAnuntSponsorizare(d),
   });
-  if (!catreAsociatie) return { catreAsociatie: false };
+  if (!catreAsociatie) return { catreAsociatie: false, catreFirma: false };
 
-  await trimiteEmail({
+  const catreFirma = await trimiteEmail({
     catre: d.email,
     raspundeLa: FUNDRAISING.email,
     ...compuneSponsorizare(d),
-  });
-  return { catreAsociatie: true };
+  }).catch(() => false);
+  return { catreAsociatie: true, catreFirma };
 }
 
 // ─── 3,5% — persoane fizice ───────────────────────────────────────────────

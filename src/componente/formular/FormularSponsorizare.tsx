@@ -2,7 +2,7 @@
 
 import { useId, useState } from "react";
 import { CONTACT_FIRME, EMAIL } from "@/date/asociatie";
-import { CAI_SPONSORIZARE } from "@/date/formulare";
+import { CAI_SPONSORIZARE, pasulUrmatorSponsorizare } from "@/date/formulare";
 import Decor from "../Decor";
 import Pictograma from "../Pictograma";
 import Camp, {
@@ -45,11 +45,11 @@ type Erori = Partial<
 type Stare =
   | { fel: "gol" }
   | { fel: "trimite" }
-  | { fel: "reusit" }
+  | { fel: "reusit"; cale: string; peEmail: boolean }
   | { fel: "eroare"; mesaj: string };
 
 /** Cu sau fără „RO”, cu sau fără spațiu — aceeași regulă ca pe server. */
-const CUI = /^(ro)?\s?\d{2,10}$/i;
+const CUI = /^(ro)?[\s.\-]*\d[\d\s.\-]{1,14}$/i;
 
 const FUNDRAISING = CONTACT_FIRME[0];
 
@@ -121,7 +121,11 @@ export default function FormularSponsorizare() {
         });
         return;
       }
-      setStare({ fel: "reusit" });
+      setStare({
+        fel: "reusit",
+        cale: String(date.get("cale") ?? ""),
+        peEmail: (corp.mesaj ?? "").includes("pe e-mail"),
+      });
     } catch {
       setStare({
         fel: "eroare",
@@ -145,11 +149,13 @@ export default function FormularSponsorizare() {
           <Pictograma nume="plic" className="size-7" />
         </span>
         <p className="relative mt-5 font-titlu text-h4 font-bold text-turcoaz-900">
-          Mulțumim! V-am trimis pașii pe e-mail.
+          {stare.peEmail
+            ? "Mulțumim! V-am trimis pașii pe e-mail."
+            : "Mulțumim! V-am înregistrat cererea."}
         </p>
         <p className="relative mt-3 text-corp text-turcoaz-900/80">
-          Vă scrie {FUNDRAISING.nume} cu contractul de sponsorizare completat cu
-          datele noastre. Dacă e ceva urgent, sunați la{" "}
+          {pasulUrmatorSponsorizare(stare.cale, FUNDRAISING.nume)} Dacă e ceva
+          urgent, sunați la{" "}
           <a
             href={`tel:${FUNDRAISING.telefon.apel}`}
             className="font-titlu font-bold underline underline-offset-4"

@@ -4,6 +4,7 @@ import {
   firma as iaFirma,
   schimbaStadiulFirmei,
   scrieInteractiune,
+  normalizeazaCui,
 } from "@/lib/crm";
 import {
   contractDeSponsorizare,
@@ -59,7 +60,7 @@ export async function POST(cerere: Request) {
     const inregistrat = await numarPentruContract({
       firmaId: id,
       denumire: camp("denumire") || firma.denumire,
-      cui: camp("cui") || firma.cui,
+      cui: normalizeazaCui(camp("cui")) || firma.cui,
       /*
         În registru suma stă în bani, ca peste tot în baza asta. Fără
         înmulțire, 1.500 de lei ar fi intrat ca 15 lei — iar totalul anului
@@ -79,7 +80,7 @@ export async function POST(cerere: Request) {
     denumire: camp("denumire") || firma.denumire,
     sediu: camp("sediu"),
     judet: camp("judet"),
-    cui: camp("cui") || firma.cui,
+    cui: normalizeazaCui(camp("cui")) || firma.cui,
     regCom: camp("regCom"),
     reprezentant: camp("reprezentant"),
     calitate: camp("calitate"),

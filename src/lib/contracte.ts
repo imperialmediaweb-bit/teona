@@ -197,7 +197,9 @@ export async function totaluriContracte(
     `SELECT count(*)                                                  AS cate,
             count(*) FILTER (WHERE stadiu = 'semnat')                 AS semnate,
             count(*) FILTER (WHERE stadiu = 'incasat')                AS incasate,
-            coalesce(sum(valoare_bani) FILTER (WHERE stadiu <> 'anulat'), 0)
+            -- Numai ce s-a semnat: un contract doar descărcat de pe site, sau
+            -- refăcut cu altă sumă, nu e o sponsorizare (audit 11 nov. 2026).
+            coalesce(sum(valoare_bani) FILTER (WHERE stadiu IN ('semnat','incasat')), 0)
                                                                       AS valoare_totala,
             coalesce(sum(valoare_bani) FILTER (WHERE stadiu = 'incasat'), 0)
                                                                       AS valoare_incasata,
@@ -244,18 +246,24 @@ export async function nereinnoite(an: number): Promise<SponsorNereinnoit[]> {
     valoare_bani: string | null;
     ultimul_an: number;
   }>(
-    `SELECT DISTINCT ON (coalesce(c.cui, c.denumire))
+    /*
+      Numai cine a semnat chiar: o firmă care doar a descărcat contractul
+      anul trecut n-a sponsorizat. CUI-ul se compară fără „RO” și spații,
+      altfel „RO14399840” și „14399840” ar fi două firme.
+    */
+    `SELECT DISTINCT ON (coalesce(regexp_replace(upper(c.cui), '^RO|\s', '', 'g'), c.denumire))
             c.denumire, c.cui, c.firma_id, c.valoare_bani, c.an AS ultimul_an
        FROM contracte c
       WHERE c.an < $1
-        AND c.stadiu <> 'anulat'
+        AND c.stadiu IN ('semnat', 'incasat')
         AND NOT EXISTS (
           SELECT 1 FROM contracte d
            WHERE d.an = $1
              AND d.stadiu <> 'anulat'
-             AND coalesce(d.cui, d.denumire) = coalesce(c.cui, c.denumire)
+             AND coalesce(regexp_replace(upper(d.cui), '^RO|\s', '', 'g'), d.denumire)
+               = coalesce(regexp_replace(upper(c.cui), '^RO|\s', '', 'g'), c.denumire)
         )
-      ORDER BY coalesce(c.cui, c.denumire), c.an DESC`,
+      ORDER BY coalesce(regexp_replace(upper(c.cui), '^RO|\s', '', 'g'), c.denumire), c.an DESC`,
     [an],
   );
   return randuri.map((r) => ({

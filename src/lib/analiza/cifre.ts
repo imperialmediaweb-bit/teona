@@ -136,10 +136,15 @@ export async function profilulDonatorilor(): Promise<ProfilDonatori> {
         GROUP BY 1`,
     ),
     intreaba<{ nr: string; bani: string | null }>(
+      // Ultima plată a fiecăruia, ca pe tabloul de bord (`venitLunarRecurent`).
       `SELECT COUNT(DISTINCT email) AS nr, SUM(suma_bani) AS bani
-         FROM donatii
-        WHERE ${INCASATE} AND frecventa = 'lunar'
-          AND platita_la >= now() - interval '35 days'`,
+         FROM (
+           SELECT DISTINCT ON (lower(email), destinatie) email, suma_bani
+             FROM donatii
+            WHERE ${INCASATE} AND frecventa = 'lunar'
+              AND platita_la >= now() - interval '35 days'
+            ORDER BY lower(email), destinatie, platita_la DESC
+         ) ultimele`,
     ),
     intreaba<{ nr: string }>(
       `SELECT COUNT(*) AS nr FROM (

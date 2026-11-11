@@ -408,7 +408,9 @@ export function limitaDeRata(
 /** Un șir nevid, fără spații pe margini, de cel mult `maxim` caractere. */
 export function text(valoare: unknown, maxim: number): string | null {
   if (typeof valoare !== "string") return null;
-  const curat = valoare.trim();
+  // Browserul trimite rândurile ca \r\n: numărate ca două semne, un text
+  // lung cu multe paragrafe trecea de limită fără să fi trecut în pagină.
+  const curat = valoare.replace(/\r\n?/g, "\n").trim();
   if (curat.length === 0 || curat.length > maxim) return null;
   return curat;
 }

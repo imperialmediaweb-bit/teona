@@ -331,12 +331,21 @@ export async function venitLunarRecurent(): Promise<{
   donatori: number;
 }> {
   const randuri = await intreaba<{ bani: string | null; nr: string }>(
+    /*
+      Numai ultima plată a fiecărui om, pe fiecare destinație: fereastra de
+      35 de zile prinde câteva zile pe lună două plăți ale aceluiași donator,
+      iar 50 de lei pe lună apăreau ca 100 (audit 11 nov. 2026).
+    */
     `SELECT SUM(suma_bani) AS bani, COUNT(DISTINCT email) AS nr
-       FROM donatii
-      WHERE moneda = 'RON'
-        AND frecventa = 'lunar'
-        AND stare = 'platita'
-        AND platita_la >= now() - interval '35 days'`,
+       FROM (
+         SELECT DISTINCT ON (lower(email), destinatie) email, suma_bani
+           FROM donatii
+          WHERE moneda = 'RON'
+            AND frecventa = 'lunar'
+            AND stare = 'platita'
+            AND platita_la >= now() - interval '35 days'
+          ORDER BY lower(email), destinatie, platita_la DESC
+       ) ultimele`,
   );
   return {
     bani: Number(randuri[0]?.bani ?? 0),

@@ -110,7 +110,7 @@ function citeste(
     paragrafe: corp
       ? corp
           .replace(/\r\n/g, "\n")
-          .split(/\n{2,}/)
+          .split(/(?:\r?\n){2,}/)
           .map((p) => p.replace(/\n/g, " ").trim())
           .filter(Boolean)
       : EXEMPLU.paragrafe,

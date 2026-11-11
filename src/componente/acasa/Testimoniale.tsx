@@ -124,7 +124,7 @@ export default function Testimoniale({
                     >
                       {/* Rând gol = paragraf nou, ca peste tot în panou. */}
                       {curent.textLung
-                        .split(/\n{2,}/)
+                        .split(/(?:\r?\n){2,}/)
                         .map((bucata) => bucata.trim())
                         .filter(Boolean)
                         .map((bucata, i) => (

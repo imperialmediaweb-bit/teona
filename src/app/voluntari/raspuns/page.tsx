@@ -155,7 +155,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   return (
     <Cadru titlu="Poți veni?">
       {detalii}
-      {apel.mesaj.split(/\n{2,}/).map((p, i) => (
+      {apel.mesaj.split(/(?:\r?\n){2,}/).map((p, i) => (
         <p key={i} className="mt-4 text-amplu whitespace-pre-line text-cerneala-moale">
           {p}
         </p>

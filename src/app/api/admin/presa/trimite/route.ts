@@ -105,7 +105,7 @@ export async function POST(cerere: Request) {
     })),
   );
 
-  const { html, text: simplu } = corp(continut.split(/\n{2,}/).filter((x) => x.trim()));
+  const { html, text: simplu } = corp(continut.split(/(?:\r?\n){2,}/).filter((x) => x.trim()));
 
   let plecate = 0;
   const ratate: string[] = [];

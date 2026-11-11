@@ -469,7 +469,8 @@ async function Continut({
             value="salveaza"
             className="colt-mic-a border-2 border-cerneala/15 bg-hartie px-5 py-2.5 font-titlu text-mic font-bold text-cerneala transition-colors hover:border-caramiziu-500"
           >
-            Salvează ciorna
+            {/* Pe un text publicat, butonul ăsta îl scoate de pe site: se spune pe față. */}
+            {text?.publicat ? "Scoate de pe site (ciornă)" : "Salvează ciorna"}
           </button>
           <button
             type="submit"

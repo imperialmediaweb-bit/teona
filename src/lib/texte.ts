@@ -213,6 +213,7 @@ export async function textDupaId(id: string): Promise<Text | null> {
 export async function slugLiber(
   fel: FelText,
   titlu: string,
+  ocupate: readonly string[] = [],
 ): Promise<string> {
   const baza = faSlug(titlu) || "text";
   const luate = await intreaba<{ slug: string }>(
@@ -220,6 +221,9 @@ export async function slugLiber(
     [fel, `${baza}%`],
   );
   const set = new Set(luate.map((r) => r.slug));
+  // La tabere, și slugurile din cod sunt luate: o tabără nouă cu titlul uneia
+  // vechi s-ar fi pus peste ea, cu pozele altor copii (audit 11 nov. 2026).
+  for (const s of ocupate) set.add(s);
   if (!set.has(baza)) return baza;
   for (let i = 2; i < 200; i++) {
     if (!set.has(`${baza}-${i}`)) return `${baza}-${i}`;
@@ -262,6 +266,8 @@ export async function creeazaText(
    * altfel inserarea ar pica pe cheia unică, iar omul ar pierde ce a scris.
    */
   slugCerut?: string,
+  /** Sluguri luate în afara tabelului: taberele din cod. */
+  ocupate: readonly string[] = [],
 ): Promise<string> {
   const curat = (slugCerut ?? "").trim().toLowerCase();
   const cerut =
@@ -276,7 +282,7 @@ export async function creeazaText(
         [date.fel, cerut],
       )
     ).length === 0;
-  const slug = liber ? cerut : await slugLiber(date.fel, date.titlu);
+  const slug = liber ? cerut : await slugLiber(date.fel, date.titlu, ocupate);
   const randuri = await intreaba<{ id: string }>(
     `INSERT INTO texte
        (fel, slug, titlu, rezumat, continut, poza_id, poza_latime,
@@ -334,7 +340,6 @@ export async function schimbaText(
        stare = $10,
        publicat_la = CASE
          WHEN $10 = 'publicat' AND publicat_la IS NULL THEN now()
-         WHEN $10 = 'ciorna' THEN NULL
          ELSE publicat_la
        END,
        schimbat_la = now()

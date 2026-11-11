@@ -125,10 +125,11 @@ export async function POST(cerere: Request) {
     (altă zi, altă sumă) au referințe diferite și intră amândouă.
   */
   const referinta =
-    `${data} · ${suma} lei · ${adresa || camp("telefon") || nume}`.slice(
-      0,
-      120,
-    );
+    // Destinația intră și ea: două transferuri în aceeași zi, de aceeași
+    // sumă, unul pentru tabere și unul pentru Casa Teona, sunt două.
+    `${data} · ${suma} lei · ${adresa || camp("telefon") || nume}${
+      destinatie === "oriunde" ? "" : ` · ${destinatie}`
+    }`.slice(0, 120);
 
   const rezultat = await anuntaTransfer({
     referinta,
@@ -167,7 +168,7 @@ export async function POST(cerere: Request) {
     }).catch(() => false);
     await notificaPanoul({
       titlu: "Transfer anunțat",
-      text: `${nume.split(/\s+/)[0]} spune că a trimis ${scrieSuma(suma)} lei. Caută-l în extras.`,
+      text: `${nume.split(/\s+/)[0]} spune că a trimis ${scrieSuma(suma)}. Caută-l în extras.`,
       adresa: "/admin/donatii",
     }).catch(() => 0);
   }

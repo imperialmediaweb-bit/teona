@@ -43,3 +43,20 @@ export const PREFERINTE_REDIRECTIONARE = [
     pictograma: "plic",
   },
 ] as const;
+
+/**
+ * Ce urmează după cererea de sponsorizare, după calea aleasă de firmă.
+ *
+ * Până pe 11 noiembrie 2026 ecranul, e-mailul către firmă și anunțul intern
+ * spuneau toate „contractul de sponsorizare”, orice ar fi ales firma — iar la
+ * Declarația 177 contractul e altul (`/documente/contract-declaratia-177`).
+ * Scris o dată, ca cele trei locuri să nu mai poată spune lucruri diferite.
+ * `cine` e omul de la fundraising, cu rolul lui dacă e nevoie.
+ */
+export function pasulUrmatorSponsorizare(cale: string, cine: string): string {
+  if (cale === "Declarația 177")
+    return `Vă scrie ${cine} cu contractul pentru Declarația 177, completat cu datele noastre.`;
+  if (cale === "Contract de sponsorizare")
+    return `Vă scrie ${cine} cu contractul de sponsorizare completat cu datele noastre.`;
+  return `Vă scrie sau vă sună ${cine}, ca să alegem împreună calea potrivită firmei dumneavoastră.`;
+}

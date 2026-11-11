@@ -196,12 +196,19 @@ export async function abonamenteleLui(
   const gasite: AbonamentDonator[] = [];
 
   for (const client of clienti.data) {
+    /*
+      Și cele cu plata picată (`past_due`, `unpaid`): omul care a primit
+      „plata n-a trecut” și vrea să oprească n-avea buton, iar o reîncercare
+      reușită îl taxa (audit 11 nov. 2026). Stripe nu filtrează pe mai multe
+      stări deodată, deci se cer toate și se cern aici.
+    */
     const abonamente = await stripe.subscriptions.list({
       customer: client.id,
-      status: "active",
-      limit: 20,
+      status: "all",
+      limit: 40,
     });
     for (const a of abonamente.data) {
+      if (!["active", "past_due", "unpaid", "trialing"].includes(a.status)) continue;
       const rand = a.items.data[0];
       if (!rand) continue;
       /*

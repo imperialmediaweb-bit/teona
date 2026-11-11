@@ -80,5 +80,5 @@ async function posteaza(cerere: Request) {
   const cheie = firmaId ?? email ?? "";
   const separator = inapoi.includes("?") ? "&" : "?";
 
-  return trimiteLa(`${inapoi}${separator}deschis=${encodeURIComponent(cheie)}${firmaId ? `#${firmaId}` : ""}`);
+  return trimiteLa(`${inapoi}${separator}deschis=${encodeURIComponent(cheie)}&salvat=1${firmaId ? `#${firmaId}` : ""}`);
 }

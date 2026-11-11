@@ -1,3 +1,4 @@
+import { numeleMetodei } from "@/lib/plati/donatori";
 import { intreaba } from "@/lib/baza";
 
 /**
@@ -65,6 +66,7 @@ const DESTINATII: Record<string, string> = {
 };
 
 const METODE: Record<string, string> = {
+  "transfer-anuntat": "Transfer bancar",
   stripe: "Card",
   paypal: "PayPal",
   transfer: "Transfer bancar",
@@ -148,7 +150,9 @@ async function perioada(de: string, pana: string): Promise<Perioada> {
       nr: Number(d.nr),
     })),
     peMetode: metode.map((m) => ({
-      eticheta: nume(METODE, m.procesator),
+      // În bază stă „manual-transfer”, „transfer-anuntat”: fără traducerea
+      // asta, PDF-ul le tipărea întocmai.
+      eticheta: METODE[m.procesator] ?? numeleMetodei(m.procesator),
       bani: Number(m.bani),
       nr: Number(m.nr),
     })),

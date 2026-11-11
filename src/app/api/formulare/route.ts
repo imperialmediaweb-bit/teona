@@ -60,7 +60,9 @@ const MAXIM = {
  * asociației cu cine vorbește, iar un formular care respinge o firmă reală
  * costă mai mult decât o literă în plus într-un e-mail.
  */
-const CUI = /^(ro)?\s?\d{2,10}$/i;
+// Cu „RO”, spații, puncte sau liniuțe: cum îl scrie omul. `CampCui` găsea
+// firma la ANAF pentru „43.533.953”, iar regula veche o respingea apoi.
+const CUI = /^(ro)?[\s.\-]*\d[\d\s.\-]{1,14}$/i;
 
 /**
  * Se verifică **după** validarea câmpurilor, nu înainte.
@@ -191,8 +193,8 @@ export async function POST(cerere: Request) {
     // Omul află totuși că nu i-am trimis nimic pe e-mail.
     if (inactiv && !inCrm) return inactiv;
 
-    const { catreAsociatie } = inactiv
-      ? { catreAsociatie: false }
+    const { catreAsociatie, catreFirma } = inactiv
+      ? { catreAsociatie: false, catreFirma: false }
       : await trimiteSponsorizare({
           firma,
           cui,
@@ -212,7 +214,8 @@ export async function POST(cerere: Request) {
     }
 
     return raspuns(
-      catreAsociatie
+      // „V-am trimis” numai dacă e-mailul către firmă chiar a plecat.
+      catreFirma
         ? "Mulțumim! V-am trimis pașii pe e-mail și vă contactăm în curând."
         : "Mulțumim! V-am înregistrat cererea și vă contactăm în curând.",
       200,

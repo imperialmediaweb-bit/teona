@@ -65,4 +65,11 @@ export type ProiectAfisat = {
    * stau direct sub rădăcină, nu într-un an.
    */
   dosarCloud?: string;
+  /**
+   * Numai la textele din panou: dacă data și categoria au fost chiar scrise
+   * acolo, sau sunt puse din oficiu (data publicării, „2026”). Cele puse din
+   * oficiu nu au voie să treacă peste ale unei tabere vechi (`peste`).
+   */
+  areDataScrisa?: boolean;
+  areCategorieScrisa?: boolean;
 };

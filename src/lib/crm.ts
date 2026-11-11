@@ -87,7 +87,7 @@ function laFirma(r: RandFirma): Firma {
  * crea un al doilea card în lista de urmărit, cu alt stadiu decât primul.
  */
 export function normalizeazaCui(brut: string): string {
-  return brut.replace(/\s/g, "").replace(/^ro/i, "");
+  return brut.replace(/[\s.\-]/g, "").replace(/^ro/i, "");
 }
 
 /**
@@ -120,6 +120,23 @@ export async function salveazaFirma(date: {
        cale          = EXCLUDED.cale,
        suma_estimata = COALESCE(EXCLUDED.suma_estimata, firme.suma_estimata),
        mesaj         = COALESCE(EXCLUDED.mesaj, firme.mesaj),
+       /*
+         O firmă care a renunțat, sau a sponsorizat într-un an trecut, și
+         scrie din nou e o cerere nouă: altfel rămânea pe „A renunțat” cu
+         suma de anul trecut și nu intra nici la „Cerere nouă”, nici la
+         firmele fără răspuns (audit 11 nov. 2026). Una aflată pe drum
+         (contract trimis, semnat, încasat anul ăsta) nu se dă înapoi.
+       */
+       stadiu        = CASE WHEN firme.stadiu = 'renuntat'
+                              OR (firme.stadiu = 'incasat'
+                                  AND date_part('year', firme.schimbat_la AT TIME ZONE 'Europe/Bucharest')
+                                    < date_part('year', now() AT TIME ZONE 'Europe/Bucharest'))
+                            THEN 'cerere' ELSE firme.stadiu END,
+       suma_bani     = CASE WHEN firme.stadiu = 'renuntat'
+                              OR (firme.stadiu = 'incasat'
+                                  AND date_part('year', firme.schimbat_la AT TIME ZONE 'Europe/Bucharest')
+                                    < date_part('year', now() AT TIME ZONE 'Europe/Bucharest'))
+                            THEN NULL ELSE firme.suma_bani END,
        schimbat_la   = now()
      RETURNING id, (xmax <> 0) AS era_deja`,
     [

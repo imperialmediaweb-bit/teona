@@ -195,7 +195,7 @@ export default function Sfatuitor() {
  * reguli, și fără `dangerouslySetInnerHTML` pentru text venit de la un model.
  */
 function Scris({ text }: { text: string }) {
-  const bucati = text.split(/\n{2,}/).filter((x) => x.trim() !== "");
+  const bucati = text.split(/(?:\r?\n){2,}/).filter((x) => x.trim() !== "");
   return (
     <div className="grid gap-2.5">
       {bucati.map((b, i) => {

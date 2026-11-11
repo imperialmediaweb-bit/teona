@@ -419,7 +419,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                     {d.platitaLa ? CAND.format(new Date(d.platitaLa)) : "—"}
                   </td>
                   <td className="py-2.5 pr-4 font-titlu font-bold whitespace-nowrap text-cerneala">
-                    {scrieSuma(d.sumaBani / 100)}
+                    {scrieSuma(d.sumaBani / 100, d.moneda)}
                     {d.frecventa === "lunar" && (
                       <span className="ml-1.5 rounded-full bg-turcoaz-100 px-2 py-0.5 text-nota font-bold text-turcoaz-900">
                         lunar

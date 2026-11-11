@@ -121,7 +121,10 @@ export async function POST(cerere: Request) {
     console.error(`[stripe] nu s-a putut deschide sesiunea: ${(e as Error).message}`);
     return raspuns(
       "Nu am putut porni plata. Încearcă din nou peste câteva minute.",
-      503,
+      // Nu 503: formularul citește 503 ca „plata cu cardul nu e pornită încă”
+      // și îi spunea omului că asociația e în verificare la bancă. Nici 502:
+      // Cloudflare îi înlocuiește corpul cu pagina lui.
+      500,
     );
   }
 }

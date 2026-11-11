@@ -361,7 +361,12 @@ export async function anuntaTransfer(date: {
           email, prenume, nume, telefon, stare, platita_la,
           observatii, adaugat_de, canal, sursa)
        VALUES ($1,$2,$3,'RON','o-data',$4,$5,NULL,$6,$7,'anuntata',$8,$9,'donator',$10,$11)
-       ON CONFLICT (procesator, referinta) DO NOTHING
+       -- Un anunț respins („N-am găsit-o”) și trimis din nou se redeschide:
+       -- transferul de vineri intră luni, iar omul care anunța a doua oară
+       -- primea „e deja notat” și rândul nu mai apărea nicăieri în panou.
+       ON CONFLICT (procesator, referinta) DO UPDATE
+         SET stare = 'anuntata', observatii = EXCLUDED.observatii
+       WHERE donatii.stare = 'respinsa'
        RETURNING id`,
       [
         TRANSFER_ANUNTAT,

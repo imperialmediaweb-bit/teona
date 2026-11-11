@@ -24,7 +24,7 @@ export function compuneApelul(
   linkNuPot: string,
 ): { subiect: string; html: string; text: string } {
   const subiect = `Avem nevoie de voluntari: ${a.titlu}`;
-  const paragrafe = a.mesaj.split(/\n{2,}/).map((x) => x.trim()).filter(Boolean);
+  const paragrafe = a.mesaj.split(/(?:\r?\n){2,}/).map((x) => x.trim()).filter(Boolean);
   const corp = `
     <p style="${P}">${prenume ? `Bună, ${curat(prenume)},` : "Bună,"}</p>
     ${paragrafe.map((x) => `<p style="${P}">${curat(x).replace(/\n/g, "<br />")}</p>`).join("\n")}

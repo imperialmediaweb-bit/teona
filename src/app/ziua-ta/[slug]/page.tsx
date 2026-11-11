@@ -148,7 +148,9 @@ async function Continut(proprietati: Proprietati) {
     cât a strâns fiecare pagină — iar omul care și-a făcut pagina poate
     întreba oricând și primi un răspuns.
   */
-  const unde = `${RUTE.doneaza}?campanie=${encodeURIComponent(campanie.slug)}`;
+  // Un dar de ziua cuiva e o donație o dată, nu un abonament: formularul
+  // pornea pe „Lunar”, iar reînnoirile se adunau la campanie ani la rând.
+  const unde = `${RUTE.doneaza}?campanie=${encodeURIComponent(campanie.slug)}&frecventa=o-data`;
   const adresaPaginii = `${ADRESA_SITE}/ziua-ta/${campanie.slug}`;
 
   return (

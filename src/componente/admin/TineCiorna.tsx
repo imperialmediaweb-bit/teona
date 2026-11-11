@@ -30,7 +30,10 @@ function cheia(camp: HTMLInputElement | HTMLTextAreaElement): string | null {
   // Un nume care apare în mai multe formulare pe aceeași pagină (notița de
   // pe fiecare rând dintr-o listă) nu se ține: ciorna ar reveni în toate.
   if (document.querySelectorAll(`[name="${CSS.escape(camp.name)}"]`).length !== 1) return null;
-  return `${PREFIX}${location.pathname}:${camp.name}`;
+  // Și fișa deschisă: `/admin/firme?deschis=…` arată altă firmă pe aceeași
+  // cale, iar notița despre una apărea gata scrisă în caseta alteia.
+  const fisa = new URLSearchParams(location.search).get("deschis") ?? "";
+  return `${PREFIX}${location.pathname}:${fisa}:${camp.name}`;
 }
 
 export default function TineCiorna() {

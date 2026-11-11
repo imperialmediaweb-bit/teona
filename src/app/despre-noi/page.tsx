@@ -17,7 +17,7 @@ import { textelePaginilor } from "@/lib/texte-pagini";
  */
 function paragrafe(text: string): string[] {
   return (text ?? "")
-    .split(/\n{2,}/)
+    .split(/(?:\r?\n){2,}/)
     .map((p) => p.trim())
     .filter(Boolean);
 }

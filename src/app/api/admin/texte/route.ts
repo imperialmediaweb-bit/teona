@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
-import { ETICHETA_PROIECTE_PANOU } from "@/date/proiecte";
+import { ETICHETA_PROIECTE_PANOU, proiecteAfisate } from "@/date/proiecte";
 import { cuBaza, formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
 import {
@@ -191,6 +191,7 @@ async function posteaza(cerere: Request) {
   const nou = await creeazaText(
     { ...date, fel },
     fel === "proiect" ? camp("slug") : undefined,
+    fel === "proiect" ? proiecteAfisate().map((p) => p.slug) : [],
   );
   return inapoi(
     cerere,

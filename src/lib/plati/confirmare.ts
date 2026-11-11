@@ -1,3 +1,4 @@
+import { esteProba } from "@/lib/proba";
 import { intreaba } from "@/lib/baza";
 import { laBuletin } from "@/lib/buletin";
 import { anuntaDonatia, trimiteMultumirea } from "@/lib/email/donatie";
@@ -63,7 +64,8 @@ export async function dupaIncasare(
         () => undefined,
       );
     }
-    const suma = `${scrieSuma(date.sumaBani / 100)}${rand.moneda === "EUR" ? " €" : " lei"}`;
+    // `scrieSuma` pune singură moneda; adăugată încă o dată ieșea „50 lei lei”.
+    const suma = scrieSuma(date.sumaBani / 100, rand.moneda);
     await notificaPanoul({
       titlu: "Donație nouă",
       text: `${rand.prenume?.trim() || "Cineva"} a donat ${suma}${rand.frecventa === "lunar" ? " pe lună" : ""}.`,
@@ -72,7 +74,10 @@ export async function dupaIncasare(
   }
 
   // Pe lista de buletin ajunge doar cine a bifat el acordul.
-  if (rand.acord_buletin && rand.email) {
+  // Nu la reînnoiri: acordul din metadatele abonamentului e cel din ziua
+  // primei plăți. Cine s-a dezabonat între timp era pus înapoi pe listă în
+  // fiecare lună, cu „Abonat nou” trimis asociației (audit 11 nov. 2026).
+  if (!reinnoire && rand.acord_buletin && rand.email) {
     const nume = [rand.prenume, rand.nume].filter(Boolean).join(" ") || null;
     await laBuletin(rand.email, "persoane", nume, "donatie").catch(() => undefined);
   }
@@ -232,6 +237,9 @@ export async function incaseazaSiInregistreaza(comanda: string): Promise<boolean
  */
 export async function verificaInainte(): Promise<void> {
   if (!process.env.STRIPE_SECRET_KEY) return;
+  // Proba nu confirmă plățile oamenilor: mulțumirea lor ar pleca la adresa
+  // de probă, o singură dată, și donatorul n-ar mai primi-o niciodată.
+  if (await esteProba()) return;
   // Dacă o verificare e deja în curs (Stripe lent), prima deschidere a
   // plătit cele patru secunde; următoarele nu mai așteaptă nimic.
   if (inCurs) return;

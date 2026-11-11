@@ -20,7 +20,7 @@ import { completeazaCifrele, textelePaginilor } from "@/lib/texte-pagini";
 /** Rând gol = paragraf nou, ca în panou. */
 function paragrafe(text: string): string[] {
   return (text ?? "")
-    .split(/\n{2,}/)
+    .split(/(?:\r?\n){2,}/)
     .map((p) => p.trim())
     .filter(Boolean);
 }

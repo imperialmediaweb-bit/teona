@@ -172,7 +172,7 @@ Aici ajunge sponsorizarea firmei tale: în tabere și în lunile în care Casa T
 
 function paragrafe(text: string, cifre: Parameters<typeof completeazaCifrele>[1]) {
   return completeazaCifrele(text, cifre)
-    .split(/\n{2,}/)
+    .split(/(?:\r?\n){2,}/)
     .map((p) => p.trim())
     .filter(Boolean);
 }
