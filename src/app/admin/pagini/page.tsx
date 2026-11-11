@@ -47,7 +47,10 @@ const PAGINI: ReadonlyArray<{
     nume: "Despre noi",
     adresa: "/despre-noi",
     texte: "Despre noi",
-    alte: [{ eticheta: "Cifrele", href: "/admin/cifre" }],
+    alte: [
+      { eticheta: "Cifrele", href: "/admin/cifre" },
+      { eticheta: "Echipa", href: "/admin/echipa" },
+    ],
   },
   { nume: "Casa Teona", adresa: "/casa-teona", texte: "Casa Teona", alte: [] },
   { nume: "Donează", adresa: "/doneaza", texte: "Donează", alte: [] },
@@ -74,6 +77,11 @@ const PAGINI: ReadonlyArray<{
     adresa: "/sponsori-si-parteneri",
     texte: "Sponsori și parteneri",
     alte: [{ eticheta: "Siglele sponsorilor", href: "/admin/sponsori" }],
+  },
+  {
+    nume: "Suntem în presă",
+    adresa: "/suntem-in-presa",
+    alte: [{ eticheta: "Aparițiile în presă", href: "/admin/aparitii" }],
   },
   {
     nume: "Blog",

@@ -1738,9 +1738,15 @@ antetele, subdomeniile și versiunile afișate. Ce s-a găsit și ce s-a făcut:
    (`/admin/testimoniale`), cele patru cifre (`/admin/cifre`), documentele de
    descărcat (`/admin/documente`), siglele sponsorilor (`/admin/sponsori`) și
    textele paginilor fixe (`/admin/texte`).
+   De la 11 noiembrie 2026 și **echipa** de pe Despre noi (`/admin/echipa`,
+   cu poză) și **aparițiile în presă** (`/admin/aparitii`), cu aceeași formă
+   ca sponsorii: tabelul pornește cu lista din cod (`date/echipa.ts`,
+   `date/aparitii-presa.ts`), nimic nu se șterge, se mută cu ↑↓
+   (`lib/lista-panou.ts`). O apariție nouă intră prima; anul se citește din
+   dată; un link de filmare Facebook primește playerul. Cazurile umanitare
+   se scriu ca proiect, cu categoria „Cazuri umanitare”.
    Rămân prin dezvoltator: **structura** paginilor (titluri de secțiuni,
-   fotografii, butoane, așezare), fișa echipei, descrierile cazurilor
-   umanitare și paginile legale.
+   fotografii, butoane, așezare) și paginile legale.
 3. **CRM pentru donatori**, cu campanii de e-mail — urmează.
 
 ## Ce lipsește de la client

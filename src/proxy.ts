@@ -204,6 +204,8 @@ const RUTE_PROBA = [
   "/api/admin/texte-pagini",
   "/api/admin/calendar",
   "/api/admin/qr",
+  "/api/admin/echipa",
+  "/api/admin/aparitii",
 ];
 
 export default async function proxy(cerere: NextRequest) {

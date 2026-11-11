@@ -54,6 +54,8 @@ const NUME_PAGINA: Record<string, string> = {
   "/admin/cifre": "Cifrele",
   "/admin/documente": "Documente",
   "/admin/sponsori": "Sponsori",
+  "/admin/echipa": "Echipa",
+  "/admin/aparitii": "Apariții în presă",
   "/admin/texte": "Textele paginilor",
   "/admin/pagini": "Pagini",
   "/admin/facebook": "Facebook",
