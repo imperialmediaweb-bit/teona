@@ -164,8 +164,9 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
       {cauta.apel && (
         <p role="status" className="mb-6 colt-mic-a border border-turcoaz-200 bg-turcoaz-50 px-5 py-4 text-turcoaz-900">
           Apelul a fost trimis la {cauta.intrebati} {cauta.intrebati === "1" ? "voluntar" : "voluntari"}
-          {cauta.emailuri !== undefined && `, ${cauta.emailuri} pe e-mail`}. Pentru ceilalți ai
-          linkurile de WhatsApp la „Apelurile trimise”.
+          {cauta.emailuri !== undefined && `, ${cauta.emailuri} pe e-mail`}.
+          {cauta.emailuri !== cauta.intrebati &&
+            " Pentru ceilalți ai linkurile de WhatsApp la „Apelurile trimise”."}
         </p>
       )}
 
