@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
-import Link from "next/link";
 import {
   areParolaConfigurata,
   arePermisiune,
@@ -12,8 +11,8 @@ import { campaniileDeRaportat } from "@/lib/rapoarte/date";
 import { areCampanii, grupuri } from "@/lib/email/mailerlite";
 import { areEmail } from "@/lib/email/trimite";
 import {
-  CUPRINS,
   FELURI_SABLON,
+  bucatiPentruEditor,
   esteFelSablon,
   type FelSablon,
 } from "@/lib/email/campanie-sabloane";
@@ -21,8 +20,7 @@ import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 import CumScriem from "@/componente/admin/CumScriem";
-import PrevizualizareEmail from "@/componente/admin/PrevizualizareEmail";
-import CompunereEmail from "@/componente/admin/CompunereEmail";
+import EmailPeLoc from "@/componente/admin/EmailPeLoc";
 
 export const metadata: Metadata = {
   title: "Șabloane de e-mail",
@@ -163,6 +161,7 @@ async function Continut({
   }
 
   const ales: FelSablon = esteFelSablon(fel) ? fel : "persoane";
+  const desen = { persoane: bucatiPentruEditor("persoane"), firme: bucatiPentruEditor("firme") };
   const [liste, campanii] = await Promise.all([
     areCampanii() ? grupuri().catch(() => []) : Promise.resolve([]),
     areBazaDeDate()
@@ -193,7 +192,7 @@ async function Continut({
         </p>
       )}
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,620px)] lg:items-start">
+      <div className="grid max-w-3xl gap-8">
         <div className="grid gap-5">
           <form
             id="formular-sablon"
@@ -242,107 +241,6 @@ async function Continut({
 
             <CumScriem />
 
-            <div className="grid gap-2">
-              <Eticheta htmlFor="titlu" copii="Titlul" />
-              <input
-                id="titlu"
-                name="titlu"
-                type="text"
-                maxLength={160}
-                placeholder="Tabăra de iarnă are nevoie de 30 de locuri"
-                className={CLASA_CAMP}
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Eticheta
-                htmlFor="text"
-                copii="Textul"
-                nota="Un rând gol desparte paragrafele. Fără titluri și fără liste — restul e deja în șablon."
-              />
-              <textarea
-                id="text"
-                name="text"
-                rows={9}
-                placeholder={
-                  "Dragi prieteni,\n\nÎn fiecare iarnă ducem copiii la…"
-                }
-                className={`${CLASA_CAMP} font-sans leading-relaxed`}
-              />
-            </div>
-
-            {/*
-            Poza se alege de aici, ca la scrisul pe site.
-
-            Înainte, câmpul cerea identificatorul din Cloudinary, copiat de la
-            Poze. Adică: deschide altă pagină, caută fotografia, copiază un șir
-            de semne, întoarce-te. Pentru o campanie pe lună, pasul ăla e tot
-            ce trebuie ca să nu se mai pună poză deloc — iar un e-mail fără
-            fotografie, despre copii, e un e-mail mai slab.
-
-            Identificatorul rămâne dedesubt, pentru o fotografie care e deja în
-            Cloudinary și n-are rost urcată a doua oară.
-          */}
-            <div className="grid gap-2 sm:grid-cols-2">
-              <div className="grid gap-2">
-                <Eticheta
-                  htmlFor="poza_fisier"
-                  copii="Poza"
-                  nota="O alegi de pe calculator sau de pe telefon."
-                />
-                <input
-                  id="poza_fisier"
-                  name="poza_fisier"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className={CLASA_CAMP}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Eticheta
-                  htmlFor="poza_alt"
-                  copii="Ce se vede în poză"
-                  nota="Dacă nu scrii nimic, se folosește titlul campaniei."
-                />
-                <input
-                  id="poza_alt"
-                  name="poza_alt"
-                  type="text"
-                  maxLength={200}
-                  placeholder="Copii la tabăra de la Vatra Dornei"
-                  className={CLASA_CAMP}
-                />
-              </div>
-            </div>
-            <details className="-mt-2">
-              <summary className="cursor-pointer font-titlu text-nota font-bold text-cerneala-moale">
-                Sau o fotografie care e deja pe site
-              </summary>
-              <div className="mt-3 grid gap-2">
-                <Eticheta
-                  htmlFor="poza"
-                  copii="Identificatorul din Cloudinary"
-                  nota="Se folosește numai dacă n-ai ales un fișier mai sus."
-                />
-                <input
-                  id="poza"
-                  name="poza"
-                  type="text"
-                  placeholder="Teona/2025/TABĂRĂ…/poza-1"
-                  className={CLASA_CAMP}
-                />
-                <p className="text-nota text-cerneala-slab">
-                  Se ia de la{" "}
-                  <Link
-                    href="/admin/poze"
-                    className="font-semibold text-caramiziu-700 underline underline-offset-2"
-                  >
-                    Poze
-                  </Link>
-                  , unde e un buton de copiat sub fiecare fotografie.
-                </p>
-              </div>
-            </details>
 
             {campanii.length > 0 && (
               <div className="grid gap-2">
@@ -367,7 +265,7 @@ async function Continut({
               (noiembrie 2026, „să aleg ce apare în mailuri”). Previzualizarea
               se redesenează la fiecare schimbare.
             */}
-            <CompunereEmail felInitial={ales} />
+            <EmailPeLoc felInitial={ales} desen={desen} />
 
             {/*
             Butoanele, în ordinea în care se folosesc: te uiți, îți trimiți o
@@ -527,47 +425,6 @@ async function Continut({
             </div>
           </form>
 
-          <div className="colt-a border border-hartie-umbra bg-hartie p-5 sm:p-6">
-            <h2 className="font-titlu text-amplu font-bold text-cerneala">
-              Ce poate apărea în șablonul pentru{" "}
-              {ales === "firme" ? "firme" : "persoane fizice"}
-            </h2>
-            <p className="mt-1 text-mic text-cerneala-moale">
-              Le muți, le scoți sau adaugi altele din formular, la „Ce apare
-              în e-mail”: text, buton, poză.
-            </p>
-            <ul className="mt-4 grid gap-2.5">
-              {CUPRINS[ales].map((punct) => (
-                <li
-                  key={punct}
-                  className="relative pl-6 text-mic text-cerneala-moale"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="absolute top-[0.55em] left-0 size-1.5 rounded-full bg-caramiziu-600"
-                  />
-                  {punct}
-                </li>
-              ))}
-            </ul>
-            <div className="mt-5 flex flex-wrap gap-2.5">
-              <a
-                href={`/api/admin/sablon?fel=${ales}`}
-                target="_blank"
-                rel="noreferrer"
-                className="colt-mic-a border border-hartie-umbra bg-hartie px-4 py-2 font-titlu text-mic font-semibold text-cerneala transition-colors hover:border-caramiziu-700 hover:text-caramiziu-800"
-              >
-                Deschide șablonul gol
-              </a>
-              <Link
-                href={`/admin/sabloane?fel=${ales === "firme" ? "persoane" : "firme"}`}
-                className="colt-mic-a border border-hartie-umbra bg-hartie px-4 py-2 font-titlu text-mic font-semibold text-cerneala transition-colors hover:border-caramiziu-700 hover:text-caramiziu-800"
-              >
-                Vezi-l pe celălalt
-              </Link>
-            </div>
-          </div>
-
           <div className="colt-a border border-hartie-umbra bg-hartie-calda p-5">
             <h2 className="font-titlu text-mic font-bold text-cerneala">
               E-mailul pleacă direct de aici
@@ -579,20 +436,6 @@ async function Continut({
               dezabonare e pus singur.
             </p>
           </div>
-        </div>
-
-        {/*
-            Ce e în șablon, scris pe pagină — o privire asupra butoanelor care
-            pleacă odată cu el. Desenul întreg e în dreapta.
-          */}
-        <div className="lg:sticky lg:top-6 lg:self-start">
-          <PrevizualizareEmail
-            formular="formular-sablon"
-            grupuri={{
-              persoane: process.env.MAILERLITE_GROUP_ID,
-              firme: process.env.MAILERLITE_GROUP_FIRME,
-            }}
-          />
         </div>
       </div>
     </Cadru>

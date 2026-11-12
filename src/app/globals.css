@@ -696,6 +696,27 @@ body:has(#panou-admin),
 }
 
 /*
+  E-mailul desenat în panou (`EmailPeLoc`) e făcut din tabele, ca orice
+  e-mail: nu primește chenarul și umbra tabelelor de date. Stilurile scrise
+  pe fiecare element (fundal, colțuri) rămân, fiindcă bat foaia de stil.
+*/
+#panou-admin [data-email] table:not(.sr-only) {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  box-shadow: none;
+}
+#panou-admin [data-email] table:not(.sr-only) td:first-child,
+#panou-admin [data-email] table:not(.sr-only) td:last-child {
+  padding-left: 0;
+  padding-right: 0;
+}
+#panou-admin [data-email] table:not(.sr-only) tbody tr:hover {
+  background: transparent;
+}
+
+/*
   Linkurile din conținut: fără subliniere, cu greutate și culoare. Subliniate,
   zece adrese de e-mail pe un ecran arătau ca un formular din 2005.
 */

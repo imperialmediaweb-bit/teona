@@ -799,3 +799,52 @@ export function textSimpluCampanie(
   );
   return linii.join("\n");
 }
+
+/* ── Pentru editorul din panou ───────────────────────────────────────── */
+
+/** O piesă gata făcută, desenată ca în e-mail, pentru editorul din panou. */
+export type BucataEditor = { grup?: "rand" | "card"; html: string };
+
+export type BucatiEditor = {
+  bucati: Record<string, BucataEditor>;
+  titluri: { rand: string; card: string };
+  antet: { sigla: string; denumire: string; motto: string };
+  poza: { adresa: string; alt: string };
+};
+
+/**
+ * Piesele gata făcute, fiecare desenată singură, cu adresele site-ului
+ * făcute relative: editorul de la `/admin/sabloane` le arată în pagină exact
+ * cum ies în e-mail, iar fundraiserul le mută, le scoate și scrie între ele.
+ * HTML-ul trimis rămâne cel din `sablonCampanie` — aici e doar desenul.
+ */
+export function bucatiPentruEditor(
+  fel: FelSablon,
+  aleLor: ReadonlyArray<Cifra> = CIFRE_DIN_COD,
+): BucatiEditor {
+  const c: ContinutCampanie = { titlu: "", paragrafe: [] };
+  const piese = fel === "firme" ? pieseFirme(c) : piesePersoane(c, true);
+  const relativ = (h: string) => h.split(`${ADRESA_SITE}/`).join("/");
+  const tabel = (randuri: string) =>
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${randuri}</table>`;
+  const bucati: Record<string, BucataEditor> = {};
+  for (const b of BLOCURI[fel]) {
+    if (b.id === "cifre") {
+      bucati.cifre = { html: tabel(cifre(aleLor)) };
+      continue;
+    }
+    const p = piese[b.id];
+    if (!p) continue;
+    bucati[b.id] = p.grup
+      ? { grup: p.grup, html: relativ(tabel(`<tr><td style="padding:0 32px;">${p.html}</td></tr>`)) }
+      : { html: relativ(tabel(p.html)) };
+  }
+  const titlu = (t: string) =>
+    tabel(`<tr><td style="padding:22px 32px 0;">${titluMic(t)}</td></tr>`);
+  return {
+    bucati,
+    titluri: { rand: titlu(TITLURI_GRUP[fel].rand), card: titlu(TITLURI_GRUP[fel].card) },
+    antet: { sigla: relativ(SIGLA), denumire: ASOCIATIA.denumire, motto: ASOCIATIA.motto },
+    poza: { adresa: relativ(POZA_IMPLICITA.adresa), alt: POZA_IMPLICITA.alt },
+  };
+}
