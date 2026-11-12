@@ -12,6 +12,7 @@ import { campaniileDeRaportat } from "@/lib/rapoarte/date";
 import { areCampanii, grupuri } from "@/lib/email/mailerlite";
 import { areEmail } from "@/lib/email/trimite";
 import {
+  BLOCURI,
   CUPRINS,
   FELURI_SABLON,
   esteFelSablon,
@@ -22,7 +23,6 @@ import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 import CumScriem from "@/componente/admin/CumScriem";
 import PrevizualizareEmail from "@/componente/admin/PrevizualizareEmail";
-import CompunereEmail from "@/componente/admin/CompunereEmail";
 
 export const metadata: Metadata = {
   title: "Șabloane de e-mail",
@@ -363,11 +363,40 @@ async function Continut({
             )}
 
             {/*
-              Ce apare în e-mail: fundraiserul compune e-mailul bloc cu bloc
-              (noiembrie 2026, „să aleg ce apare în mailuri”). Previzualizarea
-              se redesenează la fiecare schimbare.
+              Ce apare în e-mail: fundraiserul bifează blocurile (noiembrie
+              2026, „să aleg ce apare în mailuri”). Se văd numai bifele
+              șablonului ales sus; previzualizarea se redesenează la fiecare bifă.
             */}
-            <CompunereEmail felInitial={ales} />
+            <input type="hidden" name="blocuri_trimise" value="da" />
+            <style>{`
+              #formular-sablon:has(input[name=fel][value=firme]:checked) .blocuri-persoane,
+              #formular-sablon:has(input[name=fel][value=persoane]:checked) .blocuri-firme { display: none; }
+            `}</style>
+            {(["persoane", "firme"] as const).map((f) => (
+              <fieldset key={f} className={`blocuri-${f} grid gap-2 colt-mic-a border border-hartie-umbra bg-hartie p-4`}>
+                <legend className="px-1 font-titlu text-mic font-bold text-cerneala">
+                  Ce apare în e-mail
+                </legend>
+                <p className="text-nota text-cerneala-slab">
+                  Debifează ce nu vrei. Subsolul cu datele asociației și
+                  dezabonarea apar mereu.
+                </p>
+                <div className="grid gap-1.5 sm:grid-cols-2">
+                  {BLOCURI[f].map((b) => (
+                    <label key={b.id} className="flex cursor-pointer items-start gap-2.5 text-mic text-cerneala">
+                      <input
+                        type="checkbox"
+                        name={`bloc_${f}`}
+                        value={b.id}
+                        defaultChecked
+                        className="mt-0.5 size-4 shrink-0 accent-caramiziu-700"
+                      />
+                      {b.eticheta}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ))}
 
             {/*
             Butoanele, în ordinea în care se folosesc: te uiți, îți trimiți o
@@ -533,8 +562,8 @@ async function Continut({
               {ales === "firme" ? "firme" : "persoane fizice"}
             </h2>
             <p className="mt-1 text-mic text-cerneala-moale">
-              Le muți, le scoți sau adaugi altele din formular, la „Ce apare
-              în e-mail”: text, buton, poză.
+              Le alegi cu bifele din formular, la „Ce apare în e-mail”. Tu
+              scrii titlul, textul și pui poza.
             </p>
             <ul className="mt-4 grid gap-2.5">
               {CUPRINS[ales].map((punct) => (

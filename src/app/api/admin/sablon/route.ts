@@ -18,7 +18,6 @@ import {
   sablonCampanie,
   textSimpluCampanie,
   BLOCURI,
-  type BlocEmail,
   type ContinutCampanie,
   type FelSablon,
 } from "@/lib/email/campanie-sabloane";
@@ -89,70 +88,6 @@ async function pozaDinFormular(
   return urcata ? { id: urcata.id } : { eroare: "poza-urcare" };
 }
 
-/**
- * Compoziția e-mailului, din editorul de blocuri (`CompunereEmail`).
- *
- * Câmpul `compozitie` ține ordinea: blocuri gata făcute (după `id`) și
- * blocuri scrise (după o cheie `k`, cu valorile în câmpurile lor). Nimic nu
- * se crede pe cuvânt: un `id` necunoscut se sare, adresa unui buton trebuie
- * să fie un link adevărat, iar poza trebuie să fie din Cloudinary.
- */
-function citesteCompozitia(formular: FormData, fel: FelSablon): BlocEmail[] | null {
-  const scris = String(formular.get("compozitie") ?? "");
-  if (!scris) return null;
-  let lista: unknown;
-  try {
-    lista = JSON.parse(scris);
-  } catch {
-    return null;
-  }
-  if (!Array.isArray(lista)) return null;
-  const stiute = new Set(BLOCURI[fel].map((b) => b.id));
-  const camp = (n: string) => String(formular.get(n) ?? "").trim();
-  const iese: BlocEmail[] = [];
-  for (const x of lista.slice(0, 40)) {
-    if (!x || typeof x !== "object") continue;
-    const { tip, id, k } = x as { tip?: string; id?: string; k?: string };
-    if (tip === "gata") {
-      if (id && stiute.has(id)) iese.push({ tip: "gata", id });
-      continue;
-    }
-    if (!k || !/^[a-z0-9]{1,20}$/.test(k)) continue;
-    if (tip === "text") {
-      const html = camp(`bt_${k}`);
-      if (html && html.length <= 20_000) iese.push({ tip: "text", html });
-    } else if (tip === "buton") {
-      const eticheta = camp(`bb_e_${k}`).slice(0, 60);
-      let adresa = camp(`bb_a_${k}`);
-      if (adresa && !/^(https?:\/\/|mailto:|tel:)/i.test(adresa)) adresa = `https://${adresa}`;
-      let buna = false;
-      try {
-        buna = /^(https?|mailto|tel):$/.test(new URL(adresa).protocol);
-      } catch {
-        buna = false;
-      }
-      if (eticheta && buna) {
-        iese.push({
-          tip: "buton",
-          eticheta,
-          adresa,
-          culoare: camp(`bb_c_${k}`) === "turcoaz" ? "turcoaz" : "portocaliu",
-        });
-      }
-    } else if (tip === "poza") {
-      const id = camp(`bp_${k}`);
-      if (/^[A-Za-z0-9_\-/. ]{1,200}$/.test(id)) {
-        iese.push({
-          tip: "poza",
-          adresa: pozaPentruEmail(id),
-          alt: (curataText(camp(`bp_alt_${k}`), 200) ?? "") || "Fotografie de la Asociația Teona Ariana",
-        });
-      }
-    }
-  }
-  return iese;
-}
-
 function citeste(
   formular: FormData,
   /** Identificatorul fotografiei urcate acum; bate câmpul scris de mână. */
@@ -191,8 +126,15 @@ function citeste(
   };
 
   if (!esteFelSablon(fel)) return { fel: "persoane", continut, eroare: "fel" };
-  const compozitie = citesteCompozitia(formular, fel);
-  if (compozitie) continut.compozitie = compozitie;
+  // Bifele „Ce apare în e-mail”. Fără ele în formular (o cerere veche),
+  // apar toate; cu ele, numai cele bifate și cunoscute.
+  if (formular.get("blocuri_trimise") === "da") {
+    const stiute = new Set(BLOCURI[fel].map((b) => b.id));
+    continut.blocuri = formular
+      .getAll(`bloc_${fel}`)
+      .map(String)
+      .filter((id) => stiute.has(id));
+  }
   return { fel, continut };
 }
 

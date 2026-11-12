@@ -1158,25 +1158,11 @@ picată, `pause_turn`, pistă respinsă care nu învie:
   Patru butoane: vezi cum arată, descarcă HTML-ul (pentru editorul de cod din
   MailerLite), trimite-ți o probă, fă ciorna în MailerLite. **Nu trimite nimic
   către listă** — asta rămâne un gest omenesc, făcut acolo.
-  **Fundraiserul compune e-mailul bloc cu bloc** (noiembrie 2026, „să aleg
-  ce apare în mailuri, acum sunt multe presetate”):
-  `componente/admin/CompunereEmail.tsx`, la „Ce apare în e-mail”. Blocurile
-  gata făcute (`BLOCURI` din `lib/email/campanie-blocuri.ts`, fără
-  dependențe de server, ca editorul din browser să le poată citi) se mută
-  cu ↑ ↓ și se scot cu ✕; se adaugă **text** (editorul `simplu`), **buton**
-  (etichetă, link, culoare) și **poză** (urcată prin `/api/admin/poza-in-text`,
-  care întoarce și `id`-ul, pus în e-mail cu `pozaPentruEmail`). Pleacă
-  `compozitie` (JSON cu ordinea) plus câmpurile blocurilor (`bt_<k>`,
-  `bb_e_<k>`, `bb_a_<k>`, `bb_c_<k>`, `bp_<k>`, `bp_alt_<k>`), citite și
-  verificate în `citesteCompozitia` (ruta `sablon`): `id` necunoscut se sare,
-  linkul butonului trebuie să fie http(s)/mailto/tel, poza un identificator
-  Cloudinary. Textul trece prin `curataHtml` și primește stiluri în linie
-  (`textInEmail`), fiindcă Gmail taie `<style>`. Rândurile și cardurile gata
-  făcute care stau unul după altul se strâng sub titlul lor, deci ordinea
-  din fabrică arată ca înainte. Fără `compozitie`, apar toate. Subsolul
-  legal cu dezabonarea apare mereu. Previzualizarea scrie relativ linkurile
-  site-ului (`htmlPentruCadru`): o probă caută `href="/proiecte"`, nu adresa
-  întreagă. Probă: `scratchpad/compunere.mjs` (cu `POZA=` pe site).
+  **Fundraiserul alege ce blocuri apar** (noiembrie 2026, „să aleg ce apare
+  în mailuri, acum sunt multe presetate”): `BLOCURI` din
+  `campanie-sabloane.ts`, bife „Ce apare în e-mail” în formular
+  (`bloc_persoane` / `bloc_firme`, plus `blocuri_trimise=da`). Fără bife
+  trimise apar toate; subsolul legal cu dezabonarea apare mereu.
   Linkurile poartă etichete UTM, deci Google Analytics arată singur ce a adus
   buletinul. Probă: `BAZA=… PAROLA_ADMIN=… node scripts/qa/sabloane-email.mjs`.
 

@@ -43,7 +43,7 @@ export async function POST(cerere: Request) {
   if (!urcata) return raspuns("Poza n-a putut fi urcată. Încearcă din nou.", 503);
 
   return Response.json(
-    { id: urcata.id, adresa: adresaPoza(urcata.id, 1400), latime: urcata.latime, inaltime: urcata.inaltime },
+    { adresa: adresaPoza(urcata.id, 1400), latime: urcata.latime, inaltime: urcata.inaltime },
     { headers: { "Cache-Control": "no-store" } },
   );
 }
