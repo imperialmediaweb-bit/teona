@@ -108,35 +108,53 @@ export function esteFelSablon(x: unknown): x is FelSablon {
  * înainte să aleagă șablonul, ca să știe ce butoane pleacă odată cu el. Scrisă
  * lângă șabloane, nu în pagină, ca să se schimbe în același loc cu ele.
  */
-export const CUPRINS: Record<FelSablon, readonly string[]> = {
+export type Bloc = { id: string; eticheta: string };
+
+/**
+ * Blocurile fiecărui șablon, în ordinea din e-mail. Fundraiserul bifează în
+ * panou care apar (noiembrie 2026: „să aleg ce apare în mailuri, acum sunt
+ * multe presetate”). Subsolul legal, cu dezabonarea, nu e în listă: apare
+ * mereu, așa cer legea și MailerLite.
+ */
+export const BLOCURI: Record<FelSablon, readonly Bloc[]> = {
   persoane: [
-    "Donez acum — butonul mare, spre formularul de donație",
-    "20 / 50 / 100 lei — suma ajunge aleasă în formular",
-    "Donez lunar — caseta care explică de ce ajută cel mai mult",
-    "Card cu poză spre campaniile deschise",
-    "Card cu poză spre taberele RESPIRO",
-    "Redirecționez 3,5% din impozitul pe venit",
-    "SMS cu SUSTIN la 8835, cu felul în care se oprește",
-    "Campanie de ziua ta",
-    "Voluntariat",
-    "Galantom",
-    "Transfer bancar, cu toate cele trei conturi",
-    "Distribuie pe Facebook și pe WhatsApp",
-    "Rețelele asociației și subsolul legal, cu dezabonare",
+    { id: "donez", eticheta: "Butonul mare „Donez acum”" },
+    { id: "sume", eticheta: "Butoanele 20 / 50 / 100 lei" },
+    { id: "lunar", eticheta: "Caseta „Donez lunar”" },
+    { id: "campanii", eticheta: "Card cu poză: campaniile deschise" },
+    { id: "tabere", eticheta: "Card cu poză: taberele RESPIRO" },
+    { id: "redirectionare", eticheta: "Redirecționează 3,5%" },
+    { id: "sms", eticheta: "SMS cu SUSTIN la 8835" },
+    { id: "ziuata", eticheta: "Campanie de ziua ta" },
+    { id: "voluntar", eticheta: "Vino voluntar" },
+    { id: "galantom", eticheta: "Galantom" },
+    { id: "transfer", eticheta: "Transfer bancar, cu conturile" },
+    { id: "distribuie", eticheta: "Distribuie pe Facebook și WhatsApp" },
+    { id: "cifre", eticheta: "Banda cu cifrele asociației" },
   ],
   firme: [
-    "Vreau să sponsorizez — butonul mare, spre pagina pentru firme",
-    "Caseta cu regula: 20% din impozitul pe profit sau 0,75% din cifra de afaceri",
-    "Calculează suma firmei mele — direct la calculator",
-    "Cei trei pași: calculezi, descarci contractul, îl semnezi și ni-l trimiți",
-    "Modelul de contract, în Word",
-    "Declarația 177",
-    "Ce primește firma: sigla pe site, raportul, materialele",
-    "Carduri cu poze spre tabere și spre campaniile deschise",
-    "Hai să vorbim — telefonul și e-mailul managerului de fundraising",
-    "Rețelele asociației și subsolul legal, cu dezabonare",
+    { id: "sponsorizez", eticheta: "Butonul mare „Vreau să sponsorizez”" },
+    { id: "regula", eticheta: "Caseta cu 20% / 0,75% și calculatorul" },
+    { id: "pasi", eticheta: "Cei trei pași" },
+    { id: "documente", eticheta: "Contractul și Declarația 177" },
+    { id: "primeste", eticheta: "Ce primește firma" },
+    { id: "tabere", eticheta: "Card cu poză: taberele RESPIRO" },
+    { id: "campanii", eticheta: "Card cu poză: campaniile deschise" },
+    { id: "contact", eticheta: "„Hai să vorbim”: telefonul și e-mailul" },
+    { id: "cifre", eticheta: "Banda cu cifrele asociației" },
   ],
 };
+
+/** Ce e în fiecare șablon, pe scurt, pentru panou. */
+export const CUPRINS: Record<FelSablon, readonly string[]> = {
+  persoane: BLOCURI.persoane.map((b) => b.eticheta),
+  firme: BLOCURI.firme.map((b) => b.eticheta),
+};
+
+/** Blocul apare? Fără alegere făcută (șablonul gol, ciornele vechi), apar toate. */
+function are(c: ContinutCampanie, id: string): boolean {
+  return !c.blocuri || c.blocuri.includes(id);
+}
 
 export type ContinutCampanie = {
   titlu: string;
@@ -150,6 +168,8 @@ export type ContinutCampanie = {
   campanie?: string | null;
   /** Adresa de dezabonare. MailerLite o înlocuiește cu a lui. */
   dezabonare?: string;
+  /** Blocurile bifate în panou (`BLOCURI`). Lipsă = toate. */
+  blocuri?: readonly string[];
 };
 
 function curat(text: string): string {
@@ -401,7 +421,7 @@ function invelis(
 
         ${corp}
 
-        ${cifre(aleLor)}
+        ${are(continut, "cifre") ? cifre(aleLor) : ""}
 
         ${subsol(continut)}
 
@@ -447,93 +467,124 @@ function corpPersoane(c: ContinutCampanie): string {
     )
     .join("");
 
-  return `
-    <tr><td align="center" style="padding:10px 32px 8px;">
+  const randuri = [
+    are(c, "redirectionare")
+      ? rand(
+          "Redirecționează 3,5% din impozitul pe venit",
+          "Nu te costă nimic: sunt bani pe care oricum îi plătești statului. Completezi formularul 230 în câteva minute.",
+          {
+            eticheta: "Vezi cum",
+            adresa: link(RUTE.redirectionare35, "persoane", campanie),
+          },
+        )
+      : "",
+    are(c, "sms")
+      ? rand(
+          `Trimite un SMS cu ${SMS.text} la ${SMS.numar}`,
+          `${SMS.sumaLunara} pe lună, din abonamentul tău. Te oprești trimițând ${SMS.textOprire}, gratuit.`,
+        )
+      : "",
+    are(c, "ziuata")
+      ? rand(
+          "Fă-ți o campanie de ziua ta",
+          "În loc de cadouri, prietenii tăi donează pentru copii. Pagina ta, cu numele și poza ta.",
+          {
+            eticheta: "Îmi fac pagina",
+            adresa: link(RUTE.ziuaTa, "persoane", campanie),
+          },
+        )
+      : "",
+    are(c, "voluntar")
+      ? rand(
+          "Vino voluntar",
+          "La tabere, la Casa Teona sau la evenimente. Avem nevoie și de câteva ore pe lună.",
+          {
+            eticheta: "Mă înscriu",
+            adresa: link(RUTE.voluntar, "persoane", campanie),
+          },
+        )
+      : "",
+    are(c, "galantom")
+      ? rand(
+          "Donează prin Galantom",
+          "Platforma de donații recurente, dacă îți e mai la îndemână.",
+          { eticheta: "Deschide Galantom", adresa: LINKURI_EXTERNE.galantom },
+        )
+      : "",
+  ].filter(Boolean);
+
+  const carduri = [
+    are(c, "campanii")
+      ? cardFoto({
+          poza: POZE.campanii.adresa,
+          alt: POZE.campanii.alt,
+          titlu: "Campaniile deschise acum",
+          text: "Fiecare campanie spune limpede pentru ce se strâng banii și cât s-a strâns până acum.",
+          eticheta: "Vezi campaniile",
+          adresa: link(RUTE.campanii, "persoane", campanie),
+        })
+      : "",
+    are(c, "tabere")
+      ? cardFoto({
+          poza: POZE.tabere.adresa,
+          alt: POZE.tabere.alt,
+          titlu: "Taberele RESPIRO",
+          text: "O săptămână în care copiii se joacă, iar părinții răsuflă. Toate taberele de până acum, cu poze.",
+          eticheta: "Vezi taberele",
+          adresa: link(RUTE.proiecte, "persoane", campanie),
+        })
+      : "",
+  ].filter(Boolean);
+
+  return [
+    are(c, "donez")
+      ? `<tr><td align="center" style="padding:10px 32px 8px;">
       ${butonPlin("Donez acum", catre())}
-    </td></tr>
-
-    <tr><td align="center" style="padding:14px 32px 6px;">
-      ${titluMic("sau alege o sumă")}
+    </td></tr>`
+      : "",
+    are(c, "sume")
+      ? `<tr><td align="center" style="padding:14px 32px 6px;">
+      ${titluMic(are(c, "donez") ? "sau alege o sumă" : "alege o sumă")}
       ${butonGol("20 lei", catre({ suma: "20" }))}${butonGol("50 lei", catre({ suma: "50" }))}${butonGol("100 lei", catre({ suma: "100" }))}
-    </td></tr>
-
-    <tr><td style="padding:18px 32px 0;">
+    </td></tr>`
+      : "",
+    are(c, "lunar")
+      ? `<tr><td style="padding:18px 32px 0;">
       ${caseta(
         `<p style="margin:0 0 6px;font-family:${FONT};font-size:17px;font-weight:bold;color:${CERNEALA};">Cel mai mult ajută o donație lunară</p>
          <p style="margin:0 0 16px;font-family:${FONT};font-size:15px;line-height:1.6;color:${MOALE};">Cu o sumă mică, dar în fiecare lună, asociația poate promite unui copil că tabăra de anul viitor are loc. Se oprește oricând, dintr-un clic.</p>
          ${butonPlin("Donez lunar", catre({ frecventa: "lunar" }), TURCOAZ)}`,
       )}
-    </td></tr>
-
-    <tr><td style="padding:22px 32px 0;">
+    </td></tr>`
+      : "",
+    carduri.length
+      ? `<tr><td style="padding:22px 32px 0;">
       ${titluMic("unde se duc banii")}
-      ${cardFoto({
-        poza: POZE.campanii.adresa,
-        alt: POZE.campanii.alt,
-        titlu: "Campaniile deschise acum",
-        text: "Fiecare campanie spune limpede pentru ce se strâng banii și cât s-a strâns până acum.",
-        eticheta: "Vezi campaniile",
-        adresa: link(RUTE.campanii, "persoane", campanie),
-      })}
-      ${cardFoto({
-        poza: POZE.tabere.adresa,
-        alt: POZE.tabere.alt,
-        titlu: "Taberele RESPIRO",
-        text: "O săptămână în care copiii se joacă, iar părinții răsuflă. Toate taberele de până acum, cu poze.",
-        eticheta: "Vezi taberele",
-        adresa: link(RUTE.proiecte, "persoane", campanie),
-      })}
-    </td></tr>
-
-    <tr><td style="padding:6px 32px 0;">
+      ${carduri.join("")}
+    </td></tr>`
+      : "",
+    randuri.length
+      ? `<tr><td style="padding:6px 32px 0;">
       ${titluMic("alte feluri de a ajuta, fără să scoți un leu în plus")}
-      ${cutie(`${rand(
-        "Redirecționează 3,5% din impozitul pe venit",
-        "Nu te costă nimic: sunt bani pe care oricum îi plătești statului. Completezi formularul 230 în câteva minute.",
-        {
-          eticheta: "Vezi cum",
-          adresa: link(RUTE.redirectionare35, "persoane", campanie),
-        },
-      )}
-      ${rand(
-        `Trimite un SMS cu ${SMS.text} la ${SMS.numar}`,
-        `${SMS.sumaLunara} pe lună, din abonamentul tău. Te oprești trimițând ${SMS.textOprire}, gratuit.`,
-      )}
-      ${rand(
-        "Fă-ți o campanie de ziua ta",
-        "În loc de cadouri, prietenii tăi donează pentru copii. Pagina ta, cu numele și poza ta.",
-        {
-          eticheta: "Îmi fac pagina",
-          adresa: link(RUTE.ziuaTa, "persoane", campanie),
-        },
-      )}
-      ${rand(
-        "Vino voluntar",
-        "La tabere, la Casa Teona sau la evenimente. Avem nevoie și de câteva ore pe lună.",
-        {
-          eticheta: "Mă înscriu",
-          adresa: link(RUTE.voluntar, "persoane", campanie),
-        },
-      )}
-      ${rand(
-        "Donează prin Galantom",
-        "Platforma de donații recurente, dacă îți e mai la îndemână.",
-        { eticheta: "Deschide Galantom", adresa: LINKURI_EXTERNE.galantom },
-      )}`)}
-    </td></tr>
-
-    <tr><td style="padding:10px 32px 0;">
+      ${cutie(randuri.join(""))}
+    </td></tr>`
+      : "",
+    are(c, "transfer")
+      ? `<tr><td style="padding:10px 32px 0;">
       ${caseta(
         `<p style="margin:0 0 10px;font-family:${FONT};font-size:15px;font-weight:bold;color:${CERNEALA};">Transfer bancar</p>
          ${conturi}
          <p style="margin:10px 0 0;font-family:${FONT};font-size:13px;line-height:1.6;color:${MOALE};">După transfer, spune-ne pe site ca să-l găsim în extras și să-ți mulțumim.</p>`,
       )}
-    </td></tr>
-
-    <tr><td align="center" style="padding:8px 32px 22px;">
+    </td></tr>`
+      : "",
+    are(c, "distribuie")
+      ? `<tr><td align="center" style="padding:8px 32px 22px;">
       ${titluMic("spune mai departe")}
       ${butonGol("Pe Facebook", `https://www.facebook.com/sharer/sharer.php?u=${deDistribuit}`)}${butonGol("Pe WhatsApp", `https://wa.me/?text=${textDistribuit}%20${deDistribuit}`)}
-    </td></tr>`;
+    </td></tr>`
+      : `<tr><td style="padding:0 0 14px;"></td></tr>`,
+  ].join("\n");
 }
 
 /* ── Firme ───────────────────────────────────────────────────────────── */
@@ -544,35 +595,64 @@ function corpFirme(c: ContinutCampanie): string {
   const pagina = link(RUTE.directionare20, "firme", campanie);
   const calculator = `${link(RUTE.directionare20, "firme", campanie)}#calculator`;
 
-  return `
-    <tr><td align="center" style="padding:10px 32px 8px;">
-      ${butonPlin("Vreau să sponsorizez", pagina)}
-    </td></tr>
+  const primeste = are(c, "primeste");
+  const carduri = [
+    are(c, "tabere")
+      ? cardFoto({
+          poza: POZE.tabere.adresa,
+          alt: POZE.tabere.alt,
+          titlu: "Taberele RESPIRO",
+          text: "O săptămână în care copiii cu nevoi speciale se joacă, iar părinții răsuflă. Toate taberele de până acum, cu poze.",
+          eticheta: "Vezi taberele",
+          adresa: link(RUTE.proiecte, "firme", campanie),
+        })
+      : "",
+    are(c, "campanii")
+      ? cardFoto({
+          poza: POZE.campanii.adresa,
+          alt: POZE.campanii.alt,
+          titlu: "Campaniile deschise acum",
+          text: "Dacă firma vrea să susțină un lucru anume, de aici se alege.",
+          eticheta: "Vezi campaniile",
+          adresa: link(RUTE.campanii, "firme", campanie),
+        })
+      : "",
+  ].filter(Boolean);
 
-    <tr><td style="padding:20px 32px 0;">
+  return [
+    are(c, "sponsorizez")
+      ? `<tr><td align="center" style="padding:10px 32px 8px;">
+      ${butonPlin("Vreau să sponsorizez", pagina)}
+    </td></tr>`
+      : "",
+    are(c, "regula")
+      ? `<tr><td style="padding:20px 32px 0;">
       ${caseta(
         `<p style="margin:0 0 6px;font-family:${FONT};font-size:17px;font-weight:bold;color:${CERNEALA};">Cât poate da firma ta, fără cost în plus</p>
          <p style="margin:0 0 14px;font-family:${FONT};font-size:15px;line-height:1.6;color:${MOALE};">Sponsorizarea se scade din impozit: <strong style="color:${CERNEALA};">20% din impozitul pe profit</strong> sau <strong style="color:${CERNEALA};">0,75% din cifra de afaceri</strong> — se ia suma mai mică dintre ele. Sunt bani care altfel ar rămâne la stat.</p>
          <p style="margin:0 0 16px;font-family:${FONT};font-size:15px;line-height:1.6;color:${MOALE};">Scrii CUI-ul, iar calculatorul ia restul datelor de la ANAF și îți arată suma.</p>
          ${butonPlin("Calculează suma firmei mele", calculator, TURCOAZ)}`,
       )}
-    </td></tr>
-
-    <tr><td style="padding:4px 32px 0;">
+    </td></tr>`
+      : "",
+    are(c, "pasi")
+      ? `<tr><td style="padding:4px 32px 0;">
       ${titluMic("trei pași, un sfert de oră")}
       ${pasi([
         "Scrii CUI-ul în calculator și vezi suma maximă.",
         "Descarci contractul, deja completat cu datele firmei, în Word sau PDF.",
         `Îl semnezi și ni-l trimiți pe e-mail, la ${EMAIL.contact}. Îl contrasemnăm și îți trimitem exemplarul semnat de amândoi.`,
       ])}
-    </td></tr>
-
-    <tr><td align="center" style="padding:20px 32px 4px;">
+    </td></tr>`
+      : "",
+    are(c, "documente")
+      ? `<tr><td align="center" style="padding:20px 32px 4px;">
       ${titluMic("documentele")}
       ${butonGol("Modelul de contract", `${ADRESA_SITE}/api/contract/descarca`)}${butonGol("Declarația 177", `${pagina}#documente`)}
-    </td></tr>
-
-    <tr><td style="padding:14px 32px 0;">
+    </td></tr>`
+      : "",
+    primeste
+      ? `<tr><td style="padding:14px 32px 0;">
       ${titluMic("ce primește firma")}
       ${cutie(`${rand(
         "Numele și sigla pe site",
@@ -586,29 +666,16 @@ function corpFirme(c: ContinutCampanie): string {
         "Materiale pentru comunicarea voastră",
         "Fotografii și text despre proiectul pe care îl susțineți, de folosit pe canalele firmei.",
       )}`)}
-    </td></tr>
-
-    <tr><td style="padding:20px 32px 0;">
+    </td></tr>`
+      : "",
+    carduri.length
+      ? `<tr><td style="padding:20px 32px 0;">
       ${titluMic("ce susține firma")}
-      ${cardFoto({
-        poza: POZE.tabere.adresa,
-        alt: POZE.tabere.alt,
-        titlu: "Taberele RESPIRO",
-        text: "O săptămână în care copiii cu nevoi speciale se joacă, iar părinții răsuflă. 33 de tabere până acum.",
-        eticheta: "Vezi taberele",
-        adresa: link(RUTE.proiecte, "firme", campanie),
-      })}
-      ${cardFoto({
-        poza: POZE.campanii.adresa,
-        alt: POZE.campanii.alt,
-        titlu: "Campaniile deschise acum",
-        text: "Dacă firma vrea să susțină un lucru anume, de aici se alege.",
-        eticheta: "Vezi campaniile",
-        adresa: link(RUTE.campanii, "firme", campanie),
-      })}
-    </td></tr>
-
-    <tr><td style="padding:12px 32px 0;">
+      ${carduri.join("")}
+    </td></tr>`
+      : "",
+    are(c, "contact")
+      ? `<tr><td style="padding:12px 32px 0;">
       ${caseta(
         `<p style="margin:0 0 6px;font-family:${FONT};font-size:17px;font-weight:bold;color:${CERNEALA};">Hai să vorbim</p>
          <p style="margin:0 0 14px;font-family:${FONT};font-size:15px;line-height:1.6;color:${MOALE};">${curat(om.nume)}, ${curat(om.rol)}. Dacă firma are nevoie de alt text în contract sau de o întâlnire, se rezolvă într-un telefon.</p>
@@ -617,7 +684,9 @@ function corpFirme(c: ContinutCampanie): string {
            <td>${butonGol("Scrie-ne", `mailto:${om.email}`)}</td>
          </tr></table>`,
       )}
-    </td></tr>`;
+    </td></tr>`
+      : "",
+  ].join("\n");
 }
 
 /* ── Ce se cheamă din afară ──────────────────────────────────────────── */
@@ -653,16 +722,17 @@ export function textSimpluCampanie(
 
   if (fel === "firme") {
     const om = CONTACT_FIRME[0];
+    const r = (id: string, ...x: string[]) => (are(c, id) ? x : []);
     linii.push(
-      `Vreau să sponsorizez: ${link(RUTE.directionare20, fel, campanie)}`,
-      `Calculează suma firmei: ${link(RUTE.directionare20, fel, campanie)}#calculator`,
-      `Modelul de contract: ${ADRESA_SITE}/api/contract/descarca`,
-      `Ce primesc sponsorii: ${link(RUTE.sponsori, fel, campanie)}`,
-      `Taberele RESPIRO: ${link(RUTE.proiecte, fel, campanie)}`,
-      `Campaniile deschise: ${link(RUTE.campanii, fel, campanie)}`,
+      ...r("sponsorizez", `Vreau să sponsorizez: ${link(RUTE.directionare20, fel, campanie)}`),
+      ...r("regula", `Calculează suma firmei: ${link(RUTE.directionare20, fel, campanie)}#calculator`),
+      ...r("documente", `Modelul de contract: ${ADRESA_SITE}/api/contract/descarca`),
+      ...r("primeste", `Ce primesc sponsorii: ${link(RUTE.sponsori, fel, campanie)}`),
+      ...r("tabere", `Taberele RESPIRO: ${link(RUTE.proiecte, fel, campanie)}`),
+      ...r("campanii", `Campaniile deschise: ${link(RUTE.campanii, fel, campanie)}`),
       "",
-      `20% din impozitul pe profit sau 0,75% din cifra de afaceri — suma mai mică dintre ele.`,
-      `${om.nume}, ${om.rol} · ${om.telefon.afisat} · ${om.email}`,
+      ...r("regula", `20% din impozitul pe profit sau 0,75% din cifra de afaceri — suma mai mică dintre ele.`),
+      ...r("contact", `${om.nume}, ${om.rol} · ${om.telefon.afisat} · ${om.email}`),
     );
   } else {
     const catre = (p: Record<string, string> = {}) =>
@@ -670,19 +740,22 @@ export function textSimpluCampanie(
         ...(campanie ? { campanie } : {}),
         ...p,
       });
+    const r = (id: string, ...x: string[]) => (are(c, id) ? x : []);
     linii.push(
-      `Donez acum: ${catre()}`,
-      `Donez lunar: ${catre({ frecventa: "lunar" })}`,
-      `Redirecționez 3,5%: ${link(RUTE.redirectionare35, fel, campanie)}`,
-      `SMS: ${SMS.text} la ${SMS.numar} (${SMS.sumaLunara} pe lună, oprire cu ${SMS.textOprire})`,
-      `Campaniile deschise: ${link(RUTE.campanii, fel, campanie)}`,
-      `Taberele RESPIRO: ${link(RUTE.proiecte, fel, campanie)}`,
-      `Campanie de ziua ta: ${link(RUTE.ziuaTa, fel, campanie)}`,
-      `Voluntariat: ${link(RUTE.voluntar, fel, campanie)}`,
-      "",
-      "Transfer bancar:",
-      ...JURIDIC.conturi.map(
-        (c2) => `  ${c2.banca} (${c2.moneda}): ${c2.iban}`,
+      ...r("donez", `Donez acum: ${catre()}`),
+      ...r("lunar", `Donez lunar: ${catre({ frecventa: "lunar" })}`),
+      ...r("redirectionare", `Redirecționez 3,5%: ${link(RUTE.redirectionare35, fel, campanie)}`),
+      ...r("sms", `SMS: ${SMS.text} la ${SMS.numar} (${SMS.sumaLunara} pe lună, oprire cu ${SMS.textOprire})`),
+      ...r("campanii", `Campaniile deschise: ${link(RUTE.campanii, fel, campanie)}`),
+      ...r("tabere", `Taberele RESPIRO: ${link(RUTE.proiecte, fel, campanie)}`),
+      ...r("ziuata", `Campanie de ziua ta: ${link(RUTE.ziuaTa, fel, campanie)}`),
+      ...r("voluntar", `Voluntariat: ${link(RUTE.voluntar, fel, campanie)}`),
+      ...r("galantom", `Galantom: ${LINKURI_EXTERNE.galantom}`),
+      ...r(
+        "transfer",
+        "",
+        "Transfer bancar:",
+        ...JURIDIC.conturi.map((c2) => `  ${c2.banca} (${c2.moneda}): ${c2.iban}`),
       ),
     );
   }

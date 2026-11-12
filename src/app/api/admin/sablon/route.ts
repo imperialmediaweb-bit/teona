@@ -17,6 +17,7 @@ import {
   esteFelSablon,
   sablonCampanie,
   textSimpluCampanie,
+  BLOCURI,
   type ContinutCampanie,
   type FelSablon,
 } from "@/lib/email/campanie-sabloane";
@@ -125,6 +126,15 @@ function citeste(
   };
 
   if (!esteFelSablon(fel)) return { fel: "persoane", continut, eroare: "fel" };
+  // Bifele „Ce apare în e-mail”. Fără ele în formular (o cerere veche),
+  // apar toate; cu ele, numai cele bifate și cunoscute.
+  if (formular.get("blocuri_trimise") === "da") {
+    const stiute = new Set(BLOCURI[fel].map((b) => b.id));
+    continut.blocuri = formular
+      .getAll(`bloc_${fel}`)
+      .map(String)
+      .filter((id) => stiute.has(id));
+  }
   return { fel, continut };
 }
 

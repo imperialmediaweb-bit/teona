@@ -1158,6 +1158,11 @@ picată, `pause_turn`, pistă respinsă care nu învie:
   Patru butoane: vezi cum arată, descarcă HTML-ul (pentru editorul de cod din
   MailerLite), trimite-ți o probă, fă ciorna în MailerLite. **Nu trimite nimic
   către listă** — asta rămâne un gest omenesc, făcut acolo.
+  **Fundraiserul alege ce blocuri apar** (noiembrie 2026, „să aleg ce apare
+  în mailuri, acum sunt multe presetate”): `BLOCURI` din
+  `campanie-sabloane.ts`, bife „Ce apare în e-mail” în formular
+  (`bloc_persoane` / `bloc_firme`, plus `blocuri_trimise=da`). Fără bife
+  trimise apar toate; subsolul legal cu dezabonarea apare mereu.
   Linkurile poartă etichete UTM, deci Google Analytics arată singur ce a adus
   buletinul. Probă: `BAZA=… PAROLA_ADMIN=… node scripts/qa/sabloane-email.mjs`.
 
