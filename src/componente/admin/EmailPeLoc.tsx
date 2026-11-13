@@ -274,8 +274,67 @@ function Plus({
   );
 }
 
-function Blocuri({ fel, vizibil, desen }: { fel: FelSablon; vizibil: boolean; desen: BucatiEditor }) {
-  const [randuri, setRanduri] = useState<Rand[]>(() => implicit(fel));
+type Seteaza = (f: (l: Rand[]) => Rand[]) => void;
+
+/**
+ * Bifa unui bloc gata făcut: debifat iese din e-mail, bifat intră la locul
+ * lui din fabrică (după vecinul lui din fabrică).
+ */
+function comuta(fel: FelSablon, id: string, pune: boolean): (l: Rand[]) => Rand[] {
+  return (l) => {
+    if (!pune) return l.filter((r) => !(r.tip === "gata" && r.id === id));
+    if (l.some((r) => r.tip === "gata" && r.id === id)) return l;
+    const ordine = BLOCURI[fel].map((b) => b.id);
+    const al = ordine.indexOf(id);
+    // Lângă cel mai apropiat vecin din fabrică, nu după ultimul găsit.
+    let unde = 0;
+    let celMaiAproape = -1;
+    l.forEach((r, i) => {
+      const x = r.tip === "gata" ? ordine.indexOf(r.id) : -1;
+      if (x < al && x > celMaiAproape) {
+        celMaiAproape = x;
+        unde = i + 1;
+      }
+    });
+    return [...l.slice(0, unde), { k: cheie(), tip: "gata", id }, ...l.slice(unde)];
+  };
+}
+
+function Bife({ fel, randuri, setRanduri }: { fel: FelSablon; randuri: Rand[]; setRanduri: Seteaza }) {
+  return (
+    <fieldset className="mx-auto mb-5 max-w-[600px] rounded-moale border border-hartie-umbra bg-hartie p-4">
+      <legend className="px-1 font-titlu text-mic font-bold text-cerneala">Ce apare în e-mail</legend>
+      <div className="grid gap-1.5 sm:grid-cols-2">
+        {BLOCURI[fel].map((b) => (
+          <label key={b.id} className="flex cursor-pointer items-start gap-2 text-mic text-cerneala">
+            <input
+              type="checkbox"
+              data-bifa={b.id}
+              checked={randuri.some((r) => r.tip === "gata" && r.id === b.id)}
+              onChange={(e) => setRanduri(comuta(fel, b.id, e.target.checked))}
+              className="mt-0.5 size-4 shrink-0 accent-caramiziu-700"
+            />
+            {b.eticheta}
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
+function Blocuri({
+  fel,
+  vizibil,
+  desen,
+  randuri,
+  setRanduri,
+}: {
+  fel: FelSablon;
+  vizibil: boolean;
+  desen: BucatiEditor;
+  randuri: Rand[];
+  setRanduri: Seteaza;
+}) {
   const [meniu, setMeniu] = useState<number | null>(null);
   const ascuns = useRef<HTMLInputElement>(null);
   const lipsa = BLOCURI[fel].filter((b) => !randuri.some((r) => r.tip === "gata" && r.id === b.id));
@@ -365,7 +424,7 @@ function Blocuri({ fel, vizibil, desen }: { fel: FelSablon; vizibil: boolean; de
         <button
           type="button"
           className="text-nota text-cerneala-slab underline underline-offset-2 hover:text-caramiziu-700"
-          onClick={() => setRanduri(implicit(fel))}
+          onClick={() => setRanduri(() => implicit(fel))}
         >
           Pune la loc blocurile de la început
         </button>
@@ -394,11 +453,16 @@ export default function EmailPeLoc({
     return () => f.removeEventListener("change", la);
   }, []);
   const antet = desen[fel].antet;
+  const [persoane, setPersoane] = useState<Rand[]>(() => implicit("persoane"));
+  const [firme, setFirme] = useState<Rand[]>(() => implicit("firme"));
+  const randuri = { persoane, firme };
+  const seteaza: Record<FelSablon, Seteaza> = { persoane: setPersoane, firme: setFirme };
 
   return (
     <div ref={radacina} data-email className="-mx-4 bg-[#f9f5f2] px-2 py-6 sm:mx-0 sm:rounded-moale sm:px-4">
+      <Bife fel={fel} randuri={randuri[fel]} setRanduri={seteaza[fel]} />
       <p className="mx-auto mb-3 max-w-[600px] text-center text-nota text-cerneala-moale">
-        Așa pleacă e-mailul. Dă clic pe titlu sau pe text și scrie. Treci peste un bloc ca să-l
+        Bifezi ce vrei mai sus. Dedesubt e e-mailul cum pleacă: dă clic pe titlu sau pe text și scrie. Treci peste un bloc ca să-l
         muți (↑ ↓) sau să-l scoți (🗑). Apasă „+” ca să adaugi ceva între blocuri.
       </p>
       <div
@@ -440,8 +504,8 @@ export default function EmailPeLoc({
         </div>
 
         <div className="pt-2">
-          <Blocuri fel="persoane" vizibil={fel === "persoane"} desen={desen.persoane} />
-          <Blocuri fel="firme" vizibil={fel === "firme"} desen={desen.firme} />
+          <Blocuri fel="persoane" vizibil={fel === "persoane"} desen={desen.persoane} randuri={persoane} setRanduri={setPersoane} />
+          <Blocuri fel="firme" vizibil={fel === "firme"} desen={desen.firme} randuri={firme} setRanduri={setFirme} />
         </div>
 
         <div className="bg-[#232323] px-8 py-5 text-center text-nota text-white/70">
