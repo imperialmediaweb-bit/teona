@@ -187,6 +187,15 @@ export async function adaugaLead(d: {
   telefon: string | null;
   nota: string | null;
 }): Promise<{ id: string; eraDeja: boolean; refuza: boolean }> {
+  // Fără CUI, aceeași adresă de e-mail înseamnă aceeași firmă: se deschide cea care e.
+  if (!d.cui) {
+    const [era] = await intreaba<{ id: string; refuza: boolean }>(
+      `SELECT id, fara_emailuri_la IS NOT NULL AS refuza FROM firme WHERE lower(email) = lower($1)
+        ORDER BY creat_la LIMIT 1`,
+      [d.email],
+    );
+    if (era) return { id: era.id, eraDeja: true, refuza: era.refuza };
+  }
   const cui = d.cui ? normalizeazaCui(d.cui) : `fara-cui-${crypto.randomUUID().slice(0, 8)}`;
   /*
     O adresă care a spus „nu” rămâne „nu”, oricum ar fi adăugată din nou

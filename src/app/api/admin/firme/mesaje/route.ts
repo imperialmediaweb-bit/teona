@@ -3,7 +3,7 @@ import {
   email as emailValid,
   formularAdmin,
   limitaDeRata,
-  nuTrece,
+  nuTrece as nuTreceSimplu,
   raspuns,
   sesiuneExpirata,
   text,
@@ -54,13 +54,17 @@ export async function POST(cerere: Request) {
 
   if (!(await arePermisiune("/admin/firme"))) return sesiuneExpirata();
   if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
-  if (!areEmail()) return nuTrece("Trimiterea de e-mailuri nu e configurată pe site.");
+  if (!areEmail()) return nuTreceSimplu("Trimiterea de e-mailuri nu e configurată pe site.");
 
   const citit = await formularAdmin(cerere);
   if (citit.raspuns) return citit.raspuns;
   const f = citit.formular;
+  // După o eroare, browserul nu mai ține fișierele alese: omul trebuie să afle.
+  const cuFisiere = f.getAll("fisier").some((x) => x instanceof File && x.size > 0);
+  const nuTrece = (m: string) => nuTreceSimplu(cuFisiere ? `${m} Atașamentele trebuie alese din nou.` : m);
 
-  const subiect = text(f.get("subiect"), 200);
+  // Câmpul gol la un răspuns: subiectul sugerat („Re: …”).
+  const subiect = text(f.get("subiect"), 200) ?? text(f.get("subiect_implicit"), 200);
   if (!subiect) return nuTrece("Scrie subiectul.");
   const continut = String(f.get("continut") ?? "").trim();
   if (textSimplu(continut).join(" ").length < 2) return nuTrece("Scrie textul e-mailului.");
@@ -92,10 +96,11 @@ export async function POST(cerere: Request) {
     const fi = await citesteFirma(una);
     if (!fi) return nuTrece("Firma nu există.");
     // Una sau mai multe adrese ale aceleiași firme, despărțite prin virgulă.
-    const scrise = String(f.get("catre") ?? fi.email)
-      .split(/[,;\s]+/)
-      .map((x) => x.trim())
-      .filter(Boolean);
+    // Adresele, și din forma lipită din Gmail: „Ion Pop <ion@firma.ro>, ana@firma.ro”.
+    const brut = String(f.get("catre") ?? fi.email);
+    const scrise = brut.includes("<")
+      ? (brut.match(/[^\s<>,;"]+@[^\s<>,;"]+/g) ?? [])
+      : brut.split(/[,;\s]+/).map((x) => x.trim()).filter(Boolean);
     const catre = [...new Set(scrise.map((x) => emailValid(x)))];
     if (!catre.length || catre.some((x) => !x)) return nuTrece("O adresă de e-mail nu e scrisă corect. Pune-le despărțite prin virgulă.");
     if (catre.length > 10) return nuTrece("Cel mult 10 adrese la un e-mail.");

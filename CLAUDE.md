@@ -1436,8 +1436,42 @@ există trimitere unu-la-unu și nici atașamente. Pleacă prin Resend
 - Formularele de lead și de trimitere la mai multe firme se întorc cu
   `salvat=1`, ca `TineCiorna` să le golească: altfel următoarea firmă se
   deschidea cu numele și CUI-ul celei de dinainte (prins de probă).
+- **Auditul din 16 noiembrie 2026** (trei agenți: logică, ~130 de scenarii în
+  browser, probele vechi — acestea toate trecute). Reparate, fiecare cu
+  proba ei (`scratchpad/mf/fixuri.mjs`, `fixuri2.mjs`):
+  - un răspuns nu se mai pierde când Resend nu dă conținutul: ruta răspunde
+    500 și Resend reîncearcă (rândul gol ținea locul `resend_id`);
+  - `anunturi_resend` ține `svix-id`-urile prelucrate, deci o deschidere
+    retrimisă nu se numără de două ori; semnul se șterge dacă prelucrarea
+    cade;
+  - răspunsul pe adresa unei firme șterse se leagă după expeditor sau stă
+    nelegat (înainte: 500 la nesfârșit, cheie străină);
+  - refuzul dintr-un link semnat pune în `adrese_oprite` și adresele la
+    care i s-a scris firmei, nu doar pe cea din fișă;
+  - cheia de probă nu atinge firme adevărate (`probaAreVoie` în `mesaje`,
+    `refuz`, `lead`); `curata-proba` golește și `adrese_oprite`;
+  - analiza și raportul anual au rândul „Lead: de contactat”, iar
+    procentele se socotesc fără lead-uri; „uitate” folosește
+    `FIRME_UITATE_SQL`;
+  - lead fără CUI + formularul de pe site cu aceeași adresă = o fișă
+    (`salveazaFirma` îi pune CUI-ul); contractul cere CUI-ul adevărat și
+    nu mai scrie „faracui…”; lead pus de două ori cu aceeași adresă
+    deschide fișa care era; CUI-ul lead-ului se verifică cu cifra de control;
+  - la „mai multe firme” pleacă **bifele**, nu căsuțele de pe ecran (o firmă
+    bifată și ascunsă de căutare tot primește);
+  - butonul nu mai rămâne pe „Se trimite…” când editorul oprește trimiterea;
+    atașamentele se verifică în pagină (5, 10 MB, tip) — după o eroare de la
+    server browserul nu le mai ține; a doua alegere de fișiere se adaugă la
+    prima; subiectul de răspuns e sugestie (placeholder + `subiect_implicit`),
+    ca ciorna să poată pune înapoi subiectul scris; `{persoană}` cu ă;
+    „Către” include omul care a răspuns; adresele lipite din Gmail
+    („Ion <ion@x>”) se citesc;
+  - `TineCiorna` pune ciorna și în câmpurile desenate mai târziu (Suspense),
+    printr-un `MutationObserver` de 15 secunde.
 - Probă, cu un Resend de mențiune și anunțuri semnate:
-  `scratchpad/mf/proba.mjs` (61 de verificări).
+  `scratchpad/mf/proba.mjs` (61), `fixuri.mjs` (16), `fixuri2.mjs` (13);
+  rulate împreună de `scratchpad/mf/toate.sh`, care repornește serverul
+  între ele (limita de 5 intrări în 15 minute).
 
 ## Site-ul nu face campanii de e-mail
 

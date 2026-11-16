@@ -58,14 +58,14 @@ export default function MesajFirma({ m }: { m: Mesaj }) {
       } ${!m.citit ? "ring-2 ring-caramiziu-400" : ""}`}
     >
       <header className="flex flex-wrap items-baseline justify-between gap-2">
-        <p className="text-mic">
+        <p className="min-w-0 text-mic [overflow-wrap:anywhere]">
           <span className="font-titlu font-bold text-cerneala">{trimis ? (m.trimisDe ?? "Asociația") : m.deLa}</span>
           <span className="text-cerneala-slab"> {trimis ? `→ ${m.catre}` : "a răspuns"}</span>
           {!m.citit && <span className="ml-2 rounded-full bg-caramiziu-700 px-2 py-0.5 text-nota font-bold text-hartie">nou</span>}
         </p>
         <time className="text-nota text-cerneala-slab">{cand(m.creatLa)}</time>
       </header>
-      <p className="font-titlu text-mic font-bold text-cerneala">{m.subiect}</p>
+      <p className="font-titlu text-mic font-bold text-cerneala [overflow-wrap:anywhere]">{m.subiect}</p>
       <div className="text-bogat text-mic break-words" dangerouslySetInnerHTML={{ __html: curataHtml(m.html) || "" }} />
       {!m.html.trim() && m.text && <p className="whitespace-pre-line text-mic text-cerneala-moale">{m.text}</p>}
       {m.atasamente.length > 0 && (

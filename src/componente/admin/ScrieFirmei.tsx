@@ -26,35 +26,74 @@ function mb(o: number) {
   return o < 1024 * 1024 ? `${Math.max(1, Math.round(o / 1024))} KB` : `${(o / 1024 / 1024).toFixed(1).replace(".", ",")} MB`;
 }
 
-function Atasamente() {
-  const intrare = useRef<HTMLInputElement>(null);
+const MAXIM_FISIERE = 5;
+const MAXIM_TOTAL = 10 * 1024 * 1024;
+const ACCEPTATE = /\.(pdf|docx?|pptx?|xlsx?|jpe?g|png|webp)$/i;
+
+/**
+ * Ce e greșit la atașamente, spus înainte de trimitere. Pe server se verifică
+ * oricum; aici omul află pe loc, cu fișierele încă alese — după o eroare de
+ * la server, browserul nu mai ține fișierele, iar e-mailul ar pleca fără ele.
+ */
+export function problemaAtasamente(fisiere: File[]): string | null {
+  if (fisiere.length > MAXIM_FISIERE) return `Cel mult ${MAXIM_FISIERE} fișiere. Scoate ${fisiere.length - MAXIM_FISIERE}.`;
+  const rau = fisiere.find((f) => !ACCEPTATE.test(f.name));
+  if (rau) return `„${rau.name}” nu e PDF, Word, PowerPoint, Excel sau poză.`;
+  const total = fisiere.reduce((t, f) => t + f.size, 0);
+  if (total > MAXIM_TOTAL) return `Fișierele au împreună ${mb(total)}; merg cel mult 10 MB. Scoate ceva sau pune un link.`;
+  return null;
+}
+
+function Atasamente({ intrare }: { intrare: React.RefObject<HTMLInputElement | null> }) {
   const [lista, setLista] = useState<File[]>([]);
-  useEffect(() => {
-    const c = intrare.current;
-    if (!c) return;
-    const la = () => setLista(Array.from(c.files ?? []));
-    c.addEventListener("change", la);
-    return () => c.removeEventListener("change", la);
-  }, []);
-  const scoate = (i: number) => {
+  const [lucreaza, setLucreaza] = useState(false);
+  const puse = (fisiere: File[]) => {
     const c = intrare.current;
     if (!c) return;
     const dt = new DataTransfer();
-    Array.from(c.files ?? []).forEach((f, j) => j !== i && dt.items.add(f));
+    fisiere.forEach((f) => dt.items.add(f));
     c.files = dt.files;
-    setLista(Array.from(dt.files));
+    setLista(fisiere);
+  };
+  /*
+    Alegerea a doua se adaugă la prima: cine pune întâi contractul și apoi
+    prezentarea nu trebuie să piardă contractul. Pozele mari se micșorează
+    aici (câmpul are `data-fara-micsorare`, ca MicsoreazaPoza să nu înlocuiască
+    lista cu numai ultima alegere).
+  */
+  const alese = async (noi: File[]) => {
+    setLucreaza(true);
+    const { micsoreaza } = await import("@/componente/admin/MicsoreazaPoza");
+    const mici = await Promise.all(noi.map(async (f) => (await micsoreaza(f).catch(() => null)) ?? f));
+    setLucreaza(false);
+    puse([...lista, ...mici]);
   };
   const total = lista.reduce((t, f) => t + f.size, 0);
+  const problema = problemaAtasamente(lista);
   return (
     <div className="grid gap-2">
       <span className="font-titlu text-mic font-bold text-cerneala">Atașamente</span>
-      <label className="flex cursor-pointer items-center gap-3 rounded-moale border-2 border-dashed border-hartie-umbra bg-hartie px-4 py-3 text-mic text-cerneala-moale hover:border-caramiziu-400">
+      <label className="flex cursor-pointer items-center gap-3 rounded-moale border-2 border-dashed border-hartie-umbra bg-hartie px-4 py-3 text-mic text-cerneala-moale focus-within:border-caramiziu-700 focus-within:ring-2 focus-within:ring-caramiziu-400 hover:border-caramiziu-400">
         <span className="text-xl">📎</span>
         <span>
-          Alege fișiere: prezentarea, contractul, poze (PDF, Word, PowerPoint, Excel, JPG, PNG).
-          Cel mult 5, împreună sub 10 MB.
+          {lucreaza
+            ? "Se pregătesc pozele…"
+            : "Alege fișiere: prezentarea, contractul, poze (PDF, Word, PowerPoint, Excel, JPG, PNG). Cel mult 5, împreună sub 10 MB. Poți alege de mai multe ori."}
         </span>
-        <input ref={intrare} type="file" name="fisier" multiple className="sr-only" />
+        <input
+          ref={intrare}
+          type="file"
+          name="fisier"
+          multiple
+          data-fara-micsorare
+          className="sr-only"
+          onChange={(e) => {
+            const noi = Array.from(e.target.files ?? []);
+            // Câmpul ține acum numai alegerea nouă; lista întreagă se pune înapoi în `alese`.
+            if (noi.length) void alese(noi);
+            else puse(lista);
+          }}
+        />
       </label>
       {lista.length > 0 && (
         <ul className="grid gap-1.5">
@@ -62,16 +101,18 @@ function Atasamente() {
             <li key={`${f.name}-${i}`} className="flex items-center gap-2 rounded-moale bg-hartie-calda px-3 py-1.5 text-mic">
               <span className="min-w-0 flex-1 truncate">{f.name}</span>
               <span className="text-nota text-cerneala-slab">{mb(f.size)}</span>
-              <button type="button" onClick={() => scoate(i)} aria-label={`Scoate ${f.name}`} className="px-2 font-bold text-caramiziu-700">
+              <button type="button" onClick={() => puse(lista.filter((_, j) => j !== i))} aria-label={`Scoate ${f.name}`} className="px-2 font-bold text-caramiziu-700">
                 ✕
               </button>
             </li>
           ))}
-          <li className={`text-nota ${total > 10 * 1024 * 1024 ? "font-bold text-caramiziu-800" : "text-cerneala-slab"}`}>
-            Împreună: {mb(total)}
-            {total > 10 * 1024 * 1024 && " — prea mult, scoate ceva sau pune un link"}
-          </li>
+          <li className="text-nota text-cerneala-slab">Împreună: {mb(total)}</li>
         </ul>
+      )}
+      {problema && (
+        <p role="alert" className="text-mic font-semibold text-caramiziu-800">
+          {problema}
+        </p>
       )}
     </div>
   );
@@ -118,20 +159,26 @@ function AlegeFirme({ firme, limita }: { firme: FirmaDeAles[]; limita: number })
       <p className={`text-mic font-semibold ${alese.size > limita ? "text-caramiziu-800" : "text-cerneala"}`}>
         {alese.size} bifate{alese.size > limita ? ` — cel mult ${limita} o dată` : ""}
       </p>
-      <ul className="grid max-h-80 gap-1 overflow-y-auto">
+      {/*
+        Ce pleacă la server sunt bifele, nu căsuțele de pe ecran: o firmă
+        bifată și ascunsă apoi de căutare tot primește e-mailul.
+      */}
+      {[...alese].map((id) => (
+        <input key={id} type="hidden" name="firme" value={id} />
+      ))}
+      <ul className="grid max-h-80 min-w-0 gap-1 overflow-y-auto">
         {vizibile.map((f) => (
           <li key={f.id}>
             <label className="flex cursor-pointer items-start gap-2.5 rounded-moale px-2 py-1.5 hover:bg-hartie-calda">
               <input
                 type="checkbox"
-                name="firme"
                 value={f.id}
                 checked={alese.has(f.id)}
                 disabled={f.faraEmailuri}
                 onChange={(e) => comuta(f.id, e.target.checked)}
                 className="mt-1 size-4 shrink-0 accent-caramiziu-700"
               />
-              <span className="min-w-0 text-mic">
+              <span className="min-w-0 text-mic break-words [overflow-wrap:anywhere]">
                 <span className="font-semibold text-cerneala">{f.denumire}</span>
                 <span className="text-cerneala-slab"> · {f.persoana} · {f.email} · {f.eticheta}</span>
                 {f.faraEmailuri && <span className="ml-1 font-semibold text-caramiziu-800">· nu vrea e-mailuri</span>}
@@ -159,14 +206,38 @@ export default function ScrieFirmei({
   limita?: number;
 }) {
   const [trimite, setTrimite] = useState(false);
+  const [eroare, setEroare] = useState<string | null>(null);
+  const fisiere = useRef<HTMLInputElement>(null);
   const lot = Boolean(firme);
+  // Înapoi din browser aduce pagina din memorie, cu butonul încă „Se trimite…”.
+  useEffect(() => {
+    const la = () => setTrimite(false);
+    window.addEventListener("pageshow", la);
+    return () => window.removeEventListener("pageshow", la);
+  }, []);
   return (
     <form
       action="/api/admin/firme/mesaje"
       method="post"
       encType="multipart/form-data"
       className="grid gap-4"
-      onSubmit={() => setTrimite(true)}
+      onSubmit={(e) => {
+        // Editorul oprește trimiterea când textul e gol: butonul nu se blochează.
+        if (e.defaultPrevented) return;
+        const p = problemaAtasamente(Array.from(fisiere.current?.files ?? []));
+        if (p) {
+          e.preventDefault();
+          setEroare(p);
+          return;
+        }
+        if (lot && !e.currentTarget.querySelector('input[name="firme"]')) {
+          e.preventDefault();
+          setEroare("Bifează cel puțin o firmă.");
+          return;
+        }
+        setEroare(null);
+        setTrimite(true);
+      }}
     >
       {firmaId && <input type="hidden" name="firma" value={firmaId} />}
       {firme && <AlegeFirme firme={firme} limita={limita} />}
@@ -181,7 +252,13 @@ export default function ScrieFirmei({
       )}
       <label className="grid gap-1.5">
         <span className="font-titlu text-mic font-bold text-cerneala">Subiect</span>
-        <input name="subiect" defaultValue={subiect} required maxLength={200} className={camp} />
+        {/*
+          Subiectul de răspuns stă ca sugestie, nu scris în câmp: altfel
+          ciorna (TineCiorna completează numai câmpuri goale) nu mai putea
+          pune înapoi subiectul scris de om după o eroare.
+        */}
+        <input name="subiect" placeholder={subiect || undefined} required={!subiect} maxLength={200} className={camp} />
+        {subiect && <input type="hidden" name="subiect_implicit" value={subiect} />}
       </label>
       <div className="grid gap-1.5">
         <span className="font-titlu text-mic font-bold text-cerneala">Textul</span>
@@ -192,12 +269,17 @@ export default function ScrieFirmei({
         </span>
         <EditorText name="continut" defaultValue="" minim={2} />
       </div>
-      <Atasamente />
+      <Atasamente intrare={fisiere} />
       {lot && (
         <label className="flex items-start gap-2.5 text-mic text-cerneala">
           <input type="checkbox" name="confirm" value="da" required className="mt-0.5 size-4 shrink-0 accent-caramiziu-700" />
           Am citit e-mailul. Fiecare firmă bifată îl primește separat, cu numele ei.
         </label>
+      )}
+      {eroare && (
+        <p role="alert" className="text-mic font-semibold text-caramiziu-800">
+          {eroare}
+        </p>
       )}
       <div>
         <button

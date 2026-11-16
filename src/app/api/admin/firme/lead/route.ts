@@ -12,6 +12,7 @@ import { arePermisiune, cineEsteConectat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { adaugaLead, scrieInteractiune } from "@/lib/crm";
 import { probaAreVoie } from "@/lib/proba";
+import { cuiValid, curataCui } from "@/lib/cui";
 
 /** O firmă adăugată de mână, ca lead, și dusă direct la discuția ei. */
 export async function POST(cerere: Request) {
@@ -31,8 +32,11 @@ export async function POST(cerere: Request) {
   if (!(await probaAreVoie("email", email))) return new Response("Proba lucrează numai pe rândurile ei.", { status: 403 });
   const persoana = text(f.get("persoana"), 150) ?? "Echipa " + denumire;
   const cuiBrut = text(f.get("cui"), 20);
-  if (cuiBrut && !/^(ro)?\s*\d{2,10}$/i.test(cuiBrut.replace(/[\s.-]/g, "")))
-    return nuTrece("CUI-ul are doar cifre (poate începe cu RO). Dacă nu-l știi, lasă-l gol.");
+  if (cuiBrut) {
+    const cuiNr = curataCui(cuiBrut);
+    if (cuiNr === null || !cuiValid(cuiNr))
+      return nuTrece("CUI-ul nu e scris corect (are doar cifre, poate începe cu RO, iar ultima cifră e de control). Dacă nu-l știi, lasă-l gol.");
+  }
   const telefon = text(f.get("telefon"), 40);
   const nota = text(f.get("nota"), 2000);
 

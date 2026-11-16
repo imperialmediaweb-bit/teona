@@ -72,17 +72,35 @@ export default function TineCiorna() {
         memorie.removeItem(k);
       }
     }
-    if (!salvat) {
+    /*
+      Pune ciorna în câmpurile goale. Se cheamă și când apar câmpuri noi:
+      paginile din panou vin pe bucăți (Suspense), iar un formular desenat
+      după ce s-a montat componenta asta rămânea gol, deși ciorna era în filă.
+    */
+    const puneCiorna = () => {
       for (const camp of document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("textarea, input")) {
+        if (camp.dataset.ciornaPusa !== undefined) continue;
+        camp.dataset.ciornaPusa = "";
         const k = cheia(camp);
         if (!k || camp.value) continue;
         try {
           const { text } = JSON.parse(memorie.getItem(k) ?? "{}") as { text?: string };
-          if (text) camp.value = text;
+          if (text) {
+            camp.value = text;
+            camp.dispatchEvent(new Event("input", { bubbles: true }));
+          }
         } catch {
           /* o ciornă stricată nu e o ciornă */
         }
       }
+    };
+    let observator: MutationObserver | null = null;
+    let opreste: ReturnType<typeof setTimeout> | null = null;
+    if (!salvat) {
+      puneCiorna();
+      observator = new MutationObserver(() => puneCiorna());
+      observator.observe(document.body, { childList: true, subtree: true });
+      opreste = setTimeout(() => observator?.disconnect(), 15_000);
     }
     const laScris = (e: Event) => {
       const camp = e.target;
@@ -97,7 +115,11 @@ export default function TineCiorna() {
       }
     };
     document.addEventListener("input", laScris, true);
-    return () => document.removeEventListener("input", laScris, true);
+    return () => {
+      document.removeEventListener("input", laScris, true);
+      observator?.disconnect();
+      if (opreste) clearTimeout(opreste);
+    };
   }, []);
   return null;
 }

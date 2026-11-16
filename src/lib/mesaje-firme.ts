@@ -91,7 +91,7 @@ function scapa(s: string): string {
 /** {firma} și {persoana} din text, înlocuite cu datele firmei. */
 export function personalizeaza(text: string, f: Pick<Firma, "denumire" | "persoana">, html: boolean): string {
   const s = html ? scapa : (x: string) => x;
-  return text.replace(/\{firma\}/gi, s(f.denumire)).replace(/\{persoana\}/gi, s(f.persoana));
+  return text.replace(/\{firma\}/gi, s(f.denumire)).replace(/\{persoan[aă]\}/gi, s(f.persoana));
 }
 
 /**

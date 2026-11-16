@@ -48,6 +48,14 @@ async function Continut({
   const mesaje = await mesajeleFirmei(f.id);
   await marcheazaCitite(f.id).catch(() => undefined);
   const ultimul = [...mesaje].reverse()[0];
+  /*
+    Răspunsul merge la cine a scris ultimul (de pildă contabila, nu omul din
+    fișă); dacă e altcineva decât adresa din fișă, le primesc pe amândouă.
+  */
+  const ultimulPrimit = [...mesaje].reverse().find((m) => m.directie === "primit");
+  const dinRaspuns = ultimulPrimit ? (ultimulPrimit.deLa.match(/<([^>]+)>/)?.[1] ?? ultimulPrimit.deLa).trim().toLowerCase() : "";
+  const catreImplicit =
+    dinRaspuns && dinRaspuns !== f.email.toLowerCase() && dinRaspuns.includes("@") ? `${f.email}, ${dinRaspuns}` : f.email;
   const subiect = ultimul ? `Re: ${ultimul.subiect.replace(/^(re|fw|fwd|răs)\s*:\s*/i, "")}` : "";
   const stadiu = STADII_FIRMA.find((s) => s.id === f.stadiu)?.eticheta ?? f.stadiu;
 
@@ -136,7 +144,7 @@ async function Continut({
           </div>
         ) : (
           <>
-            <ScrieFirmei firmaId={f.id} catre={f.email} subiect={subiect} />
+            <ScrieFirmei firmaId={f.id} catre={catreImplicit} subiect={subiect} />
             <form action="/api/admin/firme/refuz" method="post" className="mt-6 border-t border-hartie-umbra pt-4">
               <input type="hidden" name="firma" value={f.id} />
               <input type="hidden" name="fac" value="opreste" />
