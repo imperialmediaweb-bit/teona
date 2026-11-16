@@ -88,9 +88,15 @@ export async function POST(cerere: Request) {
     if (!UUID.test(una)) return nuTrece("Firma nu există.");
     const fi = await citesteFirma(una);
     if (!fi) return nuTrece("Firma nu există.");
-    const catre = emailValid(f.get("catre") ?? fi.email);
-    if (!catre) return nuTrece("Adresa de e-mail nu e scrisă corect.");
-    const ok = await trimiteFirmei({ firma: fi, catre, subiect, html: continut, atasamente, trimisDe, emailCelui });
+    // Una sau mai multe adrese ale aceleiași firme, despărțite prin virgulă.
+    const scrise = String(f.get("catre") ?? fi.email)
+      .split(/[,;\s]+/)
+      .map((x) => x.trim())
+      .filter(Boolean);
+    const catre = [...new Set(scrise.map((x) => emailValid(x)))];
+    if (!catre.length || catre.some((x) => !x)) return nuTrece("O adresă de e-mail nu e scrisă corect. Pune-le despărțite prin virgulă.");
+    if (catre.length > 10) return nuTrece("Cel mult 10 adrese la un e-mail.");
+    const ok = await trimiteFirmei({ firma: fi, catre: catre as string[], subiect, html: continut, atasamente, trimisDe, emailCelui });
     return trimiteLa(`/admin/firme/${fi.id}/mesaje?${ok ? "trimis=1" : "ratat=1"}#jos`);
   }
 

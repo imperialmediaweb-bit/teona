@@ -169,7 +169,10 @@ export default function ScrieFirmei({
       {!lot && (
         <label className="grid gap-1.5">
           <span className="font-titlu text-mic font-bold text-cerneala">Către</span>
-          <input name="catre" type="email" defaultValue={catre} required className={camp} />
+          <input name="catre" type="text" inputMode="email" defaultValue={catre} required className={camp} />
+          <span className="text-nota text-cerneala-slab">
+            Mai mulți oameni din aceeași firmă? Pune adresele despărțite prin virgulă. Primesc același e-mail.
+          </span>
         </label>
       )}
       <label className="grid gap-1.5">

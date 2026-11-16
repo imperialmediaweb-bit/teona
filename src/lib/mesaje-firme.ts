@@ -133,7 +133,7 @@ export type FisierAtasat = { nume: string; tip: string; continut: Uint8Array };
 
 export async function trimiteFirmei(d: {
   firma: Firma;
-  catre: string;
+  catre: string | string[];
   subiect: string;
   html: string;
   atasamente: FisierAtasat[];
@@ -163,7 +163,7 @@ export async function trimiteFirmei(d: {
   const [rand] = await intreaba<{ id: string }>(
     `INSERT INTO mesaje_firme (firma_id, directie, de_la, catre, subiect, html, text_simplu, resend_id, trimis_de, lot)
      VALUES ($1,'trimis',$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`,
-    [d.firma.id, EMAIL.contact, d.catre, subiect, curataHtml(scris), text, r.id, d.trimisDe, d.lot ?? null],
+    [d.firma.id, EMAIL.contact, [d.catre].flat().join(", "), subiect, curataHtml(scris), text, r.id, d.trimisDe, d.lot ?? null],
   );
   for (const a of d.atasamente) {
     await intreaba(
