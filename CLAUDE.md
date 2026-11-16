@@ -1418,6 +1418,13 @@ există trimitere unu-la-unu și nici atașamente. Pleacă prin Resend
   trimiterea (`scrisoarea`), cu numele firmei alese (în lot, prima bifată);
   proba pleacă la omul care scrie, cu „[PROBĂ]”, fără atașamente, și nu intră
   în discuția firmei. Probă: `scratchpad/mf/previz.mjs` (13).
+- **Campaniile de pe site intră în e-mail** („Pune în e-mail o campanie de
+  pe site”, cel mult `MAXIM_CAMPANII` = 3): card cu poză, titlu, rezumat și
+  „Vezi campania”, link cu `utm_medium=firme`. Numai campaniile publicate
+  (`campaniileAlese`); un identificator scris pe lângă formular se sare. În
+  discuție rămâne „Campania: <link>”. Pozele și linkurile din text se pun din
+  bara editorului; în e-mail `f_auto` devine `f_jpg` (Outlook nu arată WebP)
+  și o adresă relativă devine absolută. Probă: `scratchpad/mf/camp.mjs` (10).
 - „Deschis” nu e sigur (iPhone deschide singur pozele, Outlook le
   blochează); „a apăsat pe link” e semnul sigur. Scrie și pe pagină.
 - **„Nu mai doresc mesaje”**: jos în fiecare e-mail către o firmă se pune

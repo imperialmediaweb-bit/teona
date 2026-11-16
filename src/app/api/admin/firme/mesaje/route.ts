@@ -16,7 +16,7 @@ import { areEmail } from "@/lib/email/trimite";
 import { tipDinOcteti } from "@/lib/poza-urcata";
 import { textSimplu } from "@/lib/text-bogat";
 import { probaAreVoie } from "@/lib/proba";
-import { LIMITA_LOT, trimiteFirmei, type FisierAtasat } from "@/lib/mesaje-firme";
+import { campaniileAlese, LIMITA_LOT, trimiteFirmei, type FisierAtasat } from "@/lib/mesaje-firme";
 
 /**
  * Trimite un e-mail unei firme (`firma`) sau mai multora (`firme`), fiecăreia
@@ -83,6 +83,8 @@ export async function POST(cerere: Request) {
     atasamente.push({ nume: x.name.replace(/[\\/\r\n"]/g, "_").slice(0, 150), tip, continut: continutFisier });
   }
 
+  const campanii = await campaniileAlese(f.getAll("campanii"));
+
   const cine = await cineEsteConectat();
   const trimisDe = cine?.nume ?? "Asociația";
   const emailCelui = cine?.fel === "cont" ? cine.utilizator.email : null;
@@ -104,7 +106,7 @@ export async function POST(cerere: Request) {
     const catre = [...new Set(scrise.map((x) => emailValid(x)))];
     if (!catre.length || catre.some((x) => !x)) return nuTrece("O adresă de e-mail nu e scrisă corect. Pune-le despărțite prin virgulă.");
     if (catre.length > 10) return nuTrece("Cel mult 10 adrese la un e-mail.");
-    const rez = await trimiteFirmei({ firma: fi, catre: catre as string[], subiect, html: continut, atasamente, trimisDe, emailCelui });
+    const rez = await trimiteFirmei({ firma: fi, catre: catre as string[], subiect, html: continut, atasamente, trimisDe, emailCelui, campanii });
     const semn = rez === "trimis" ? "trimis=1" : rez === "refuza" ? "refuza=1" : "ratat=1";
     return trimiteLa(`/admin/firme/${fi.id}/mesaje?${semn}#jos`);
   }
@@ -137,6 +139,7 @@ export async function POST(cerere: Request) {
       emailCelui,
       lot,
       masa: true,
+      campanii,
     });
     if (rez === "trimis") plecate++;
     else if (rez === "refuza") refuza.push(fi.denumire);

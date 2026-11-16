@@ -7,6 +7,7 @@ import { firma as iaFirma, STADII_FIRMA } from "@/lib/crm";
 import { domeniuRaspuns, marcheazaCitite, mesajeleFirmei, NU_RASPUNDE_DUPA, trimiseFaraRaspuns } from "@/lib/mesaje-firme";
 import Cadru from "@/componente/admin/Cadru";
 import ScrieFirmei from "@/componente/admin/ScrieFirmei";
+import { textePublicate } from "@/lib/texte";
 import MesajFirma from "@/componente/admin/firme/MesajFirma";
 import { poarta } from "@/componente/admin/firme/Poarta";
 
@@ -46,6 +47,7 @@ async function Continut({
   if (!f) notFound();
 
   const mesaje = await mesajeleFirmei(f.id);
+  const campanii = (await textePublicate("campanie", 30).catch(() => [])).map((c) => ({ id: c.id, titlu: c.titlu }));
   await marcheazaCitite(f.id).catch(() => undefined);
   const ultimul = [...mesaje].reverse()[0];
   /*
@@ -144,7 +146,7 @@ async function Continut({
           </div>
         ) : (
           <>
-            <ScrieFirmei firmaId={f.id} catre={catreImplicit} subiect={subiect} />
+            <ScrieFirmei firmaId={f.id} catre={catreImplicit} subiect={subiect} campanii={campanii} />
             <form action="/api/admin/firme/refuz" method="post" className="mt-6 border-t border-hartie-umbra pt-4">
               <input type="hidden" name="firma" value={f.id} />
               <input type="hidden" name="fac" value="opreste" />

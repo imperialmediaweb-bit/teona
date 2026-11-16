@@ -6,6 +6,7 @@ import { firme, STADII_FIRMA } from "@/lib/crm";
 import { LIMITA_LOT } from "@/lib/mesaje-firme";
 import Cadru from "@/componente/admin/Cadru";
 import ScrieFirmei from "@/componente/admin/ScrieFirmei";
+import { textePublicate } from "@/lib/texte";
 import { poarta } from "@/componente/admin/firme/Poarta";
 
 export const metadata: Metadata = {
@@ -26,6 +27,7 @@ async function Continut({ searchParams }: { searchParams: Promise<{ gresit?: str
   const { gresit } = await searchParams;
   const oprit = await poarta("Scrie la mai multe firme", "/admin/firme/mesaje", gresit);
   if (oprit) return oprit;
+  const campanii = (await textePublicate("campanie", 30).catch(() => [])).map((c) => ({ id: c.id, titlu: c.titlu }));
   const lista = (await firme(undefined, "", 1000)).map((f) => ({
     id: f.id,
     denumire: f.denumire,
@@ -49,7 +51,7 @@ async function Continut({ searchParams }: { searchParams: Promise<{ gresit?: str
         adrese) se folosește MailerLite, nu pagina asta.
       </p>
       <div className="max-w-4xl">
-        <ScrieFirmei firme={lista} limita={LIMITA_LOT} />
+        <ScrieFirmei firme={lista} limita={LIMITA_LOT} campanii={campanii} />
       </div>
     </Cadru>
   );

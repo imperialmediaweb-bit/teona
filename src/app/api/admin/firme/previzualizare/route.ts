@@ -6,7 +6,7 @@ import { firma as citesteFirma } from "@/lib/crm";
 import { EMAIL } from "@/date/asociatie";
 import { areEmail, trimiteEmailCuId } from "@/lib/email/trimite";
 import { textSimplu } from "@/lib/text-bogat";
-import { scrisoarea } from "@/lib/mesaje-firme";
+import { campaniileAlese, scrisoarea } from "@/lib/mesaje-firme";
 
 /**
  * „Vezi cum arată” și „Trimite-mi o probă” pentru e-mailul către o firmă.
@@ -35,6 +35,7 @@ export async function POST(cerere: Request) {
   const cine = await cineEsteConectat();
   const trimisDe = cine?.nume ?? "Asociația";
   const emailCelui = cine?.fel === "cont" ? cine.utilizator.email : null;
+  const campanii = areBazaDeDate() ? await campaniileAlese(f.getAll("campanii")) : [];
   const s = scrisoarea({
     // Butoanele din previzualizare nu duc nicăieri: nu se face un link semnat pentru o vizualizare.
     firma: fi ? { denumire: fi.denumire, persoana: fi.persoana } : EXEMPLU,
@@ -42,6 +43,7 @@ export async function POST(cerere: Request) {
     html: continut || "<p>(textul e încă gol)</p>",
     trimisDe,
     emailCelui,
+    campanii,
   });
 
   if (f.get("fac") !== "proba") {

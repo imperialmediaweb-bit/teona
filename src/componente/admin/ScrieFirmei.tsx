@@ -193,6 +193,55 @@ function AlegeFirme({ firme, limita }: { firme: FirmaDeAles[]; limita: number })
 }
 
 /**
+ * Campaniile publicate pe site, de pus în e-mail ca un card cu poză și
+ * buton. Cel mult trei: mai multe ar face din scrisoare un buletin.
+ */
+function AlegeCampanii({ campanii }: { campanii: Array<{ id: string; titlu: string }> }) {
+  const [alese, setAlese] = useState<string[]>([]);
+  return (
+    <fieldset className="grid gap-2">
+      <legend className="mb-1 font-titlu text-mic font-bold text-cerneala">Pune în e-mail o campanie de pe site</legend>
+      {campanii.length === 0 ? (
+        <p className="text-nota text-cerneala-slab">
+          Nicio campanie publicată încă. Se adaugă din{" "}
+          <a href="/admin/scrie/nou?fel=campanie" className="font-semibold text-caramiziu-700 underline">
+            Campanii
+          </a>
+          .
+        </p>
+      ) : (
+        <>
+          <span className="text-nota text-cerneala-slab">
+            Apare sub text, cu poza ei și butonul „Vezi campania”. Cel mult 3.
+          </span>
+          <ul className="grid gap-1">
+            {campanii.map((c) => {
+              const bifat = alese.includes(c.id);
+              return (
+                <li key={c.id}>
+                  <label className="flex cursor-pointer items-start gap-2.5 rounded-moale px-2 py-1.5 hover:bg-hartie-calda">
+                    <input
+                      type="checkbox"
+                      name="campanii"
+                      value={c.id}
+                      checked={bifat}
+                      disabled={!bifat && alese.length >= 3}
+                      onChange={(e) => setAlese((a) => (e.target.checked ? [...a, c.id] : a.filter((x) => x !== c.id)))}
+                      className="mt-1 size-4 shrink-0 accent-caramiziu-700"
+                    />
+                    <span className="min-w-0 text-mic text-cerneala [overflow-wrap:anywhere]">{c.titlu}</span>
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
+    </fieldset>
+  );
+}
+
+/**
  * „Vezi cum arată” și „Trimite-mi o probă”: același e-mail pe care îl
  * primește firma, compus pe server cu aceeași funcție ca trimiterea.
  * Atașamentele nu pleacă aici: se văd în listă, iar proba e despre text.
@@ -267,7 +316,9 @@ export default function ScrieFirmei({
   subiect = "",
   firme,
   limita = 30,
+  campanii = [],
 }: {
+  campanii?: Array<{ id: string; titlu: string }>;
   firmaId?: string;
   catre?: string;
   subiect?: string;
@@ -336,10 +387,11 @@ export default function ScrieFirmei({
         <span className="text-nota text-cerneala-slab">
           Scrie <code className="rounded bg-hartie-umbra px-1">{"{firma}"}</code> sau{" "}
           <code className="rounded bg-hartie-umbra px-1">{"{persoana}"}</code> și se pun singure numele firmei
-          și al omului. Jos se pun singure: rândul „Dacă nu doriți să mai primiți mesaje de la noi, răspundeți cu «NU»…” și semnătura cu numele tău și datele asociației.
+          și al omului. Din bara editorului pui poze în text (Poză) și linkuri (selectezi cuvintele, apoi Link). Jos se pun singure: rândul „Dacă nu doriți să mai primiți mesaje de la noi, răspundeți cu «NU»…” și semnătura cu numele tău și datele asociației.
         </span>
         <EditorText name="continut" defaultValue="" minim={2} />
       </div>
+      <AlegeCampanii campanii={campanii} />
       <Atasamente intrare={fisiere} />
       <Previzualizare formular={formular} />
       {lot && (

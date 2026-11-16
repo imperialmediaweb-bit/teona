@@ -8,6 +8,8 @@ import { scrieInteractiune, type Firma } from "@/lib/crm";
 import { mediu } from "@/lib/mediu";
 import { ASOCIATIA, EMAIL, TELEFOANE } from "@/date/asociatie";
 import { ADRESA_SITE } from "@/app/seo";
+import { pozaPentruEmail } from "@/lib/cloudinary-listare";
+import type { Text } from "@/lib/texte";
 
 /**
  * E-mailurile cu firmele, scrise și citite din panou.
@@ -244,8 +246,13 @@ export function corpScrisoare(
   refuz?: string | null,
   interes?: string | null,
   emailSemnatura: string = EMAIL.contact,
+  campanii: Text[] = [],
 ): { html: string; text: string } {
   const curat = curataHtml(htmlScris)
+    // Pozele din editor: `f_auto` poate da WebP sau AVIF, pe care Outlook nu le arată.
+    .replace(/(https:\/\/res\.cloudinary\.com\/[^"]*?)f_auto/g, "$1f_jpg")
+    // O adresă relativă nu duce nicăieri dintr-o căsuță de e-mail.
+    .replace(/(<img [^>]*src=")\/(?!\/)/g, `$1${ADRESA_SITE}/`)
     .replace(/<div data-video[^>]*>[\s\S]*?<\/div>/g, "")
     .replace(/<iframe[\s\S]*?<\/iframe>/g, "")
     .replace(/<p>/g, `<p style="margin:0 0 14px;font-family:${FONT};font-size:15px;line-height:1.6;color:#232323;">`)
@@ -267,6 +274,7 @@ export function corpScrisoare(
 <body style="margin:0;padding:20px 16px;background:#ffffff;">
 <div style="max-width:640px;">
 ${curat}
+${campanii.map(cardCampanie).join("\n")}
 ${interes || refuz ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:22px 0 0;"><tr>
 ${interes ? `<td bgcolor="#b82b09" style="border-radius:999px;"><a href="${scapa(interes)}" style="display:inline-block;padding:11px 22px;font-family:${FONT};font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:999px;">Da, ne interesează</a></td><td style="width:10px;"></td>` : ""}
 ${refuz ? `<td style="border:1px solid #cfd3d8;border-radius:999px;"><a href="${scapa(refuz)}" style="display:inline-block;padding:10px 20px;font-family:${FONT};font-size:14px;color:#616161;text-decoration:none;border-radius:999px;">Nu mai doresc mesaje</a></td>` : ""}
@@ -277,7 +285,45 @@ ${semnatura.map((s, i) => `<p style="${mic}${i === 0 ? "font-weight:bold;color:#
 </div></div></body></html>`;
   const interesText = interes ? `Vă interesează? Apăsați aici: ${interes}` : "";
   const refuzText = `Dacă nu doriți să mai primiți mesaje de la noi${refuz ? `, deschideți ${refuz} sau` : ","} răspundeți la acest e-mail cu „NU” și nu vă mai scriem.`;
-  return { html, text: [...textSimplu(htmlScris), ...(interesText ? [interesText] : []), refuzText, "", "--", ...semnatura].join("\n\n") };
+  const campaniiText = campanii.map((c) => `${c.titlu}: ${linkCampanie(c)}`);
+  return { html, text: [...textSimplu(htmlScris), ...campaniiText, ...(interesText ? [interesText] : []), refuzText, "", "--", ...semnatura].join("\n\n") };
+}
+
+/* ── Campaniile de pe site, puse în e-mail ──────────────────────────── */
+
+/** Câte campanii încap într-un e-mail către o firmă. Mai multe ar fi un buletin. */
+export const MAXIM_CAMPANII = 3;
+
+/** Linkul campaniei, cu etichetă: Google Analytics arată ce au adus e-mailurile către firme. */
+function linkCampanie(c: Pick<Text, "slug">): string {
+  return `${ADRESA_SITE}/campanii/${encodeURIComponent(c.slug)}?utm_source=email&utm_medium=firme&utm_campaign=${encodeURIComponent(c.slug)}`;
+}
+
+/** Un card simplu: poza, titlul, primele rânduri, butonul. Tabel, ca să țină și în Outlook. */
+function cardCampanie(c: Text): string {
+  const link = scapa(linkCampanie(c));
+  const rezumat = (c.rezumat || textSimplu(c.continut)[0] || "").slice(0, 220);
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 18px;border:1px solid #e6e8ec;border-radius:10px;">
+<tr><td style="padding:0;">
+${c.poza ? `<a href="${link}"><img src="${scapa(pozaPentruEmail(c.poza.id, 1072))}" alt="${scapa(c.poza.alt || c.titlu)}" width="600" style="display:block;width:100%;max-width:600px;height:auto;border:0;border-radius:10px 10px 0 0;" /></a>` : ""}
+</td></tr>
+<tr><td style="padding:14px 16px 16px;">
+<p style="margin:0 0 6px;font-family:${FONT};font-size:17px;font-weight:bold;line-height:1.35;color:#232323;">${scapa(c.titlu)}</p>
+${rezumat ? `<p style="margin:0 0 12px;font-family:${FONT};font-size:14px;line-height:1.55;color:#616161;">${scapa(rezumat)}</p>` : ""}
+<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#b82b09" style="border-radius:999px;"><a href="${link}" style="display:inline-block;padding:9px 18px;font-family:${FONT};font-size:14px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:999px;">Vezi campania</a></td></tr></table>
+</td></tr></table>`;
+}
+
+/**
+ * Campaniile alese în formular: numai cele publicate, cel mult trei. Un
+ * identificator din afara listei (scris de mână, o campanie scoasă de pe
+ * site între timp) se sare.
+ */
+export async function campaniileAlese(ids: unknown[]): Promise<Text[]> {
+  const { textDupaId } = await import("@/lib/texte");
+  const unice = [...new Set(ids.map(String).filter((x) => /^[0-9a-f-]{36}$/i.test(x)))].slice(0, MAXIM_CAMPANII);
+  const gasite = await Promise.all(unice.map((id) => textDupaId(id).catch(() => null)));
+  return gasite.filter((t): t is Text => Boolean(t && t.fel === "campanie" && t.publicat));
 }
 
 /* ── Trimiterea ─────────────────────────────────────────────────────── */
@@ -294,6 +340,7 @@ export function scrisoarea(d: {
   html: string;
   trimisDe: string;
   emailCelui: string | null;
+  campanii?: Text[];
 }) {
   const subiect = personalizeaza(d.subiect, d.firma, false);
   const scris = personalizeaza(d.html, d.firma, true);
@@ -303,7 +350,7 @@ export function scrisoarea(d: {
   const dela = om ? adresaDeLa(d.emailCelui) : adresaDeLa(null);
   const refuz = d.firma.id ? linkRefuz(d.firma.id) : "#";
   const interes = d.firma.id ? linkInteres(d.firma.id) : "#";
-  const { html, text } = corpScrisoare(scris, om, refuz, interes, dela);
+  const { html, text } = corpScrisoare(scris, om, refuz, interes, dela, d.campanii ?? []);
   const expeditorNume = om ? `${om} · ${ASOCIATIA.denumire}` : ASOCIATIA.denumire;
   return { subiect, html, text, dela, expeditorNume };
 }
@@ -321,6 +368,7 @@ export async function trimiteFirmei(d: {
   emailCelui: string | null;
   lot?: string;
   masa?: boolean;
+  campanii?: Text[];
 }): Promise<"trimis" | "esuat" | "refuza"> {
   // Firma a spus că nu mai vrea: nu pleacă nimic, oricine ar apăsa. Și nici
   // la o adresă care a spus „nu” din fișa altei firme (pusă din nou, alt nume).
@@ -338,6 +386,7 @@ export async function trimiteFirmei(d: {
     html: d.html,
     trimisDe: d.trimisDe,
     emailCelui: d.emailCelui,
+    campanii: d.campanii,
   });
   const antet = linkRefuz(d.firma.id, true);
   const raspundeLa = adresaDeRaspuns(d.firma.id) ?? d.emailCelui ?? EMAIL.contact;
@@ -359,7 +408,7 @@ export async function trimiteFirmei(d: {
   const [rand] = await intreaba<{ id: string }>(
     `INSERT INTO mesaje_firme (firma_id, directie, de_la, catre, subiect, html, text_simplu, resend_id, trimis_de, lot)
      VALUES ($1,'trimis',$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`,
-    [d.firma.id, dela, [d.catre].flat().join(", "), subiect, curataHtml(personalizeaza(d.html, d.firma, true)), text, r.id, d.trimisDe, d.lot ?? null],
+    [d.firma.id, dela, [d.catre].flat().join(", "), subiect, curataHtml(personalizeaza(d.html, d.firma, true) + (d.campanii ?? []).map((c) => `<p>Campania: <a href="${scapa(linkCampanie(c))}">${scapa(c.titlu)}</a></p>`).join("")), text, r.id, d.trimisDe, d.lot ?? null],
   );
   for (const a of d.atasamente) {
     await intreaba(
