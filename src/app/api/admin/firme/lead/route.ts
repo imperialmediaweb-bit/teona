@@ -43,7 +43,7 @@ export async function POST(cerere: Request) {
       scrisDe: cine?.nume,
     }).catch(() => false);
   }
-  return trimiteLa(`/admin/firme/${r.id}/mesaje?${r.eraDeja ? "era=1" : "nou=1"}#jos`);
+  return trimiteLa(`/admin/firme/${r.id}/mesaje?${r.eraDeja ? "era=1" : "nou=1"}${r.refuza ? "&refuza=1" : ""}#jos`);
 }
 
 export const GET = () => raspuns("Metodă nepermisă.", 405);

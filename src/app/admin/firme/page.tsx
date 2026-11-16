@@ -208,7 +208,14 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                       {f.cui.startsWith("fara-cui-") ? "fără CUI" : `CUI ${f.cui}`} · {f.cale} · a scris {cand(f.creatLa)}
                     </p>
                   </div>
-                  <Eticheta stadiu={f.stadiu} />
+                  <span className="flex flex-wrap items-center gap-2">
+                    {f.faraEmailuri && (
+                      <span className="rounded-full bg-caramiziu-50 px-2.5 py-0.5 text-nota font-semibold text-caramiziu-900">
+                        nu vrea e-mailuri
+                      </span>
+                    )}
+                    <Eticheta stadiu={f.stadiu} />
+                  </span>
                 </div>
 
                 <div className="mt-4 grid gap-x-8 gap-y-1.5 text-mic sm:grid-cols-2">

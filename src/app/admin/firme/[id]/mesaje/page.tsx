@@ -20,7 +20,7 @@ export default function PaginaDiscutie({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ gresit?: string; trimis?: string; ratat?: string; nou?: string; era?: string }>;
+  searchParams: Promise<{ gresit?: string; trimis?: string; ratat?: string; nou?: string; era?: string; refuza?: string }>;
 }) {
   return (
     <Suspense fallback={<Cadru titlu="E-mailuri cu firma">Se încarcă…</Cadru>}>
@@ -34,11 +34,11 @@ async function Continut({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ gresit?: string; trimis?: string; ratat?: string; nou?: string; era?: string }>;
+  searchParams: Promise<{ gresit?: string; trimis?: string; ratat?: string; nou?: string; era?: string; refuza?: string }>;
 }) {
   await connection();
   const { id } = await params;
-  const { gresit, trimis, ratat, nou, era } = await searchParams;
+  const { gresit, trimis, ratat, nou, era, refuza } = await searchParams;
   const oprit = await poarta("E-mailuri cu firma", "/admin/firme/mesaje", gresit);
   if (oprit) return oprit;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
@@ -99,6 +99,11 @@ async function Continut({
             Firma cu CUI-ul ăsta era deja în listă; n-am schimbat nimic la ea. Iată discuția ei.
           </p>
         )}
+        {refuza && !f.faraEmailuri && (
+          <p role="alert" className="mb-4 colt-mic-a bg-caramiziu-50 px-4 py-3 text-mic font-semibold text-caramiziu-900">
+            N-a plecat nimic: una dintre adresele scrise la „Către” a cerut să nu mai primească e-mailuri de la noi.
+          </p>
+        )}
         {trimis && (
           <p role="status" className="mb-4 colt-mic-a bg-turcoaz-50 px-4 py-3 text-mic font-semibold text-turcoaz-900">
             A plecat. Îl vezi mai sus; când îl deschide, scrie „Deschis”.
@@ -109,7 +114,33 @@ async function Continut({
             N-a plecat: serverul de e-mail n-a răspuns. Ce ai scris e tot în caseta de mai jos; încearcă din nou peste câteva minute.
           </p>
         )}
-        <ScrieFirmei firmaId={f.id} catre={f.email} subiect={subiect} />
+        {f.faraEmailuri ? (
+          <div className="grid gap-3" data-refuza>
+            <p role="status" className="colt-mic-a bg-caramiziu-50 px-4 py-3 text-mic font-semibold text-caramiziu-900">
+              {refuza ? "N-a plecat nimic. " : ""}Adresa asta a cerut să nu mai primească e-mailuri de la noi (din{" "}
+              {new Intl.DateTimeFormat("ro-RO", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Bucharest" }).format(new Date(f.faraEmailuri))}
+              ). Panoul nu-i mai trimite nimic.
+            </p>
+            <form action="/api/admin/firme/refuz" method="post">
+              <input type="hidden" name="firma" value={f.id} />
+              <input type="hidden" name="fac" value="porneste" />
+              <button type="submit" className="text-mic font-semibold text-cerneala-moale underline underline-offset-2">
+                Am vorbit cu ei și vor iar e-mailuri
+              </button>
+            </form>
+          </div>
+        ) : (
+          <>
+            <ScrieFirmei firmaId={f.id} catre={f.email} subiect={subiect} />
+            <form action="/api/admin/firme/refuz" method="post" className="mt-6 border-t border-hartie-umbra pt-4">
+              <input type="hidden" name="firma" value={f.id} />
+              <input type="hidden" name="fac" value="opreste" />
+              <button type="submit" className="text-nota font-semibold text-cerneala-moale underline underline-offset-2 hover:text-caramiziu-800">
+                Firma a răspuns „NU”: nu-i mai scrie
+              </button>
+            </form>
+          </>
+        )}
       </section>
     </Cadru>
   );

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-type Cautare = { gresit?: string; trimise?: string; ratate?: string };
+type Cautare = { gresit?: string; trimise?: string; ratate?: string; refuza?: string };
 
 export default function PaginaMesajeFirme({ searchParams }: { searchParams: Promise<Cautare> }) {
   return (
@@ -30,7 +30,7 @@ const cand = (iso: string) =>
 
 async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   await connection();
-  const { gresit, trimise, ratate } = await searchParams;
+  const { gresit, trimise, ratate, refuza } = await searchParams;
   const oprit = await poarta("Mesaje cu firmele", "/admin/firme/mesaje", gresit);
   if (oprit) return oprit;
 
@@ -50,6 +50,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
         <p role="status" className="mb-6 colt-mic-a bg-turcoaz-50 px-4 py-3 text-mic font-semibold text-turcoaz-900">
           {trimise === "1" ? "A plecat 1 e-mail." : `Au plecat ${trimise} e-mailuri, fiecare la firma lui.`}
           {ratate && <span className="block text-caramiziu-900">N-au plecat: {ratate}.</span>}
+          {refuza && <span className="block text-cerneala">Sărite, fiindcă nu mai vor e-mailuri: {refuza}.</span>}
         </p>
       )}
 

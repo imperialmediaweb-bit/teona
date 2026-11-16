@@ -96,8 +96,9 @@ export async function POST(cerere: Request) {
     const catre = [...new Set(scrise.map((x) => emailValid(x)))];
     if (!catre.length || catre.some((x) => !x)) return nuTrece("O adresă de e-mail nu e scrisă corect. Pune-le despărțite prin virgulă.");
     if (catre.length > 10) return nuTrece("Cel mult 10 adrese la un e-mail.");
-    const ok = await trimiteFirmei({ firma: fi, catre: catre as string[], subiect, html: continut, atasamente, trimisDe, emailCelui });
-    return trimiteLa(`/admin/firme/${fi.id}/mesaje?${ok ? "trimis=1" : "ratat=1"}#jos`);
+    const rez = await trimiteFirmei({ firma: fi, catre: catre as string[], subiect, html: continut, atasamente, trimisDe, emailCelui });
+    const semn = rez === "trimis" ? "trimis=1" : rez === "refuza" ? "refuza=1" : "ratat=1";
+    return trimiteLa(`/admin/firme/${fi.id}/mesaje?${semn}#jos`);
   }
 
   // Mai multe firme: fiecare primește e-mailul ei.
@@ -109,6 +110,7 @@ export async function POST(cerere: Request) {
   const lot = randomUUID();
   let plecate = 0;
   const ratate: string[] = [];
+  const refuza: string[] = [];
   for (const id of ids) {
     const fi = await citesteFirma(id);
     const catre = fi ? emailValid(fi.email) : null;
@@ -116,7 +118,7 @@ export async function POST(cerere: Request) {
       if (fi) ratate.push(fi.denumire);
       continue;
     }
-    const ok = await trimiteFirmei({
+    const rez = await trimiteFirmei({
       firma: fi,
       catre,
       subiect,
@@ -127,11 +129,13 @@ export async function POST(cerere: Request) {
       lot,
       masa: true,
     });
-    if (ok) plecate++;
+    if (rez === "trimis") plecate++;
+    else if (rez === "refuza") refuza.push(fi.denumire);
     else ratate.push(fi.denumire);
   }
   const unde = new URLSearchParams({ trimise: String(plecate) });
   if (ratate.length) unde.set("ratate", ratate.join(", ").slice(0, 500));
+  if (refuza.length) unde.set("refuza", refuza.join(", ").slice(0, 500));
   return trimiteLa(`/admin/firme/mesaje?${unde}`);
 }
 

@@ -45,6 +45,8 @@ export type Firma = {
   sumaBani: number | null;
   creatLa: string;
   schimbatLa: string;
+  /** Când a cerut firma să nu mai primească e-mailuri din panou. */
+  faraEmailuri: string | null;
 };
 
 type RandFirma = {
@@ -61,6 +63,7 @@ type RandFirma = {
   suma_bani: string | null;
   creat_la: Date;
   schimbat_la: Date;
+  fara_emailuri_la?: Date | null;
 };
 
 function laFirma(r: RandFirma): Firma {
@@ -78,6 +81,7 @@ function laFirma(r: RandFirma): Firma {
     sumaBani: r.suma_bani === null ? null : Number(r.suma_bani),
     creatLa: r.creat_la.toISOString(),
     schimbatLa: r.schimbat_la.toISOString(),
+    faraEmailuri: r.fara_emailuri_la ? r.fara_emailuri_la.toISOString() : null,
   };
 }
 
@@ -169,17 +173,25 @@ export async function adaugaLead(d: {
   email: string;
   telefon: string | null;
   nota: string | null;
-}): Promise<{ id: string; eraDeja: boolean }> {
+}): Promise<{ id: string; eraDeja: boolean; refuza: boolean }> {
   const cui = d.cui ? normalizeazaCui(d.cui) : `fara-cui-${crypto.randomUUID().slice(0, 8)}`;
-  const noi = await intreaba<{ id: string }>(
-    `INSERT INTO firme (cui, denumire, persoana, email, telefon, cale, mesaj, stadiu)
-     VALUES ($1,$2,$3,$4,$5,'adăugată din panou',$6,'prospect')
-     ON CONFLICT (cui) DO NOTHING RETURNING id`,
+  /*
+    O adresă care a spus „nu” rămâne „nu”, oricum ar fi adăugată din nou
+    (alt nume, fără CUI): firma nouă se naște deja oprită.
+  */
+  const noi = await intreaba<{ id: string; refuza: boolean }>(
+    `INSERT INTO firme (cui, denumire, persoana, email, telefon, cale, mesaj, stadiu, fara_emailuri_la)
+     VALUES ($1,$2,$3,$4,$5,'adăugată din panou',$6,'prospect',
+             (SELECT max(fara_emailuri_la) FROM firme WHERE lower(email) = lower($4)))
+     ON CONFLICT (cui) DO NOTHING RETURNING id, fara_emailuri_la IS NOT NULL AS refuza`,
     [cui, d.denumire, d.persoana, d.email, d.telefon, d.nota],
   );
-  if (noi[0]) return { id: noi[0].id, eraDeja: false };
-  const [era] = await intreaba<{ id: string }>("SELECT id FROM firme WHERE cui = $1", [cui]);
-  return { id: era.id, eraDeja: true };
+  if (noi[0]) return { id: noi[0].id, eraDeja: false, refuza: noi[0].refuza };
+  const [era] = await intreaba<{ id: string; refuza: boolean }>(
+    "SELECT id, fara_emailuri_la IS NOT NULL AS refuza FROM firme WHERE cui = $1",
+    [cui],
+  );
+  return { id: era.id, eraDeja: true, refuza: era.refuza };
 }
 
 /**

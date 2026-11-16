@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto";
 import { intreaba } from "@/lib/baza";
-import { cheiaDeSemnat } from "@/lib/cheie-semnare";
+import { cheiaDeSemnat, semnaturaLinkuluiTine, semneazaText } from "@/lib/cheie-semnare";
 import { curataHtml } from "@/lib/curata-html";
 import { textSimplu } from "@/lib/text-bogat";
 import { trimiteEmailCuId } from "@/lib/email/trimite";
@@ -98,7 +98,72 @@ export function personalizeaza(text: string, f: Pick<Firma, "denumire" | "persoa
  * Un e-mail simplu, ca de la un om: textul, apoi semnătura. Fără bandă și
  * fără butoane — e o scrisoare către o firmă, nu un buletin.
  */
-export function corpScrisoare(htmlScris: string, cine: string): { html: string; text: string } {
+/* ── „Nu mai doresc mesaje” ─────────────────────────────────────────── */
+
+/**
+ * Linkul cu care o firmă spune că nu mai vrea e-mailuri din panou. Semnat,
+ * ca nimeni să nu poată opri altă firmă ghicind adresa. Duce la o pagină cu
+ * buton (scanerele de e-mail deschid toate linkurile), iar antetul
+ * `List-Unsubscribe` duce la ruta care primește apăsarea dintr-un clic a lui
+ * Gmail și Outlook. O firmă care poate spune ușor „nu” nu mai apasă „spam”.
+ */
+export function linkRefuz(firmaId: string, pentruAntet = false): string | null {
+  const s = semneazaText(`refuz-firma:${firmaId}`);
+  if (!s) return null;
+  const q = `f=${firmaId}&s=${s}`;
+  return pentruAntet ? `${ADRESA_SITE}/api/firme/nu-mai-scrie?${q}` : `${ADRESA_SITE}/nu-mai-scrie?${q}`;
+}
+
+export function refuzValid(firmaId: string, semnul: string): boolean {
+  return /^[0-9a-f-]{36}$/i.test(firmaId) && /^[0-9a-f]{64}$/.test(semnul) && semnaturaLinkuluiTine(`refuz-firma:${firmaId}`, semnul);
+}
+
+/** Firma nu mai primește e-mailuri. Întoarce `true` numai prima dată. */
+export async function opresteEmailurile(firmaId: string, cine: string): Promise<boolean> {
+  const r = await intreaba<{ id: string }>(
+    `UPDATE firme SET fara_emailuri_la = now() WHERE id = $1 AND fara_emailuri_la IS NULL RETURNING id`,
+    [firmaId],
+  );
+  if (!r.length) return false;
+  // Aceeași adresă, pusă și la altă firmă: se oprește și acolo.
+  await intreaba(
+    `UPDATE firme SET fara_emailuri_la = now()
+      WHERE fara_emailuri_la IS NULL AND lower(email) = (SELECT lower(email) FROM firme WHERE id = $1)`,
+    [firmaId],
+  );
+  await scrieInteractiune({
+    firmaId,
+    fel: "notita",
+    rezumat: "Nu mai vrea e-mailuri de la noi. Panoul nu-i mai trimite nimic.",
+    scrisDe: cine,
+  }).catch(() => false);
+  return true;
+}
+
+export async function pornesteEmailurile(firmaId: string, cine: string): Promise<void> {
+  await intreaba(
+    `UPDATE firme SET fara_emailuri_la = NULL
+      WHERE id = $1 OR lower(email) = (SELECT lower(email) FROM firme WHERE id = $1)`,
+    [firmaId],
+  );
+  await scrieInteractiune({
+    firmaId,
+    fel: "notita",
+    rezumat: "Am vorbit cu firma: vrea iar e-mailuri de la noi.",
+    scrisDe: cine,
+  }).catch(() => false);
+}
+
+/**
+ * Rândul de la sfârșitul fiecărui e-mail către o firmă: cum spune că nu mai
+ * vrea mesaje. Scris aici, nu de mână, ca să nu lipsească niciodată.
+ * Firmelor li se scrie cu „dumneavoastră”.
+ */
+export function corpScrisoare(
+  htmlScris: string,
+  cine: string,
+  refuz?: string | null,
+): { html: string; text: string } {
   const curat = curataHtml(htmlScris)
     .replace(/<div data-video[^>]*>[\s\S]*?<\/div>/g, "")
     .replace(/<iframe[\s\S]*?<\/iframe>/g, "")
@@ -121,10 +186,12 @@ export function corpScrisoare(htmlScris: string, cine: string): { html: string; 
 <body style="margin:0;padding:20px 16px;background:#ffffff;">
 <div style="max-width:640px;">
 ${curat}
+<p style="margin:18px 0 0;font-family:${FONT};font-size:13px;line-height:1.6;color:#616161;">Dacă nu doriți să mai primiți mesaje de la noi, ${refuz ? `<a href="${scapa(refuz)}" style="color:#616161;text-decoration:underline;">apăsați aici</a>` : "răspundeți la acest e-mail cu „NU”"}${refuz ? " sau răspundeți la acest e-mail cu „NU”" : ""} și nu vă mai scriem.</p>
 <div style="margin-top:22px;padding-top:12px;border-top:1px solid #e6e8ec;">
 ${semnatura.map((s, i) => `<p style="${mic}${i === 0 ? "font-weight:bold;color:#232323;" : ""}">${scapa(s)}</p>`).join("\n")}
 </div></div></body></html>`;
-  return { html, text: [...textSimplu(htmlScris), "", "--", ...semnatura].join("\n\n") };
+  const refuzText = `Dacă nu doriți să mai primiți mesaje de la noi${refuz ? `, deschideți ${refuz} sau` : ","} răspundeți la acest e-mail cu „NU” și nu vă mai scriem.`;
+  return { html, text: [...textSimplu(htmlScris), refuzText, "", "--", ...semnatura].join("\n\n") };
 }
 
 /* ── Trimiterea ─────────────────────────────────────────────────────── */
@@ -142,12 +209,23 @@ export async function trimiteFirmei(d: {
   emailCelui: string | null;
   lot?: string;
   masa?: boolean;
-}): Promise<boolean> {
+}): Promise<"trimis" | "esuat" | "refuza"> {
+  // Firma a spus că nu mai vrea: nu pleacă nimic, oricine ar apăsa. Și nici
+  // la o adresă care a spus „nu” din fișa altei firme (pusă din nou, alt nume).
+  if (d.firma.faraEmailuri) return "refuza";
+  const adrese = [d.catre].flat().map((x) => x.toLowerCase());
+  const [opriti] = await intreaba<{ nr: string }>(
+    `SELECT count(*) AS nr FROM firme WHERE fara_emailuri_la IS NOT NULL AND lower(email) = ANY($1::text[])`,
+    [adrese],
+  );
+  if (Number(opriti?.nr ?? 0) > 0) return "refuza";
   const subiect = personalizeaza(d.subiect, d.firma, false);
   const scris = personalizeaza(d.html, d.firma, true);
   // Intrat cu parola asociației, „cine” e chiar asociația: nu se scrie de două ori.
   const om = /^asocia/i.test(d.trimisDe) ? "" : d.trimisDe;
-  const { html, text } = corpScrisoare(scris, om);
+  const refuz = linkRefuz(d.firma.id);
+  const { html, text } = corpScrisoare(scris, om, refuz);
+  const antet = linkRefuz(d.firma.id, true);
   const raspundeLa = adresaDeRaspuns(d.firma.id) ?? d.emailCelui ?? EMAIL.contact;
   const r = await trimiteEmailCuId({
     catre: d.catre,
@@ -158,8 +236,11 @@ export async function trimiteFirmei(d: {
     atasamente: d.atasamente.map((a) => ({ nume: a.nume, continut: a.continut })),
     expeditorNume: om ? `${om} · ${ASOCIATIA.denumire}` : ASOCIATIA.denumire,
     masa: d.masa,
+    antete: antet
+      ? { "List-Unsubscribe": `<${antet}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" }
+      : undefined,
   }).catch(() => ({ ok: false, id: null }));
-  if (!r.ok) return false;
+  if (!r.ok) return "esuat";
   const [rand] = await intreaba<{ id: string }>(
     `INSERT INTO mesaje_firme (firma_id, directie, de_la, catre, subiect, html, text_simplu, resend_id, trimis_de, lot)
      VALUES ($1,'trimis',$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`,
@@ -177,7 +258,7 @@ export async function trimiteFirmei(d: {
     rezumat: `E-mail trimis din panou: „${subiect}”${d.atasamente.length ? ` (${d.atasamente.length} atașament${d.atasamente.length > 1 ? "e" : ""})` : ""}`,
     scrisDe: d.trimisDe,
   }).catch(() => false);
-  return true;
+  return "trimis";
 }
 
 /* ── Citirea ─────────────────────────────────────────────────────────── */

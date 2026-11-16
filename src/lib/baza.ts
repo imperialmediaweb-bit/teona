@@ -639,6 +639,8 @@ const ADAOSURI = `
     continut  bytea NOT NULL
   );
   CREATE INDEX IF NOT EXISTS atasamente_firme_dupa_mesaj ON atasamente_firme (mesaj_id);
+  /* Firma care a cerut să nu mai primească e-mailuri din panou: de atunci nu i se mai trimite nimic. */
+  ALTER TABLE firme ADD COLUMN IF NOT EXISTS fara_emailuri_la timestamptz;
 `;
 
 async function pregateste(): Promise<void> {

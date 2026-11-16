@@ -1409,6 +1409,18 @@ există trimitere unu-la-unu și nici atașamente. Pleacă prin Resend
   anunț dublat nu face nimic a doua oară (`resend_id` unic).
 - „Deschis” nu e sigur (iPhone deschide singur pozele, Outlook le
   blochează); „a apăsat pe link” e semnul sigur. Scrie și pe pagină.
+- **„Nu mai doresc mesaje”**: jos în fiecare e-mail către o firmă se pune
+  singur rândul „Dacă nu doriți să mai primiți mesaje de la noi, apăsați
+  aici sau răspundeți cu „NU”…” (`corpScrisoare`), plus antetul
+  `List-Unsubscribe` + `List-Unsubscribe-Post` (butonul de dezabonare din
+  Gmail/Outlook — cine poate spune ușor „nu” nu mai apasă „spam”). Linkul e
+  semnat (`linkRefuz`) și duce la `/nu-mai-scrie`, o pagină cu buton
+  (scanerele deschid linkurile); dezabonarea dintr-un clic lovește
+  `/api/firme/nu-mai-scrie`. Se scrie `firme.fara_emailuri_la`; din panou,
+  „Firma a răspuns „NU”: nu-i mai scrie” face același lucru. **Refuzul ține
+  de adresă, nu de fișă**: `trimiteFirmei` refuză orice adresă oprită la
+  oricare firmă, iar un lead nou cu o adresă oprită se naște oprit.
+  „Am vorbit cu ei și vor iar e-mailuri” îl ridică.
 - Probă, cu un Resend de mențiune și anunțuri semnate:
   `scratchpad/mf/proba.mjs` (34 de verificări).
 

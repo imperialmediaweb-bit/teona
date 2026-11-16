@@ -15,6 +15,8 @@ export type FirmaDeAles = {
   email: string;
   stadiu: string;
   eticheta: string;
+  /** A cerut să nu mai primească e-mailuri: nu se poate bifa. */
+  faraEmailuri?: boolean;
 };
 
 const camp =
@@ -106,7 +108,7 @@ function AlegeFirme({ firme, limita }: { firme: FirmaDeAles[]; limita: number })
             </option>
           ))}
         </select>
-        <button type="button" className="text-mic font-semibold text-caramiziu-700 underline" onClick={() => vizibile.forEach((f) => comuta(f.id, true))}>
+        <button type="button" className="text-mic font-semibold text-caramiziu-700 underline" onClick={() => vizibile.filter((f) => !f.faraEmailuri).forEach((f) => comuta(f.id, true))}>
           Bifează-le pe toate de mai jos
         </button>
         <button type="button" className="text-mic font-semibold text-cerneala-moale underline" onClick={() => setAlese(new Set())}>
@@ -125,12 +127,14 @@ function AlegeFirme({ firme, limita }: { firme: FirmaDeAles[]; limita: number })
                 name="firme"
                 value={f.id}
                 checked={alese.has(f.id)}
+                disabled={f.faraEmailuri}
                 onChange={(e) => comuta(f.id, e.target.checked)}
                 className="mt-1 size-4 shrink-0 accent-caramiziu-700"
               />
               <span className="min-w-0 text-mic">
                 <span className="font-semibold text-cerneala">{f.denumire}</span>
                 <span className="text-cerneala-slab"> · {f.persoana} · {f.email} · {f.eticheta}</span>
+                {f.faraEmailuri && <span className="ml-1 font-semibold text-caramiziu-800">· nu vrea e-mailuri</span>}
               </span>
             </label>
           </li>
@@ -184,7 +188,7 @@ export default function ScrieFirmei({
         <span className="text-nota text-cerneala-slab">
           Scrie <code className="rounded bg-hartie-umbra px-1">{"{firma}"}</code> sau{" "}
           <code className="rounded bg-hartie-umbra px-1">{"{persoana}"}</code> și se pun singure numele firmei
-          și al omului. Semnătura cu numele tău și datele asociației se pune singură.
+          și al omului. Jos se pun singure: rândul „Dacă nu doriți să mai primiți mesaje de la noi, răspundeți cu «NU»…” și semnătura cu numele tău și datele asociației.
         </span>
         <EditorText name="continut" defaultValue="" minim={2} />
       </div>

@@ -33,6 +33,7 @@ async function Continut({ searchParams }: { searchParams: Promise<{ gresit?: str
     email: f.email,
     stadiu: f.stadiu,
     eticheta: STADII_FIRMA.find((s) => s.id === f.stadiu)?.eticheta ?? f.stadiu,
+    faraEmailuri: Boolean(f.faraEmailuri),
   }));
   return (
     <Cadru

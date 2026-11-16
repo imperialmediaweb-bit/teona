@@ -76,6 +76,8 @@ export async function trimiteEmailCuId(mesaj: {
   masa?: boolean;
   /** Numele de la „De la” (adresa rămâne cea verificată în Resend). */
   expeditorNume?: string;
+  /** Antete în plus (de ex. `List-Unsubscribe`). */
+  antete?: Record<string, string>;
 }): Promise<{ ok: boolean; id: string | null }> {
   if (mesaj.masa && !locInMasa()) {
     console.error(`[email] limita de ${LIMITA_MASA} pe oră atinsă; n-a plecat „${mesaj.subiect}”`);
@@ -124,6 +126,7 @@ export async function trimiteEmailCuId(mesaj: {
         html: mesaj.html,
         text: mesaj.text,
         ...(mesaj.raspundeLa ? { reply_to: mesaj.raspundeLa } : {}),
+        ...(mesaj.antete ? { headers: mesaj.antete } : {}),
         ...(mesaj.atasamente?.length
           ? {
               attachments: mesaj.atasamente.map((a) => ({
