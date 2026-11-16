@@ -1371,6 +1371,47 @@ de cookie-uri pe loc; contactul fără JavaScript trimite datele prin GET.
 din Node **ignoră `Host:`** — ce vrea să imite Railway folosește `node:http`
 sau `curl`.
 
+## E-mailurile cu firmele, din panou
+
+Cerut în noiembrie 2026: fundraiserul scrie fiecărei firme în parte, cu poze
+și atașamente (prezentarea, contractul), vede dacă l-a deschis și primește
+răspunsul tot în panou, cu atașamentele lui. **Nu prin MailerLite**: acolo nu
+există trimitere unu-la-unu și nici atașamente. Pleacă prin Resend
+(`src/lib/mesaje-firme.ts`, `trimiteEmailCuId`).
+
+- `/admin/firme/<id>/mesaje` — discuția cu o firmă: ce s-a trimis, ce a
+  răspuns, atașamentele (se descarcă din `/api/admin/firme/atasament`), și
+  starea fiecărui e-mail: Livrat · Deschis de N ori · A apăsat pe link ·
+  Nu a ajuns. Caseta de scris e dedesubt; `{firma}` și `{persoana}` se
+  înlocuiesc; semnătura (numele omului + datele asociației) se pune singură.
+- `/admin/firme/mesaje` — toate discuțiile, cele cu răspunsuri necitite
+  primele; numărul lor intră în „De făcut acum” și în meniu.
+- `/admin/firme/scrie` — același text la mai multe firme, **fiecare cu
+  e-mailul ei**, cel mult `LIMITA_LOT` (30) o dată și sub `LIMITA_MASA`.
+  Pentru sute de adrese rămâne MailerLite (vezi secțiunea următoare).
+- **Lead**: „Adaugă o firmă” (nume, e-mail, opțional CUI) pune firma pe
+  stadiul nou `prospect` („Lead: de contactat”). Fără CUI primește
+  `fara-cui-…` (CUI-ul e cheia tabelului). Un CUI existent nu scrie peste
+  firmă. Dacă firma completează apoi formularul de pe site, trece pe
+  „Cerere nouă”.
+- **Răspunsurile** vin pe adresa firmei `firma-<id>-<semn>@RASPUNS_DOMENIU`
+  (subdomeniu cu MX la Resend Receiving; căsuțele de pe domeniul principal nu
+  se ating). Semnul e HMAC cu `SECRET_SESIUNE`; o adresă falsificată nu
+  leagă nimic, iar răspunsul se leagă atunci după expeditor (dacă adresa e
+  într-o singură fișă) sau stă la „nu le-am putut lega”. Fără
+  `RASPUNS_DOMENIU`, răspunsul merge la omul care a scris (sau contact@).
+  La fiecare răspuns pleacă anunț la `CATRE_ASOCIATIE` și pe telefon.
+- **Webhook-ul** `/api/email/resend/webhook` (semnătură Svix, secretul în
+  `RESEND_WEBHOOK_SECRET`; fără el răspunde 503): `email.received` aduce
+  textul și atașamentele prin API (`/emails/receiving/<id>`, linkurile de
+  descărcare mor după o oră, deci fișierele se țin în `atasamente_firme`),
+  `delivered`/`opened`/`clicked`/`bounced`/`complained` scriu starea. Un
+  anunț dublat nu face nimic a doua oară (`resend_id` unic).
+- „Deschis” nu e sigur (iPhone deschide singur pozele, Outlook le
+  blochează); „a apăsat pe link” e semnul sigur. Scrie și pe pagină.
+- Probă, cu un Resend de mențiune și anunțuri semnate:
+  `scratchpad/mf/proba.mjs` (34 de verificări).
+
 ## Site-ul nu face campanii de e-mail
 
 Asociația a fost oprită odată de Railway pentru e-mailuri trimise în masă.

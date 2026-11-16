@@ -177,7 +177,7 @@ export async function schimbaContract(
               suma_bani = CASE WHEN $2 = 'incasat' THEN COALESCE($3, suma_bani) ELSE suma_bani END,
               schimbat_la = now()
         WHERE id = (SELECT firma_id FROM contracte WHERE id = $1)
-          AND (stadiu IN ('cerere', 'contract_trimis')
+          AND (stadiu IN ('prospect', 'cerere', 'contract_trimis')
                OR (stadiu = 'semnat' AND $2 = 'incasat'))`,
       [id, d.stadiu, d.valoareBani],
     ).catch(() => undefined);

@@ -53,7 +53,7 @@ function locInMasa(): boolean {
   return true;
 }
 
-export async function trimiteEmail(mesaj: {
+export async function trimiteEmailCuId(mesaj: {
   catre: string | string[];
   subiect: string;
   html: string;
@@ -74,24 +74,26 @@ export async function trimiteEmail(mesaj: {
    * apel către voluntari, proba unui șablon). Vezi `LIMITA_MASA`.
    */
   masa?: boolean;
-}): Promise<boolean> {
+  /** Numele de la „De la” (adresa rămâne cea verificată în Resend). */
+  expeditorNume?: string;
+}): Promise<{ ok: boolean; id: string | null }> {
   if (mesaj.masa && !locInMasa()) {
     console.error(`[email] limita de ${LIMITA_MASA} pe oră atinsă; n-a plecat „${mesaj.subiect}”`);
-    return false;
+    return { ok: false, id: null };
   }
   // O probă automată nu scrie nimănui adevărat: totul merge la adresa de probă.
   if (await esteProba()) {
     const proba = adresaDeProba();
     if (!proba) {
       console.warn(`[email] probă fără PROBA_EMAIL; n-a plecat „${mesaj.subiect}”`);
-      return true;
+      return { ok: true, id: null };
     }
     mesaj = { ...mesaj, catre: proba, subiect: /^\[prob[ăa]\]/i.test(mesaj.subiect) ? mesaj.subiect.replace(/^\[prob[ăa]\]/i, "[PROBĂ]") : `[PROBĂ] ${mesaj.subiect}` };
   }
   const cheie = mediu("RESEND_API_KEY");
   if (!cheie) {
     console.error(`[email] RESEND_API_KEY lipsește; n-a plecat „${mesaj.subiect}”`);
-    return false;
+    return { ok: false, id: null };
   }
 
   /*
@@ -114,7 +116,9 @@ export async function trimiteEmail(mesaj: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: expeditor(),
+        from: mesaj.expeditorNume
+          ? `${mesaj.expeditorNume.replace(/[<>"\r\n]/g, "")} <${expeditor().match(/<([^>]+)>/)?.[1] ?? EMAIL.contact}>`
+          : expeditor(),
         to: Array.isArray(mesaj.catre) ? mesaj.catre : [mesaj.catre],
         subject: mesaj.subiect,
         html: mesaj.html,
@@ -140,13 +144,21 @@ export async function trimiteEmail(mesaj: {
       const motiv = (await raspuns.text().catch(() => "")).slice(0, 300);
       console.error(`[email] Resend ${raspuns.status} la „${mesaj.subiect}”: ${motiv}`);
     }
-    return raspuns.ok;
+    if (!raspuns.ok) return { ok: false, id: null };
+    const corp = (await raspuns.json().catch(() => ({}))) as { id?: string };
+    return { ok: true, id: typeof corp.id === "string" ? corp.id : null };
   } catch (e) {
     console.error(`[email] rețea la „${mesaj.subiect}”: ${(e as Error).message}`);
     // Rețeaua a căzut sau Resend nu răspunde. Ruta va spune omului că n-a
     // mers și îi va da telefonul — nu „am primit mesajul tău".
-    return false;
+    return { ok: false, id: null };
   }
+}
+
+export async function trimiteEmail(
+  mesaj: Parameters<typeof trimiteEmailCuId>[0],
+): Promise<boolean> {
+  return (await trimiteEmailCuId(mesaj)).ok;
 }
 
 /** Scapă textul scris de om: un e-mail HTML nu trebuie să poarte marcaj străin. */

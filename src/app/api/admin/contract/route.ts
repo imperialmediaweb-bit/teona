@@ -155,7 +155,7 @@ export async function POST(cerere: Request) {
     scrisDe: (await numeleConectat()) ?? undefined,
   }).catch(() => undefined);
 
-  if (formular.get("muta") === "da" && firma.stadiu === "cerere") {
+  if (formular.get("muta") === "da" && (firma.stadiu === "cerere" || firma.stadiu === "prospect")) {
     await schimbaStadiulFirmei(id, "contract_trimis").catch(() => undefined);
   }
 

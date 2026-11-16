@@ -16,6 +16,8 @@ import { intreaba } from "./baza";
 
 /** Stadiile prin care trece o sponsorizare, în ordine. */
 export const STADII_FIRMA = [
+  /* O firmă găsită de asociație, căreia încă nu i-a scris nimeni (noiembrie 2026). */
+  { id: "prospect", eticheta: "Lead: de contactat", culoare: "cerneala" },
   { id: "cerere", eticheta: "Cerere nouă", culoare: "miere" },
   { id: "contract_trimis", eticheta: "Contract trimis", culoare: "turcoaz" },
   { id: "semnat", eticheta: "Contract semnat", culoare: "turcoaz" },
@@ -127,7 +129,7 @@ export async function salveazaFirma(date: {
          firmele fără răspuns (audit 11 nov. 2026). Una aflată pe drum
          (contract trimis, semnat, încasat anul ăsta) nu se dă înapoi.
        */
-       stadiu        = CASE WHEN firme.stadiu = 'renuntat'
+       stadiu        = CASE WHEN firme.stadiu IN ('renuntat', 'prospect')
                               OR (firme.stadiu = 'incasat'
                                   AND date_part('year', firme.schimbat_la AT TIME ZONE 'Europe/Bucharest')
                                     < date_part('year', now() AT TIME ZONE 'Europe/Bucharest'))
@@ -152,6 +154,32 @@ export async function salveazaFirma(date: {
   );
   const r = randuri[0];
   return r ? { id: r.id, eraDeja: r.era_deja } : null;
+}
+
+/**
+ * O firmă adăugată de mână, ca lead: găsită de asociație, nu venită prin
+ * formular. Fără CUI primește un loc ținut (`fara-cui-…`), fiindcă CUI-ul e
+ * cheia tabelului; se completează când se află. Dacă firma există deja (același
+ * CUI), nu se scrie nimic peste ea: se întoarce cea care e.
+ */
+export async function adaugaLead(d: {
+  cui: string | null;
+  denumire: string;
+  persoana: string;
+  email: string;
+  telefon: string | null;
+  nota: string | null;
+}): Promise<{ id: string; eraDeja: boolean }> {
+  const cui = d.cui ? normalizeazaCui(d.cui) : `fara-cui-${crypto.randomUUID().slice(0, 8)}`;
+  const noi = await intreaba<{ id: string }>(
+    `INSERT INTO firme (cui, denumire, persoana, email, telefon, cale, mesaj, stadiu)
+     VALUES ($1,$2,$3,$4,$5,'adăugată din panou',$6,'prospect')
+     ON CONFLICT (cui) DO NOTHING RETURNING id`,
+    [cui, d.denumire, d.persoana, d.email, d.telefon, d.nota],
+  );
+  if (noi[0]) return { id: noi[0].id, eraDeja: false };
+  const [era] = await intreaba<{ id: string }>("SELECT id FROM firme WHERE cui = $1", [cui]);
+  return { id: era.id, eraDeja: true };
 }
 
 /**

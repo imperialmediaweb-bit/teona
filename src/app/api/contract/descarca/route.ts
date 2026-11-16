@@ -186,7 +186,7 @@ export async function POST(cerere: Request) {
       // O firmă nouă trece la „contract trimis”; una aflată deja mai departe
       // (semnat, bani încasați) nu se dă înapoi.
       await intreaba(
-        "UPDATE firme SET stadiu = 'contract_trimis', schimbat_la = now() WHERE id = $1 AND stadiu = 'cerere'",
+        "UPDATE firme SET stadiu = 'contract_trimis', schimbat_la = now() WHERE id = $1 AND stadiu IN ('cerere', 'prospect')",
         [firma.id],
       ).catch(() => undefined);
       await scrieInteractiune({

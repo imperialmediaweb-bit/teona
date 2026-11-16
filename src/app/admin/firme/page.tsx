@@ -18,6 +18,7 @@ import Descarca from "@/componente/admin/Descarca";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 import Jurnal from "@/componente/admin/Jurnal";
+import AdaugaLead from "@/componente/admin/firme/AdaugaLead";
 
 export const metadata: Metadata = {
   title: "Firme",
@@ -149,6 +150,23 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
           </a>
         </p>
       )}
+      <p className="mt-5 flex flex-wrap gap-3">
+        <Link
+          href="/admin/firme/mesaje"
+          className="colt-mic-a border border-hartie-umbra bg-hartie px-4 py-2 font-titlu text-mic font-semibold text-cerneala hover:border-caramiziu-700"
+        >
+          ✉ Mesaje cu firmele
+        </Link>
+        <Link
+          href="/admin/firme/scrie"
+          className="colt-mic-a border border-hartie-umbra bg-hartie px-4 py-2 font-titlu text-mic font-semibold text-cerneala hover:border-caramiziu-700"
+        >
+          Scrie la mai multe firme
+        </Link>
+      </p>
+      <div className="mt-4">
+        <AdaugaLead />
+      </div>
       <form method="get" className="mt-5 flex max-w-md gap-2">
         {ales && <input type="hidden" name="stadiu" value={ales} />}
         <input
@@ -187,7 +205,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                       {f.denumire}
                     </p>
                     <p className="mt-0.5 text-nota text-cerneala-slab">
-                      CUI {f.cui} · {f.cale} · a scris {cand(f.creatLa)}
+                      {f.cui.startsWith("fara-cui-") ? "fără CUI" : `CUI ${f.cui}`} · {f.cale} · a scris {cand(f.creatLa)}
                     </p>
                   </div>
                   <Eticheta stadiu={f.stadiu} />
@@ -229,7 +247,13 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                   )}
                   {/* Contractul, de la fișa firmei: datele pe care le-ar
                       completa cineva de mână sunt deja aici. */}
-                  <p className="sm:col-span-2">
+                  <p className="flex flex-wrap gap-x-5 gap-y-1 sm:col-span-2">
+                    <Link
+                      href={`/admin/firme/${f.id}/mesaje#jos`}
+                      className="font-titlu font-semibold text-caramiziu-700 underline underline-offset-2"
+                    >
+                      ✉ E-mailuri cu firma
+                    </Link>
                     <Link
                       href={`/admin/firme/${f.id}/contract`}
                       className="font-titlu font-semibold text-caramiziu-700 underline underline-offset-2"

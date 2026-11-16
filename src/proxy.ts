@@ -215,6 +215,9 @@ const RUTE_PROBA = [
   */
   "/api/admin/cereri",
   "/api/admin/firme",
+  "/api/admin/firme/mesaje",
+  "/api/admin/firme/atasament",
+  "/api/admin/firme/lead",
   "/api/admin/jurnal",
   "/api/admin/donatii",
   "/api/admin/donatii/confirma",

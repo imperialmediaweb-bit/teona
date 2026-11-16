@@ -599,6 +599,46 @@ const ADAOSURI = `
     ON donatii (canal, platita_la DESC);
 
   UPDATE donatii SET email = lower(email) WHERE email IS NOT NULL AND email <> lower(email);
+  /*
+    E-mailurile cu firmele, scrise și primite din panou (noiembrie 2026).
+    Un rând pe mesaj; trimise prin Resend, iar răspunsurile vin înapoi prin
+    Resend, pe adresa de răspuns a firmei. Atașamentele stau aici, în baza
+    de date: linkurile Resend la fișierele primite mor după o oră.
+    Firma ștearsă își ia mesajele cu ea. Un răspuns pe care nu-l putem lega
+    de nicio firmă rămâne cu firma goală și se vede în lista de mesaje.
+  */
+  CREATE TABLE IF NOT EXISTS mesaje_firme (
+    id           bigserial PRIMARY KEY,
+    firma_id     uuid REFERENCES firme(id) ON DELETE CASCADE,
+    directie     text NOT NULL,
+    de_la        text NOT NULL,
+    catre        text NOT NULL,
+    subiect      text NOT NULL,
+    html         text NOT NULL DEFAULT '',
+    text_simplu  text NOT NULL DEFAULT '',
+    resend_id    text UNIQUE,
+    trimis_de    text,
+    lot          text,
+    creat_la     timestamptz NOT NULL DEFAULT now(),
+    livrat_la    timestamptz,
+    deschis_la   timestamptz,
+    deschideri   integer NOT NULL DEFAULT 0,
+    clic_la      timestamptz,
+    clicuri      integer NOT NULL DEFAULT 0,
+    ultimul_link text,
+    respins      text,
+    citit_la     timestamptz
+  );
+  CREATE INDEX IF NOT EXISTS mesaje_firme_dupa_firma ON mesaje_firme (firma_id, creat_la);
+  CREATE TABLE IF NOT EXISTS atasamente_firme (
+    id        bigserial PRIMARY KEY,
+    mesaj_id  bigint NOT NULL REFERENCES mesaje_firme(id) ON DELETE CASCADE,
+    nume      text NOT NULL,
+    tip       text NOT NULL DEFAULT 'application/octet-stream',
+    marime    integer NOT NULL,
+    continut  bytea NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS atasamente_firme_dupa_mesaj ON atasamente_firme (mesaj_id);
 `;
 
 async function pregateste(): Promise<void> {

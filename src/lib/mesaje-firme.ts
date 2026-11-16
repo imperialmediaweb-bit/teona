@@ -1,0 +1,390 @@
+import { createHmac } from "node:crypto";
+import { intreaba } from "@/lib/baza";
+import { cheiaDeSemnat } from "@/lib/cheie-semnare";
+import { curataHtml } from "@/lib/curata-html";
+import { textSimplu } from "@/lib/text-bogat";
+import { trimiteEmailCuId } from "@/lib/email/trimite";
+import { scrieInteractiune, type Firma } from "@/lib/crm";
+import { mediu } from "@/lib/mediu";
+import { ASOCIATIA, EMAIL, TELEFOANE } from "@/date/asociatie";
+import { ADRESA_SITE } from "@/app/seo";
+
+/**
+ * E-mailurile cu firmele, scrise și citite din panou.
+ *
+ * Fundraiserul, noiembrie 2026: să scrie fiecărei firme în parte, cu poze și
+ * atașamente (prezentarea, contractul), să vadă dacă l-a deschis și să-i
+ * vadă răspunsul, tot acolo, cu atașamentele lui.
+ *
+ * **Nu prin MailerLite.** MailerLite trimite campanii către liste și nu pune
+ * atașamente. Aici pleacă prin Resend, ca mulțumirile: un mesaj, o firmă.
+ * Trimiterea „la mai multe firme” e tot câte unul (fiecare cu numele lui),
+ * cel mult 30 o dată și sub `LIMITA_MASA` — nu e un buletin.
+ *
+ * **Răspunsurile** vin pe o adresă a firmei, pe subdomeniul din
+ * `RASPUNS_DOMENIU` (de ex. `raspuns.teona-ariana.ro`, cu MX-ul la Resend):
+ * `firma-<id>-<semn>@…`. Semnul ține pe cineva să scrie în discuția altei
+ * firme ghicind adresa. Fără variabilă, răspunsul merge la adresa celui care
+ * a scris (sau contact@), ca până acum, și nu apare în panou.
+ */
+
+export const LIMITA_LOT = 30;
+
+export type Atasament = { id: string; nume: string; tip: string; marime: number };
+
+export type Mesaj = {
+  id: string;
+  directie: "trimis" | "primit";
+  deLa: string;
+  catre: string;
+  subiect: string;
+  html: string;
+  text: string;
+  trimisDe: string | null;
+  creatLa: string;
+  livratLa: string | null;
+  deschisLa: string | null;
+  deschideri: number;
+  clicLa: string | null;
+  clicuri: number;
+  ultimulLink: string | null;
+  respins: string | null;
+  citit: boolean;
+  atasamente: Atasament[];
+};
+
+/* ── Adresa de răspuns ─────────────────────────────────────────────── */
+
+function semn(id: string): string | null {
+  const c = cheiaDeSemnat();
+  return c ? createHmac("sha256", c).update(`raspuns-firma:${id}`).digest("hex").slice(0, 10) : null;
+}
+
+export function domeniuRaspuns(): string | null {
+  const d = mediu("RASPUNS_DOMENIU")?.toLowerCase();
+  return d && /^[a-z0-9.-]+\.[a-z]{2,}$/.test(d) ? d : null;
+}
+
+export function adresaDeRaspuns(firmaId: string): string | null {
+  const d = domeniuRaspuns();
+  const s = semn(firmaId);
+  return d && s ? `firma-${firmaId.replace(/-/g, "")}-${s}@${d}` : null;
+}
+
+/** Firma din adresa de răspuns, dacă semnul ține. */
+export function firmaDinAdresa(adresa: string): string | null {
+  const m = adresa.toLowerCase().match(/firma-([0-9a-f]{32})-([0-9a-f]{10})@/);
+  if (!m) return null;
+  const h = m[1];
+  const id = `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+  return semn(id) === m[2] ? id : null;
+}
+
+/* ── Corpul e-mailului ─────────────────────────────────────────────── */
+
+const FONT = "Arial,Helvetica,sans-serif";
+
+function scapa(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+/** {firma} și {persoana} din text, înlocuite cu datele firmei. */
+export function personalizeaza(text: string, f: Pick<Firma, "denumire" | "persoana">, html: boolean): string {
+  const s = html ? scapa : (x: string) => x;
+  return text.replace(/\{firma\}/gi, s(f.denumire)).replace(/\{persoana\}/gi, s(f.persoana));
+}
+
+/**
+ * Un e-mail simplu, ca de la un om: textul, apoi semnătura. Fără bandă și
+ * fără butoane — e o scrisoare către o firmă, nu un buletin.
+ */
+export function corpScrisoare(htmlScris: string, cine: string): { html: string; text: string } {
+  const curat = curataHtml(htmlScris)
+    .replace(/<div data-video[^>]*>[\s\S]*?<\/div>/g, "")
+    .replace(/<iframe[\s\S]*?<\/iframe>/g, "")
+    .replace(/<p>/g, `<p style="margin:0 0 14px;font-family:${FONT};font-size:15px;line-height:1.6;color:#232323;">`)
+    .replace(/<h2>/g, `<h2 style="margin:16px 0 10px;font-family:${FONT};font-size:20px;color:#232323;">`)
+    .replace(/<h3>/g, `<h3 style="margin:14px 0 8px;font-family:${FONT};font-size:17px;color:#232323;">`)
+    .replace(/<(ul|ol)>/g, `<$1 style="margin:0 0 14px;padding-left:22px;font-family:${FONT};font-size:15px;line-height:1.6;color:#232323;">`)
+    .replace(/<blockquote>/g, `<blockquote style="margin:0 0 14px;padding-left:14px;border-left:3px solid #b82b09;color:#616161;">`)
+    .replace(/<img /g, `<img style="display:block;max-width:100%;height:auto;border:0;border-radius:8px;margin:0 0 14px;" `)
+    .replace(/<a /g, `<a style="color:#b82b09;" `);
+  const semnatura = [
+    cine,
+    ASOCIATIA.denumire,
+    TELEFOANE.map((t) => t.afisat).join(" · "),
+    EMAIL.contact,
+    ADRESA_SITE.replace(/^https?:\/\//, ""),
+  ].filter(Boolean);
+  const mic = `margin:0;font-family:${FONT};font-size:13px;line-height:1.6;color:#616161;`;
+  const html = `<!doctype html><html lang="ro"><head><meta charset="utf-8" /></head>
+<body style="margin:0;padding:20px 16px;background:#ffffff;">
+<div style="max-width:640px;">
+${curat}
+<div style="margin-top:22px;padding-top:12px;border-top:1px solid #e6e8ec;">
+${semnatura.map((s, i) => `<p style="${mic}${i === 0 ? "font-weight:bold;color:#232323;" : ""}">${scapa(s)}</p>`).join("\n")}
+</div></div></body></html>`;
+  return { html, text: [...textSimplu(htmlScris), "", "--", ...semnatura].join("\n\n") };
+}
+
+/* ── Trimiterea ─────────────────────────────────────────────────────── */
+
+export type FisierAtasat = { nume: string; tip: string; continut: Uint8Array };
+
+export async function trimiteFirmei(d: {
+  firma: Firma;
+  catre: string;
+  subiect: string;
+  html: string;
+  atasamente: FisierAtasat[];
+  trimisDe: string;
+  /** Adresa de e-mail a celui care scrie, dacă are cont: răspunsul de rezervă. */
+  emailCelui: string | null;
+  lot?: string;
+  masa?: boolean;
+}): Promise<boolean> {
+  const subiect = personalizeaza(d.subiect, d.firma, false);
+  const scris = personalizeaza(d.html, d.firma, true);
+  // Intrat cu parola asociației, „cine” e chiar asociația: nu se scrie de două ori.
+  const om = /^asocia/i.test(d.trimisDe) ? "" : d.trimisDe;
+  const { html, text } = corpScrisoare(scris, om);
+  const raspundeLa = adresaDeRaspuns(d.firma.id) ?? d.emailCelui ?? EMAIL.contact;
+  const r = await trimiteEmailCuId({
+    catre: d.catre,
+    subiect,
+    html,
+    text,
+    raspundeLa,
+    atasamente: d.atasamente.map((a) => ({ nume: a.nume, continut: a.continut })),
+    expeditorNume: om ? `${om} · ${ASOCIATIA.denumire}` : ASOCIATIA.denumire,
+    masa: d.masa,
+  }).catch(() => ({ ok: false, id: null }));
+  if (!r.ok) return false;
+  const [rand] = await intreaba<{ id: string }>(
+    `INSERT INTO mesaje_firme (firma_id, directie, de_la, catre, subiect, html, text_simplu, resend_id, trimis_de, lot)
+     VALUES ($1,'trimis',$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`,
+    [d.firma.id, EMAIL.contact, d.catre, subiect, curataHtml(scris), text, r.id, d.trimisDe, d.lot ?? null],
+  );
+  for (const a of d.atasamente) {
+    await intreaba(
+      `INSERT INTO atasamente_firme (mesaj_id, nume, tip, marime, continut) VALUES ($1,$2,$3,$4,$5)`,
+      [rand.id, a.nume, a.tip, a.continut.byteLength, Buffer.from(a.continut)],
+    );
+  }
+  await scrieInteractiune({
+    firmaId: d.firma.id,
+    fel: "email",
+    rezumat: `E-mail trimis din panou: „${subiect}”${d.atasamente.length ? ` (${d.atasamente.length} atașament${d.atasamente.length > 1 ? "e" : ""})` : ""}`,
+    scrisDe: d.trimisDe,
+  }).catch(() => false);
+  return true;
+}
+
+/* ── Citirea ─────────────────────────────────────────────────────────── */
+
+type RandMesaj = {
+  id: string;
+  directie: "trimis" | "primit";
+  de_la: string;
+  catre: string;
+  subiect: string;
+  html: string;
+  text_simplu: string;
+  trimis_de: string | null;
+  creat_la: Date;
+  livrat_la: Date | null;
+  deschis_la: Date | null;
+  deschideri: number;
+  clic_la: Date | null;
+  clicuri: number;
+  ultimul_link: string | null;
+  respins: string | null;
+  citit_la: Date | null;
+};
+
+const iso = (d: Date | null) => (d ? d.toISOString() : null);
+
+export async function mesajeleFirmei(firmaId: string): Promise<Mesaj[]> {
+  return citeste(`firma_id = $1 ORDER BY creat_la ASC LIMIT 500`, [firmaId]);
+}
+
+async function citeste(unde: string, parametri: unknown[]): Promise<Mesaj[]> {
+  const randuri = await intreaba<RandMesaj>(
+    `SELECT id, directie, de_la, catre, subiect, html, text_simplu, trimis_de, creat_la, livrat_la,
+            deschis_la, deschideri, clic_la, clicuri, ultimul_link, respins, citit_la
+       FROM mesaje_firme WHERE ${unde}`,
+    parametri,
+  );
+  const ids = randuri.map((r) => r.id);
+  const atas = ids.length
+    ? await intreaba<{ id: string; mesaj_id: string; nume: string; tip: string; marime: number }>(
+        `SELECT id, mesaj_id, nume, tip, marime FROM atasamente_firme WHERE mesaj_id = ANY($1::bigint[]) ORDER BY id`,
+        [ids],
+      )
+    : [];
+  return randuri.map((r) => ({
+    id: String(r.id),
+    directie: r.directie,
+    deLa: r.de_la,
+    catre: r.catre,
+    subiect: r.subiect,
+    html: r.html,
+    text: r.text_simplu,
+    trimisDe: r.trimis_de,
+    creatLa: r.creat_la.toISOString(),
+    livratLa: iso(r.livrat_la),
+    deschisLa: iso(r.deschis_la),
+    deschideri: r.deschideri,
+    clicLa: iso(r.clic_la),
+    clicuri: r.clicuri,
+    ultimulLink: r.ultimul_link,
+    respins: r.respins,
+    citit: r.directie === "trimis" || r.citit_la !== null,
+    atasamente: atas
+      .filter((a) => String(a.mesaj_id) === String(r.id))
+      .map((a) => ({ id: String(a.id), nume: a.nume, tip: a.tip, marime: a.marime })),
+  }));
+}
+
+export async function marcheazaCitite(firmaId: string): Promise<void> {
+  await intreaba(
+    `UPDATE mesaje_firme SET citit_la = now() WHERE firma_id = $1 AND directie = 'primit' AND citit_la IS NULL`,
+    [firmaId],
+  );
+}
+
+export type Discutie = {
+  firmaId: string | null;
+  denumire: string;
+  persoana: string | null;
+  ultimul: { subiect: string; directie: "trimis" | "primit"; cand: string; deLa: string };
+  necitite: number;
+  trimise: number;
+  deschise: number;
+};
+
+/** Discuțiile, cele cu răspunsuri necitite primele, apoi cele mai noi. */
+export async function discutii(): Promise<Discutie[]> {
+  const r = await intreaba<{
+    firma_id: string | null;
+    denumire: string | null;
+    persoana: string | null;
+    subiect: string;
+    directie: "trimis" | "primit";
+    creat_la: Date;
+    de_la: string;
+    necitite: string;
+    trimise: string;
+    deschise: string;
+  }>(
+    `WITH ult AS (
+       SELECT DISTINCT ON (coalesce(firma_id::text, 'm' || id::text)) *
+         FROM mesaje_firme ORDER BY coalesce(firma_id::text, 'm' || id::text), creat_la DESC
+     )
+     SELECT u.firma_id, f.denumire, f.persoana, u.subiect, u.directie, u.creat_la, u.de_la,
+            (SELECT count(*) FROM mesaje_firme m WHERE m.directie = 'primit' AND m.citit_la IS NULL
+               AND (m.firma_id = u.firma_id OR (u.firma_id IS NULL AND m.id = u.id))) AS necitite,
+            (SELECT count(*) FROM mesaje_firme m WHERE m.firma_id = u.firma_id AND m.directie = 'trimis') AS trimise,
+            (SELECT count(*) FROM mesaje_firme m WHERE m.firma_id = u.firma_id AND m.directie = 'trimis' AND m.deschideri > 0) AS deschise
+       FROM ult u LEFT JOIN firme f ON f.id = u.firma_id
+      ORDER BY (SELECT count(*) FROM mesaje_firme m WHERE m.directie = 'primit' AND m.citit_la IS NULL
+                  AND (m.firma_id = u.firma_id OR (u.firma_id IS NULL AND m.id = u.id))) > 0 DESC,
+               u.creat_la DESC
+      LIMIT 300`,
+  );
+  return r.map((x) => ({
+    firmaId: x.firma_id,
+    denumire: x.denumire ?? x.de_la,
+    persoana: x.persoana,
+    ultimul: { subiect: x.subiect, directie: x.directie, cand: x.creat_la.toISOString(), deLa: x.de_la },
+    necitite: Number(x.necitite),
+    trimise: Number(x.trimise),
+    deschise: Number(x.deschise),
+  }));
+}
+
+/** Răspunsurile care n-au fost legate de nicio firmă, cu tot cu text. */
+export async function mesajeNelegate(): Promise<Mesaj[]> {
+  return citeste(`firma_id IS NULL ORDER BY creat_la DESC LIMIT 50`, []);
+}
+
+/** Răspunsurile nelegate se citesc pe pagina de mesaje, deci se marchează acolo. */
+export async function marcheazaNelegateCitite(): Promise<void> {
+  await intreaba(`UPDATE mesaje_firme SET citit_la = now() WHERE firma_id IS NULL AND citit_la IS NULL`);
+}
+
+export async function cateNecitite(): Promise<number> {
+  const [r] = await intreaba<{ nr: string }>(
+    `SELECT count(*) AS nr FROM mesaje_firme WHERE directie = 'primit' AND citit_la IS NULL`,
+  );
+  return Number(r?.nr ?? 0);
+}
+
+export async function atasamentul(id: string): Promise<{ nume: string; tip: string; continut: Buffer } | null> {
+  if (!/^\d{1,18}$/.test(id)) return null;
+  const [r] = await intreaba<{ nume: string; tip: string; continut: Buffer }>(
+    `SELECT nume, tip, continut FROM atasamente_firme WHERE id = $1`,
+    [id],
+  );
+  return r ?? null;
+}
+
+/* ── Ce anunță Resend ────────────────────────────────────────────────── */
+
+export async function evenimentTrimis(
+  resendId: string,
+  fel: "livrat" | "deschis" | "clic" | "respins",
+  detaliu?: string,
+): Promise<void> {
+  if (fel === "livrat") {
+    await intreaba(`UPDATE mesaje_firme SET livrat_la = coalesce(livrat_la, now()) WHERE resend_id = $1`, [resendId]);
+  } else if (fel === "deschis") {
+    await intreaba(
+      `UPDATE mesaje_firme SET deschideri = deschideri + 1, deschis_la = coalesce(deschis_la, now()) WHERE resend_id = $1`,
+      [resendId],
+    );
+  } else if (fel === "clic") {
+    await intreaba(
+      `UPDATE mesaje_firme SET clicuri = clicuri + 1, clic_la = coalesce(clic_la, now()), ultimul_link = $2 WHERE resend_id = $1`,
+      [resendId, (detaliu ?? "").slice(0, 500) || null],
+    );
+  } else {
+    await intreaba(`UPDATE mesaje_firme SET respins = $2 WHERE resend_id = $1`, [resendId, (detaliu ?? "respins").slice(0, 300)]);
+  }
+}
+
+export async function salveazaPrimit(d: {
+  resendId: string;
+  firmaId: string | null;
+  deLa: string;
+  catre: string;
+  subiect: string;
+  html: string;
+  text: string;
+  atasamente: FisierAtasat[];
+}): Promise<string | null> {
+  const randuri = await intreaba<{ id: string }>(
+    `INSERT INTO mesaje_firme (firma_id, directie, de_la, catre, subiect, html, text_simplu, resend_id)
+     VALUES ($1,'primit',$2,$3,$4,$5,$6,$7)
+     ON CONFLICT (resend_id) DO NOTHING RETURNING id`,
+    [d.firmaId, d.deLa, d.catre, d.subiect, d.html, d.text, d.resendId],
+  );
+  const id = randuri[0]?.id;
+  if (!id) return null; // același anunț, a doua oară
+  for (const a of d.atasamente) {
+    await intreaba(
+      `INSERT INTO atasamente_firme (mesaj_id, nume, tip, marime, continut) VALUES ($1,$2,$3,$4,$5)`,
+      [id, a.nume, a.tip, a.continut.byteLength, Buffer.from(a.continut)],
+    );
+  }
+  return String(id);
+}
+
+/** Firma după adresa de e-mail din fișă, când răspunsul n-a venit pe adresa ei. */
+export async function firmaDupaEmail(email: string): Promise<string | null> {
+  const r = await intreaba<{ id: string }>(
+    `SELECT id FROM firme WHERE lower(email) = lower($1) ORDER BY schimbat_la DESC LIMIT 2`,
+    [email],
+  );
+  return r.length === 1 ? r[0].id : null;
+}

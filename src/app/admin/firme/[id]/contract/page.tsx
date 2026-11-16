@@ -316,7 +316,7 @@ async function Continut({
             type="checkbox"
             name="muta"
             value="da"
-            defaultChecked={firma.stadiu === "cerere"}
+            defaultChecked={firma.stadiu === "cerere" || firma.stadiu === "prospect"}
             className="mt-0.5 size-5"
           />
           <span>

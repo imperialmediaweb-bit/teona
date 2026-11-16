@@ -1,0 +1,49 @@
+import {
+  email as emailValid,
+  formularAdmin,
+  limitaDeRata,
+  nuTrece,
+  raspuns,
+  sesiuneExpirata,
+  text,
+  trimiteLa,
+} from "@/lib/api";
+import { arePermisiune, cineEsteConectat } from "@/lib/admin";
+import { areBazaDeDate } from "@/lib/baza";
+import { adaugaLead, scrieInteractiune } from "@/lib/crm";
+
+/** O firmă adăugată de mână, ca lead, și dusă direct la discuția ei. */
+export async function POST(cerere: Request) {
+  const prea = limitaDeRata(cerere, { cheie: "admin-firme-lead", maxim: 120, fereastraMs: 60 * 60 * 1000 });
+  if (prea) return prea;
+  if (!(await arePermisiune("/admin/firme"))) return sesiuneExpirata();
+  if (!areBazaDeDate()) return raspuns("Nu există bază de date.", 503);
+  const citit = await formularAdmin(cerere);
+  if (citit.raspuns) return citit.raspuns;
+  const f = citit.formular;
+
+  const denumire = text(f.get("denumire"), 200);
+  if (!denumire) return nuTrece("Scrie numele firmei.");
+  const email = emailValid(f.get("email"));
+  if (!email) return nuTrece("Adresa de e-mail a firmei nu e scrisă corect.");
+  const persoana = text(f.get("persoana"), 150) ?? "Echipa " + denumire;
+  const cuiBrut = text(f.get("cui"), 20);
+  if (cuiBrut && !/^(ro)?\s*\d{2,10}$/i.test(cuiBrut.replace(/[\s.-]/g, "")))
+    return nuTrece("CUI-ul are doar cifre (poate începe cu RO). Dacă nu-l știi, lasă-l gol.");
+  const telefon = text(f.get("telefon"), 40);
+  const nota = text(f.get("nota"), 2000);
+
+  const r = await adaugaLead({ cui: cuiBrut, denumire, persoana, email, telefon, nota });
+  if (!r.eraDeja) {
+    const cine = await cineEsteConectat();
+    await scrieInteractiune({
+      firmaId: r.id,
+      fel: "notita",
+      rezumat: `Adăugată ca lead din panou${nota ? `: ${nota}` : "."}`,
+      scrisDe: cine?.nume,
+    }).catch(() => false);
+  }
+  return trimiteLa(`/admin/firme/${r.id}/mesaje?${r.eraDeja ? "era=1" : "nou=1"}#jos`);
+}
+
+export const GET = () => raspuns("Metodă nepermisă.", 405);

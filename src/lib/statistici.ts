@@ -261,7 +261,7 @@ export async function peMonede(): Promise<
 export async function deFacutAcum(): Promise<
   Array<{ eticheta: string; nr: number; unde: string }>
 > {
-  const [cereri, aniversari, ciorne, firme, transferuri, esuate] =
+  const [cereri, aniversari, ciorne, firme, transferuri, esuate, raspunsuri] =
     await Promise.all([
     intreaba<{ nr: string }>(
       `SELECT count(*) AS nr FROM cereri WHERE stadiu = 'nou'`,
@@ -291,6 +291,10 @@ export async function deFacutAcum(): Promise<
     intreaba<{ nr: string }>(
       `SELECT count(*) AS nr FROM plati_esuate WHERE rezolvat = false`,
     ),
+    // Firmele care au răspuns la un e-mail din panou și nu le-a citit nimeni.
+    intreaba<{ nr: string }>(
+      `SELECT count(*) AS nr FROM mesaje_firme WHERE directie = 'primit' AND citit_la IS NULL`,
+    ),
   ]);
 
   return [
@@ -298,6 +302,11 @@ export async function deFacutAcum(): Promise<
       eticheta: "donații lunare care n-au trecut",
       nr: Number(esuate[0]?.nr ?? 0),
       unde: "/admin/donatii",
+    },
+    {
+      eticheta: "răspunsuri de la firme necitite",
+      nr: Number(raspunsuri[0]?.nr ?? 0),
+      unde: "/admin/firme/mesaje",
     },
     { eticheta: "cereri noi", nr: Number(cereri[0]?.nr ?? 0), unde: "/admin/cereri?stadiu=nou" },
     {
