@@ -3,7 +3,7 @@ import { intreaba } from "@/lib/baza";
 import { cheiaDeSemnat, semnaturaLinkuluiTine, semneazaText } from "@/lib/cheie-semnare";
 import { curataHtml } from "@/lib/curata-html";
 import { textSimplu } from "@/lib/text-bogat";
-import { trimiteEmailCuId } from "@/lib/email/trimite";
+import { adresaDeLa, trimiteEmailCuId } from "@/lib/email/trimite";
 import { scrieInteractiune, type Firma } from "@/lib/crm";
 import { mediu } from "@/lib/mediu";
 import { ASOCIATIA, EMAIL, TELEFOANE } from "@/date/asociatie";
@@ -243,6 +243,7 @@ export function corpScrisoare(
   cine: string,
   refuz?: string | null,
   interes?: string | null,
+  emailSemnatura: string = EMAIL.contact,
 ): { html: string; text: string } {
   const curat = curataHtml(htmlScris)
     .replace(/<div data-video[^>]*>[\s\S]*?<\/div>/g, "")
@@ -258,7 +259,7 @@ export function corpScrisoare(
     cine,
     ASOCIATIA.denumire,
     TELEFOANE.map((t) => t.afisat).join(" · "),
-    EMAIL.contact,
+    emailSemnatura,
     ADRESA_SITE.replace(/^https?:\/\//, ""),
   ].filter(Boolean);
   const mic = `margin:0;font-family:${FONT};font-size:13px;line-height:1.6;color:#616161;`;
@@ -280,6 +281,32 @@ ${semnatura.map((s, i) => `<p style="${mic}${i === 0 ? "font-weight:bold;color:#
 }
 
 /* ── Trimiterea ─────────────────────────────────────────────────────── */
+
+/**
+ * E-mailul așa cum îl primește firma: subiectul și textul cu numele ei,
+ * butoanele, rândul de refuz, semnătura și „De la”. Aceeași funcție pentru
+ * trimitere și pentru „Vezi cum arată”, ca previzualizarea să nu mintă.
+ * Fără `id` (previzualizare fără firmă aleasă), butoanele duc nicăieri.
+ */
+export function scrisoarea(d: {
+  firma: Pick<Firma, "denumire" | "persoana"> & { id?: string };
+  subiect: string;
+  html: string;
+  trimisDe: string;
+  emailCelui: string | null;
+}) {
+  const subiect = personalizeaza(d.subiect, d.firma, false);
+  const scris = personalizeaza(d.html, d.firma, true);
+  // Intrat cu parola asociației, „cine” e chiar asociația: nu se scrie de două ori.
+  const om = /^asocia/i.test(d.trimisDe) ? "" : d.trimisDe;
+  // Firma vede adresa omului care scrie (mihaela.sfichi@…), dacă e pe domeniul asociației.
+  const dela = om ? adresaDeLa(d.emailCelui) : adresaDeLa(null);
+  const refuz = d.firma.id ? linkRefuz(d.firma.id) : "#";
+  const interes = d.firma.id ? linkInteres(d.firma.id) : "#";
+  const { html, text } = corpScrisoare(scris, om, refuz, interes, dela);
+  const expeditorNume = om ? `${om} · ${ASOCIATIA.denumire}` : ASOCIATIA.denumire;
+  return { subiect, html, text, dela, expeditorNume };
+}
 
 export type FisierAtasat = { nume: string; tip: string; continut: Uint8Array };
 
@@ -305,12 +332,13 @@ export async function trimiteFirmei(d: {
     [adrese],
   );
   if (Number(opriti?.nr ?? 0) > 0) return "refuza";
-  const subiect = personalizeaza(d.subiect, d.firma, false);
-  const scris = personalizeaza(d.html, d.firma, true);
-  // Intrat cu parola asociației, „cine” e chiar asociația: nu se scrie de două ori.
-  const om = /^asocia/i.test(d.trimisDe) ? "" : d.trimisDe;
-  const refuz = linkRefuz(d.firma.id);
-  const { html, text } = corpScrisoare(scris, om, refuz, linkInteres(d.firma.id));
+  const { subiect, html, text, dela, expeditorNume } = scrisoarea({
+    firma: d.firma,
+    subiect: d.subiect,
+    html: d.html,
+    trimisDe: d.trimisDe,
+    emailCelui: d.emailCelui,
+  });
   const antet = linkRefuz(d.firma.id, true);
   const raspundeLa = adresaDeRaspuns(d.firma.id) ?? d.emailCelui ?? EMAIL.contact;
   const r = await trimiteEmailCuId({
@@ -320,7 +348,8 @@ export async function trimiteFirmei(d: {
     text,
     raspundeLa,
     atasamente: d.atasamente.map((a) => ({ nume: a.nume, continut: a.continut })),
-    expeditorNume: om ? `${om} · ${ASOCIATIA.denumire}` : ASOCIATIA.denumire,
+    expeditorNume,
+    expeditorAdresa: dela,
     masa: d.masa,
     antete: antet
       ? { "List-Unsubscribe": `<${antet}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" }
@@ -330,7 +359,7 @@ export async function trimiteFirmei(d: {
   const [rand] = await intreaba<{ id: string }>(
     `INSERT INTO mesaje_firme (firma_id, directie, de_la, catre, subiect, html, text_simplu, resend_id, trimis_de, lot)
      VALUES ($1,'trimis',$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`,
-    [d.firma.id, EMAIL.contact, [d.catre].flat().join(", "), subiect, curataHtml(scris), text, r.id, d.trimisDe, d.lot ?? null],
+    [d.firma.id, dela, [d.catre].flat().join(", "), subiect, curataHtml(personalizeaza(d.html, d.firma, true)), text, r.id, d.trimisDe, d.lot ?? null],
   );
   for (const a of d.atasamente) {
     await intreaba(

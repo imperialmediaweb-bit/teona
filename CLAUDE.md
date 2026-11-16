@@ -1407,6 +1407,17 @@ există trimitere unu-la-unu și nici atașamente. Pleacă prin Resend
   descărcare mor după o oră, deci fișierele se țin în `atasamente_firme`),
   `delivered`/`opened`/`clicked`/`bounced`/`complained` scriu starea. Un
   anunț dublat nu face nimic a doua oară (`resend_id` unic).
+- **„De la” e omul care scrie**: `Mihaela Sfichi · Asociația Teona Ariana
+  Suceava <mihaela.sfichi@teona-ariana.ro>`, și aceeași adresă în semnătură —
+  numai dacă adresa contului e pe domeniul expeditorului verificat în Resend
+  (`adresaDeLa` din `lib/email/trimite.ts`); un cont cu Gmail trimite de la
+  contact@, altfel Resend ar refuza mesajul. Cu parola asociației: numai
+  numele asociației.
+- **„Vezi cum arată” și „Trimite-mi o probă”** sub formular
+  (`/api/admin/firme/previzualizare`): e-mailul compus cu aceeași funcție ca
+  trimiterea (`scrisoarea`), cu numele firmei alese (în lot, prima bifată);
+  proba pleacă la omul care scrie, cu „[PROBĂ]”, fără atașamente, și nu intră
+  în discuția firmei. Probă: `scratchpad/mf/previz.mjs` (13).
 - „Deschis” nu e sigur (iPhone deschide singur pozele, Outlook le
   blochează); „a apăsat pe link” e semnul sigur. Scrie și pe pagină.
 - **„Nu mai doresc mesaje”**: jos în fiecare e-mail către o firmă se pune

@@ -192,6 +192,75 @@ function AlegeFirme({ firme, limita }: { firme: FirmaDeAles[]; limita: number })
   );
 }
 
+/**
+ * „Vezi cum arată” și „Trimite-mi o probă”: același e-mail pe care îl
+ * primește firma, compus pe server cu aceeași funcție ca trimiterea.
+ * Atașamentele nu pleacă aici: se văd în listă, iar proba e despre text.
+ */
+function Previzualizare({ formular }: { formular: React.RefObject<HTMLFormElement | null> }) {
+  const [vedere, setVedere] = useState<{ html: string; deLa: string; subiect: string; pentru: string | null } | null>(null);
+  const [stare, setStare] = useState<{ ton: "bun" | "rau"; text: string } | null>(null);
+  const [lucreaza, setLucreaza] = useState<"vezi" | "proba" | null>(null);
+  const cere = async (fac: "vezi" | "proba") => {
+    const f = formular.current;
+    if (!f) return;
+    const date = new FormData(f);
+    date.delete("fisier");
+    date.set("fac", fac);
+    setLucreaza(fac);
+    setStare(null);
+    try {
+      const r = await fetch("/api/admin/firme/previzualizare", { method: "POST", body: date, credentials: "same-origin" });
+      const j = await r.json().catch(() => null);
+      if (!r.ok || !j) {
+        setStare({ ton: "rau", text: j?.mesaj ?? (r.status === 403 ? "Sesiunea a expirat. Intră din nou (ce ai scris rămâne aici)." : "N-a mers. Încearcă din nou.") });
+      } else if (fac === "vezi") {
+        setVedere(j);
+      } else {
+        setStare({ ton: "bun", text: `Proba a plecat la ${j.trimisLa}. Uită-te în căsuță (și în Spam).` });
+      }
+    } catch {
+      setStare({ ton: "rau", text: "Nu s-a putut ajunge la server. Verifică internetul." });
+    }
+    setLucreaza(null);
+  };
+  return (
+    <div className="grid gap-3" data-previzualizare>
+      <div className="flex flex-wrap gap-2">
+        <button type="button" onClick={() => void cere("vezi")} disabled={lucreaza !== null} className="rounded-full border border-cerneala-slab bg-hartie px-4 py-2 text-mic font-semibold text-cerneala hover:border-caramiziu-700 disabled:opacity-60">
+          {lucreaza === "vezi" ? "Se pregătește…" : vedere ? "Reîmprospătează previzualizarea" : "Vezi cum arată"}
+        </button>
+        <button type="button" onClick={() => void cere("proba")} disabled={lucreaza !== null} className="rounded-full border border-cerneala-slab bg-hartie px-4 py-2 text-mic font-semibold text-cerneala hover:border-caramiziu-700 disabled:opacity-60">
+          {lucreaza === "proba" ? "Se trimite proba…" : "Trimite-mi o probă"}
+        </button>
+      </div>
+      {stare && (
+        <p role={stare.ton === "rau" ? "alert" : "status"} className={`text-mic font-semibold ${stare.ton === "rau" ? "text-caramiziu-800" : "text-turcoaz-900"}`}>
+          {stare.text}
+        </p>
+      )}
+      {vedere && (
+        <div className="overflow-hidden rounded-moale border border-hartie-umbra bg-hartie">
+          <div className="grid gap-0.5 border-b border-hartie-umbra bg-hartie-calda px-4 py-2.5 text-mic [overflow-wrap:anywhere]">
+            <p>
+              <span className="text-cerneala-slab">De la: </span>
+              <span className="font-semibold text-cerneala">{vedere.deLa}</span>
+            </p>
+            <p>
+              <span className="text-cerneala-slab">Subiect: </span>
+              <span className="font-semibold text-cerneala">{vedere.subiect}</span>
+            </p>
+            <p className="text-nota text-cerneala-slab">
+              {vedere.pentru ? `Așa îl vede ${vedere.pentru}.` : "Cu un nume de exemplu; alege o firmă ca să-l vezi cu numele ei."} Butoanele din previzualizare nu duc nicăieri.
+            </p>
+          </div>
+          <iframe title="Cum arată e-mailul" srcDoc={vedere.html} sandbox="" className="h-[520px] w-full bg-white" />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ScrieFirmei({
   firmaId,
   catre,
@@ -208,6 +277,7 @@ export default function ScrieFirmei({
   const [trimite, setTrimite] = useState(false);
   const [eroare, setEroare] = useState<string | null>(null);
   const fisiere = useRef<HTMLInputElement>(null);
+  const formular = useRef<HTMLFormElement>(null);
   const lot = Boolean(firme);
   // Înapoi din browser aduce pagina din memorie, cu butonul încă „Se trimite…”.
   useEffect(() => {
@@ -217,6 +287,7 @@ export default function ScrieFirmei({
   }, []);
   return (
     <form
+      ref={formular}
       action="/api/admin/firme/mesaje"
       method="post"
       encType="multipart/form-data"
@@ -270,6 +341,7 @@ export default function ScrieFirmei({
         <EditorText name="continut" defaultValue="" minim={2} />
       </div>
       <Atasamente intrare={fisiere} />
+      <Previzualizare formular={formular} />
       {lot && (
         <label className="flex items-start gap-2.5 text-mic text-cerneala">
           <input type="checkbox" name="confirm" value="da" required className="mt-0.5 size-4 shrink-0 accent-caramiziu-700" />

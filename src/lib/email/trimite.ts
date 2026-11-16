@@ -34,6 +34,22 @@ function expeditor(): string {
   );
 }
 
+/** Adresa expeditorului verificat. */
+function adresaVerificata(): string {
+  return (expeditor().match(/<([^>]+)>/)?.[1] ?? EMAIL.contact).trim().toLowerCase();
+}
+
+/**
+ * Adresa de pus la „De la”: cea cerută, dacă e pe domeniul verificat; altfel
+ * cea verificată. Un cont cu adresă de Gmail trimite deci tot de la contact@.
+ */
+export function adresaDeLa(ceruta?: string | null): string {
+  const verificata = adresaVerificata();
+  const a = ceruta?.trim().toLowerCase();
+  if (!a || !/^[a-z0-9._%+-]+@[a-z0-9.-]+$/.test(a)) return verificata;
+  return a.split("@")[1] === verificata.split("@")[1] ? a : verificata;
+}
+
 /*
   Site-ul nu face campanii. Campaniile către liste pleacă din MailerLite, de
   pe serverele lor; de aici pleacă numai mesaje către un om anume (mulțumiri,
@@ -76,6 +92,12 @@ export async function trimiteEmailCuId(mesaj: {
   masa?: boolean;
   /** Numele de la „De la” (adresa rămâne cea verificată în Resend). */
   expeditorNume?: string;
+  /**
+   * Adresa de la „De la”, de pildă a omului care scrie. Se folosește numai
+   * dacă e pe același domeniu cu expeditorul verificat în Resend: altfel
+   * Resend refuză mesajul și nu pleacă nimic.
+   */
+  expeditorAdresa?: string | null;
   /** Antete în plus (de ex. `List-Unsubscribe`). */
   antete?: Record<string, string>;
 }): Promise<{ ok: boolean; id: string | null }> {
@@ -119,7 +141,7 @@ export async function trimiteEmailCuId(mesaj: {
       },
       body: JSON.stringify({
         from: mesaj.expeditorNume
-          ? `${mesaj.expeditorNume.replace(/[<>"\r\n]/g, "")} <${expeditor().match(/<([^>]+)>/)?.[1] ?? EMAIL.contact}>`
+          ? `${mesaj.expeditorNume.replace(/[<>"\r\n]/g, "")} <${adresaDeLa(mesaj.expeditorAdresa)}>`
           : expeditor(),
         to: Array.isArray(mesaj.catre) ? mesaj.catre : [mesaj.catre],
         subject: mesaj.subiect,
