@@ -122,7 +122,7 @@ export async function cautaPeste(text: string): Promise<Gasit[]> {
     rezultate.push({
       fel: "firma",
       titlu: f.denumire,
-      detaliu: `CUI ${f.cui} · ${f.persoana}`,
+      detaliu: `${f.cui.startsWith("fara-cui-") ? "fără CUI" : `CUI ${f.cui}`} · ${f.persoana}`,
       unde: `/admin/firme?cauta=${encodeURIComponent(f.denumire)}`,
     });
   }

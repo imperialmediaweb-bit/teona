@@ -1,3 +1,4 @@
+import { FIRME_UITATE_SQL } from "@/lib/crm";
 import { intreaba } from "@/lib/baza";
 
 /**
@@ -413,7 +414,10 @@ export async function campanii(): Promise<{
 }
 
 export type ProfilFirme = {
+  /** Firmele intrate în pâlnie (de la „cerere” încolo). Lead-urile sunt separat. */
   firme: number;
+  /** Firme adăugate de asociație ca lead, încă necontactate sau fără „da”. */
+  leaduri: number;
   peStadii: Array<{ stadiu: string; nr: number }>;
   /** Din câte cereri iese un contract semnat, și din câte banii în cont. */
   pastraDinCerere: { semnate: number; incasate: number };
@@ -428,6 +432,7 @@ export type ProfilFirme = {
 };
 
 const STADII = [
+  ["prospect", "Lead: de contactat"],
   ["cerere", "Cerere primită"],
   ["contract_trimis", "Contract trimis"],
   ["semnat", "Contract semnat"],
@@ -453,17 +458,20 @@ export async function profilulFirmelor(): Promise<ProfilFirme> {
       "SELECT cale, COUNT(*) AS nr FROM firme GROUP BY cale ORDER BY 2 DESC",
     ),
     intreaba<{ nr: string }>(
-      `SELECT COUNT(*) AS nr FROM firme
-        WHERE stadiu IN ('cerere', 'contract_trimis')
-          AND schimbat_la < now() - interval '14 days'`,
+      // Aceeași condiție ca „firme fără răspuns” de pe tabloul de bord.
+      `SELECT COUNT(*) AS nr FROM firme WHERE ${FIRME_UITATE_SQL}`,
     ),
   ]);
 
   const peStadiu = new Map(stadii.map((s) => [s.stadiu, Number(s.nr)]));
-  const toate = stadii.reduce((s, r) => s + Number(r.nr), 0);
+  // Procentele se socotesc din firmele intrate în pâlnie: 30 de lead-uri
+  // adăugate ieri n-au cum să fie „firme care n-au virat banii”.
+  const leaduri = peStadiu.get("prospect") ?? 0;
+  const toate = stadii.reduce((s, r) => s + Number(r.nr), 0) - leaduri;
 
   return {
     firme: toate,
+    leaduri,
     peStadii: STADII.map(([id, eticheta]) => ({
       stadiu: eticheta,
       nr: peStadiu.get(id) ?? 0,

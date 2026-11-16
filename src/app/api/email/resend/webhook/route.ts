@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { areBazaDeDate } from "@/lib/baza";
+import { areBazaDeDate, intreaba } from "@/lib/baza";
 import { mediu } from "@/lib/mediu";
 import { curataHtml } from "@/lib/curata-html";
 import { firma as citesteFirma } from "@/lib/crm";
@@ -69,6 +69,7 @@ type Primit = {
   to?: string[];
   received_for?: string[];
   subject?: string;
+  attachments?: unknown[];
 };
 
 async function raspunsPrimit(d: Primit): Promise<void> {
@@ -76,6 +77,8 @@ async function raspunsPrimit(d: Primit): Promise<void> {
   const pentru = [...(d.to ?? []), ...(d.received_for ?? [])];
   let firmaId: string | null = null;
   for (const a of pentru) firmaId ??= firmaDinAdresa(a);
+  // Adresa poate fi a unei firme șterse între timp: atunci se leagă după expeditor.
+  if (firmaId && !(await citesteFirma(firmaId))) firmaId = null;
   firmaId ??= deLa ? await firmaDupaEmail(deLa) : null;
 
   const plin = await cere<{ html?: string | null; text?: string | null; subject?: string }>(
@@ -84,6 +87,13 @@ async function raspunsPrimit(d: Primit): Promise<void> {
   const lista = await cere<{
     data?: Array<{ filename?: string; content_type?: string; size?: number; download_url?: string }>;
   }>(`/emails/receiving/${encodeURIComponent(d.email_id)}/attachments?limit=100`);
+  /*
+    Fără conținut nu se salvează nimic: rândul gol ar ține locul răspunsului
+    (cheia e `resend_id`), iar reîncercarea lui Resend ar fi sărită. Aruncat,
+    ruta răspunde 500 și Resend mai trimite anunțul.
+  */
+  if (!plin) throw new Error("conținutul răspunsului n-a venit de la Resend");
+  if (!lista && (d.attachments?.length ?? 0) > 0) throw new Error("lista de atașamente n-a venit de la Resend");
 
   const atasamente: FisierAtasat[] = [];
   let total = 0;
@@ -114,7 +124,7 @@ async function raspunsPrimit(d: Primit): Promise<void> {
   const id = await salveazaPrimit({
     resendId: d.email_id,
     firmaId,
-    deLa: d.from.slice(0, 300),
+    deLa: (d.from ?? "").slice(0, 300),
     catre: pentru[0] ?? "",
     subiect,
     html,
@@ -159,6 +169,18 @@ export async function POST(cerere: Request) {
   const emailId = typeof d.email_id === "string" ? d.email_id : "";
   if (!emailId) return new Response("ok");
 
+  /*
+    Resend retrimite același anunț (același `svix-id`) când nu primește 200 la
+    timp. Fără semnul ăsta, o deschidere s-ar număra de două ori. Semnul se
+    șterge dacă prelucrarea cade, ca reîncercarea să meargă.
+  */
+  const svixId = cerere.headers.get("svix-id") ?? "";
+  const nou = await intreaba<{ id: string }>(
+    "INSERT INTO anunturi_resend (id) VALUES ($1) ON CONFLICT (id) DO NOTHING RETURNING id",
+    [svixId],
+  );
+  if (!nou.length) return new Response("ok");
+
   try {
     switch (ev.type) {
       case "email.received":
@@ -187,6 +209,7 @@ export async function POST(cerere: Request) {
   } catch (e) {
     // 500, ca Resend să mai încerce: un răspuns pierdut nu se mai găsește.
     console.error(`[resend webhook] ${ev.type}: ${(e as Error).message}`);
+    await intreaba("DELETE FROM anunturi_resend WHERE id = $1", [svixId]).catch(() => undefined);
     return new Response("Eroare.", { status: 500 });
   }
   return new Response("ok");

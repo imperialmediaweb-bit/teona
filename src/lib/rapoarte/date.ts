@@ -245,6 +245,7 @@ export type RaportAnual = {
   cineva care se uită la raport crede că pasul lipsește cu totul.
 */
 const STADII = [
+  ["prospect", "Lead: de contactat"],
   ["cerere", "Cerere primită"],
   ["contract_trimis", "Contract trimis"],
   ["semnat", "Contract semnat"],

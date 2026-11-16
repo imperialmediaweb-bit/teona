@@ -176,6 +176,7 @@ export function rezumat(
   );
   randuri.push(
     `- din toate firmele intrate, ${f.pastraDinCerere.semnate} au ajuns la contract semnat și ${f.pastraDinCerere.incasate} la bani încasați`,
+    `- lead-uri adăugate de asociație, încă fără „da”: ${f.leaduri} (nu intră în procente)`,
   );
   randuri.push(
     `- total din sponsorizări încasate, după fișele completate de mână: ${lei(f.incasatBani)}; sponsorizarea medie ${lei(f.sponsorizareMedie)}`,

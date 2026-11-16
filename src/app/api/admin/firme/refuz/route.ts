@@ -2,6 +2,7 @@ import { formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, trimite
 import { arePermisiune, cineEsteConectat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { opresteEmailurile, pornesteEmailurile } from "@/lib/mesaje-firme";
+import { probaAreVoie } from "@/lib/proba";
 
 /** Din panou: „Nu mai scrie acestei firme” sau, după ce a cerut-o, „Vrea iar e-mailuri”. */
 export async function POST(cerere: Request) {
@@ -13,6 +14,7 @@ export async function POST(cerere: Request) {
   if (citit.raspuns) return citit.raspuns;
   const id = String(citit.formular.get("firma") ?? "");
   if (!/^[0-9a-f-]{36}$/i.test(id)) return nuTrece("Firma nu există.");
+  if (!(await probaAreVoie("firme", id))) return new Response("Proba lucrează numai pe rândurile ei.", { status: 403 });
   const cine = (await cineEsteConectat())?.nume ?? "Asociația";
   if (citit.formular.get("fac") === "porneste") await pornesteEmailurile(id, cine);
   else await opresteEmailurile(id, cine);

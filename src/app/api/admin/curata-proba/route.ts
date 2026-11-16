@@ -33,6 +33,8 @@ export async function POST() {
   await sterge("contracte", "DELETE FROM contracte WHERE firma_id IN (SELECT id FROM firme WHERE lower(email) = lower($1))");
   await sterge("interactiuni", "DELETE FROM interactiuni WHERE lower(email) = lower($1) OR firma_id IN (SELECT id FROM firme WHERE lower(email) = lower($1))");
   await sterge("firme", "DELETE FROM firme WHERE lower(email) = lower($1)");
+  // Mesajele cu firmele se duc odată cu firma; adresa oprită rămâne, deci se scoate aici.
+  await sterge("adrese_oprite", "DELETE FROM adrese_oprite WHERE email = lower($1)");
   await sterge("raspunsuri", "DELETE FROM raspunsuri_voluntari WHERE cerere_id IN (SELECT id FROM cereri WHERE lower(email) = lower($1))");
   await sterge("apeluri", "DELETE FROM apeluri_voluntari a WHERE a.creat_de = 'Probă automată' AND $1 <> '' AND NOT EXISTS (SELECT 1 FROM raspunsuri_voluntari r WHERE r.apel_id = a.id)");
   await sterge("cereri", "DELETE FROM cereri WHERE lower(email) = lower($1)");

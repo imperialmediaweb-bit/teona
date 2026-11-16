@@ -11,6 +11,7 @@ import {
 import { arePermisiune, cineEsteConectat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import { adaugaLead, scrieInteractiune } from "@/lib/crm";
+import { probaAreVoie } from "@/lib/proba";
 
 /** O firmă adăugată de mână, ca lead, și dusă direct la discuția ei. */
 export async function POST(cerere: Request) {
@@ -26,6 +27,8 @@ export async function POST(cerere: Request) {
   if (!denumire) return nuTrece("Scrie numele firmei.");
   const email = emailValid(f.get("email"));
   if (!email) return nuTrece("Adresa de e-mail a firmei nu e scrisă corect.");
+  // Cheia de probă adaugă numai firme cu adresa de probă, ca `curata-proba` să le găsească.
+  if (!(await probaAreVoie("email", email))) return new Response("Proba lucrează numai pe rândurile ei.", { status: 403 });
   const persoana = text(f.get("persoana"), 150) ?? "Echipa " + denumire;
   const cuiBrut = text(f.get("cui"), 20);
   if (cuiBrut && !/^(ro)?\s*\d{2,10}$/i.test(cuiBrut.replace(/[\s.-]/g, "")))

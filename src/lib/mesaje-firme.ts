@@ -181,11 +181,25 @@ export async function opresteEmailurile(firmaId: string, cine: string): Promise<
     [firmaId],
   );
   if (!r.length) return false;
-  // Aceeași adresă, pusă și la altă firmă: se oprește și acolo.
+  /*
+    Refuzul ține de adresă: intră în `adrese_oprite` adresa din fișă și toate
+    adresele la care i s-a scris firmei (linkul e al firmei, deci nu se știe
+    care dintre ele a apăsat — se oprește tot, ca să nu mai primească nimeni).
+    Apoi orice altă fișă cu una din adresele astea se oprește și ea.
+  */
+  await intreaba(
+    `INSERT INTO adrese_oprite (email)
+     SELECT DISTINCT lower(trim(a)) FROM (
+       SELECT email AS a FROM firme WHERE id = $1
+       UNION ALL
+       SELECT unnest(string_to_array(catre, ',')) FROM mesaje_firme WHERE firma_id = $1 AND directie = 'trimis'
+     ) x WHERE trim(a) <> ''
+     ON CONFLICT (email) DO NOTHING`,
+    [firmaId],
+  );
   await intreaba(
     `UPDATE firme SET fara_emailuri_la = now()
-      WHERE fara_emailuri_la IS NULL AND lower(email) = (SELECT lower(email) FROM firme WHERE id = $1)`,
-    [firmaId],
+      WHERE fara_emailuri_la IS NULL AND lower(email) IN (SELECT email FROM adrese_oprite)`,
   );
   await scrieInteractiune({
     firmaId,
@@ -202,7 +216,15 @@ export async function pornesteEmailurile(firmaId: string, cine: string): Promise
       WHERE id = $1 OR lower(email) = (SELECT lower(email) FROM firme WHERE id = $1)`,
     [firmaId],
   );
-  await intreaba(`DELETE FROM adrese_oprite WHERE email = (SELECT lower(email) FROM firme WHERE id = $1)`, [firmaId]);
+  await intreaba(
+    `DELETE FROM adrese_oprite WHERE email IN (
+       SELECT lower(trim(a)) FROM (
+         SELECT email AS a FROM firme WHERE id = $1
+         UNION ALL
+         SELECT unnest(string_to_array(catre, ',')) FROM mesaje_firme WHERE firma_id = $1 AND directie = 'trimis'
+       ) x)`,
+    [firmaId],
+  );
   await scrieInteractiune({
     firmaId,
     fel: "notita",

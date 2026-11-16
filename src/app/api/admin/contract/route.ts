@@ -1,3 +1,4 @@
+import { intreaba } from "@/lib/baza";
 import { probaAreVoie } from "@/lib/proba";
 import { formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata } from "@/lib/api";
 import { arePermisiune, numeleConectat } from "@/lib/admin";
@@ -57,11 +58,27 @@ export async function POST(cerere: Request) {
     contabilul. Dacă baza nu răspunde, contractul se face oricum, fără număr:
     mai bine un contract fără număr decât o firmă care așteaptă.
   */
+  /*
+    O firmă adăugată ca lead fără CUI are în fișă `fara-cui-…`, un loc ținut,
+    nu un CUI: în contract ar fi intrat „faracui…”. Se cere CUI-ul adevărat,
+    iar fișa îl primește (dacă nu e deja al altei firme).
+  */
+  const cuiScris = normalizeazaCui(camp("cui"));
+  if (!cuiScris && firma.cui.startsWith("fara-cui-")) {
+    return nuTrece("Scrie CUI-ul firmei. Fișa ei n-are încă unul.");
+  }
+  const cuiContract = cuiScris || firma.cui;
+  if (cuiScris && firma.cui.startsWith("fara-cui-")) {
+    await intreaba(
+      "UPDATE firme SET cui = $1 WHERE id = $2 AND NOT EXISTS (SELECT 1 FROM firme WHERE cui = $1)",
+      [cuiScris, id],
+    ).catch(() => undefined);
+  }
   let numar = camp("numar");
   const pentruRegistru = {
     firmaId: id,
     denumire: camp("denumire") || firma.denumire,
-    cui: normalizeazaCui(camp("cui")) || firma.cui,
+    cui: cuiContract,
     valoareBani: (() => {
       const { suma } = citesteSuma(camp("valoare"));
       return suma === null ? null : inBani(suma);
@@ -81,7 +98,7 @@ export async function POST(cerere: Request) {
     const inregistrat = await numarPentruContract({
       firmaId: id,
       denumire: camp("denumire") || firma.denumire,
-      cui: normalizeazaCui(camp("cui")) || firma.cui,
+      cui: cuiContract,
       /*
         În registru suma stă în bani, ca peste tot în baza asta. Fără
         înmulțire, 1.500 de lei ar fi intrat ca 15 lei — iar totalul anului
@@ -101,7 +118,7 @@ export async function POST(cerere: Request) {
     denumire: camp("denumire") || firma.denumire,
     sediu: camp("sediu"),
     judet: camp("judet"),
-    cui: normalizeazaCui(camp("cui")) || firma.cui,
+    cui: cuiContract,
     regCom: camp("regCom"),
     reprezentant: camp("reprezentant"),
     calitate: camp("calitate"),

@@ -15,6 +15,7 @@ import { firma as citesteFirma } from "@/lib/crm";
 import { areEmail } from "@/lib/email/trimite";
 import { tipDinOcteti } from "@/lib/poza-urcata";
 import { textSimplu } from "@/lib/text-bogat";
+import { probaAreVoie } from "@/lib/proba";
 import { LIMITA_LOT, trimiteFirmei, type FisierAtasat } from "@/lib/mesaje-firme";
 
 /**
@@ -86,6 +87,8 @@ export async function POST(cerere: Request) {
   const una = String(f.get("firma") ?? "");
   if (una) {
     if (!UUID.test(una)) return nuTrece("Firma nu există.");
+    // Cheia de probă scrie numai firmelor de probă (cu adresa de probă).
+    if (!(await probaAreVoie("firme", una))) return new Response("Proba lucrează numai pe rândurile ei.", { status: 403 });
     const fi = await citesteFirma(una);
     if (!fi) return nuTrece("Firma nu există.");
     // Una sau mai multe adrese ale aceleiași firme, despărțite prin virgulă.
@@ -112,6 +115,7 @@ export async function POST(cerere: Request) {
   const ratate: string[] = [];
   const refuza: string[] = [];
   for (const id of ids) {
+    if (!(await probaAreVoie("firme", id))) continue;
     const fi = await citesteFirma(id);
     const catre = fi ? emailValid(fi.email) : null;
     if (!fi || !catre) {

@@ -646,6 +646,11 @@ const ADAOSURI = `
     (linkul pus de mână în e-mailurile trimise din căsuța obișnuită), chiar
     dacă nu sunt încă în nicio fișă de firmă.
   */
+  /* Anunțurile Resend deja prelucrate (cheia: svix-id), ca o retrimitere să nu numere de două ori. */
+  CREATE TABLE IF NOT EXISTS anunturi_resend (
+    id  text PRIMARY KEY,
+    la  timestamptz NOT NULL DEFAULT now()
+  );
   CREATE TABLE IF NOT EXISTS adrese_oprite (
     email     text PRIMARY KEY,
     oprit_la  timestamptz NOT NULL DEFAULT now()

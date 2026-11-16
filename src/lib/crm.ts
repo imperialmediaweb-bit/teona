@@ -114,6 +114,19 @@ export async function salveazaFirma(date: {
   sumaEstimata?: string;
   mesaj?: string;
 }): Promise<{ id: string; eraDeja: boolean } | null> {
+  /*
+    Un lead adăugat din panou fără CUI („fara-cui-…”) care scrie acum de pe
+    site, cu aceeași adresă: primește CUI-ul adevărat pe fișa lui, iar
+    rândul de mai jos îl găsește și îl actualizează. Altfel firma ar avea
+    două fișe, iar e-mailurile ei s-ar împărți între ele.
+  */
+  await intreaba(
+    `UPDATE firme SET cui = $1
+      WHERE id = (SELECT id FROM firme WHERE cui LIKE 'fara-cui-%' AND lower(email) = lower($2)
+                   ORDER BY creat_la LIMIT 1)
+        AND NOT EXISTS (SELECT 1 FROM firme WHERE cui = $1)`,
+    [normalizeazaCui(date.cui), date.email],
+  );
   const randuri = await intreaba<{ id: string; era_deja: boolean }>(
     `INSERT INTO firme
        (cui, denumire, persoana, email, telefon, cale, suma_estimata, mesaj)

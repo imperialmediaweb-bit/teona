@@ -226,7 +226,12 @@ async function Continut({
               <span className="text-mic font-semibold text-cerneala">
                 CUI / CIF
               </span>
-              <input name="cui" defaultValue={firma.cui} className={camp} />
+              <input
+                name="cui"
+                defaultValue={firma.cui.startsWith("fara-cui-") ? "" : firma.cui}
+                placeholder={firma.cui.startsWith("fara-cui-") ? "Scrie CUI-ul firmei" : undefined}
+                className={camp}
+              />
             </label>
             <label className="grid gap-1.5">
               <span className="text-mic font-semibold text-cerneala">
