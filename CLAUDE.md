@@ -1421,8 +1421,23 @@ există trimitere unu-la-unu și nici atașamente. Pleacă prin Resend
   de adresă, nu de fișă**: `trimiteFirmei` refuză orice adresă oprită la
   oricare firmă, iar un lead nou cu o adresă oprită se naște oprit.
   „Am vorbit cu ei și vor iar e-mailuri” îl ridică.
+- **Butoanele din e-mail**: „Da, ne interesează” (`linkInteres`, pagina
+  `/raspuns-firma`, cu buton) mută lead-ul la „Cerere nouă”, scrie în jurnal
+  și anunță asociația; „Nu mai doresc mesaje” e refuzul de mai sus.
+- **Pentru e-mailurile trimise de mână, din căsuța obișnuită**:
+  `teona-ariana.ro/nu-mai-doresc` (cu `?email=` opțional) — omul își scrie
+  adresa și apasă; adresa intră în `adrese_oprite`, fișele cu ea se opresc,
+  iar o firmă adăugată mai târziu cu ea se naște oprită. Fără semnătură,
+  dinadins: linkul se lipește de mână; cel mult cineva oprește e-mailurile
+  altei adrese, adică nu-i mai scriem.
+- **„Nu răspunde”**: după `NU_RASPUNDE_DUPA` (2) e-mailuri fără niciun
+  răspuns, discuția și lista o spun, ca să nu i se scrie a treia oară.
+  Lead-urile intră și în „firme fără răspuns de două săptămâni”.
+- Formularele de lead și de trimitere la mai multe firme se întorc cu
+  `salvat=1`, ca `TineCiorna` să le golească: altfel următoarea firmă se
+  deschidea cu numele și CUI-ul celei de dinainte (prins de probă).
 - Probă, cu un Resend de mențiune și anunțuri semnate:
-  `scratchpad/mf/proba.mjs` (34 de verificări).
+  `scratchpad/mf/proba.mjs` (61 de verificări).
 
 ## Site-ul nu face campanii de e-mail
 

@@ -4,7 +4,7 @@ import { connection } from "next/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { firma as iaFirma, STADII_FIRMA } from "@/lib/crm";
-import { domeniuRaspuns, marcheazaCitite, mesajeleFirmei } from "@/lib/mesaje-firme";
+import { domeniuRaspuns, marcheazaCitite, mesajeleFirmei, NU_RASPUNDE_DUPA, trimiseFaraRaspuns } from "@/lib/mesaje-firme";
 import Cadru from "@/componente/admin/Cadru";
 import ScrieFirmei from "@/componente/admin/ScrieFirmei";
 import MesajFirma from "@/componente/admin/firme/MesajFirma";
@@ -97,6 +97,11 @@ async function Continut({
         {era && (
           <p role="status" className="mb-4 colt-mic-a bg-hartie-umbra/60 px-4 py-3 text-mic font-semibold text-cerneala">
             Firma cu CUI-ul ăsta era deja în listă; n-am schimbat nimic la ea. Iată discuția ei.
+          </p>
+        )}
+        {!f.faraEmailuri && trimiseFaraRaspuns(mesaje) >= NU_RASPUNDE_DUPA && (
+          <p data-nu-raspunde className="mb-4 colt-mic-a bg-hartie-umbra/70 px-4 py-3 text-mic font-semibold text-cerneala">
+            Nu răspunde: i-ai scris de {trimiseFaraRaspuns(mesaje)} ori fără niciun răspuns. Mai bine o lași în pace sau o suni.
           </p>
         )}
         {refuza && !f.faraEmailuri && (

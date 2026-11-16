@@ -641,6 +641,15 @@ const ADAOSURI = `
   CREATE INDEX IF NOT EXISTS atasamente_firme_dupa_mesaj ON atasamente_firme (mesaj_id);
   /* Firma care a cerut să nu mai primească e-mailuri din panou: de atunci nu i se mai trimite nimic. */
   ALTER TABLE firme ADD COLUMN IF NOT EXISTS fara_emailuri_la timestamptz;
+  /*
+    Adrese care au apăsat „Nu mai doresc mesaje” pe pagina generală
+    (linkul pus de mână în e-mailurile trimise din căsuța obișnuită), chiar
+    dacă nu sunt încă în nicio fișă de firmă.
+  */
+  CREATE TABLE IF NOT EXISTS adrese_oprite (
+    email     text PRIMARY KEY,
+    oprit_la  timestamptz NOT NULL DEFAULT now()
+  );
 `;
 
 async function pregateste(): Promise<void> {

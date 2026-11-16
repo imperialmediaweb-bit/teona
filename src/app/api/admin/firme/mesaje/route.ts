@@ -133,7 +133,8 @@ export async function POST(cerere: Request) {
     else if (rez === "refuza") refuza.push(fi.denumire);
     else ratate.push(fi.denumire);
   }
-  const unde = new URLSearchParams({ trimise: String(plecate) });
+  // `salvat=1`: TineCiorna golește formularul, altfel textul ar rămâne pentru data viitoare.
+  const unde = new URLSearchParams({ trimise: String(plecate), ...(plecate ? { salvat: "1" } : {}) });
   if (ratate.length) unde.set("ratate", ratate.join(", ").slice(0, 500));
   if (refuza.length) unde.set("refuza", refuza.join(", ").slice(0, 500));
   return trimiteLa(`/admin/firme/mesaje?${unde}`);

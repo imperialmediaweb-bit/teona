@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
 import { mediu } from "@/lib/mediu";
-import { discutii, domeniuRaspuns, marcheazaNelegateCitite, mesajeNelegate } from "@/lib/mesaje-firme";
+import { discutii, domeniuRaspuns, marcheazaNelegateCitite, mesajeNelegate, NU_RASPUNDE_DUPA } from "@/lib/mesaje-firme";
 import { ADRESA_SITE } from "@/app/seo";
 import Cadru from "@/componente/admin/Cadru";
 import MesajFirma from "@/componente/admin/firme/MesajFirma";
@@ -91,6 +91,11 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                 <span className="min-w-0 flex-1">
                   <span className="block font-titlu text-mic font-bold text-cerneala">
                     {d.denumire}
+                    {d.necitite === 0 && d.faraRaspuns >= NU_RASPUNDE_DUPA && (
+                      <span data-nu-raspunde className="ml-2 rounded-full bg-hartie-umbra px-2 py-0.5 text-nota font-bold text-cerneala-moale">
+                        Nu răspunde: {d.faraRaspuns} e-mailuri fără răspuns
+                      </span>
+                    )}
                     {d.necitite > 0 && (
                       <span className="ml-2 rounded-full bg-caramiziu-700 px-2 py-0.5 text-nota font-bold text-hartie">
                         {d.necitite} {d.necitite === 1 ? "răspuns nou" : "răspunsuri noi"}

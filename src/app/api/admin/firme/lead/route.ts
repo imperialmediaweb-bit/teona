@@ -43,7 +43,9 @@ export async function POST(cerere: Request) {
       scrisDe: cine?.nume,
     }).catch(() => false);
   }
-  return trimiteLa(`/admin/firme/${r.id}/mesaje?${r.eraDeja ? "era=1" : "nou=1"}${r.refuza ? "&refuza=1" : ""}#jos`);
+  // `salvat=1`: TineCiorna golește formularul de lead, altfel următoarea firmă
+  // s-ar deschide cu numele și CUI-ul celei de acum.
+  return trimiteLa(`/admin/firme/${r.id}/mesaje?${r.eraDeja ? "era=1" : "nou=1"}${r.refuza ? "&refuza=1" : ""}&salvat=1#jos`);
 }
 
 export const GET = () => raspuns("Metodă nepermisă.", 405);

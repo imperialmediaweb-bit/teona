@@ -118,6 +118,62 @@ export function refuzValid(firmaId: string, semnul: string): boolean {
   return /^[0-9a-f-]{36}$/i.test(firmaId) && /^[0-9a-f]{64}$/.test(semnul) && semnaturaLinkuluiTine(`refuz-firma:${firmaId}`, semnul);
 }
 
+/**
+ * Butonul „Da, ne interesează” din e-mail: duce la o pagină cu buton (ca la
+ * refuz), iar apăsarea anunță asociația și mută lead-ul la „Cerere nouă”.
+ */
+export function linkInteres(firmaId: string): string | null {
+  const s = semneazaText(`interes-firma:${firmaId}`);
+  return s ? `${ADRESA_SITE}/raspuns-firma?f=${firmaId}&s=${s}` : null;
+}
+
+export function interesValid(firmaId: string, semnul: string): boolean {
+  return /^[0-9a-f-]{36}$/i.test(firmaId) && /^[0-9a-f]{64}$/.test(semnul) && semnaturaLinkuluiTine(`interes-firma:${firmaId}`, semnul);
+}
+
+/** Firma a apăsat „Da”. Întoarce `true` dacă e prima dată în ultimele 24 de ore. */
+export async function firmaInteresata(firmaId: string): Promise<boolean> {
+  const [deja] = await intreaba<{ nr: string }>(
+    `SELECT count(*) AS nr FROM interactiuni WHERE firma_id = $1 AND rezumat LIKE 'A apăsat „Da, ne interesează”%' AND cand > now() - interval '1 day'`,
+    [firmaId],
+  );
+  if (Number(deja?.nr ?? 0) > 0) return false;
+  await intreaba(`UPDATE firme SET stadiu = 'cerere', schimbat_la = now() WHERE id = $1 AND stadiu = 'prospect'`, [firmaId]);
+  await scrieInteractiune({
+    firmaId,
+    fel: "email",
+    rezumat: "A apăsat „Da, ne interesează” în e-mail. Sună-i sau trimite-le contractul.",
+    scrisDe: "firma, din e-mail",
+  }).catch(() => false);
+  return true;
+}
+
+/**
+ * „Nu mai doresc mesaje” de pe pagina generală `/nu-mai-doresc`: adresa
+ * intră în `adrese_oprite`, iar fișele de firmă cu adresa asta se opresc.
+ * Întoarce numele firmelor oprite acum (pentru anunț) și dacă e prima dată.
+ */
+export async function opresteAdresa(email: string): Promise<{ nou: boolean; firme: string[] }> {
+  const nou = await intreaba<{ email: string }>(
+    `INSERT INTO adrese_oprite (email) VALUES ($1) ON CONFLICT (email) DO NOTHING RETURNING email`,
+    [email.toLowerCase()],
+  );
+  const firme = await intreaba<{ id: string; denumire: string }>(
+    `UPDATE firme SET fara_emailuri_la = now()
+      WHERE fara_emailuri_la IS NULL AND lower(email) = $1 RETURNING id, denumire`,
+    [email.toLowerCase()],
+  );
+  for (const f of firme) {
+    await scrieInteractiune({
+      firmaId: f.id,
+      fel: "notita",
+      rezumat: "Nu mai vrea e-mailuri de la noi (a apăsat pe pagina de dezabonare). Panoul nu-i mai trimite nimic.",
+      scrisDe: "firma, din linkul din e-mail",
+    }).catch(() => false);
+  }
+  return { nou: nou.length > 0, firme: firme.map((f) => f.denumire) };
+}
+
 /** Firma nu mai primește e-mailuri. Întoarce `true` numai prima dată. */
 export async function opresteEmailurile(firmaId: string, cine: string): Promise<boolean> {
   const r = await intreaba<{ id: string }>(
@@ -146,6 +202,7 @@ export async function pornesteEmailurile(firmaId: string, cine: string): Promise
       WHERE id = $1 OR lower(email) = (SELECT lower(email) FROM firme WHERE id = $1)`,
     [firmaId],
   );
+  await intreaba(`DELETE FROM adrese_oprite WHERE email = (SELECT lower(email) FROM firme WHERE id = $1)`, [firmaId]);
   await scrieInteractiune({
     firmaId,
     fel: "notita",
@@ -163,6 +220,7 @@ export function corpScrisoare(
   htmlScris: string,
   cine: string,
   refuz?: string | null,
+  interes?: string | null,
 ): { html: string; text: string } {
   const curat = curataHtml(htmlScris)
     .replace(/<div data-video[^>]*>[\s\S]*?<\/div>/g, "")
@@ -186,12 +244,17 @@ export function corpScrisoare(
 <body style="margin:0;padding:20px 16px;background:#ffffff;">
 <div style="max-width:640px;">
 ${curat}
+${interes || refuz ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:22px 0 0;"><tr>
+${interes ? `<td bgcolor="#b82b09" style="border-radius:999px;"><a href="${scapa(interes)}" style="display:inline-block;padding:11px 22px;font-family:${FONT};font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:999px;">Da, ne interesează</a></td><td style="width:10px;"></td>` : ""}
+${refuz ? `<td style="border:1px solid #cfd3d8;border-radius:999px;"><a href="${scapa(refuz)}" style="display:inline-block;padding:10px 20px;font-family:${FONT};font-size:14px;color:#616161;text-decoration:none;border-radius:999px;">Nu mai doresc mesaje</a></td>` : ""}
+</tr></table>` : ""}
 <p style="margin:18px 0 0;font-family:${FONT};font-size:13px;line-height:1.6;color:#616161;">Dacă nu doriți să mai primiți mesaje de la noi, ${refuz ? `<a href="${scapa(refuz)}" style="color:#616161;text-decoration:underline;">apăsați aici</a>` : "răspundeți la acest e-mail cu „NU”"}${refuz ? " sau răspundeți la acest e-mail cu „NU”" : ""} și nu vă mai scriem.</p>
 <div style="margin-top:22px;padding-top:12px;border-top:1px solid #e6e8ec;">
 ${semnatura.map((s, i) => `<p style="${mic}${i === 0 ? "font-weight:bold;color:#232323;" : ""}">${scapa(s)}</p>`).join("\n")}
 </div></div></body></html>`;
+  const interesText = interes ? `Vă interesează? Apăsați aici: ${interes}` : "";
   const refuzText = `Dacă nu doriți să mai primiți mesaje de la noi${refuz ? `, deschideți ${refuz} sau` : ","} răspundeți la acest e-mail cu „NU” și nu vă mai scriem.`;
-  return { html, text: [...textSimplu(htmlScris), refuzText, "", "--", ...semnatura].join("\n\n") };
+  return { html, text: [...textSimplu(htmlScris), ...(interesText ? [interesText] : []), refuzText, "", "--", ...semnatura].join("\n\n") };
 }
 
 /* ── Trimiterea ─────────────────────────────────────────────────────── */
@@ -215,7 +278,8 @@ export async function trimiteFirmei(d: {
   if (d.firma.faraEmailuri) return "refuza";
   const adrese = [d.catre].flat().map((x) => x.toLowerCase());
   const [opriti] = await intreaba<{ nr: string }>(
-    `SELECT count(*) AS nr FROM firme WHERE fara_emailuri_la IS NOT NULL AND lower(email) = ANY($1::text[])`,
+    `SELECT (SELECT count(*) FROM firme WHERE fara_emailuri_la IS NOT NULL AND lower(email) = ANY($1::text[]))
+          + (SELECT count(*) FROM adrese_oprite WHERE email = ANY($1::text[])) AS nr`,
     [adrese],
   );
   if (Number(opriti?.nr ?? 0) > 0) return "refuza";
@@ -224,7 +288,7 @@ export async function trimiteFirmei(d: {
   // Intrat cu parola asociației, „cine” e chiar asociația: nu se scrie de două ori.
   const om = /^asocia/i.test(d.trimisDe) ? "" : d.trimisDe;
   const refuz = linkRefuz(d.firma.id);
-  const { html, text } = corpScrisoare(scris, om, refuz);
+  const { html, text } = corpScrisoare(scris, om, refuz, linkInteres(d.firma.id));
   const antet = linkRefuz(d.firma.id, true);
   const raspundeLa = adresaDeRaspuns(d.firma.id) ?? d.emailCelui ?? EMAIL.contact;
   const r = await trimiteEmailCuId({
@@ -342,7 +406,19 @@ export type Discutie = {
   necitite: number;
   trimise: number;
   deschise: number;
+  /** E-mailuri trimise de la ultimul răspuns al firmei (sau de la început). */
+  faraRaspuns: number;
 };
+
+/** Câte e-mailuri i s-au trimis de la ultimul ei răspuns. */
+export function trimiseFaraRaspuns(mesaje: Pick<Mesaj, "directie">[]): number {
+  let n = 0;
+  for (const m of mesaje) n = m.directie === "primit" ? 0 : n + 1;
+  return n;
+}
+
+/** De la câte e-mailuri fără răspuns se spune „nu răspunde”. */
+export const NU_RASPUNDE_DUPA = 2;
 
 /** Discuțiile, cele cu răspunsuri necitite primele, apoi cele mai noi. */
 export async function discutii(): Promise<Discutie[]> {
@@ -357,6 +433,7 @@ export async function discutii(): Promise<Discutie[]> {
     necitite: string;
     trimise: string;
     deschise: string;
+    fara_raspuns: string;
   }>(
     `WITH ult AS (
        SELECT DISTINCT ON (coalesce(firma_id::text, 'm' || id::text)) *
@@ -366,7 +443,9 @@ export async function discutii(): Promise<Discutie[]> {
             (SELECT count(*) FROM mesaje_firme m WHERE m.directie = 'primit' AND m.citit_la IS NULL
                AND (m.firma_id = u.firma_id OR (u.firma_id IS NULL AND m.id = u.id))) AS necitite,
             (SELECT count(*) FROM mesaje_firme m WHERE m.firma_id = u.firma_id AND m.directie = 'trimis') AS trimise,
-            (SELECT count(*) FROM mesaje_firme m WHERE m.firma_id = u.firma_id AND m.directie = 'trimis' AND m.deschideri > 0) AS deschise
+            (SELECT count(*) FROM mesaje_firme m WHERE m.firma_id = u.firma_id AND m.directie = 'trimis' AND m.deschideri > 0) AS deschise,
+            (SELECT count(*) FROM mesaje_firme m WHERE m.firma_id = u.firma_id AND m.directie = 'trimis'
+               AND m.creat_la > coalesce((SELECT max(p.creat_la) FROM mesaje_firme p WHERE p.firma_id = u.firma_id AND p.directie = 'primit'), '-infinity')) AS fara_raspuns
        FROM ult u LEFT JOIN firme f ON f.id = u.firma_id
       ORDER BY (SELECT count(*) FROM mesaje_firme m WHERE m.directie = 'primit' AND m.citit_la IS NULL
                   AND (m.firma_id = u.firma_id OR (u.firma_id IS NULL AND m.id = u.id))) > 0 DESC,
@@ -381,6 +460,7 @@ export async function discutii(): Promise<Discutie[]> {
     necitite: Number(x.necitite),
     trimise: Number(x.trimise),
     deschise: Number(x.deschise),
+    faraRaspuns: Number(x.fara_raspuns),
   }));
 }
 

@@ -182,7 +182,8 @@ export async function adaugaLead(d: {
   const noi = await intreaba<{ id: string; refuza: boolean }>(
     `INSERT INTO firme (cui, denumire, persoana, email, telefon, cale, mesaj, stadiu, fara_emailuri_la)
      VALUES ($1,$2,$3,$4,$5,'adăugată din panou',$6,'prospect',
-             (SELECT max(fara_emailuri_la) FROM firme WHERE lower(email) = lower($4)))
+             coalesce((SELECT max(fara_emailuri_la) FROM firme WHERE lower(email) = lower($4)),
+                      (SELECT oprit_la FROM adrese_oprite WHERE email = lower($4))))
      ON CONFLICT (cui) DO NOTHING RETURNING id, fara_emailuri_la IS NOT NULL AS refuza`,
     [cui, d.denumire, d.persoana, d.email, d.telefon, d.nota],
   );
@@ -201,7 +202,8 @@ export async function adaugaLead(d: {
  * Scrisă o dată: din ea iese și cifra din „De făcut acum”, și lista la care
  * duce linkul ei (`/admin/firme?uitate=1`).
  */
-export const FIRME_UITATE_SQL = `stadiu IN ('cerere', 'contract_trimis')
+export const FIRME_UITATE_SQL = `stadiu IN ('prospect', 'cerere', 'contract_trimis')
+  AND fara_emailuri_la IS NULL
   AND schimbat_la < now() - interval '14 days'
   AND NOT EXISTS (SELECT 1 FROM interactiuni i
                    WHERE i.firma_id = firme.id
