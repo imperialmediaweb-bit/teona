@@ -1,4 +1,5 @@
 import { curataHtml } from "@/lib/curata-html";
+import { cate, forma } from "@/lib/numere-ro";
 import type { Mesaj } from "@/lib/mesaje-firme";
 
 const cand = (iso: string) =>
@@ -22,7 +23,7 @@ function Stare({ m }: { m: Mesaj }) {
   else semne.push({ text: "Trimis", ton: "slab" });
   if (m.deschideri > 0)
     semne.push({
-      text: `Deschis${m.deschideri > 1 ? ` de ${m.deschideri} ori` : ""}`,
+      text: `Deschis${m.deschideri > 1 ? ` de ${cate(m.deschideri, "dată", "ori")}` : ""}`,
       ton: "bun",
       titlu: m.deschisLa ? `Prima dată: ${cand(m.deschisLa)}` : undefined,
     });

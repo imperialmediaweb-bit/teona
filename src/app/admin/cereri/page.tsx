@@ -99,9 +99,13 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   }
 
   const felAles: FelCerere | undefined = esteFelCerere(fel) ? fel : undefined;
-  const stadiuAles: StadiuCerere | undefined = esteStadiuCerere(stadiu)
+  // „nerezolvate”: aceeași regulă ca în „De făcut acum” (tot ce nu e rezolvat).
+  const nerezolvate = stadiu === "nerezolvate";
+  const stadiuAles: StadiuCerere | "nerezolvate" | undefined = esteStadiuCerere(stadiu)
     ? stadiu
-    : undefined;
+    : nerezolvate
+      ? "nerezolvate"
+      : undefined;
   const lista = await cereri(felAles, stadiuAles);
 
   return (
@@ -126,6 +130,9 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
         <span aria-hidden="true" className="mx-1 text-hartie-umbra">
           |
         </span>
+        <Filtru href={`/admin/cereri?stadiu=nerezolvate${felAles ? `&fel=${felAles}` : ""}`} activ={nerezolvate}>
+          Așteaptă
+        </Filtru>
         {STADII_CERERE.map((s) => (
           <Filtru
             key={s.id}

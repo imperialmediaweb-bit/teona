@@ -1,3 +1,4 @@
+import { forma } from "@/lib/numere-ro";
 import { FIRME_UITATE_SQL } from "@/lib/crm";
 import { intreaba } from "./baza";
 
@@ -192,11 +193,20 @@ export async function palniaFirmelor(): Promise<
 }
 
 /** Câte cereri așteaptă, pe fel. Asta e lista de treabă a zilei. */
+/**
+ * O cerere „așteaptă” cât timp nu e rezolvată, oricare ar fi felul ei
+ * (voluntariat inclus). Scrisă o dată: din ea ies și „De făcut acum”, și
+ * cardul „Cereri care așteaptă”, și pastila din meniu. Cu două reguli
+ * (`nou` sus, `<> rezolvat` în card), pagina scria sus „nimic nu așteaptă”
+ * și dedesubt „1 cerere așteaptă”.
+ */
+export const CERERI_ASTEAPTA_SQL = "stadiu <> 'rezolvat'";
+
 export async function cereriDeLucru(): Promise<
   Array<{ fel: string; nr: number }>
 > {
   const randuri = await intreaba<{ fel: string; nr: string }>(
-    "SELECT fel, COUNT(*) AS nr FROM cereri WHERE stadiu <> 'rezolvat' GROUP BY fel",
+    `SELECT fel, COUNT(*) AS nr FROM cereri WHERE ${CERERI_ASTEAPTA_SQL} GROUP BY fel`,
   );
   return randuri.map((r) => ({ fel: r.fel, nr: Number(r.nr) }));
 }
@@ -264,7 +274,7 @@ export async function deFacutAcum(): Promise<
   const [cereri, aniversari, ciorne, firme, transferuri, esuate, raspunsuri] =
     await Promise.all([
     intreaba<{ nr: string }>(
-      `SELECT count(*) AS nr FROM cereri WHERE stadiu = 'nou'`,
+      `SELECT count(*) AS nr FROM cereri WHERE ${CERERI_ASTEAPTA_SQL}`,
     ),
     intreaba<{ nr: string }>(
       `SELECT count(*) AS nr FROM campanii_aniversare
@@ -297,38 +307,16 @@ export async function deFacutAcum(): Promise<
     ),
   ]);
 
+  // Eticheta vine după număr („1 cerere”, „2 cereri”, „20 de cereri”): pe ecran numărul stă în pastilă, lângă ea.
+  const rand = (nr: number, unu: string, multe: string, unde: string) => ({ eticheta: forma(nr, unu, multe), nr, unde });
   return [
-    {
-      eticheta: "donații lunare care n-au trecut",
-      nr: Number(esuate[0]?.nr ?? 0),
-      unde: "/admin/donatii",
-    },
-    {
-      eticheta: "răspunsuri de la firme necitite",
-      nr: Number(raspunsuri[0]?.nr ?? 0),
-      unde: "/admin/firme/mesaje",
-    },
-    { eticheta: "cereri noi", nr: Number(cereri[0]?.nr ?? 0), unde: "/admin/cereri?stadiu=nou" },
-    {
-      eticheta: "transferuri de căutat în extras",
-      nr: Number(transferuri[0]?.nr ?? 0),
-      unde: "/admin/donatii",
-    },
-    {
-      eticheta: "aniversări de aprobat",
-      nr: Number(aniversari[0]?.nr ?? 0),
-      unde: "/admin/aniversari",
-    },
-    {
-      eticheta: "firme fără răspuns de două săptămâni",
-      nr: Number(firme[0]?.nr ?? 0),
-      unde: "/admin/firme?uitate=1",
-    },
-    {
-      eticheta: "texte nepublicate",
-      nr: Number(ciorne[0]?.nr ?? 0),
-      unde: "/admin/scrie",
-    },
+    rand(Number(esuate[0]?.nr ?? 0), "donație lunară care n-a trecut", "donații lunare care n-au trecut", "/admin/donatii"),
+    rand(Number(raspunsuri[0]?.nr ?? 0), "răspuns de la o firmă, necitit", "răspunsuri de la firme necitite", "/admin/firme/mesaje"),
+    rand(Number(cereri[0]?.nr ?? 0), "cerere care așteaptă un răspuns", "cereri care așteaptă un răspuns", "/admin/cereri?stadiu=nerezolvate"),
+    rand(Number(transferuri[0]?.nr ?? 0), "transfer de căutat în extras", "transferuri de căutat în extras", "/admin/donatii"),
+    rand(Number(aniversari[0]?.nr ?? 0), "aniversare de aprobat", "aniversări de aprobat", "/admin/aniversari"),
+    rand(Number(firme[0]?.nr ?? 0), "firmă fără răspuns de două săptămâni", "firme fără răspuns de două săptămâni", "/admin/firme?uitate=1"),
+    rand(Number(ciorne[0]?.nr ?? 0), "text nepublicat", "texte nepublicate", "/admin/scrie"),
   ].filter((r) => r.nr > 0);
 }
 

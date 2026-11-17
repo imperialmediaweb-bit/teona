@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { cate, forma } from "@/lib/numere-ro";
 import { micsoreaza } from "./MicsoreazaPoza";
 
 /**
@@ -121,7 +122,7 @@ export default function UrcaPozeTabara({
     setStare(
       urcate === 0
         ? "Nicio poză n-a fost urcată."
-        : `Gata: ${urcate} ${urcate === 1 ? "poză urcată" : "poze urcate"}.` +
+        : `Gata: ${cate(urcate, "poză urcată", "poze urcate")}.` +
             (id ? ` Se văd pe pagina ${ce} după „Publică”.` : " Apasă „Publică” jos, ca să apară pe site."),
     );
   }

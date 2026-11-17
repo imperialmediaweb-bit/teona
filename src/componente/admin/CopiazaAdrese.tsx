@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { cate, forma } from "@/lib/numere-ro";
 import Adresa from "./Adresa";
 
 /**
@@ -46,7 +47,7 @@ export default function CopiazaAdrese({ adrese }: { adrese: string[] }) {
       >
         {stare === "copiat"
           ? "Copiat"
-          : `Copiază cele ${adrese.length} adrese`}
+          : adrese.length === 1 ? "Copiază adresa" : `Copiază cele ${cate(adrese.length, "adresă", "adrese")}`}
       </button>
       {stare === "eroare" && (
         <p role="alert" className="mt-2 text-nota text-caramiziu-800">

@@ -400,13 +400,13 @@ export async function salveazaCerere(date: {
 
 export async function cereri(
   fel?: FelCerere,
-  stadiu?: StadiuCerere,
+  stadiu?: StadiuCerere | "nerezolvate",
   limita = 200,
 ): Promise<Cerere[]> {
   const randuri = await intreaba<RandCerere>(
     `SELECT * FROM cereri
       WHERE ($1::text IS NULL OR fel = $1)
-        AND ($2::text IS NULL OR stadiu = $2)
+        AND ($2::text IS NULL OR stadiu = $2 OR ($2 = 'nerezolvate' AND stadiu <> 'rezolvat'))
       ORDER BY creat_la DESC
       LIMIT $3`,
     [fel ?? null, stadiu ?? null, limita],

@@ -26,3 +26,14 @@ export function lega(n: number, plural: string): string {
   const ultimele = Math.abs(n) % 100;
   return ultimele === 0 || ultimele >= 20 ? `de ${plural}` : plural;
 }
+
+/**
+ * Numai cuvântul, la forma cerută de număr, pentru locurile în care numărul
+ * stă separat (pastila din „De făcut acum”): `forma(1, "cerere", "cereri")` →
+ * „cerere”, `forma(20, …)` → „de cereri”.
+ */
+export function forma(n: number, singular: string, plural: string): string {
+  if (n === 1) return singular;
+  if (n === 0) return plural;
+  return lega(n, plural);
+}

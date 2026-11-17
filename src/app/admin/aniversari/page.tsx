@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cate, forma } from "@/lib/numere-ro";
 import Image from "next/image";
 import { arePermisiune, areParolaConfigurata, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
@@ -100,7 +101,7 @@ async function Continut({
       descriere={
         campanii.length === 1
           ? "O campanie de ziua cuiva așteaptă să fie verificată."
-          : `${campanii.length} campanii de ziua cuiva așteaptă să fie verificate.`
+          : `${cate(campanii.length, "campanie", "campanii")} de ziua cuiva ${campanii.length === 1 ? "așteaptă să fie verificată" : "așteaptă să fie verificate"}.`
       }
       activ="/admin/aniversari"
     >
@@ -164,7 +165,7 @@ async function Continut({
                 <span className="font-titlu font-bold whitespace-nowrap text-cerneala">
                   {scrieSuma(p.bani / 100)}
                   <span className="ml-2 font-normal text-cerneala-slab">
-                    {p.donatii === 1 ? "o donație" : `${p.donatii} donații`}
+                    {p.donatii === 1 ? "o donație" : cate(p.donatii, "donație", "donații")}
                   </span>
                 </span>
               </li>

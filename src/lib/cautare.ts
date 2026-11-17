@@ -1,4 +1,5 @@
 import { intreaba } from "./baza";
+import { cate, forma } from "@/lib/numere-ro";
 
 /**
  * Căutarea peste tot panoul, dintr-un singur câmp.
@@ -110,7 +111,7 @@ export async function cautaPeste(text: string): Promise<Gasit[]> {
     rezultate.push({
       fel: "donator",
       titlu: d.nume || d.email,
-      detaliu: `${d.email} · ${d.cate} ${Number(d.cate) === 1 ? "donație" : "donații"}${
+      detaliu: `${d.email} · ${cate(Number(d.cate), "donație", "donații")}${
         d.total ? `, ${Number(d.total).toLocaleString("ro-RO")} lei` : ""
       }`,
       // Lista de donatori caută după e-mail, deci linkul duce fix la el.

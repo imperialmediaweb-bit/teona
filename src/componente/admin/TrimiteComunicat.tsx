@@ -1,6 +1,7 @@
 "use client";
 
 import Adresa from "./Adresa";
+import { cate, forma } from "@/lib/numere-ro";
 import { useState } from "react";
 
 /**
@@ -164,7 +165,7 @@ export default function TrimiteComunicat({
             className="rounded-full bg-caramiziu-700 px-6 py-2.5 font-titlu text-mic font-bold text-hartie transition-colors hover:bg-caramiziu-800 disabled:cursor-not-allowed disabled:bg-cerneala-slab"
           >
             Trimite comunicatul la {alese.size}{" "}
-            {alese.size === 1 ? "redacție" : "redacții"}
+            {forma(alese.size, "redacție", "redacții")}
           </button>
         </div>
       </div>

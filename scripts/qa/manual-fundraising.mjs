@@ -148,7 +148,7 @@ await sectiune("Tabloul de bord", async () => {
   await asteaptaText("cereri");
   const t = await text();
   ok(/De făcut acum/i.test(t), "are „De făcut acum”");
-  ok(/cereri noi|cerere nouă/i.test(t), "arată cererile noi");
+  ok(/cereri? care așteaptă|cereri noi|cerere nouă/i.test(t), "arată cererile care așteaptă");
   ok(/transfer/i.test(t), "arată transferurile anunțate de verificat");
   ok(/aniversăr/i.test(t), "arată aniversările de aprobat");
   ok(/lunar/i.test(t), "arată cât vine lunar");

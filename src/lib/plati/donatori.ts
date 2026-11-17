@@ -144,12 +144,15 @@ export async function rezumat(): Promise<{
   donatori: number;
   lunari: number;
   lunaAsta: number;
+  /** Luna trecută, numai zilele 1–N (N = ziua de azi): comparația cinstită cu o lună neterminată. */
+  lunaTrecutaPanaAzi: number;
 }> {
   const randuri = await intreaba<{
     total_bani: string | null;
     nr_donatori: string;
     nr_lunari: string;
     luna_asta: string | null;
+    luna_trecuta_pana_azi: string | null;
   }>(
     `SELECT
         -- Totalurile sunt în lei. Donațiile în altă monedă se văd separat,
@@ -165,7 +168,17 @@ export async function rezumat(): Promise<{
           WHERE moneda = 'RON'
             AND platita_la >= date_trunc('month', now())
             AND platita_la < date_trunc('month', now()) + interval '1 month'
-        )                                                AS luna_asta
+        )                                                AS luna_asta,
+        -- Aceleași zile din luna trecută, nu luna întreagă: o lună la jumătate
+        -- comparată cu una încheiată ieșea mereu „în scădere”. Plafonată la
+        -- sfârșitul lunii trecute (31 martie față de un februarie de 28 de zile).
+        SUM(suma_bani) FILTER (
+          WHERE moneda = 'RON'
+            AND platita_la >= date_trunc('month', now()) - interval '1 month'
+            AND platita_la < LEAST(
+                  date_trunc('month', now()) - interval '1 month' + (now() - date_trunc('month', now())),
+                  date_trunc('month', now()))
+        )                                                AS luna_trecuta_pana_azi
        FROM donatii
       WHERE stare = 'platita'`,
   );
@@ -175,6 +188,7 @@ export async function rezumat(): Promise<{
     donatori: Number(r?.nr_donatori ?? 0),
     lunari: Number(r?.nr_lunari ?? 0),
     lunaAsta: Number(r?.luna_asta ?? 0),
+    lunaTrecutaPanaAzi: Number(r?.luna_trecuta_pana_azi ?? 0),
   };
 }
 

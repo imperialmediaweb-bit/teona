@@ -7,6 +7,7 @@ import { textSimplu } from "@/lib/text-bogat";
 import { adresaDeLa, trimiteEmailCuId } from "@/lib/email/trimite";
 import { scrieInteractiune, type Firma } from "@/lib/crm";
 import { mediu } from "@/lib/mediu";
+import { cate } from "@/lib/numere-ro";
 import { esteProba } from "@/lib/proba";
 import { ASOCIATIA, EMAIL, TELEFOANE } from "@/date/asociatie";
 import { ADRESA_SITE } from "@/app/seo";
@@ -422,7 +423,7 @@ export async function trimiteFirmei(d: {
   await scrieInteractiune({
     firmaId: d.firma.id,
     fel: "email",
-    rezumat: `E-mail trimis din panou: „${subiect}”${d.atasamente.length ? ` (${d.atasamente.length} atașament${d.atasamente.length > 1 ? "e" : ""})` : ""}`,
+    rezumat: `E-mail trimis din panou: „${subiect}”${d.atasamente.length ? ` (${cate(d.atasamente.length, "atașament", "atașamente")})` : ""}`,
     scrisDe: d.trimisDe,
   }).catch(() => false);
   return "trimis";

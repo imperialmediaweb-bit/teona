@@ -1,6 +1,7 @@
 "use client";
 
 import Adresa from "./Adresa";
+import { cate, forma } from "@/lib/numere-ro";
 import { useState } from "react";
 
 /**
@@ -132,13 +133,13 @@ export default function BazaVoluntari({
           disabled={alesi.size === 0}
           className="mt-4 inline-flex min-h-11 items-center rounded-full bg-caramiziu-700 px-5 font-titlu font-bold text-hartie hover:bg-caramiziu-600 disabled:opacity-50"
         >
-          Trimite apelul la {alesi.size} {alesi.size === 1 ? "voluntar" : "voluntari"}
+          Trimite apelul la {cate(alesi.size, "voluntar", "voluntari")}
         </button>
       </details>
 
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="font-titlu text-mic font-bold text-cerneala">
-          {voluntari.length} {voluntari.length === 1 ? "voluntar" : "voluntari"} · bifați {alesi.size}
+          {cate(voluntari.length, "voluntar", "voluntari")} · bifați {alesi.size}
         </p>
         <div className="flex gap-2">
           <button

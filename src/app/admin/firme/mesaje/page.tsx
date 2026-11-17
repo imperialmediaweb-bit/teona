@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cate, forma } from "@/lib/numere-ro";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
@@ -48,7 +49,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
     >
       {trimise !== undefined && (
         <p role="status" className="mb-6 colt-mic-a bg-turcoaz-50 px-4 py-3 text-mic font-semibold text-turcoaz-900">
-          {trimise === "1" ? "A plecat 1 e-mail." : `Au plecat ${trimise} e-mailuri, fiecare la firma lui.`}
+          {trimise === "1" ? "A plecat 1 e-mail." : `Au plecat ${cate(Number(trimise), "e-mail", "e-mailuri")}, fiecare la firma lui.`}
           {ratate && <span className="block text-caramiziu-900">N-au plecat: {ratate}.</span>}
           {refuza && <span className="block text-cerneala">Sărite, fiindcă nu mai vor e-mailuri: {refuza}.</span>}
         </p>
@@ -93,12 +94,12 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                     {d.denumire}
                     {d.necitite === 0 && d.faraRaspuns >= NU_RASPUNDE_DUPA && (
                       <span data-nu-raspunde className="ml-2 rounded-full bg-hartie-umbra px-2 py-0.5 text-nota font-bold text-cerneala-moale">
-                        Nu răspunde: {d.faraRaspuns} e-mailuri fără răspuns
+                        Nu răspunde: {cate(d.faraRaspuns, "e-mail", "e-mailuri")} fără răspuns
                       </span>
                     )}
                     {d.necitite > 0 && (
                       <span className="ml-2 rounded-full bg-caramiziu-700 px-2 py-0.5 text-nota font-bold text-hartie">
-                        {d.necitite} {d.necitite === 1 ? "răspuns nou" : "răspunsuri noi"}
+                        {cate(d.necitite, "răspuns nou", "răspunsuri noi")}
                       </span>
                     )}
                   </span>

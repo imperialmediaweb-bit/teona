@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cate, forma } from "@/lib/numere-ro";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
@@ -111,7 +112,7 @@ async function Continut({
         )}
         {!f.faraEmailuri && trimiseFaraRaspuns(mesaje) >= NU_RASPUNDE_DUPA && (
           <p data-nu-raspunde className="mb-4 colt-mic-a bg-hartie-umbra/70 px-4 py-3 text-mic font-semibold text-cerneala">
-            Nu răspunde: i-ai scris de {trimiseFaraRaspuns(mesaje)} ori fără niciun răspuns. Mai bine o lași în pace sau o suni.
+            Nu răspunde: i-ai scris de {cate(trimiseFaraRaspuns(mesaje), "dată", "ori")} fără niciun răspuns. Mai bine o lași în pace sau o suni.
           </p>
         )}
         {refuza && !f.faraEmailuri && (

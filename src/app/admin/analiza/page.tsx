@@ -289,7 +289,7 @@ function Donatori({ d }: { d: ProfilDonatori }) {
         <Cifra
           eticheta="Donatori"
           valoare={String(d.donatori)}
-          nota={`${d.donatii} donații încasate`}
+          nota={`${cate(d.donatii, "donație încasată", "donații încasate")}`}
         />
         <Cifra
           eticheta="Cât dă un om"
@@ -304,7 +304,7 @@ function Donatori({ d }: { d: ProfilDonatori }) {
         <Cifra
           eticheta="Vine lunar"
           valoare={lei(d.baniRecurentiPeLuna)}
-          nota={`${d.recurentiActivi} donatori cu plată lunară activă`}
+          nota={`${cate(d.recurentiActivi, "donator", "donatori")} cu plată lunară activă`}
         />
       </div>
 
@@ -449,7 +449,7 @@ function Campanii({
         {c.faraEticheta > 0 && (
           <>
             <strong className="text-cerneala-moale">
-              {c.faraEticheta} donații ({scrieSuma(c.baniFaraEticheta / 100)})
+              {cate(c.faraEticheta, "donație", "donații")} ({scrieSuma(c.baniFaraEticheta / 100)})
             </strong>{" "}
             n-au eticheta vreunei campanii. Nu înseamnă că n-au venit dintr-una
             — înseamnă că n-am putut-o lega.{" "}
@@ -586,7 +586,7 @@ function DeUndeVin({
         {c.nelegate > 0 && (
           <>
             <strong className="text-cerneala-moale">
-              {c.nelegate} donații ({lei(c.baniNelegate)})
+              {cate(c.nelegate, "donație", "donații")} ({lei(c.baniNelegate)})
             </strong>{" "}
             n-au niciun canal: sunt cele dinainte ca site-ul să-l scrie, cele
             adăugate de mână din extrasul de cont și cele ale oamenilor care au

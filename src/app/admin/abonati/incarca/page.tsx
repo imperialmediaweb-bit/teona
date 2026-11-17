@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cate, forma } from "@/lib/numere-ro";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
@@ -88,7 +89,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
           className="mt-6 grid gap-1 colt-mic-a border border-turcoaz-200 bg-turcoaz-50 px-4 py-3 text-mic text-turcoaz-900"
         >
           <p className="font-semibold">
-            {cauta.adaugati === "1" ? "O adresă încărcată" : `${cauta.adaugati} adrese încărcate`} la{" "}
+            {cauta.adaugati === "1" ? "O adresă încărcată" : `${cate(Number(cauta.adaugati), "adresă încărcată", "adrese încărcate")}`} la{" "}
             {cauta.lista === "firme" ? "firme" : "persoane fizice"}.
           </p>
           {cauta.deja && <p>{cauta.deja} erau deja abonate. Nu le-am urcat a doua oară.</p>}

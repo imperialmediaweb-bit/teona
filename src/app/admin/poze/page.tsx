@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cate, forma } from "@/lib/numere-ro";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
@@ -267,7 +268,7 @@ async function Continut({
       {poze.length > 0 && (
         <>
           <p className="mt-8 text-mic text-cerneala-moale">
-            {poze.length} {poze.length === 1 ? "fotografie" : "fotografii"}.
+            {cate(poze.length, "fotografie", "fotografii")}.
             Identificatorul de sub fiecare e ce îmi trimiți ca s-o pun pe site.
           </p>
           <ul className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

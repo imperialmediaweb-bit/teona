@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cate, forma } from "@/lib/numere-ro";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
@@ -193,8 +194,16 @@ async function Continut({
   const lunar = frecvente.find((f) => f.eticheta === "Lunar")?.bani ?? 0;
   const totalFrecvente = frecvente.reduce((s, f) => s + f.bani, 0);
 
-  /* Luna trecută, pentru comparație: penultima din cele douăsprezece. */
-  const lunaTrecuta = luni.at(-2)?.bani ?? 0;
+  /*
+    Luna trecută, pentru comparație: numai zilele 1–N, cât a trecut și din
+    luna asta. Comparată cu luna trecută întreagă, o lună neterminată ieșea
+    mereu „în scădere” (pe 17 noiembrie: -32%).
+  */
+  const lunaTrecuta = cifre.lunaTrecutaPanaAzi;
+  const ziuaDeAzi = Number(new Intl.DateTimeFormat("ro-RO", { day: "numeric", timeZone: "Europe/Bucharest" }).format(new Date()));
+  const numeLunaTrecuta = new Intl.DateTimeFormat("ro-RO", { month: "long", timeZone: "Europe/Bucharest" }).format(
+    new Date(new Date().getFullYear(), new Date().getMonth() - 1, 15),
+  );
   const fataDeLunaTrecuta =
     lunaTrecuta > 0
       ? Math.round(((cifre.lunaAsta - lunaTrecuta) / lunaTrecuta) * 100)
@@ -276,8 +285,8 @@ async function Continut({
           valoare={scrieSuma(cifre.lunaAsta / 100)}
           nota={
             fataDeLunaTrecuta === null
-              ? "Luna trecută n-a intrat nimic"
-              : `${fataDeLunaTrecuta >= 0 ? "+" : ""}${fataDeLunaTrecuta}% față de luna trecută`
+              ? `În 1–${ziuaDeAzi} ${numeLunaTrecuta} n-a intrat nimic`
+              : `${fataDeLunaTrecuta >= 0 ? "+" : ""}${fataDeLunaTrecuta}% față de 1–${ziuaDeAzi} ${numeLunaTrecuta}`
           }
           culoare="turcoaz"
         />
@@ -291,13 +300,13 @@ async function Continut({
         <Cifra
           eticheta="Vine lunar"
           valoare={scrieSuma(recurent.bani / 100)}
-          nota={`${recurent.donatori} ${recurent.donatori === 1 ? "donator" : "donatori"} cu plată recurentă activă`}
+          nota={`${cate(recurent.donatori, "donator", "donatori")} cu plată recurentă activă`}
           culoare="miere"
         />
         <Cifra
           eticheta="Donatori"
           valoare={String(cifre.donatori)}
-          nota={`${totalDeLucru} ${totalDeLucru === 1 ? "cerere așteaptă" : "cereri așteaptă"} un răspuns`}
+          nota={`${cate(totalDeLucru, "cerere așteaptă", "cereri așteaptă")} un răspuns`}
           culoare="cerneala"
         />
       </div>

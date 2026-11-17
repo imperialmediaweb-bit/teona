@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cate, forma } from "@/lib/numere-ro";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
@@ -162,7 +163,7 @@ async function Continut({
         <Cifra
           eticheta="Încasat"
           valoare={scrieSuma(totaluri.valoareIncasata / 100)}
-          nota={`${totaluri.incasate} contracte`}
+          nota={cate(totaluri.incasate, "contract", "contracte")}
         />
         <Cifra
           eticheta="Semnate, bani neintrați"
