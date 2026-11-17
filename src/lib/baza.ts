@@ -645,6 +645,8 @@ const ADAOSURI = `
   */
   ALTER TABLE atasamente_firme ADD COLUMN IF NOT EXISTS cheie_r2 text;
   ALTER TABLE atasamente_firme ALTER COLUMN continut DROP NOT NULL;
+  /* Cheia cu care e criptat fisierul (f1 = CHEIE_FISIERE, s1 = derivata din SECRET_SESIUNE); NULL = necriptat (cele vechi). */
+  ALTER TABLE atasamente_firme ADD COLUMN IF NOT EXISTS criptat text;
   /* Raspunsul fara e-mailul citat si fara semnatura; html ramane intreg, pentru Arata tot. */
   ALTER TABLE mesaje_firme ADD COLUMN IF NOT EXISTS html_nou text;
   /* Firma scoasa din liste, dar pastrata (are contracte sau donatii): stergerea ei ar rupe registrul si rapoartele. */

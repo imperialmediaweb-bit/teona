@@ -1,6 +1,6 @@
 import { curataHtml } from "@/lib/curata-html";
 import { cate, forma } from "@/lib/numere-ro";
-import type { Mesaj } from "@/lib/mesaje-firme";
+import { doarRaspunsul, type Mesaj } from "@/lib/mesaje-firme";
 
 const cand = (iso: string) =>
   new Intl.DateTimeFormat("ro-RO", {
@@ -49,8 +49,14 @@ function Stare({ m }: { m: Mesaj }) {
   );
 }
 
-export default function MesajFirma({ m }: { m: Mesaj }) {
-  const trimis = m.directie === "trimis";
+export default function MesajFirma({ m: mesaj }: { m: Mesaj }) {
+  const trimis = mesaj.directie === "trimis";
+  /*
+    Răspunsurile venite înainte de 17 noiembrie 2026 n-au `htmlNou`: se taie
+    aici, la afișare, după semnele care rămân și după curățare („On … wrote:”,
+    citatul, „-----Original Message-----”).
+  */
+  const m = !trimis && !mesaj.htmlNou ? { ...mesaj, htmlNou: doarRaspunsul(mesaj.html) } : mesaj;
   return (
     <article
       data-mesaj={m.directie}

@@ -1,5 +1,6 @@
 import { createHmac, randomUUID } from "node:crypto";
 import { areR2, legaturaSemnata, stergeDinR2, urcaInR2 } from "@/lib/r2";
+import { cripteaza, decripteaza } from "@/lib/criptare-fisiere";
 import { intreaba } from "@/lib/baza";
 import { cheiaDeSemnat, semnaturaLinkuluiTine, semneazaText } from "@/lib/cheie-semnare";
 import { curataHtml } from "@/lib/curata-html";
@@ -617,12 +618,25 @@ export async function marcheazaNelegateCitite(ids: string[]): Promise<void> {
 
 export async function atasamentul(id: string): Promise<{ nume: string; tip: string; continut: Buffer } | null> {
   if (!/^\d{1,18}$/.test(id)) return null;
-  const [r] = await intreaba<{ nume: string; tip: string; continut: Buffer | null; cheie_r2: string | null }>(
-    `SELECT nume, tip, continut, cheie_r2 FROM atasamente_firme WHERE id = $1`,
+  const [r] = await intreaba<{ nume: string; tip: string; continut: Buffer | null; cheie_r2: string | null; criptat: string | null }>(
+    `SELECT nume, tip, continut, cheie_r2, criptat FROM atasamente_firme WHERE id = $1`,
     [id],
   );
   if (!r) return null;
-  if (r.continut) return { nume: r.nume, tip: r.tip, continut: r.continut };
+  const deschis = (b: Buffer): Buffer | null => {
+    if (!r.criptat) return b;
+    try {
+      return decripteaza(b, r.criptat);
+    } catch (e) {
+      console.error(`[mesaje-firme] atașamentul ${id} nu se poate decripta: ${(e as Error).message}`);
+      return null;
+    }
+  };
+  const deschide = (b: Buffer) => {
+    const c = deschis(b);
+    return c ? { nume: r.nume, tip: r.tip, continut: c } : null;
+  };
+  if (r.continut) return deschide(r.continut);
   if (!r.cheie_r2) return null;
   // Din R2, printr-o legătură semnată de două minute, citită aici: omul vede adresa panoului, nu pe a depozitului.
   const leg = legaturaSemnata(r.cheie_r2, 120);
@@ -632,7 +646,7 @@ export async function atasamentul(id: string): Promise<{ nume: string; tip: stri
     console.warn(`[mesaje-firme] R2 a răspuns ${raspuns?.status ?? "nimic"} la atașamentul ${id}`);
     return null;
   }
-  return { nume: r.nume, tip: r.tip, continut: Buffer.from(await raspuns.arrayBuffer()) };
+  return deschide(Buffer.from(await raspuns.arrayBuffer()));
 }
 
 /**
@@ -642,10 +656,13 @@ export async function atasamentul(id: string): Promise<{ nume: string; tip: stri
  */
 async function puneAtasament(mesajId: string, a: FisierAtasat): Promise<void> {
   const nume = a.nume.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9._-]+/g, "_").slice(-80) || "fisier";
-  const cheie = areR2() ? await urcaInR2(`firme/${mesajId}/${randomUUID()}-${nume}`, a.continut, a.tip) : null;
+  // Criptat aici, înainte de R2: în depozit ajung numai octeți fără sens (`lib/criptare-fisiere.ts`).
+  const c = cripteaza(a.continut);
+  const date = c ? c.date : Buffer.from(a.continut);
+  const cheie = areR2() && c ? await urcaInR2(`firme/${mesajId}/${randomUUID()}-${nume}`, date, "application/octet-stream") : null;
   await intreaba(
-    `INSERT INTO atasamente_firme (mesaj_id, nume, tip, marime, continut, cheie_r2) VALUES ($1,$2,$3,$4,$5,$6)`,
-    [mesajId, a.nume, a.tip, a.continut.byteLength, cheie ? null : Buffer.from(a.continut), cheie],
+    `INSERT INTO atasamente_firme (mesaj_id, nume, tip, marime, continut, cheie_r2, criptat) VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+    [mesajId, a.nume, a.tip, a.continut.byteLength, cheie ? null : date, cheie, c?.cheie ?? null],
   );
 }
 
@@ -709,7 +726,10 @@ const INCEPUT_CITAT = [
   /<blockquote/i,
   /-----\s*(?:Original Message|Mesaj original|Mesajul original)\s*-----/i,
   /(?:<b>|<strong>)?\s*(?:From|De la|Från|Von)\s*:\s*(?:<\/b>|<\/strong>)?[^<]{0,200}@/i,
-  /(?:On|Pe|În|Le|Am)\s[^<]{6,240}?(?:wrote|a scris|scrie|écrit|schrieb)\s*:/i,
+  // „On Tue, 17 Nov … <contact@…> wrote:” — și cu linkuri sau &lt;…&gt; în mijloc.
+  /(?:On|Pe|În|Le|Am)\s(?:[^<]|<[^>]*>){6,400}?(?:wrote|a scris|scrie|écrit|schrieb)\s*:/i,
+  // Rânduri citate cu „>”, după ce textul simplu a devenit HTML („&gt; ”).
+  /(?:^|<p>|<br\s*\/?>|\n)\s*&gt;\s/i,
   /(?:^|>|\n)--\s*(?:<br\s*\/?>|\n)/i,
 ];
 

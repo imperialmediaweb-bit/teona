@@ -1442,11 +1442,21 @@ există trimitere unu-la-unu și nici atașamente. Pleacă prin Resend
   (`tipDupaNume` când a venit „octet-stream”). `curata-proba` le șterge și
   din R2. Probele pornesc un R2 de mențiune pe `http://127.0.0.1:4395`
   (`R2_ENDPOINT` cu `http://` e primit numai pentru 127.0.0.1/localhost).
+- **Atașamentele sunt criptate de site înainte de R2** (`lib/criptare-fisiere.ts`,
+  AES-256-GCM): în depozit ajung numai octeți fără sens, iar cheia stă în
+  Railway, nu în Cloudflare — cine are cheile de acces la R2 tot nu le
+  poate citi. Cheia e `CHEIE_FISIERE` sau, fără ea, una derivată din
+  `SECRET_SESIUNE` (HKDF); rândul ține care (`atasamente_firme.criptat`:
+  „f1”/„s1”; NULL la cele vechi, necriptate). **Cheia nu se schimbă și nu se
+  șterge**: fișierele criptate cu ea nu se mai deschid. Tot ce va avea date
+  personale în R2 (un Formular 230 completat, de pildă) trece pe aici.
 - **Răspunsul se vede fără e-mailul citat**: la primire, `doarRaspunsul`
   (HTML, înainte de curățare — curățarea scoate clasele `gmail_quote`,
   `gmail_signature`…) sau `doarRaspunsulText` taie la citat sau semnătură, în
-  `html_nou`; `html` rămâne întreg și se deschide sub „Arată tot”.
-  Probă: `scratchpad/mf/r2.mjs` (14).
+  `html_nou`; `html` rămâne întreg și se deschide sub „Arată tot”. Cele
+  primite înainte (fără `html_nou`) se taie la afișare, în `MesajFirma`, după
+  semnele care rezistă curățării („On … wrote:” cu linkuri în el, „&gt; ”).
+  Probă: `scratchpad/mf/r2.mjs` (19).
 - **„Nu mai doresc mesaje”**: jos în fiecare e-mail către o firmă se pune
   singur rândul „Dacă nu doriți să mai primiți mesaje de la noi, apăsați
   aici sau răspundeți cu „NU”…” (`corpScrisoare`), plus antetul
