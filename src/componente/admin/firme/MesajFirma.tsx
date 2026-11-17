@@ -66,7 +66,18 @@ export default function MesajFirma({ m }: { m: Mesaj }) {
         <time className="text-nota text-cerneala-slab">{cand(m.creatLa)}</time>
       </header>
       <p className="font-titlu text-mic font-bold text-cerneala [overflow-wrap:anywhere]">{m.subiect}</p>
-      <div className="text-bogat text-mic break-words" dangerouslySetInnerHTML={{ __html: curataHtml(m.html) || "" }} />
+      {m.htmlNou ? (
+        <>
+          {/* Numai ce a scris omul acum; e-mailul citat și semnătura stau dedesubt, strânse. */}
+          <div data-raspuns-nou className="text-bogat text-mic break-words" dangerouslySetInnerHTML={{ __html: curataHtml(m.htmlNou) || "" }} />
+          <details data-tot className="text-mic">
+            <summary className="cursor-pointer select-none text-nota font-semibold text-cerneala-moale underline underline-offset-2">Arată tot</summary>
+            <div className="text-bogat mt-3 border-l-2 border-hartie-umbra pl-3 break-words text-cerneala-moale" dangerouslySetInnerHTML={{ __html: curataHtml(m.html) || "" }} />
+          </details>
+        </>
+      ) : (
+        <div className="text-bogat text-mic break-words" dangerouslySetInnerHTML={{ __html: curataHtml(m.html) || "" }} />
+      )}
       {!m.html.trim() && m.text && <p className="whitespace-pre-line text-mic text-cerneala-moale">{m.text}</p>}
       {m.atasamente.length > 0 && (
         <ul className="flex flex-wrap gap-2">

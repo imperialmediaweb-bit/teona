@@ -2,6 +2,7 @@ import { cineEsteConectat } from "@/lib/admin";
 import { intreaba } from "@/lib/baza";
 import { raspuns } from "@/lib/api";
 import { adresaDeProba } from "@/lib/proba";
+import { stergeAtasamenteleDinR2 } from "@/lib/mesaje-firme";
 
 /**
  * Curățenia de după o probă automată pe site-ul adevărat.
@@ -32,6 +33,8 @@ export async function POST() {
 
   await sterge("contracte", "DELETE FROM contracte WHERE firma_id IN (SELECT id FROM firme WHERE lower(email) = lower($1))");
   await sterge("interactiuni", "DELETE FROM interactiuni WHERE lower(email) = lower($1) OR firma_id IN (SELECT id FROM firme WHERE lower(email) = lower($1))");
+  // Fișierele din R2 întâi: după ștergerea firmei, rândurile care le arătau nu mai există.
+  await stergeAtasamenteleDinR2(e);
   await sterge("firme", "DELETE FROM firme WHERE lower(email) = lower($1)");
   // Mesajele cu firmele se duc odată cu firma; adresa oprită rămâne, deci se scoate aici.
   await sterge("adrese_oprite", "DELETE FROM adrese_oprite WHERE email = lower($1)");

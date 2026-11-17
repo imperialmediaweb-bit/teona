@@ -1,4 +1,5 @@
-import { createHmac } from "node:crypto";
+import { createHmac, randomUUID } from "node:crypto";
+import { areR2, legaturaSemnata, stergeDinR2, urcaInR2 } from "@/lib/r2";
 import { intreaba } from "@/lib/baza";
 import { cheiaDeSemnat, semnaturaLinkuluiTine, semneazaText } from "@/lib/cheie-semnare";
 import { curataHtml } from "@/lib/curata-html";
@@ -42,6 +43,8 @@ export type Mesaj = {
   catre: string;
   subiect: string;
   html: string;
+  /** La un răspuns: numai textul nou, fără e-mailul citat și fără semnătură. */
+  htmlNou: string | null;
   text: string;
   trimisDe: string | null;
   creatLa: string;
@@ -276,18 +279,20 @@ export function corpScrisoare(
 <div style="max-width:640px;">
 ${curat}
 ${campanii.map(cardCampanie).join("\n")}
-${interes || refuz ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:22px 0 0;"><tr>
-${interes ? `<td bgcolor="#b82b09" style="border-radius:999px;"><a href="${scapa(interes)}" style="display:inline-block;padding:11px 22px;font-family:${FONT};font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:999px;">Da, ne interesează</a></td><td style="width:10px;"></td>` : ""}
-${refuz ? `<td style="border:1px solid #cfd3d8;border-radius:999px;"><a href="${scapa(refuz)}" style="display:inline-block;padding:10px 20px;font-family:${FONT};font-size:14px;color:#616161;text-decoration:none;border-radius:999px;">Nu mai doresc mesaje</a></td>` : ""}
-</tr></table>` : ""}
-<p style="margin:18px 0 0;font-family:${FONT};font-size:13px;line-height:1.6;color:#616161;">Dacă nu doriți să mai primiți mesaje de la noi, ${refuz ? `<a href="${scapa(refuz)}" style="color:#616161;text-decoration:underline;">apăsați aici</a>` : "răspundeți la acest e-mail cu „NU”"}${refuz ? " sau răspundeți la acest e-mail cu „NU”" : ""} și nu vă mai scriem.</p>
+<p style="margin:22px 0 0;font-family:${FONT};font-size:13px;line-height:1.6;color:#616161;">${refuz ? `Dacă nu doriți să mai primiți mesaje de la noi, <a href="${scapa(refuz)}" style="color:#616161;text-decoration:underline;">apăsați aici</a>.` : "Dacă nu doriți să mai primiți mesaje de la noi, răspundeți la acest e-mail cu „NU”."}</p>
 <div style="margin-top:22px;padding-top:12px;border-top:1px solid #e6e8ec;">
 ${semnatura.map((s, i) => `<p style="${mic}${i === 0 ? "font-weight:bold;color:#232323;" : ""}">${scapa(s)}</p>`).join("\n")}
 </div></div></body></html>`;
-  const interesText = interes ? `Vă interesează? Apăsați aici: ${interes}` : "";
-  const refuzText = `Dacă nu doriți să mai primiți mesaje de la noi${refuz ? `, deschideți ${refuz} sau` : ","} răspundeți la acest e-mail cu „NU” și nu vă mai scriem.`;
+  /*
+    Fără butoane (17 noiembrie 2026, după proba în Gmail): o scrisoare cu
+    butoane colorate arată a reclamă și ajunge la „Promoții”. Rămâne un
+    singur rând, scurt, cu linkul de refuz.
+  */
+  const refuzText = refuz
+    ? `Dacă nu doriți să mai primiți mesaje de la noi, deschideți: ${refuz}`
+    : "Dacă nu doriți să mai primiți mesaje de la noi, răspundeți la acest e-mail cu „NU”.";
   const campaniiText = campanii.map((c) => `${c.titlu}: ${linkCampanie(c)}`);
-  return { html, text: [...textSimplu(htmlScris), ...campaniiText, ...(interesText ? [interesText] : []), refuzText, "", "--", ...semnatura].join("\n\n") };
+  return { html, text: [...textSimplu(htmlScris), ...campaniiText, refuzText, "", "--", ...semnatura].join("\n\n") };
 }
 
 /* ── Campaniile de pe site, puse în e-mail ──────────────────────────── */
@@ -412,10 +417,7 @@ export async function trimiteFirmei(d: {
     [d.firma.id, dela, [d.catre].flat().join(", "), subiect, curataHtml(personalizeaza(d.html, d.firma, true) + (d.campanii ?? []).map((c) => `<p>Campania: <a href="${scapa(linkCampanie(c))}">${scapa(c.titlu)}</a></p>`).join("")), text, r.id, d.trimisDe, d.lot ?? null],
   );
   for (const a of d.atasamente) {
-    await intreaba(
-      `INSERT INTO atasamente_firme (mesaj_id, nume, tip, marime, continut) VALUES ($1,$2,$3,$4,$5)`,
-      [rand.id, a.nume, a.tip, a.continut.byteLength, Buffer.from(a.continut)],
-    );
+    await puneAtasament(String(rand.id), a);
   }
   await scrieInteractiune({
     firmaId: d.firma.id,
@@ -435,6 +437,7 @@ type RandMesaj = {
   catre: string;
   subiect: string;
   html: string;
+  html_nou: string | null;
   text_simplu: string;
   trimis_de: string | null;
   creat_la: Date;
@@ -456,7 +459,7 @@ export async function mesajeleFirmei(firmaId: string): Promise<Mesaj[]> {
 
 async function citeste(unde: string, parametri: unknown[]): Promise<Mesaj[]> {
   const randuri = await intreaba<RandMesaj>(
-    `SELECT id, directie, de_la, catre, subiect, html, text_simplu, trimis_de, creat_la, livrat_la,
+    `SELECT id, directie, de_la, catre, subiect, html, html_nou, text_simplu, trimis_de, creat_la, livrat_la,
             deschis_la, deschideri, clic_la, clicuri, ultimul_link, respins, citit_la
        FROM mesaje_firme WHERE ${unde}`,
     parametri,
@@ -475,6 +478,7 @@ async function citeste(unde: string, parametri: unknown[]): Promise<Mesaj[]> {
     catre: r.catre,
     subiect: r.subiect,
     html: r.html,
+    htmlNou: r.html_nou ?? null,
     text: r.text_simplu,
     trimisDe: r.trimis_de,
     creatLa: r.creat_la.toISOString(),
@@ -585,11 +589,122 @@ export async function marcheazaNelegateCitite(ids: string[]): Promise<void> {
 
 export async function atasamentul(id: string): Promise<{ nume: string; tip: string; continut: Buffer } | null> {
   if (!/^\d{1,18}$/.test(id)) return null;
-  const [r] = await intreaba<{ nume: string; tip: string; continut: Buffer }>(
-    `SELECT nume, tip, continut FROM atasamente_firme WHERE id = $1`,
+  const [r] = await intreaba<{ nume: string; tip: string; continut: Buffer | null; cheie_r2: string | null }>(
+    `SELECT nume, tip, continut, cheie_r2 FROM atasamente_firme WHERE id = $1`,
     [id],
   );
-  return r ?? null;
+  if (!r) return null;
+  if (r.continut) return { nume: r.nume, tip: r.tip, continut: r.continut };
+  if (!r.cheie_r2) return null;
+  // Din R2, printr-o legătură semnată de două minute, citită aici: omul vede adresa panoului, nu pe a depozitului.
+  const leg = legaturaSemnata(r.cheie_r2, 120);
+  if (!leg) return null;
+  const raspuns = await fetch(leg, { signal: AbortSignal.timeout(30_000) }).catch(() => null);
+  if (!raspuns?.ok) {
+    console.warn(`[mesaje-firme] R2 a răspuns ${raspuns?.status ?? "nimic"} la atașamentul ${id}`);
+    return null;
+  }
+  return { nume: r.nume, tip: r.tip, continut: Buffer.from(await raspuns.arrayBuffer()) };
+}
+
+/**
+ * Pune un atașament: în R2 dacă e configurat, în baza de date numai dacă R2
+ * lipsește sau n-a răspuns — un fișier primit de la o firmă nu se pierde
+ * pentru că depozitul a tăcut o clipă.
+ */
+async function puneAtasament(mesajId: string, a: FisierAtasat): Promise<void> {
+  const nume = a.nume.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9._-]+/g, "_").slice(-80) || "fisier";
+  const cheie = areR2() ? await urcaInR2(`firme/${mesajId}/${randomUUID()}-${nume}`, a.continut, a.tip) : null;
+  await intreaba(
+    `INSERT INTO atasamente_firme (mesaj_id, nume, tip, marime, continut, cheie_r2) VALUES ($1,$2,$3,$4,$5,$6)`,
+    [mesajId, a.nume, a.tip, a.continut.byteLength, cheie ? null : Buffer.from(a.continut), cheie],
+  );
+}
+
+/** Tipul unui fișier după extensie, când cine l-a trimis n-a spus altul. */
+export function tipDupaNume(nume: string): string {
+  const ext = nume.toLowerCase().match(/\.([a-z0-9]{2,5})$/)?.[1] ?? "";
+  const tipuri: Record<string, string> = {
+    pdf: "application/pdf",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    webp: "image/webp",
+    gif: "image/gif",
+    doc: "application/msword",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    xls: "application/vnd.ms-excel",
+    xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ppt: "application/vnd.ms-powerpoint",
+    pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    txt: "text/plain",
+    zip: "application/zip",
+  };
+  return tipuri[ext] ?? "application/octet-stream";
+}
+
+/** Șterge din R2 atașamentele firmelor cu adresa dată, înainte ca rândurile lor să dispară. */
+export async function stergeAtasamenteleDinR2(email: string): Promise<void> {
+  const chei = await intreaba<{ cheie_r2: string }>(
+    `SELECT a.cheie_r2 FROM atasamente_firme a JOIN mesaje_firme m ON m.id = a.mesaj_id JOIN firme f ON f.id = m.firma_id
+      WHERE lower(f.email) = lower($1) AND a.cheie_r2 IS NOT NULL`,
+    [email],
+  ).catch(() => []);
+  for (const c of chei) await stergeDinR2(c.cheie_r2).catch(() => false);
+}
+
+/* ── Răspunsul, fără e-mailul citat ────────────────────────────────── */
+
+/*
+  Unde începe partea citată sau semnătura, în HTML-ul trimis de Gmail,
+  Outlook, Apple Mail, Yahoo, Thunderbird. Se caută înainte de curățare:
+  curățarea scoate clasele după care se recunosc.
+*/
+const INCEPUT_CITAT = [
+  /<div[^>]*class="[^"]*gmail_quote/i,
+  /<div[^>]*(?:class="[^"]*gmail_signature|data-smartmail="gmail_signature")/i,
+  /<span[^>]*class="[^"]*gmail_signature_prefix/i,
+  /<blockquote[^>]*type="cite"/i,
+  /<div[^>]*id="(?:divRplyFwdMsg|appendonsend|mail-editor-reference-message-container|Signature)"/i,
+  /<div[^>]*class="[^"]*(?:yahoo_quoted|moz-cite-prefix|moz-signature|OutlookMessageHeader)/i,
+  /<hr[^>]*id="?stopSpelling/i,
+  /<blockquote/i,
+  /-----\s*(?:Original Message|Mesaj original|Mesajul original)\s*-----/i,
+  /(?:<b>|<strong>)?\s*(?:From|De la|Från|Von)\s*:\s*(?:<\/b>|<\/strong>)?[^<]{0,200}@/i,
+  /(?:On|Pe|În|Le|Am)\s[^<]{6,240}?(?:wrote|a scris|scrie|écrit|schrieb)\s*:/i,
+  /(?:^|>|\n)--\s*(?:<br\s*\/?>|\n)/i,
+];
+
+/**
+ * Numai textul nou dintr-un răspuns: totul până la primul semn de citat sau
+ * semnătură. `null` când nu se găsește niciun semn sau când ce rămâne n-are
+ * text — atunci panoul arată răspunsul întreg, ca înainte.
+ */
+export function doarRaspunsul(htmlBrut: string): string | null {
+  let taie = -1;
+  for (const re of INCEPUT_CITAT) {
+    const m = re.exec(htmlBrut);
+    if (m && (taie < 0 || m.index < taie)) taie = m.index;
+  }
+  if (taie < 0) return null;
+  const nou = curataHtml(htmlBrut.slice(0, taie));
+  return textSimplu(nou).join(" ").trim().length >= 2 ? nou : null;
+}
+
+/** Același lucru pentru un răspuns venit numai ca text simplu. */
+export function doarRaspunsulText(text: string): string | null {
+  const randuri = text.split(/\r?\n/);
+  const i = randuri.findIndex(
+    (r) =>
+      /^\s*>/.test(r) ||
+      /^-- ?$/.test(r) ||
+      /^-{3,}\s*(Original Message|Mesaj original)/i.test(r) ||
+      /^(On|Pe|În|Le|Am)\s.{6,240}(wrote|a scris|scrie|écrit|schrieb)\s*:\s*$/i.test(r) ||
+      /^(From|De la)\s*:/i.test(r),
+  );
+  if (i <= 0) return null;
+  const nou = randuri.slice(0, i).join("\n").trim();
+  return nou.length >= 2 ? nou : null;
 }
 
 /* ── Ce anunță Resend ────────────────────────────────────────────────── */
@@ -623,22 +738,21 @@ export async function salveazaPrimit(d: {
   catre: string;
   subiect: string;
   html: string;
+  /** Numai textul nou (fără citat și semnătură), dacă s-a putut despărți. */
+  htmlNou?: string | null;
   text: string;
   atasamente: FisierAtasat[];
 }): Promise<string | null> {
   const randuri = await intreaba<{ id: string }>(
-    `INSERT INTO mesaje_firme (firma_id, directie, de_la, catre, subiect, html, text_simplu, resend_id)
-     VALUES ($1,'primit',$2,$3,$4,$5,$6,$7)
+    `INSERT INTO mesaje_firme (firma_id, directie, de_la, catre, subiect, html, html_nou, text_simplu, resend_id)
+     VALUES ($1,'primit',$2,$3,$4,$5,$6,$7,$8)
      ON CONFLICT (resend_id) DO NOTHING RETURNING id`,
-    [d.firmaId, d.deLa, d.catre, d.subiect, d.html, d.text, d.resendId],
+    [d.firmaId, d.deLa, d.catre, d.subiect, d.html, d.htmlNou ?? null, d.text, d.resendId],
   );
   const id = randuri[0]?.id;
   if (!id) return null; // același anunț, a doua oară
   for (const a of d.atasamente) {
-    await intreaba(
-      `INSERT INTO atasamente_firme (mesaj_id, nume, tip, marime, continut) VALUES ($1,$2,$3,$4,$5)`,
-      [id, a.nume, a.tip, a.continut.byteLength, Buffer.from(a.continut)],
-    );
+    await puneAtasament(String(id), a);
   }
   return String(id);
 }

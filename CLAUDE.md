@@ -1429,6 +1429,24 @@ există trimitere unu-la-unu și nici atașamente. Pleacă prin Resend
   blochează); „a apăsat pe link” e un semn mai bun, dar nici el sigur
   (scanerele firmelor — Safe Links, Mimecast — apasă singure pe linkuri);
   sigur e numai un răspuns. Scrie și pe pagină.
+- **Fără butoane în e-mail** (17 noiembrie 2026, după proba în Gmail: cu
+  butoane colorate, e-mailul ajungea la „Promoții”): jos rămâne un singur
+  rând, „Dacă nu doriți să mai primiți mesaje de la noi, apăsați aici.”, cu
+  linkul de refuz; antetele `List-Unsubscribe` rămân. Pagina
+  `/raspuns-firma` rămâne, pentru e-mailurile plecate înainte.
+- **Atașamentele stau în R2** (`cheie_r2`, sub `firme/<mesaj>/`), cele trimise
+  și cele primite; în baza de date (`continut`) numai cele vechi și cele pe
+  care R2 nu le-a primit — un fișier de la o firmă nu se pierde pentru că
+  depozitul a tăcut. Se citesc prin ruta panoului, cu legătură semnată de
+  două minute; PDF-urile și pozele se deschid în browser, cu tipul real
+  (`tipDupaNume` când a venit „octet-stream”). `curata-proba` le șterge și
+  din R2. Probele pornesc un R2 de mențiune pe `http://127.0.0.1:4395`
+  (`R2_ENDPOINT` cu `http://` e primit numai pentru 127.0.0.1/localhost).
+- **Răspunsul se vede fără e-mailul citat**: la primire, `doarRaspunsul`
+  (HTML, înainte de curățare — curățarea scoate clasele `gmail_quote`,
+  `gmail_signature`…) sau `doarRaspunsulText` taie la citat sau semnătură, în
+  `html_nou`; `html` rămâne întreg și se deschide sub „Arată tot”.
+  Probă: `scratchpad/mf/r2.mjs` (14).
 - **„Nu mai doresc mesaje”**: jos în fiecare e-mail către o firmă se pune
   singur rândul „Dacă nu doriți să mai primiți mesaje de la noi, apăsați
   aici sau răspundeți cu „NU”…” (`corpScrisoare`), plus antetul

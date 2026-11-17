@@ -43,6 +43,11 @@ function config() {
     gazda: adresa
       ? adresa.replace(/^https?:\/\//, "").replace(/\/+$/, "")
       : `${cont}.r2.cloudflarestorage.com`,
+    /*
+      Numai probele pun `http://127.0.0.1:…` (un depozit de mențiune); un
+      depozit adevărat merge mereu pe https.
+    */
+    schema: adresa && /^http:\/\/(127\.0\.0\.1|localhost)[:/]/.test(adresa) ? "http" : "https",
   };
 }
 
@@ -172,7 +177,7 @@ export async function urcaInR2(
   });
 
   try {
-    const raspuns = await fetch(`https://${c.gazda}${cale}`, {
+    const raspuns = await fetch(`${c.schema}://${c.gazda}${cale}`, {
       method: "PUT",
       headers: {
         ...antete,
@@ -233,7 +238,7 @@ export function legaturaSemnata(cheie: string, secunde = 600): string | null {
     secret: c.secret,
   });
 
-  return `https://${c.gazda}${cale}?${parametri.toString()}&X-Amz-Signature=${semnatura}`;
+  return `${c.schema}://${c.gazda}${cale}?${parametri.toString()}&X-Amz-Signature=${semnatura}`;
 }
 
 /** Șterge un fișier. `true` dacă nu mai e acolo. */
@@ -264,7 +269,7 @@ export async function stergeDinR2(cheie: string): Promise<boolean> {
   });
 
   try {
-    const raspuns = await fetch(`https://${c.gazda}${cale}`, {
+    const raspuns = await fetch(`${c.schema}://${c.gazda}${cale}`, {
       method: "DELETE",
       headers: {
         ...antete,

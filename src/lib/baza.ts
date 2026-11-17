@@ -639,6 +639,14 @@ const ADAOSURI = `
     continut  bytea NOT NULL
   );
   CREATE INDEX IF NOT EXISTS atasamente_firme_dupa_mesaj ON atasamente_firme (mesaj_id);
+  /*
+    Atasamentele stau in R2 (cheie_r2), nu in baza de date; continut ramane
+    numai pentru cele de dinainte si pentru cand R2 nu raspunde la urcare.
+  */
+  ALTER TABLE atasamente_firme ADD COLUMN IF NOT EXISTS cheie_r2 text;
+  ALTER TABLE atasamente_firme ALTER COLUMN continut DROP NOT NULL;
+  /* Raspunsul fara e-mailul citat si fara semnatura; html ramane intreg, pentru Arata tot. */
+  ALTER TABLE mesaje_firme ADD COLUMN IF NOT EXISTS html_nou text;
   /* Firma care a cerut să nu mai primească e-mailuri din panou: de atunci nu i se mai trimite nimic. */
   ALTER TABLE firme ADD COLUMN IF NOT EXISTS fara_emailuri_la timestamptz;
   /*

@@ -7,7 +7,10 @@ import {
   evenimentTrimis,
   firmaDinAdresa,
   firmaDupaEmail,
+  doarRaspunsul,
+  doarRaspunsulText,
   salveazaPrimit,
+  tipDupaNume,
   type FisierAtasat,
 } from "@/lib/mesaje-firme";
 import { notificaPanoul } from "@/lib/notificari";
@@ -106,7 +109,8 @@ async function raspunsPrimit(d: Primit): Promise<void> {
     total += continut.byteLength;
     atasamente.push({
       nume: (a.filename || "fisier").replace(/[\\/\r\n"]/g, "_").slice(0, 150),
-      tip: a.content_type || "application/octet-stream",
+      // Unii clienți trimit orice fișier ca „octet-stream”: atunci tipul se ia după extensie.
+      tip: a.content_type && a.content_type !== "application/octet-stream" ? a.content_type : tipDupaNume(a.filename ?? ""),
       continut,
     });
   }
@@ -120,6 +124,13 @@ async function raspunsPrimit(d: Primit): Promise<void> {
         .map((p) => `<p>${curat(p).replace(/\n/g, "<br />")}</p>`)
         .join("");
   const subiect = (plin?.subject ?? d.subject ?? "(fără subiect)").slice(0, 300);
+  // E-mailul întreg rămâne în `html`; în panou se vede întâi numai ce e nou.
+  const htmlNou = corpHtml.trim()
+    ? doarRaspunsul(corpHtml)
+    : (() => {
+        const t = doarRaspunsulText(textPlin);
+        return t ? t.split(/\n{2,}/).map((p) => `<p>${curat(p).replace(/\n/g, "<br />")}</p>`).join("") : null;
+      })();
 
   const id = await salveazaPrimit({
     resendId: d.email_id,
@@ -128,6 +139,7 @@ async function raspunsPrimit(d: Primit): Promise<void> {
     catre: pentru[0] ?? "",
     subiect,
     html,
+    htmlNou,
     text: textPlin.slice(0, 100_000),
     atasamente,
   });
