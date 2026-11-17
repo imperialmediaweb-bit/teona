@@ -198,6 +198,20 @@ export async function adaugaLead(d: {
   }
   const cui = d.cui ? normalizeazaCui(d.cui) : `fara-cui-${crypto.randomUUID().slice(0, 8)}`;
   /*
+    Cu CUI, dar firma e deja aici ca lead fără CUI, cu aceeași adresă: îi pune
+    CUI-ul, ca e-mailurile să rămână într-o singură fișă (ca `salveazaFirma`).
+  */
+  if (d.cui) {
+    const [pus] = await intreaba<{ id: string; refuza: boolean }>(
+      `UPDATE firme SET cui = $1, schimbat_la = now()
+        WHERE id = (SELECT id FROM firme WHERE cui LIKE 'fara-cui-%' AND lower(email) = lower($2) ORDER BY creat_la LIMIT 1)
+          AND NOT EXISTS (SELECT 1 FROM firme WHERE cui = $1)
+        RETURNING id, fara_emailuri_la IS NOT NULL AS refuza`,
+      [cui, d.email],
+    );
+    if (pus) return { id: pus.id, eraDeja: true, refuza: pus.refuza };
+  }
+  /*
     O adresă care a spus „nu” rămâne „nu”, oricum ar fi adăugată din nou
     (alt nume, fără CUI): firma nouă se naște deja oprită.
   */

@@ -15,6 +15,7 @@ import {
 } from "@/lib/contract";
 import { numarPentruContract, numarScrisDeMana } from "@/lib/contracte";
 import { citesteSuma } from "@/lib/suma";
+import { cuiValid, curataCui } from "@/lib/cui";
 import { inBani } from "@/date/plati";
 import { contractWord } from "@/lib/contract-word";
 
@@ -66,6 +67,11 @@ export async function POST(cerere: Request) {
   const cuiScris = normalizeazaCui(camp("cui"));
   if (!cuiScris && firma.cui.startsWith("fara-cui-")) {
     return nuTrece("Scrie CUI-ul firmei. Fișa ei n-are încă unul.");
+  }
+  if (cuiScris && firma.cui.startsWith("fara-cui-")) {
+    // Rămâne pentru totdeauna în fișă: se verifică cu cifra de control, ca la lead.
+    const nr = curataCui(cuiScris);
+    if (nr === null || !cuiValid(nr)) return nuTrece("CUI-ul nu e scris corect. Verifică cifrele.");
   }
   const cuiContract = cuiScris || firma.cui;
   if (cuiScris && firma.cui.startsWith("fara-cui-")) {

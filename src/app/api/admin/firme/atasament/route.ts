@@ -10,8 +10,12 @@ export async function GET(cerere: Request) {
   const id = new URL(cerere.url).searchParams.get("id") ?? "";
   const a = await atasamentul(id);
   if (!a) return raspuns("Fișierul nu există.", 404);
-  // Pozele și PDF-urile se deschid în browser; restul se descarcă.
-  const inline = /^image\/(jpeg|png|webp|gif)$|^application\/pdf$/.test(a.tip);
+  /*
+    Pozele se deschid în browser; restul, PDF-urile incluse, se descarcă:
+    cititorul de PDF din Chrome nu se deschide sub `sandbox` (o pagină albă),
+    iar fără `sandbox` un PDF primit de la oricine ar rula în adresa panoului.
+  */
+  const inline = /^image\/(jpeg|png|webp|gif)$/.test(a.tip);
   const nume = encodeURIComponent(a.nume);
   return new Response(new Uint8Array(a.continut), {
     headers: {

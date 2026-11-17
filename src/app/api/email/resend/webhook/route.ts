@@ -134,6 +134,12 @@ async function raspunsPrimit(d: Primit): Promise<void> {
   if (!id) return; // același anunț, a doua oară
 
   const fi = firmaId ? await citesteFirma(firmaId) : null;
+  /*
+    Un răspuns nelegat poate fi și spam trimis la întâmplare pe domeniul de
+    răspunsuri: se păstrează oricum, dar anunțurile pentru ele sunt cel mult
+    trei pe oră, ca un val de spam să nu sune telefoanele toată noaptea.
+  */
+  if (!fi && !locDeAnuntNelegat()) return;
   const cine = fi?.denumire ?? deLa;
   const unde = fi ? `/admin/firme/${fi.id}/mesaje` : "/admin/firme/mesaje";
   await notificaPanoul({ titlu: `Răspuns de la ${cine}`, text: subiect, adresa: unde }).catch(() => 0);
@@ -151,6 +157,15 @@ async function raspunsPrimit(d: Primit): Promise<void> {
     html: paginaInterna(`Răspuns de la ${cine}`, corp, subiect),
     text: `${cine} a răspuns: ${subiect}\n\n${textPlin.slice(0, 2000)}\n\n${ADRESA_SITE}${unde}`,
   }).catch(() => false);
+}
+
+const anunturiNelegate: number[] = [];
+function locDeAnuntNelegat(): boolean {
+  const acum = Date.now();
+  while (anunturiNelegate.length && acum - anunturiNelegate[0] > 60 * 60 * 1000) anunturiNelegate.shift();
+  if (anunturiNelegate.length >= 3) return false;
+  anunturiNelegate.push(acum);
+  return true;
 }
 
 export async function POST(cerere: Request) {

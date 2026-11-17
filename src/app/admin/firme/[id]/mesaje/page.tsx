@@ -106,7 +106,7 @@ async function Continut({
         )}
         {era && (
           <p role="status" className="mb-4 colt-mic-a bg-hartie-umbra/60 px-4 py-3 text-mic font-semibold text-cerneala">
-            Firma cu CUI-ul ăsta era deja în listă; n-am schimbat nimic la ea. Iată discuția ei.
+            Firma era deja în listă (același CUI sau aceeași adresă de e-mail). Iată discuția ei.
           </p>
         )}
         {!f.faraEmailuri && trimiseFaraRaspuns(mesaje) >= NU_RASPUNDE_DUPA && (

@@ -106,6 +106,9 @@ export async function POST(cerere: Request) {
     const catre = [...new Set(scrise.map((x) => emailValid(x)))];
     if (!catre.length || catre.some((x) => !x)) return nuTrece("O adresă de e-mail nu e scrisă corect. Pune-le despărțite prin virgulă.");
     if (catre.length > 10) return nuTrece("Cel mult 10 adrese la un e-mail.");
+    // Cheia de probă scrie numai la adresa de probă: altfel rândul din discuție
+    // ar purta o adresă adevărată, iar „opreste”/„porneste” ar atinge refuzul ei.
+    for (const x of catre) if (!(await probaAreVoie("email", x as string))) return new Response("Proba lucrează numai pe rândurile ei.", { status: 403 });
     const rez = await trimiteFirmei({ firma: fi, catre: catre as string[], subiect, html: continut, atasamente, trimisDe, emailCelui, campanii });
     const semn = rez === "trimis" ? "trimis=1" : rez === "refuza" ? "refuza=1" : "ratat=1";
     return trimiteLa(`/admin/firme/${fi.id}/mesaje?${semn}#jos`);

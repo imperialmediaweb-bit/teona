@@ -35,7 +35,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   if (oprit) return oprit;
 
   const [lista, nelegate] = await Promise.all([discutii(), mesajeNelegate()]);
-  if (nelegate.some((m) => !m.citit)) await marcheazaNelegateCitite().catch(() => undefined);
+  if (nelegate.some((m) => !m.citit)) await marcheazaNelegateCitite(nelegate.filter((m) => !m.citit).map((m) => String(m.id))).catch(() => undefined);
   const cuDiscutie = lista.filter((d) => d.firmaId);
   const primeste = Boolean(domeniuRaspuns());
   const urmareste = Boolean(mediu("RESEND_WEBHOOK_SECRET"));
@@ -155,7 +155,8 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
         </ol>
         <p className="mt-4 text-nota text-cerneala-slab">
           „Deschis” nu e sigur: iPhone-ul deschide singur pozele (arată deschis și când nu l-a citit), Outlook le blochează (arată
-          nedeschis deși l-a citit). „A apăsat pe link” e semnul sigur.
+          nedeschis deși l-a citit). „A apăsat pe link” e un semn mai bun, dar nici el sigur: la unele firme, programul de securitate
+          deschide singur linkurile din e-mail. Sigur e numai un răspuns.
         </p>
       </details>
     </Cadru>

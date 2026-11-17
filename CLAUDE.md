@@ -1426,7 +1426,9 @@ există trimitere unu-la-unu și nici atașamente. Pleacă prin Resend
   bara editorului; în e-mail `f_auto` devine `f_jpg` (Outlook nu arată WebP)
   și o adresă relativă devine absolută. Probă: `scratchpad/mf/camp.mjs` (10).
 - „Deschis” nu e sigur (iPhone deschide singur pozele, Outlook le
-  blochează); „a apăsat pe link” e semnul sigur. Scrie și pe pagină.
+  blochează); „a apăsat pe link” e un semn mai bun, dar nici el sigur
+  (scanerele firmelor — Safe Links, Mimecast — apasă singure pe linkuri);
+  sigur e numai un răspuns. Scrie și pe pagină.
 - **„Nu mai doresc mesaje”**: jos în fiecare e-mail către o firmă se pune
   singur rândul „Dacă nu doriți să mai primiți mesaje de la noi, apăsați
   aici sau răspundeți cu „NU”…” (`corpScrisoare`), plus antetul
@@ -1486,6 +1488,17 @@ există trimitere unu-la-unu și nici atașamente. Pleacă prin Resend
     („Ion <ion@x>”) se citesc;
   - `TineCiorna` pune ciorna și în câmpurile desenate mai târziu (Suspense),
     printr-un `MutationObserver` de 15 secunde.
+- **A doua citire, 17 noiembrie 2026** (un cititor separat, peste tot
+  diff-ul): cheia de probă nu mai scrie la „Către” altă adresă decât cea de
+  probă (altfel „oprește”/„pornește” ar fi atins refuzul unei firme
+  adevărate); deschiderea unei discuții cu cheia nu mai marchează răspunsurile
+  ca citite; nelegatele se marchează numai cele arătate (50); un lead pus a
+  doua oară cu CUI se lipește de fișa fără CUI cu aceeași adresă; contractul
+  verifică cifra de control a CUI-ului scris pentru o fișă fără CUI;
+  răspunsurile nelegate (spam pe domeniul de răspunsuri) se păstrează, dar
+  anunță cel mult de 3 ori pe oră; PDF-urile primite se descarcă (cititorul
+  din Chrome nu merge sub `sandbox`); `EMAIL_EXPEDITOR` scris fără `<…>` e
+  citit. Probă: `scratchpad/mf/fixuri3.mjs` (11).
 - Probă, cu un Resend de mențiune și anunțuri semnate:
   `scratchpad/mf/proba.mjs` (61), `fixuri.mjs` (16), `fixuri2.mjs` (13);
   rulate împreună de `scratchpad/mf/toate.sh`, care repornește serverul

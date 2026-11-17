@@ -6,6 +6,7 @@ import { textSimplu } from "@/lib/text-bogat";
 import { adresaDeLa, trimiteEmailCuId } from "@/lib/email/trimite";
 import { scrieInteractiune, type Firma } from "@/lib/crm";
 import { mediu } from "@/lib/mediu";
+import { esteProba } from "@/lib/proba";
 import { ASOCIATIA, EMAIL, TELEFOANE } from "@/date/asociatie";
 import { ADRESA_SITE } from "@/app/seo";
 import { pozaPentruEmail } from "@/lib/cloudinary-listare";
@@ -492,6 +493,9 @@ async function citeste(unde: string, parametri: unknown[]): Promise<Mesaj[]> {
 }
 
 export async function marcheazaCitite(firmaId: string): Promise<void> {
+  // Proba automată deschide pagini ca să le verifice, nu le citește: un răspuns
+  // adevărat ar pierde semnul „nou” fără să-l fi văzut cineva.
+  if (await esteProba()) return;
   await intreaba(
     `UPDATE mesaje_firme SET citit_la = now() WHERE firma_id = $1 AND directie = 'primit' AND citit_la IS NULL`,
     [firmaId],
@@ -569,17 +573,15 @@ export async function mesajeNelegate(): Promise<Mesaj[]> {
   return citeste(`firma_id IS NULL ORDER BY creat_la DESC LIMIT 50`, []);
 }
 
-/** Răspunsurile nelegate se citesc pe pagina de mesaje, deci se marchează acolo. */
-export async function marcheazaNelegateCitite(): Promise<void> {
-  await intreaba(`UPDATE mesaje_firme SET citit_la = now() WHERE firma_id IS NULL AND citit_la IS NULL`);
+/**
+ * Răspunsurile nelegate se citesc pe pagina de mesaje, deci se marchează
+ * acolo — numai cele arătate (lista are cel mult 50), nu și cele mai vechi.
+ */
+export async function marcheazaNelegateCitite(ids: string[]): Promise<void> {
+  if (!ids.length || (await esteProba())) return;
+  await intreaba(`UPDATE mesaje_firme SET citit_la = now() WHERE firma_id IS NULL AND citit_la IS NULL AND id::text = ANY($1::text[])`, [ids]);
 }
 
-export async function cateNecitite(): Promise<number> {
-  const [r] = await intreaba<{ nr: string }>(
-    `SELECT count(*) AS nr FROM mesaje_firme WHERE directie = 'primit' AND citit_la IS NULL`,
-  );
-  return Number(r?.nr ?? 0);
-}
 
 export async function atasamentul(id: string): Promise<{ nume: string; tip: string; continut: Buffer } | null> {
   if (!/^\d{1,18}$/.test(id)) return null;

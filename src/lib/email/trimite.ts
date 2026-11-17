@@ -36,7 +36,9 @@ function expeditor(): string {
 
 /** Adresa expeditorului verificat. */
 function adresaVerificata(): string {
-  return (expeditor().match(/<([^>]+)>/)?.[1] ?? EMAIL.contact).trim().toLowerCase();
+  const e = expeditor();
+  // `EMAIL_EXPEDITOR` poate fi scris și fără nume: „noreply@mail.teona-ariana.ro”.
+  return (e.match(/<([^>]+)>/)?.[1] ?? (/^[^\s<>]+@[^\s<>]+$/.test(e.trim()) ? e : EMAIL.contact)).trim().toLowerCase();
 }
 
 /**
