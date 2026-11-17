@@ -4,7 +4,8 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
 import { mediu } from "@/lib/mediu";
-import { discutii, domeniuRaspuns, marcheazaNelegateCitite, mesajeNelegate, NU_RASPUNDE_DUPA } from "@/lib/mesaje-firme";
+import { STADII_FIRMA } from "@/lib/crm";
+import { discutii, domeniuRaspuns, marcheazaNelegateCitite, mesajeNelegate, NU_RASPUNDE_DUPA, cifreleMesajelor, STADII_CONVERTITE } from "@/lib/mesaje-firme";
 import { ADRESA_SITE } from "@/app/seo";
 import Cadru from "@/componente/admin/Cadru";
 import MesajFirma from "@/componente/admin/firme/MesajFirma";
@@ -35,7 +36,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   const oprit = await poarta("Mesaje cu firmele", "/admin/firme/mesaje", gresit);
   if (oprit) return oprit;
 
-  const [lista, nelegate] = await Promise.all([discutii(), mesajeNelegate()]);
+  const [lista, nelegate, cifre] = await Promise.all([discutii(), mesajeNelegate(), cifreleMesajelor()]);
   if (nelegate.some((m) => !m.citit)) await marcheazaNelegateCitite(nelegate.filter((m) => !m.citit).map((m) => String(m.id))).catch(() => undefined);
   const cuDiscutie = lista.filter((d) => d.firmaId);
   const primeste = Boolean(domeniuRaspuns());
@@ -84,6 +85,27 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
         <AdaugaLead />
       </div>
 
+      {cifre.scrise > 0 && (
+        <dl data-cifre-mesaje className="mb-8 grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-4">
+          {[
+            { k: "scrise", e: forma(cifre.scrise, "firmă căreia i-am scris", "firme cărora le-am scris"), n: cifre.scrise },
+            { k: "raspuns", e: forma(cifre.raspuns, "firmă a răspuns", "firme au răspuns"), n: cifre.raspuns },
+            { k: "convertite", e: forma(cifre.convertite, "convertită (a ajuns la contract)", "convertite (au ajuns la contract)"), n: cifre.convertite },
+            { k: "semnate", e: forma(cifre.semnate, "cu contract semnat", "cu contract semnat"), n: cifre.semnate },
+          ].map((c) => (
+            <div key={c.k} data-cifra={c.k} data-n={c.n} className="rounded-card border border-hartie-umbra bg-hartie p-4">
+              <dt className="text-nota text-cerneala-slab">{c.e}</dt>
+              <dd className="font-titlu text-2xl font-bold text-cerneala">
+                {c.n}
+                {c.n > 0 && cifre.scrise > 0 && c.n !== cifre.scrise && (
+                  <span className="ml-2 text-mic font-semibold text-cerneala-slab">{Math.round((c.n / cifre.scrise) * 100)}%</span>
+                )}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
+
       {cuDiscutie.length === 0 ? (
         <p className="text-amplu text-cerneala-moale">
           Niciun e-mail încă. Deschide o firmă din <Link href="/admin/firme" className="underline">Firme</Link> și apasă „✉ E-mailuri”, sau scrie la mai multe deodată.
@@ -113,6 +135,13 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                       </span>
                     )}
                   </span>
+                  {d.stadiu && (
+                    <span data-stadiu className={`mb-0.5 inline-block rounded-full px-2 py-0.5 text-nota font-semibold ${
+                      (STADII_CONVERTITE as readonly string[]).includes(d.stadiu) ? "bg-turcoaz-50 text-turcoaz-900" : "bg-hartie-umbra/60 text-cerneala-moale"
+                    }`}>
+                      {STADII_FIRMA.find((s) => s.id === d.stadiu)?.eticheta ?? d.stadiu}
+                    </span>
+                  )}
                   <span className="block truncate text-nota text-cerneala-moale">
                     {d.ultimul.directie === "primit" ? "↩ " : "→ "}
                     {d.ultimul.subiect}

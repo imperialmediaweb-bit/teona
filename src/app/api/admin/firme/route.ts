@@ -48,5 +48,8 @@ export async function POST(cerere: Request) {
     citita.suma === null ? null : inBani(citita.suma),
   );
 
+  // Din discuția cu firma se mută stadiul fără a pleca de acolo.
+  const inapoi = String(formular.get("inapoi") ?? "");
+  if (/^\/admin\/firme\/[0-9a-f-]{36}\/mesaje$/i.test(inapoi)) return trimiteLa(`${inapoi}?stadiu=schimbat#crm`);
   return trimiteLa(`/admin/firme#${id}`);
 }

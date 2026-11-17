@@ -517,6 +517,8 @@ export type Discutie = {
   deschise: number;
   /** E-mailuri trimise de la ultimul răspuns al firmei (sau de la început). */
   faraRaspuns: number;
+  /** Stadiul firmei în CRM; `null` la un răspuns nelegat. */
+  stadiu: string | null;
 };
 
 /** Câte e-mailuri i s-au trimis de la ultimul ei răspuns. */
@@ -535,6 +537,7 @@ export async function discutii(): Promise<Discutie[]> {
     firma_id: string | null;
     denumire: string | null;
     persoana: string | null;
+    stadiu: string | null;
     subiect: string;
     directie: "trimis" | "primit";
     creat_la: Date;
@@ -548,7 +551,7 @@ export async function discutii(): Promise<Discutie[]> {
        SELECT DISTINCT ON (coalesce(firma_id::text, 'm' || id::text)) *
          FROM mesaje_firme ORDER BY coalesce(firma_id::text, 'm' || id::text), creat_la DESC
      )
-     SELECT u.firma_id, f.denumire, f.persoana, u.subiect, u.directie, u.creat_la, u.de_la,
+     SELECT u.firma_id, f.denumire, f.persoana, f.stadiu, u.subiect, u.directie, u.creat_la, u.de_la,
             (SELECT count(*) FROM mesaje_firme m WHERE m.directie = 'primit' AND m.citit_la IS NULL
                AND (m.firma_id = u.firma_id OR (u.firma_id IS NULL AND m.id = u.id))) AS necitite,
             (SELECT count(*) FROM mesaje_firme m WHERE m.firma_id = u.firma_id AND m.directie = 'trimis') AS trimise,
@@ -571,7 +574,30 @@ export async function discutii(): Promise<Discutie[]> {
     trimise: Number(x.trimise),
     deschise: Number(x.deschise),
     faraRaspuns: Number(x.fara_raspuns),
+    stadiu: x.stadiu,
   }));
+}
+
+/** Stadiile în care o firmă căreia i s-a scris e socotită convertită: a ajuns la contract. */
+export const STADII_CONVERTITE = ["contract_trimis", "semnat", "incasat"] as const;
+
+/**
+ * Cifrele de sus de la „Mesaje cu firmele”: câtor firme le-am scris, câte au
+ * răspuns, câte au ajuns la contract. Numai firmele cu cel puțin un e-mail
+ * trimis din panou, nearhivate.
+ */
+export async function cifreleMesajelor(): Promise<{ scrise: number; raspuns: number; convertite: number; semnate: number }> {
+  const [r] = await intreaba<{ scrise: string; raspuns: string; convertite: string; semnate: string }>(
+    `SELECT count(*) AS scrise,
+            count(*) FILTER (WHERE EXISTS (SELECT 1 FROM mesaje_firme p WHERE p.firma_id = f.id AND p.directie = 'primit')) AS raspuns,
+            count(*) FILTER (WHERE f.stadiu = ANY($1::text[])) AS convertite,
+            count(*) FILTER (WHERE f.stadiu IN ('semnat', 'incasat')) AS semnate
+       FROM firme f
+      WHERE f.arhivata_la IS NULL
+        AND EXISTS (SELECT 1 FROM mesaje_firme t WHERE t.firma_id = f.id AND t.directie = 'trimis')`,
+    [[...STADII_CONVERTITE]],
+  );
+  return { scrise: Number(r?.scrise ?? 0), raspuns: Number(r?.raspuns ?? 0), convertite: Number(r?.convertite ?? 0), semnate: Number(r?.semnate ?? 0) };
 }
 
 /** Răspunsurile care n-au fost legate de nicio firmă, cu tot cu text. */

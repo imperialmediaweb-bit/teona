@@ -24,7 +24,7 @@ export default function PaginaDiscutie({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ gresit?: string; trimis?: string; ratat?: string; nou?: string; era?: string; refuza?: string }>;
+  searchParams: Promise<{ gresit?: string; trimis?: string; ratat?: string; nou?: string; era?: string; refuza?: string; stadiu?: string }>;
 }) {
   return (
     <Suspense fallback={<Cadru titlu="E-mailuri cu firma">Se încarcă…</Cadru>}>
@@ -38,11 +38,12 @@ async function Continut({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ gresit?: string; trimis?: string; ratat?: string; nou?: string; era?: string; refuza?: string }>;
+  searchParams: Promise<{ gresit?: string; trimis?: string; ratat?: string; nou?: string; era?: string; refuza?: string; stadiu?: string }>;
 }) {
   await connection();
   const { id } = await params;
-  const { gresit, trimis, ratat, nou, era, refuza } = await searchParams;
+  const { gresit, trimis, ratat, nou, era, refuza, stadiu: stadiuSchimbatParam } = await searchParams;
+  const stadiuSchimbat = stadiuSchimbatParam === "schimbat";
   const oprit = await poarta("E-mailuri cu firma", "/admin/firme/mesaje", gresit);
   if (oprit) return oprit;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
@@ -79,6 +80,31 @@ async function Continut({
           Fișa firmei
         </Link>
       </p>
+      {/*
+        Stadiul în CRM, mutat de aici: cine a primit răspunsul „trimiteți-ne
+        contractul” n-are de ce să plece din discuție ca s-o mute.
+      */}
+      <form id="crm" action="/api/admin/firme" method="post" className="mb-6 flex max-w-4xl scroll-mt-24 flex-wrap items-center gap-2 rounded-card border border-hartie-umbra bg-hartie px-4 py-3">
+        <input type="hidden" name="id" value={f.id} />
+        <input type="hidden" name="inapoi" value={`/admin/firme/${f.id}/mesaje`} />
+        <label className="text-mic text-cerneala-moale">
+          Stadiul în CRM:
+          <select name="stadiu" defaultValue={f.stadiu} className="ml-2 rounded-moale border border-hartie-umbra bg-hartie px-3 py-1.5 font-titlu text-mic text-cerneala">
+            {STADII_FIRMA.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.eticheta}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button type="submit" className="rounded-full bg-cerneala px-4 py-1.5 font-titlu text-nota font-bold text-hartie hover:bg-cerneala-moale">
+          Mută
+        </button>
+        {stadiuSchimbat && <span role="status" className="text-nota font-semibold text-turcoaz-900">Mutată la „{stadiu}”.</span>}
+        {(f.stadiu === "prospect" || f.stadiu === "cerere") && (
+          <span className="text-nota text-cerneala-slab">A cerut contractul? Alege „Contract trimis”; după semnare, „Contract semnat”.</span>
+        )}
+      </form>
       {f.arhivataLa && (
         <p role="status" className="mb-6 max-w-3xl colt-mic-a bg-hartie-umbra/70 px-4 py-3 text-mic font-semibold text-cerneala">
           Firma e arhivată: nu mai apare în liste, dar contractele și donațiile ei rămân în registru și în rapoarte.

@@ -1468,6 +1468,12 @@ există trimitere unu-la-unu și nici atașamente. Pleacă prin Resend
   iar o firmă adăugată mai târziu cu ea se naște oprită. Fără semnătură,
   dinadins: linkul se lipește de mână; cel mult cineva oprește e-mailurile
   altei adrese, adică nu-i mai scriem.
+- **Stadiul în CRM se mută din discuție** (caseta `#crm` de sus, aceeași
+  rută `/api/admin/firme`, cu `inapoi` acceptat numai spre
+  `/admin/firme/<id>/mesaje`). În listă, fiecare discuție arată stadiul
+  firmei, iar sus stau cifrele (`cifreleMesajelor`): cărora le-am scris, câte
+  au răspuns, câte s-au **convertit** (`STADII_CONVERTITE`: contract trimis,
+  semnat, încasat) și câte au semnat. Probă: `scratchpad/mf/conv.mjs` (8).
 - **Ștergerea unei firme** (numai rolul de administrator: `/admin/firme/sterge`
   în `PAGINI`; cheia de probă n-o are): jos în discuție, cu confirmare
   („Sigur ștergi … Nu se poate anula.”). Pleacă firma, discuția, jurnalul
