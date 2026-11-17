@@ -32,6 +32,7 @@ import FaraDrept from "@/componente/admin/FaraDrept";
 const NUME_PAGINA: Record<string, string> = {
   "/admin": "Tablou de bord",
   "/admin/rapoarte": "Rapoarte",
+  "/admin/firme/sterge": "Ștergerea unei firme",
   "/admin/analiza": "Analiză",
   "/admin/radar": "Radar finanțări",
   "/admin/donatii": "Donații",

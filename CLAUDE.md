@@ -1468,6 +1468,13 @@ există trimitere unu-la-unu și nici atașamente. Pleacă prin Resend
   iar o firmă adăugată mai târziu cu ea se naște oprită. Fără semnătură,
   dinadins: linkul se lipește de mână; cel mult cineva oprește e-mailurile
   altei adrese, adică nu-i mai scriem.
+- **Ștergerea unei firme** (numai rolul de administrator: `/admin/firme/sterge`
+  în `PAGINI`; cheia de probă n-o are): jos în discuție, cu confirmare
+  („Sigur ștergi … Nu se poate anula.”). Pleacă firma, discuția, jurnalul
+  și atașamentele, și din R2. **Cu contracte în registru sau donații
+  încasate de pe adresa ei nu se șterge, se arhivează** (`firme.arhivata_la`):
+  dispare din liste (`firme()`, `discutii()`, „uitate”), rămâne în registru
+  și în rapoarte. Probă: `scratchpad/mf/sterge.mjs` (13).
 - **„Nu răspunde”**: după `NU_RASPUNDE_DUPA` (2) e-mailuri fără niciun
   răspuns, discuția și lista o spun, ca să nu i se scrie a treia oară.
   Lead-urile intră și în „firme fără răspuns de două săptămâni”.

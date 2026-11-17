@@ -647,6 +647,8 @@ const ADAOSURI = `
   ALTER TABLE atasamente_firme ALTER COLUMN continut DROP NOT NULL;
   /* Raspunsul fara e-mailul citat si fara semnatura; html ramane intreg, pentru Arata tot. */
   ALTER TABLE mesaje_firme ADD COLUMN IF NOT EXISTS html_nou text;
+  /* Firma scoasa din liste, dar pastrata (are contracte sau donatii): stergerea ei ar rupe registrul si rapoartele. */
+  ALTER TABLE firme ADD COLUMN IF NOT EXISTS arhivata_la timestamptz;
   /* Firma care a cerut să nu mai primească e-mailuri din panou: de atunci nu i se mai trimite nimic. */
   ALTER TABLE firme ADD COLUMN IF NOT EXISTS fara_emailuri_la timestamptz;
   /*

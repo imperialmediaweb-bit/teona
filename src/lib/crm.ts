@@ -47,6 +47,8 @@ export type Firma = {
   schimbatLa: string;
   /** Când a cerut firma să nu mai primească e-mailuri din panou. */
   faraEmailuri: string | null;
+  /** Scoasă din liste (are contracte sau donații, deci nu s-a putut șterge). */
+  arhivataLa: string | null;
 };
 
 type RandFirma = {
@@ -64,6 +66,7 @@ type RandFirma = {
   creat_la: Date;
   schimbat_la: Date;
   fara_emailuri_la?: Date | null;
+  arhivata_la?: Date | null;
 };
 
 function laFirma(r: RandFirma): Firma {
@@ -82,6 +85,7 @@ function laFirma(r: RandFirma): Firma {
     creatLa: r.creat_la.toISOString(),
     schimbatLa: r.schimbat_la.toISOString(),
     faraEmailuri: r.fara_emailuri_la ? r.fara_emailuri_la.toISOString() : null,
+    arhivataLa: r.arhivata_la ? r.arhivata_la.toISOString() : null,
   };
 }
 
@@ -238,7 +242,8 @@ export async function adaugaLead(d: {
  * Scrisă o dată: din ea iese și cifra din „De făcut acum”, și lista la care
  * duce linkul ei (`/admin/firme?uitate=1`).
  */
-export const FIRME_UITATE_SQL = `stadiu IN ('prospect', 'cerere', 'contract_trimis')
+export const FIRME_UITATE_SQL = `arhivata_la IS NULL
+  AND stadiu IN ('prospect', 'cerere', 'contract_trimis')
   AND fara_emailuri_la IS NULL
   AND schimbat_la < now() - interval '14 days'
   AND NOT EXISTS (SELECT 1 FROM interactiuni i
@@ -254,7 +259,8 @@ export async function firme(
   const fd = (x: string) => `translate(lower(${x}), 'ăâîșşțţ', 'aaisstt')`;
   const randuri = await intreaba<RandFirma>(
     `SELECT * FROM firme
-      WHERE ($1::text IS NULL OR stadiu = $1)
+      WHERE arhivata_la IS NULL
+        AND ($1::text IS NULL OR stadiu = $1)
         AND ($2 = '' OR ${fd("denumire")} LIKE '%' || ${fd("$2")} || '%'
              OR cui ILIKE '%' || regexp_replace($2, '^\\s*ro\\s*|[\\s.\\-]', '', 'gi') || '%'
              OR ${fd("persoana")} LIKE '%' || ${fd("$2")} || '%'
@@ -505,4 +511,30 @@ export async function interactiuni(cui: {
     cand: r.cand.toISOString(),
     scrisDe: r.scris_de,
   }));
+}
+
+/**
+ * Șterge o firmă cu discuția și atașamentele ei. Dacă are contracte în
+ * registru sau donații încasate de pe adresa ei, n-o șterge: o arhivează
+ * (dispare din liste, rămâne în baza de date) — registrul contractelor și
+ * rapoartele trebuie să spună și peste un an ce s-a întâmplat.
+ */
+export async function stergeSauArhiveazaFirma(id: string): Promise<"stearsa" | "arhivata" | "nu-exista"> {
+  const [f] = await intreaba<{ email: string; contracte: string; donatii: string }>(
+    `SELECT f.email,
+            (SELECT count(*) FROM contracte c WHERE c.firma_id = f.id) AS contracte,
+            (SELECT count(*) FROM donatii d WHERE f.email <> '' AND lower(d.email) = lower(f.email) AND d.stare = 'platita') AS donatii
+       FROM firme f WHERE f.id = $1`,
+    [id],
+  );
+  if (!f) return "nu-exista";
+  if (Number(f.contracte) > 0 || Number(f.donatii) > 0) {
+    await intreaba(`UPDATE firme SET arhivata_la = now() WHERE id = $1 AND arhivata_la IS NULL`, [id]);
+    return "arhivata";
+  }
+  // Fișierele din R2 întâi: după ștergere, rândurile care le arătau nu mai există.
+  const { stergeAtasamenteleFirmei } = await import("@/lib/mesaje-firme");
+  await stergeAtasamenteleFirmei(id);
+  await intreaba(`DELETE FROM firme WHERE id = $1`, [id]); // discuția, atașamentele și jurnalul pleacă odată (ON DELETE CASCADE)
+  return "stearsa";
 }

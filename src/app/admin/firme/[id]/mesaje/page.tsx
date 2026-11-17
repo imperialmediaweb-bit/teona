@@ -11,6 +11,8 @@ import ScrieFirmei from "@/componente/admin/ScrieFirmei";
 import { textePublicate } from "@/lib/texte";
 import MesajFirma from "@/componente/admin/firme/MesajFirma";
 import { poarta } from "@/componente/admin/firme/Poarta";
+import { arePermisiune } from "@/lib/admin";
+import StergeFirma from "@/componente/admin/firme/StergeFirma";
 
 export const metadata: Metadata = {
   title: "E-mailuri cu firma",
@@ -48,6 +50,7 @@ async function Continut({
   if (!f) notFound();
 
   const mesaje = await mesajeleFirmei(f.id);
+  const poateSterge = await arePermisiune("/admin/firme/sterge");
   const campanii = (await textePublicate("campanie", 30).catch(() => [])).map((c) => ({ id: c.id, titlu: c.titlu }));
   await marcheazaCitite(f.id).catch(() => undefined);
   const ultimul = [...mesaje].reverse()[0];
@@ -76,6 +79,11 @@ async function Continut({
           Fișa firmei
         </Link>
       </p>
+      {f.arhivataLa && (
+        <p role="status" className="mb-6 max-w-3xl colt-mic-a bg-hartie-umbra/70 px-4 py-3 text-mic font-semibold text-cerneala">
+          Firma e arhivată: nu mai apare în liste, dar contractele și donațiile ei rămân în registru și în rapoarte.
+        </p>
+      )}
 
       {!domeniuRaspuns() && (
         <p className="mb-6 max-w-3xl colt-mic-a bg-hartie-calda px-4 py-3 text-mic text-cerneala-moale">
@@ -158,6 +166,11 @@ async function Continut({
           </>
         )}
       </section>
+      {poateSterge && !f.arhivataLa && (
+        <div className="mt-10 max-w-4xl border-t border-hartie-umbra pt-5">
+          <StergeFirma id={f.id} denumire={f.denumire} />
+        </div>
+      )}
     </Cadru>
   );
 }

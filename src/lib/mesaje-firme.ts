@@ -556,6 +556,7 @@ export async function discutii(): Promise<Discutie[]> {
             (SELECT count(*) FROM mesaje_firme m WHERE m.firma_id = u.firma_id AND m.directie = 'trimis'
                AND m.creat_la > coalesce((SELECT max(p.creat_la) FROM mesaje_firme p WHERE p.firma_id = u.firma_id AND p.directie = 'primit'), '-infinity')) AS fara_raspuns
        FROM ult u LEFT JOIN firme f ON f.id = u.firma_id
+      WHERE f.arhivata_la IS NULL
       ORDER BY (SELECT count(*) FROM mesaje_firme m WHERE m.directie = 'primit' AND m.citit_la IS NULL
                   AND (m.firma_id = u.firma_id OR (u.firma_id IS NULL AND m.id = u.id))) > 0 DESC,
                u.creat_la DESC
@@ -642,6 +643,16 @@ export function tipDupaNume(nume: string): string {
     zip: "application/zip",
   };
   return tipuri[ext] ?? "application/octet-stream";
+}
+
+/** Șterge din R2 atașamentele unei firme, înainte ca rândurile ei să dispară. */
+export async function stergeAtasamenteleFirmei(firmaId: string): Promise<void> {
+  const chei = await intreaba<{ cheie_r2: string }>(
+    `SELECT a.cheie_r2 FROM atasamente_firme a JOIN mesaje_firme m ON m.id = a.mesaj_id
+      WHERE m.firma_id = $1 AND a.cheie_r2 IS NOT NULL`,
+    [firmaId],
+  ).catch(() => []);
+  for (const c of chei) await stergeDinR2(c.cheie_r2).catch(() => false);
 }
 
 /** Șterge din R2 atașamentele firmelor cu adresa dată, înainte ca rândurile lor să dispară. */

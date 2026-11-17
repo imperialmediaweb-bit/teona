@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-type Cautare = { gresit?: string; trimise?: string; ratate?: string; refuza?: string };
+type Cautare = { gresit?: string; trimise?: string; ratate?: string; refuza?: string; stearsa?: string; arhivata?: string };
 
 export default function PaginaMesajeFirme({ searchParams }: { searchParams: Promise<Cautare> }) {
   return (
@@ -31,7 +31,7 @@ const cand = (iso: string) =>
 
 async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   await connection();
-  const { gresit, trimise, ratate, refuza } = await searchParams;
+  const { gresit, trimise, ratate, refuza, stearsa, arhivata } = await searchParams;
   const oprit = await poarta("Mesaje cu firmele", "/admin/firme/mesaje", gresit);
   if (oprit) return oprit;
 
@@ -47,6 +47,16 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
       descriere="E-mailurile scrise fiecărei firme, cu atașamente, și răspunsurile lor. Vezi cine a deschis și cine a apăsat pe link."
       activ="/admin/firme/mesaje"
     >
+      {stearsa && (
+        <p role="status" className="mb-6 colt-mic-a bg-turcoaz-50 px-4 py-3 text-mic font-semibold text-turcoaz-900">
+          Firma a fost ștearsă, cu discuția și atașamentele ei.
+        </p>
+      )}
+      {arhivata && (
+        <p role="status" className="mb-6 colt-mic-a bg-hartie-umbra/70 px-4 py-3 text-mic font-semibold text-cerneala">
+          Firma are contracte sau donații, deci n-am șters-o: e arhivată. Nu mai apare în liste, dar rămâne în registru și în rapoarte.
+        </p>
+      )}
       {trimise !== undefined && (
         <p role="status" className="mb-6 colt-mic-a bg-turcoaz-50 px-4 py-3 text-mic font-semibold text-turcoaz-900">
           {trimise === "1" ? "A plecat 1 e-mail." : `Au plecat ${cate(Number(trimise), "e-mail", "e-mailuri")}, fiecare la firma lui.`}
