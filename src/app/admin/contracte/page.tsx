@@ -122,7 +122,7 @@ async function Continut({
   return (
     <Cadru
       titlu="Contracte"
-      descriere="Registrul sponsorizărilor: număr, dată, firmă, sumă."
+      descriere="Registrul contractelor de sponsorizare: număr, dată, firmă și sumă."
       activ="/admin/contracte"
     >
       {ratat && RATAT[ratat] && (
@@ -181,10 +181,7 @@ async function Continut({
         <p className="mt-4 max-w-3xl colt-mic-a bg-caramiziu-50 px-4 py-3 text-mic text-caramiziu-900">
           <strong>Sponsorizarea se scade din impozitul anului în care a fost
           plătită.</strong>{" "}
-          Un contract semnat acum și plătit în ianuarie pierde anul fiscal
-          pentru firmă — iar firma se supără pe asociație, nu pe propria
-          contabilitate. Termenul exact al Declarației 177 îl confirmă
-          contabilitatea firmei.
+          Un contract semnat acum, dar plătit în ianuarie, nu mai poate fi scăzut din impozitul pe anul acesta. Termenul exact al Declarației 177 îl confirmă contabilul firmei.
         </p>
       )}
 
@@ -225,15 +222,13 @@ async function Continut({
             Au sponsorizat înainte, în {an} nu
           </h2>
           <p className="text-nota text-cerneala-slab">
-            Cine a semnat o dată semnează mai ușor a doua oară decât oricine
-            altcineva.
+            Un sponsor de anul trecut semnează mai ușor decât o firmă nouă.
           </p>
         </div>
 
         {fara.length === 0 ? (
           <p className="max-w-3xl text-amplu text-cerneala-moale">
-            Niciuna — ori toți sponsorii de până acum au reînnoit, ori încă nu
-            există contracte din anii trecuți în registru.
+            Niciuna. Ori au reînnoit toți sponsorii, ori nu sunt încă în registru contracte din anii trecuți.
           </p>
         ) : (
           <ul className="grid gap-2">

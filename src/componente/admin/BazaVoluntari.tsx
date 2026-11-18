@@ -85,7 +85,7 @@ export default function BazaVoluntari({
     <form action="/api/admin/voluntari/apel" method="post" className="grid gap-6">
       <details className="colt-a border border-hartie-umbra bg-hartie p-5" open={false}>
         <summary className="cursor-pointer font-titlu text-amplu font-bold text-cerneala">
-          Cere ajutor: „Avem nevoie de voluntari pe data…”
+          Cere ajutorul voluntarilor pentru o anumită zi
         </summary>
         <p className="mt-2 max-w-2xl text-mic text-cerneala-moale">
           Pleacă la voluntarii bifați mai jos ({alesi.size}). Fiecare primește

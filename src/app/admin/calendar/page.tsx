@@ -131,7 +131,7 @@ async function Continut({
   return (
     <Cadru
       titlu="Calendar"
-      descriere="Ce iese pe site și când. Ce se repetă în fiecare an e deja pe el."
+      descriere="Ce publicăm și când. Datele importante din fiecare an sunt deja trecute."
       activ="/admin/calendar"
     >
       <div className="mb-5 flex flex-wrap items-center gap-3">
@@ -251,7 +251,7 @@ async function Continut({
             Ciornele
           </h2>
           <p className="text-nota text-cerneala-slab">
-            Pune-le o zi și apar în calendar. Publicarea rămâne o apăsare de om.
+            Alege o zi și apar în calendar. Nu se publică singure: tu apeși „Publică”.
           </p>
         </div>
         {ciorne.length === 0 ? (

@@ -30,12 +30,11 @@ export default async function FaraDrept({
     <Cadru titlu={titlu} activ={activ}>
       <div className="max-w-2xl">
         <p className="text-amplu text-cerneala-moale">
-          Pagina asta nu e deschisă pentru rolul tău
+          Nu ai acces la această pagină
           {rol ? <> — „{rol}”</> : null}.
         </p>
         <p className="mt-3 text-cerneala-moale">
-          Dacă ai nevoie de ea ca să-ți faci treaba, cere-i unui administrator
-          al asociației să-ți schimbe rolul.
+          Dacă ai nevoie de ea, cere-i unui administrator să-ți schimbe rolul.
         </p>
         <Link
           href="/admin"

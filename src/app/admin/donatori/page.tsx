@@ -269,10 +269,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
       )}
 
       <p className="mt-6 max-w-3xl text-mic text-cerneala-moale">
-        <strong>„Uită-l”</strong> șterge numele, e-mailul și telefonul din toate
-        donațiile omului, dar păstrează suma, data și destinația: asociația are
-        obligația legală să țină evidența contabilă. Omul dispare din listă;
-        banii rămân în contabilitate. Operația nu se poate anula.
+        <strong>„Uită-l”</strong> șterge numele, e-mailul și telefonul din toate donațiile persoanei, dar păstrează suma, data și destinația, pentru evidența contabilă obligatorie. Persoana dispare din listă, banii rămân în contabilitate. Operația nu se poate anula.
       </p>
     </Cadru>
   );

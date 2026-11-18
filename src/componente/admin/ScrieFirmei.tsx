@@ -235,7 +235,7 @@ function AlegeFirme({
                 </label>
               </li>
             ))}
-            {vizibile.length === 0 && <li className="px-2 text-mic text-cerneala-slab">Nicio firmă cu numele ăsta. Adaug-o mai jos, ca firmă nouă.</li>}
+            {vizibile.length === 0 && <li className="px-2 text-mic text-cerneala-slab">Nicio firmă cu acest nume. Adaug-o mai jos ca firmă nouă.</li>}
           </ul>
           {vizibile.length > 1 && (
             <p className="flex flex-wrap gap-x-4 text-nota">
@@ -276,7 +276,7 @@ function AlegeFirme({
             CUI (dacă îl știi)
             <input name="nou_cui" inputMode="numeric" maxLength={20} className={camp} />
           </label>
-          <p className="text-nota text-cerneala-slab sm:col-span-2">Se adaugă în lista de firme, cu stadiul „Nou”; după trimitere trece singură pe „Contactat”.</p>
+          <p className="text-nota text-cerneala-slab sm:col-span-2">Se adaugă în lista de firme ca „Nou” și trece singură pe „Contactat” după trimitere.</p>
         </div>
       ) : (
         <button
@@ -479,7 +479,7 @@ export default function ScrieFirmei({
           <span className="font-titlu text-mic font-bold text-cerneala">Către</span>
           <input name="catre" type="text" inputMode="email" defaultValue={catre} required className={camp} />
           <span className="text-nota text-cerneala-slab">
-            Mai mulți oameni din aceeași firmă? Pune adresele despărțite prin virgulă. Primesc același e-mail.
+            Mai multe persoane din aceeași firmă? Scrie adresele despărțite prin virgulă; toți primesc același e-mail.
           </span>
         </label>
       )}
@@ -497,8 +497,8 @@ export default function ScrieFirmei({
         <span className="font-titlu text-mic font-bold text-cerneala">Textul</span>
         <span className="text-nota text-cerneala-slab">
           Scrie <code className="rounded bg-hartie-umbra px-1">{"{firma}"}</code> sau{" "}
-          <code className="rounded bg-hartie-umbra px-1">{"{persoana}"}</code> și se pun singure numele firmei
-          și al omului. Din bara editorului pui poze în text (Poză) și linkuri (selectezi cuvintele, apoi Link). Jos se pun singure semnătura cu numele tău și datele asociației, și rândul „Dacă nu doriți să mai primiți mesaje de la noi, apăsați aici.”
+          <code className="rounded bg-hartie-umbra px-1">{"{persoana}"}</code> și se completează singure numele firmei
+          și al persoanei. Din bara editorului adaugi poze și linkuri. La final se adaugă automat semnătura ta, datele asociației și linkul de dezabonare.
         </span>
         <EditorText name="continut" defaultValue="" minim={2} />
       </div>

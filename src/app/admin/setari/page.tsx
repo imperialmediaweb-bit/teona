@@ -74,7 +74,7 @@ async function Continut({ searchParams }: { searchParams: Promise<{ gresit?: str
   const trimite = Boolean(mediu("RESEND_API_KEY"));
 
   return (
-    <Cadru titlu="Setări" descriere="Contul tău, oamenii care intră în panou și ce se pornește o singură dată." activ="/admin/setari">
+    <Cadru titlu="Setări" descriere="Contul tău, utilizatorii și setările care se fac o singură dată." activ="/admin/setari">
       <div className="mb-8 grid max-w-3xl gap-3 sm:grid-cols-2">
         <Link href="/admin/parola" prefetch={false} className="flex items-start gap-3 rounded-2xl bg-hartie p-5 shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_rgb(0_0_0/0.04)] transition hover:-translate-y-0.5">
           <span className="grid size-10 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-600"><KeyRound className="size-5" aria-hidden="true" /></span>
@@ -139,7 +139,7 @@ async function Continut({ searchParams }: { searchParams: Promise<{ gresit?: str
           <summary className="cursor-pointer font-titlu text-mic font-bold text-cerneala">
             Mesaje oprite în ultimele 30 de zile ({oprite.length})
           </summary>
-          <p className="mt-1 text-nota text-cerneala-slab">Dacă vezi aici un mesaj bun, scrie-i omului direct și, dacă e blocat, deblochează-l.</p>
+          <p className="mt-1 text-nota text-cerneala-slab">Dacă vezi aici un mesaj bun, răspunde-i direct persoanei și, dacă adresa e blocată, deblocheaz-o.</p>
           <ul className="mt-2 divide-y divide-hartie-umbra/70">
             {oprite.map((m, i) => (
               <li key={i} className="py-2 text-nota text-cerneala-moale">

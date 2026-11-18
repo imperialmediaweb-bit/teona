@@ -64,12 +64,12 @@ async function Continut({ searchParams }: { searchParams: Cautare }) {
     "colt-mic-a border-2 border-hartie-umbra bg-hartie px-3 py-2 text-mic min-w-0 file:mr-3 file:border-0 file:bg-transparent file:font-titlu file:font-bold file:text-caramiziu-700";
 
   return (
-    <Cadru titlu="Echipa" descriere="Oamenii de pe pagina „Despre noi”, cu poză, rol și o frază." activ={CALE}>
+    <Cadru titlu="Echipa" descriere="Echipa de pe pagina „Despre noi”: poză, rol și o scurtă prezentare." activ={CALE}>
       <Mesaj mesaj={stare ? STARI[stare] : undefined} />
       <DeStiut>
         <li>Ordinea de aici e ordinea de pe site. Mută cu ↑ și ↓.</li>
-        <li>Fără poză, cardul arată inițialele. Poza se micșorează singură; una de la telefon e bună.</li>
-        <li>Nimic nu se șterge: „Scoate de pe site” ascunde omul, „Pune înapoi” îl aduce.</li>
+        <li>Fără poză, cardul arată inițialele. Poți folosi o poză făcută cu telefonul.</li>
+        <li>„Scoate de pe site” ascunde persoana fără s-o șteargă; „Pune înapoi” o readuce.</li>
       </DeStiut>
 
       <section className="mb-12">

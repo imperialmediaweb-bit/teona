@@ -51,7 +51,7 @@ export default function CopiazaAdrese({ adrese }: { adrese: string[] }) {
       </button>
       {stare === "eroare" && (
         <p role="alert" className="mt-2 text-nota text-caramiziu-800">
-          Browserul n-a lăsat copierea. Selectează-le de mai jos, cu mâna.
+          Browserul nu a permis copierea. Selectează adresele de mai jos și copiază-le.
         </p>
       )}
       <p className="mt-3 break-all colt-mic-a bg-hartie-umbra/60 px-3 py-2 font-mono text-nota text-cerneala-moale select-all">

@@ -110,7 +110,7 @@ async function Continut({
   return (
     <Cadru
       titlu="Formulare 230"
-      descriere="Ce au trimis oamenii de pe site, și fișierul pe care îl descarcă."
+      descriere="Formularele 230 trimise de pe site și fișierul pe care îl descarcă oamenii."
       activ="/admin/formulare"
     >
       {gata && (
@@ -137,9 +137,8 @@ async function Continut({
           descarcă de la{" "}
           <code className="rounded bg-hartie-umbra px-1.5">
             teona-ariana.ro/formular-230
-          </code>{" "}
-          — adresa rămâne aceeași când înlocuiești fișierul, deci o poți pune
-          într-o postare fără grijă.
+          </code>
+          . Adresa rămâne aceeași și după ce înlocuiești fișierul, așa că o poți pune liniștit într-o postare.
         </p>
 
         {areR2() ? (
@@ -204,9 +203,7 @@ async function Continut({
         </h2>
 
         <p className="mt-3 max-w-3xl text-mic text-cerneala-moale">
-          Oamenii trimit poza pe WhatsApp, iar hârtia prin poștă. Aici e doar
-          lista: cine a completat, pe câți ani, și cum îl suni. Fără hârtia
-          semnată, ANAF nu înregistrează redirecționarea.
+          Oamenii trimit poza formularului pe WhatsApp și originalul prin poștă. Aici vezi cine a completat, pe câți ani și cum îl contactezi. Fără formularul semnat, ANAF nu înregistrează redirecționarea.
         </p>
 
         {/*
@@ -219,7 +216,7 @@ async function Continut({
         */}
         <details className="mt-5 max-w-3xl colt-a border border-hartie-umbra bg-hartie">
           <summary className="cursor-pointer px-5 py-4 font-titlu text-mic font-bold text-cerneala">
-            Adaug eu unul — a trimis pe WhatsApp sau a sunat
+            Adaugă un formular primit pe WhatsApp sau la telefon
           </summary>
 
           <form
@@ -253,8 +250,7 @@ async function Continut({
               </label>
             </div>
             <p className="-mt-2 text-nota text-cerneala-slab">
-              Măcar unul din cele două. De pe WhatsApp ai un număr, nu o adresă
-              — e în regulă așa.
+              Măcar unul dintre ele. De pe WhatsApp ai doar numărul, și e suficient.
             </p>
 
             <div className="grid gap-4 sm:grid-cols-2">

@@ -121,7 +121,7 @@ async function Continut({
   return (
     <Cadru
       titlu="Presă"
-      descriere="Cui se trimite un comunicat, și cu ce text."
+      descriere="Redacțiile și trimiterea comunicatelor de presă."
       activ="/admin/presa"
     >
       {ratat && RATAT[ratat] && (
@@ -141,10 +141,7 @@ async function Continut({
           Trimite comunicatul
         </h2>
         <p className="mt-2 max-w-3xl text-mic text-cerneala-moale">
-          Bifezi redacțiile, scrii comunicatul și apeși butonul. Fiecare
-          redacție primește un e-mail separat, cu adresa ei la „Către”, nu o
-          listă la grămadă — așa nu ajunge în spam și nimeni nu vede cui i s-a
-          mai trimis.
+          Bifezi redacțiile, scrii comunicatul și apeși butonul. Fiecare redacție primește un e-mail separat, așa că mesajul nu ajunge în spam și nimeni nu vede cui i s-a mai trimis.
         </p>
         {trimis !== undefined && (
           <p
@@ -203,8 +200,7 @@ async function Continut({
             Redacțiile
           </h2>
           <p className="text-nota text-cerneala-slab">
-            {contacte.length} în listă. Adaugă ziaristul cu care ai vorbit —
-            el publică, nu adresa generală.
+            {contacte.length} în listă. Adaugă și ziaristul cu care ai vorbit: el decide ce se publică, nu adresa generală.
           </p>
         </div>
 
@@ -444,9 +440,7 @@ Contact pentru presă: ${om.nume}, ${om.telefon.afisat}, ${om.email}
         Cum arată un comunicat pe care îl publică
       </h2>
       <p className="mt-2 max-w-3xl text-mic text-cerneala-moale">
-        Forma contează mai mult decât stilul: titlu scurt, primul paragraf care
-        spune tot, un citat cu nume, datele asociației și un om cu telefon.
-        Copiază-l și completează parantezele.
+        Un comunicat bun are un titlu scurt, un prim paragraf care spune tot, un citat cu nume, datele asociației și o persoană de contact cu telefon. Copiază modelul și completează parantezele.
       </p>
       <pre className="mt-4 overflow-x-auto colt-mic-a bg-hartie-umbra/50 p-4 font-mono text-nota leading-relaxed whitespace-pre-wrap text-cerneala-moale">
         {text}
@@ -455,8 +449,7 @@ Contact pentru presă: ${om.nume}, ${om.telefon.afisat}, ${om.email}
         <strong className="text-cerneala-moale">
           Acordul părinților pentru poze
         </strong>{" "}
-        nu e o formalitate: o fotografie cu un copil, trimisă presei fără
-        acord, e singura greșeală din tot comunicatul care nu se poate repara.
+        nu e o formalitate: o fotografie cu un copil trimisă presei fără acord nu mai poate fi retrasă.
       </p>
     </section>
   );

@@ -200,7 +200,7 @@ async function Continut({
   return (
     <Cadru
       titlu="Utilizatori"
-      descriere="Cine poate intra în panou și cât vede fiecare."
+      descriere="Cine are acces la panou și ce poate vedea fiecare."
       activ="/admin/utilizatori"
     >
       {mesaj && (
@@ -253,9 +253,7 @@ async function Continut({
             Fă un cont
           </h2>
           <p className="mt-1 text-nota text-cerneala-slab">
-            Cel mai bine: trimiți invitația și omul își pune singur parola. Așa
-            n-o știe nimeni altcineva, nici tu — iar parola nu mai trece prin
-            WhatsApp, unde rămâne scrisă.
+            Cel mai sigur e să trimiți invitația: persoana își alege singură parola, pe care n-o mai știe nimeni altcineva.
           </p>
         </div>
 

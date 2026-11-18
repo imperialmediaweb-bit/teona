@@ -104,7 +104,7 @@ async function Continut({
     return (
       <Cadru
         titlu="Poze"
-        descriere="Pozele din contul Cloudinary al asociației."
+        descriere="Pozele încărcate pe site, pe foldere."
         activ="/admin/poze"
       >
         <div className="max-w-2xl colt-a border border-hartie-umbra bg-hartie p-6">
@@ -130,8 +130,7 @@ async function Continut({
             </li>
           </ul>
           <p className="mt-4 text-mic text-cerneala-moale">
-            Se iau din Cloudinary, din tabloul de bord, de la „API Keys”. Nu se
-            scriu niciodată în cod și nu se trimit pe chat.
+            Le găsești în Cloudinary, la „API Keys”. Nu le trimite niciodată pe chat sau pe e-mail.
           </p>
         </div>
       </Cadru>
@@ -196,7 +195,7 @@ async function Continut({
   return (
     <Cadru
       titlu="Poze"
-      descriere="Ce e în contul Cloudinary al asociației. Cele mai noi, primele."
+      descriere="Pozele încărcate, cele mai noi primele."
       activ="/admin/poze"
     >
       <nav
@@ -309,8 +308,7 @@ async function Continut({
 
       {!cale && subdosare.length === 0 && (
         <p className="mt-8 text-amplu text-cerneala-moale">
-          Contul n-are foldere. Pozele urcate fără folder nu apar aici — pune-le
-          într-un folder în Cloudinary, ca să se poată găsi.
+          Contul nu are foldere. Pozele încărcate fără folder nu apar aici.
         </p>
       )}
     </Cadru>

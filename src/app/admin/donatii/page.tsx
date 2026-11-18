@@ -114,9 +114,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
           {/* Acțiunea principală a paginii: formularul se deschide în sertar, nu într-o secțiune pliată jos. */}
           <Sertar eticheta="Adaugă donație" titlu="Adaugă o donație" deschisLaInceput={deMana === "1"}>
         <p className="mb-5 text-mic text-cerneala-moale">
-          Pentru banii care nu trec prin site: transfer bancar, numerar, SMS,
-          Galantom. Intră în aceleași totaluri și în aceleași grafice ca
-          donațiile cu cardul.
+          Pentru banii primiți în afara site-ului: transfer bancar, numerar, SMS sau Galantom. Intră în aceleași totaluri ca donațiile cu cardul.
         </p>
 
         <form
@@ -183,9 +181,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
               className={camp}
             />
             <span className="mt-1 block text-nota text-cerneala-slab">
-              Orice o identifică fără dubiu. Două donații nu pot avea aceeași
-              referință pe aceeași cale — așa nu se trece aceeași sumă de două
-              ori dintr-un extras citit în două reprize.
+              Ceva care o identifică sigur, de exemplu numărul extrasului. Aceeași referință nu se poate folosi de două ori pe aceeași cale, ca să nu treci o donație de două ori.
             </span>
           </label>
 
@@ -209,8 +205,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
             </span>
             <input name="email" type="email" className={camp} />
             <span className="mt-1 block text-nota text-cerneala-slab">
-              Cu e-mail, donația se leagă de donatorul din listă. Fără, rămâne
-              în totaluri, dar nu are un om în spate.
+              Cu e-mail, donația apare la donatorul respectiv. Fără e-mail, intră doar în totaluri.
             </span>
           </label>
 
@@ -241,7 +236,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
           className="mb-6 rounded-card border border-turcoaz-200 bg-turcoaz-50 p-4 text-mic text-turcoaz-900"
         >
           <strong className="font-titlu font-bold">Donația e trecută.</strong>{" "}
-          Apare în listă și în tabloul de bord.
+          Apare în listă și pe pagina Acasă.
         </p>
       )}
       {respins && (
@@ -285,10 +280,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
             Donații lunare care n-au trecut ({esuate.length})
           </h2>
           <p className="mt-1 max-w-2xl text-mic text-caramiziu-900/80">
-            Oamenii ăștia vor să doneze și nu pot — de obicei fiindcă le-a
-            expirat cardul. Fiecare a primit un mesaj cu linkul de schimbat
-            cardul; jumătate nu-l deschid. Un telefon în săptămâna asta
-            recuperează donația. Rândul dispare singur când plata trece.
+            Acești donatori vor să doneze, dar plata n-a trecut, de obicei pentru că le-a expirat cardul. Fiecare a primit un e-mail cu linkul pentru schimbarea cardului, dar mulți nu-l deschid. Un telefon săptămâna asta recuperează donația. Rândul dispare singur când plata trece.
           </p>
 
           <ul className="mt-5 grid gap-3">
@@ -338,9 +330,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
             Transferuri anunțate de donatori ({anuntate.length})
           </h2>
           <p className="mt-1 max-w-2xl text-mic text-turcoaz-900/80">
-            Oamenii ăștia spun că au făcut transferul. Caută suma în extrasul de
-            cont: dacă e acolo, apasă „Am găsit-o în extras” și donația intră în
-            totaluri, cu data de mai jos. Dacă nu, scoate-o.
+            Acești donatori spun că au făcut transferul. Caută suma în extrasul de cont: dacă o găsești, apasă „Am găsit-o în extras” și donația intră în totaluri, cu data de mai jos. Dacă nu, apasă „N-am găsit-o”.
           </p>
 
           <ul className="mt-5 grid gap-4">

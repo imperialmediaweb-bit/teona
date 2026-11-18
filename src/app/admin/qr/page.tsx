@@ -96,7 +96,7 @@ async function Continut({
   return (
     <Cadru
       titlu="Cod QR"
-      descriere="Pentru afișe, fluturași, cutii de donații — cu etichetă, ca să se vadă în panou ce au adus."
+      descriere="Coduri QR pentru afișe, fluturași și cutii de donații. Pentru fiecare cod vezi separat câte donații a adus."
       activ="/admin/qr"
     >
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
@@ -165,8 +165,7 @@ async function Continut({
                 className="min-h-12 colt-mic-a border border-hartie-umbra bg-hartie px-3 text-cerneala sm:max-w-40"
               />
               <span className="text-nota text-cerneala-slab">
-                Formularul se deschide cu suma asta aleasă. Omul o poate
-                schimba oricând — e o propunere, nu o cerere.
+                Formularul de donație se deschide cu suma aceasta aleasă. Donatorul o poate schimba.
               </span>
             </label>
 
@@ -219,13 +218,11 @@ async function Continut({
             </a>
           </div>
           <p className="mt-3 text-nota text-cerneala-slab">
-            PNG pentru Word și tipar obișnuit. SVG pentru bannere și afișe
-            mari: nu se pixelează oricât îl mărești.
+            PNG pentru Word și tipar obișnuit. SVG pentru bannere și afișe mari, fiindcă rămâne clar la orice mărime.
           </p>
           <p className="mt-3 text-nota text-cerneala-slab">
             <strong className="text-cerneala-moale">Înainte de tipar:</strong>{" "}
-            scanează-l de pe ecran, cu telefonul. Un cod tipărit greșit se
-            descoperă altfel abia după o mie de fluturași.
+            scanează-l de pe ecran cu telefonul. Altfel, o greșeală se vede abia după ce ai tipărit fluturașii.
           </p>
         </aside>
       </div>

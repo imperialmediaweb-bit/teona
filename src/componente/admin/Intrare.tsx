@@ -214,8 +214,7 @@ function FormularParola({
             role="alert"
             className="mt-4 rounded-lg bg-caramiziu-50 px-4 py-3 text-mic font-semibold text-caramiziu-900"
           >
-            Codul a fost greșit de cinci ori, așa că acum se intră cu e-mailul
-            și parola. După intrare, codul merge din nou.
+            Codul a fost greșit de cinci ori. Intră acum cu e-mailul și parola; după aceea codul funcționează din nou.
           </p>
         )}
 
@@ -236,8 +235,7 @@ function FormularParola({
                   Nu am putut verifica contul: baza de date nu răspunde.
                 </p>
                 <p className="mt-1 text-mic text-caramiziu-900">
-                  Nu e parola ta. Încearcă din nou peste un minut; dacă se
-                  repetă, spune-i dezvoltatorului.
+                  Nu e vina parolei. Încearcă din nou peste un minut; dacă problema se repetă, anunță dezvoltatorul.
                 </p>
               </>
             ) : (
@@ -276,8 +274,7 @@ function FormularParola({
         </button>
 
         <p className="mt-4 text-nota text-cerneala-slab">
-          Conturile pe oameni se fac din panou, după ce intri — nu de aici.
-          Cinci încercări la 15 minute.
+          Conturile noi se fac din panou, după intrare. Ai cinci încercări la 15 minute.
         </p>
       </form>
     </div>

@@ -107,7 +107,7 @@ export default function Jurnal({
 
       {intrari.length === 0 ? (
         <p className="mt-4 text-nota text-cerneala-slab">
-          Nimic scris încă. Primul rând de aici e de obicei „l-am sunat”.
+          Nimic notat încă. De obicei, prima notiță e „l-am sunat”.
         </p>
       ) : (
         <ol className="mt-4 grid gap-2.5">

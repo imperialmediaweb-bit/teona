@@ -211,8 +211,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
           </table>
         </div>
         <p className="mt-2 max-w-3xl text-nota text-cerneala-slab">
-          La fiecare abonare de pe site (newsletter, donație, cont) primiți un e-mail și, dacă v-ați
-          pornit notificările, o notificare pe telefon. La cele încărcate manual, nu.
+          La fiecare abonare de pe site (newsletter, donație, cont) primiți un e-mail și, dacă ați pornit notificările, o notificare pe telefon. Pentru adresele încărcate de voi nu primiți nimic.
         </p>
       </section>
 

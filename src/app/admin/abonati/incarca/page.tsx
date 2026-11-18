@@ -71,9 +71,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   return (
     <Cadru titlu="Încarcă abonați" activ={activ}>
       <p className="max-w-2xl text-amplu text-cerneala-moale">
-        Pune adresele, câte una pe rând. Merge și cu virgulă între ele, și se poate lipi o
-        coloană copiată din Excel. Pleacă direct în MailerLite, în lista aleasă, iar
-        campaniile pleacă de acolo.
+        Scrie adresele câte una pe rând sau despărțite prin virgulă. Poți lipi și o coloană copiată din Excel. Adresele ajung direct în MailerLite, în lista aleasă.
       </p>
 
       {!areBuletin() && (
@@ -124,7 +122,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
             </span>
           </label>
           <span className="text-nota text-cerneala-slab">
-            Dacă ai și persoane, și firme, încarcă-le în două rânduri: întâi unele, apoi celelalte.
+            Dacă ai și persoane, și firme, încarcă-le separat.
           </span>
         </fieldset>
 
@@ -138,8 +136,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
             className={`${CAMP} font-mono`}
           />
           <span className="text-nota text-cerneala-slab">
-            Cel mult 200 o dată. Cele deja abonate nu se urcă a doua oară, iar cele repetate în
-            listă se iau o singură dată.
+            Cel mult 200 de adrese o dată. Cele deja abonate și cele repetate se adaugă o singură dată.
           </span>
         </label>
 
@@ -173,9 +170,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
       </form>
 
       <p className="mt-4 max-w-2xl text-nota text-cerneala-slab">
-        Cine s-a dezabonat vreodată nu se pune înapoi, nici dacă e pe o listă veche. De
-        aici nu pleacă niciun e-mail către cei încărcați; campaniile le trimiteți din
-        MailerLite.
+        Cine s-a dezabonat nu mai este adăugat, nici dacă apare pe o listă veche. De aici nu pleacă niciun e-mail; campaniile se trimit din MailerLite.
       </p>
     </Cadru>
   );

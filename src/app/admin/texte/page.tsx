@@ -155,13 +155,10 @@ async function Continut({
         </p>
         <ul className="mt-2 grid gap-1 text-mic text-cerneala-moale">
           <li>
-            <strong>„Pune textul de la început” aduce înapoi</strong> exact ce
-            scria la lansare. Textul ăla nu se pierde niciodată, orice scrii
-            peste el.
+            <strong>„Pune textul de la început” aduce înapoi</strong> textul de la lansare, care nu se pierde orice ai modifica.
           </li>
           <li>
-            Un <strong>rând gol</strong> desparte paragrafele. Altceva nu e
-            nevoie: felul în care arată textul îl dă site-ul.
+            Un <strong>rând gol</strong> desparte paragrafele. Restul formatării o face site-ul.
           </li>
           <li>
             Se schimbă <strong>ce scrie</strong>, nu cum arată: titlurile de

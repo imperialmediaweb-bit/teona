@@ -90,7 +90,7 @@ async function Continut({
   return (
     <Cadru
       titlu="Cifrele"
-      descriere="Cele patru cifre de pe prima pagină, de pe Despre noi și de la 3,5%."
+      descriere="Cele patru cifre afișate pe site: prima pagină, Despre noi și pagina de 3,5%."
       activ="/admin/cifre"
     >
       {mesaj && (
@@ -114,16 +114,14 @@ async function Continut({
         </p>
         <ul className="mt-2 grid gap-1 text-mic text-cerneala-moale">
           <li>
-            Prima pagină, Despre noi, pagina de 3,5%, e-mailurile de campanie
-            și ce răspunde asistentul vizitatorilor.
+            Prima pagină, Despre noi, pagina de 3,5%, e-mailurile de campanie și asistentul de pe site.
           </li>
           <li>
             <strong>Sufixul</strong> e semnul de după cifră: „+” la „1.500+”,
             gol la „33”.
           </li>
           <li>
-            <strong>Eticheta</strong> e ce scrie dedesubt. O poți schimba: dacă
-            „participanți” nu mai e cuvântul potrivit, scrie altul.
+            <strong>Eticheta</strong> e textul de sub cifră. Îl poți schimba oricând.
           </li>
           <li>
             Cifra se scrie numai cu cifre: <strong>1500</strong>, nu „1.500”.
@@ -134,8 +132,7 @@ async function Continut({
 
       {!areBazaDeDate() ? (
         <p className="max-w-2xl text-amplu text-cerneala-moale">
-          Baza de date nu e pornită, deci cifrele nu se pot schimba acum. Pe
-          site se văd cele de dinainte.
+          Baza de date nu răspunde, așa că cifrele nu se pot schimba acum. Pe site rămân cele de dinainte.
         </p>
       ) : (
         <form

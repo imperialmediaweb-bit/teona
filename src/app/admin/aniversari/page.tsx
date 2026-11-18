@@ -114,8 +114,7 @@ async function Continut({
             Campania e {gata === "publicata" ? "publicată" : "respinsă"}, dar
             e-mailul către {faraEmail || "om"} n-a plecat.
           </strong>{" "}
-          Serverul de e-mail n-a răspuns. Trimite-i tu linkul campaniei, altfel
-          nu află nimeni.
+          E-mailul n-a putut pleca. Trimite-i tu linkul campaniei, altfel omul nu află că pagina e publicată.
         </p>
       )}
       {(gata === "publicata" || gata === "respinsa") && faraEmail === undefined && (
@@ -145,7 +144,7 @@ async function Continut({
       {publicate.length > 0 && (
         <section className="mb-10 rounded-card border border-hartie-umbra bg-hartie p-5">
           <h2 className="font-titlu text-amplu font-bold text-cerneala">
-            Pagini publicate, și cât au strâns
+            Pagini publicate și cât au strâns
           </h2>
           <ul className="mt-4 grid gap-3">
             {publicate.map((p) => (

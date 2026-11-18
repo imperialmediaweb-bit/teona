@@ -990,7 +990,7 @@ async function Continut({
     return (
       <Cadru
         titlu="Analiză"
-        descriere="Vizitele de pe site. Profilurile cer baza de date."
+        descriere="Vizitele de pe site. Restul analizei are nevoie de baza de date."
         activ="/admin/analiza"
       >
         <Sectiune
@@ -1048,7 +1048,7 @@ async function Continut({
   return (
     <Cadru
       titlu="Analiză"
-      descriere="Cine sunt donatorii, unde stau firmele și ce se vede în cifre."
+      descriere="Donatorii, firmele și campaniile, în cifre."
       activ="/admin/analiza"
     >
       {ratat && RATAT[ratat] && (

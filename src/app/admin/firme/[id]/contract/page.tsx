@@ -159,9 +159,7 @@ async function Continut({
       ) : (
         <p className="mb-7 max-w-3xl colt-mic-a border border-hartie-umbra bg-hartie px-5 py-4 text-mic text-cerneala-moale">
           N-am putut lua datele de la ANAF pentru CUI-ul{" "}
-          <strong>{firma.cui}</strong>. Completează sediul și numărul de la
-          registrul comerțului de mână — ce rămâne gol apare în contract ca
-          puncte, de completat cu pixul.
+          <strong>{firma.cui}</strong>. Completează sediul și numărul de la registrul comerțului. Ce rămâne gol apare în contract cu puncte, de completat de mână.
         </p>
       )}
 

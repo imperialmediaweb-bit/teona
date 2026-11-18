@@ -55,8 +55,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
         <Link href="/admin/firme" className="font-semibold text-caramiziu-700 underline underline-offset-2">
           ← Firme / Sponsori
         </Link>
-        {" · "}E-mailul apare apoi pe pagina fiecărei firme, cu „Deschis” și „A apăsat pe link”. Pentru o listă mare (sute de
-        adrese) se folosește MailerLite.
+        {" · "}E-mailul apare apoi pe pagina fiecărei firme, cu starea lui („Deschis”, „A apăsat pe link”). Pentru sute de adrese, folosește MailerLite.
       </p>
       <div className="max-w-4xl">
         <ScrieFirmei firme={lista} limita={LIMITA_LOT} campanii={campanii} aleseLaInceput={aleasa ? [aleasa.id] : []} />

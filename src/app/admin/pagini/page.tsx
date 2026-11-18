@@ -139,7 +139,7 @@ async function Continut({
   return (
     <Cadru
       titlu="Pagini"
-      descriere="Alege pagina pe care vrei s-o schimbi. Pe fiecare card e tot ce se poate schimba pe ea."
+      descriere="Alege pagina de pe site pe care vrei s-o modifici."
       activ="/admin/pagini"
     >
       <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

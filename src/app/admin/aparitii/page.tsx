@@ -89,9 +89,9 @@ async function Continut({ searchParams }: { searchParams: Cautare }) {
       </datalist>
       <DeStiut>
         <li>O apariție nouă intră <strong>prima</strong> în listă. Ordinea de aici e ordinea de pe site; mută cu ↑ și ↓.</li>
-        <li>La „Unde a apărut”, alege din listă ziarele știute: așa apare și sigla lor. Altfel se scrie numele.</li>
+        <li>La „Unde a apărut”, alege publicația din listă ca să apară și sigla ei. Dacă nu e în listă, scrie numele.</li>
         <li>Un link de filmare de pe Facebook se arată în pagină, cu playerul.</li>
-        <li>Nimic nu se șterge: „Scoate de pe site” o ascunde.</li>
+        <li>„Scoate de pe site” o ascunde fără s-o șteargă.</li>
       </DeStiut>
 
       <section className="mb-12">

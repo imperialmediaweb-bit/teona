@@ -94,8 +94,7 @@ async function Continut({
     >
       {aCazut ? (
         <p className="max-w-2xl text-amplu text-caramiziu-800">
-          Căutarea n-a mers. Nu înseamnă că nu există nimic — înseamnă că n-am
-          putut căuta. Încearcă din nou peste un minut.
+          Căutarea nu a funcționat acum. Încearcă din nou peste un minut.
         </p>
       ) : cautat.length < 2 ? (
         <p className="max-w-2xl text-amplu text-cerneala-moale">

@@ -147,7 +147,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   return (
     <Cadru
       titlu="Firme / Sponsori"
-      descriere="Fiecare firmă stă singură în coloana ei, după ultimul e-mail. Clic pe ea pentru discuție."
+      descriere="Firmele se mută singure între coloane, după ultimul e-mail. Apasă pe o firmă ca să vezi discuția."
       activ="/admin/firme"
       actiuni={
         <span className="flex flex-wrap items-center gap-2">
@@ -161,8 +161,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
       {q.stearsa && <Anunt>Firma a fost ștearsă, cu discuția și atașamentele ei.</Anunt>}
       {q.arhivata && (
         <Anunt ton="neutru">
-          Firma are contracte sau donații, deci n-am șters-o: e arhivată. Nu mai apare în liste, dar rămâne în registru și în
-          rapoarte.
+          Firma are contracte sau donații, așa că a fost arhivată, nu ștearsă. Nu mai apare în liste, dar rămâne în registru și în rapoarte.
         </Anunt>
       )}
       {q.trimise !== undefined && (
@@ -192,7 +191,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
         <section className="mt-10 grid max-w-4xl gap-4">
           <h2 className="font-titlu text-amplu font-bold text-cerneala">Răspunsuri pe care nu le-am putut lega de o firmă</h2>
           <p className="text-mic text-cerneala-moale">
-            Au venit de la o adresă care nu e în nicio fișă de firmă. Dacă e o firmă de-a voastră, puneți adresa asta în fișa ei.
+            Au venit de la adrese care nu apar la nicio firmă. Dacă recunoști firma, adaugă adresa în fișa ei.
           </p>
           {nelegate.map((m) => (
             <MesajFirma key={m.id} m={m} />

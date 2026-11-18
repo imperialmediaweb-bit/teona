@@ -136,15 +136,12 @@ async function Continut({
   return (
     <Cadru
       titlu="E-mailuri"
-      descriere="Toate e-mailurile pe care le trimite site-ul, cu date de probă."
+      descriere="Toate e-mailurile automate ale site-ului, cu date de exemplu."
       activ="/admin/emailuri"
     >
       <FileEmailuri aici="trimise" />
       <p className="mb-6 max-w-3xl text-amplu text-cerneala-moale">
-        Mesajele astea pleacă singure, în numele asociației. Deschide-le din
-        când în când: un telefon schimbat sau o frază care nu mai e adevărată se
-        vede doar dacă se uită cineva. Nu se trimite nimic de aici, iar numele
-        din ele sunt de probă.
+        Aceste mesaje pleacă automat, în numele asociației. Verifică-le din când în când, ca să prinzi un telefon schimbat sau o informație veche. De aici nu se trimite nimic, iar numele din ele sunt de exemplu.
       </p>
 
       {!areEmail() && (
@@ -152,8 +149,7 @@ async function Continut({
           role="status"
           className="mb-6 colt-mic-a bg-caramiziu-50 px-4 py-3 text-mic font-semibold text-caramiziu-900"
         >
-          Lipsește RESEND_API_KEY din Railway, deci acum nu pleacă niciun mesaj.
-          Se văd oricum aici, așa cum vor arăta.
+          Trimiterea e-mailurilor nu e pornită (lipsește RESEND_API_KEY). Aici vezi cum vor arăta.
         </p>
       )}
 
@@ -209,17 +205,13 @@ async function Continut({
             <strong className="text-cerneala">
               Mulțumirea când transferul nu se găsește.
             </strong>{" "}
-            La „N-am găsit-o în extras” nu pleacă nimic: n-avem ce să mulțumim,
-            iar un mesaj automat care spune „nu i-am găsit banii” e o
-            conversație de purtat la telefon, nu de trimis de un server.
+            La „N-am găsit-o în extras” nu pleacă niciun e-mail. O astfel de situație se lămurește mai bine la telefon.
           </li>
           <li>
             <strong className="text-cerneala">
               Confirmarea că formularul 230 a fost depus la ANAF.
             </strong>{" "}
-            Site-ul nu știe când depuneți dosarul — hârtiile și depunerea se fac
-            în afara lui. Mesajul de după completare promite că scriem atunci,
-            deci rămâne un e-mail scris de mână.
+            Site-ul nu știe când depuneți formularele la ANAF. Confirmarea o trimiteți voi, printr-un e-mail obișnuit.
           </li>
         </ul>
       </section>

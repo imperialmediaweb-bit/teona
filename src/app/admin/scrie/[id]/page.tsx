@@ -367,7 +367,7 @@ async function Continut({
                   Cum se citește data
                 </span>
                 <span className="text-mic text-cerneala-moale">
-                  Asta se vede pe pagină. O tabără ține cinci zile, nu una.
+                  Așa apare data pe pagină, de exemplu „8–12 septembrie 2025”.
                 </span>
                 <input
                   name="dataCitita"
@@ -452,9 +452,7 @@ async function Continut({
               Ținta campaniei, în lei (opțional)
             </span>
             <span className="text-mic text-cerneala-moale">
-              Apare pe pagină ca „strângem X lei”. Lasă gol dacă nu vrei să
-              anunți o sumă — o țintă neatinsă, afișată luni de zile, face mai
-              mult rău decât bine.
+              Apare pe pagină ca „strângem X lei”. Lasă gol dacă nu vrei să afișezi o sumă.
             </span>
             <input
               name="tinta"

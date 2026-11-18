@@ -248,7 +248,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
             .
           </p>
         ) : gasiti.length === 0 ? (
-          <p className="text-amplu text-cerneala-moale">Niciun voluntar nu se potrivește cu filtrele astea.</p>
+          <p className="text-amplu text-cerneala-moale">Niciun voluntar nu se potrivește cu filtrele alese.</p>
         ) : (
           // Cheia se schimbă cu filtrul, ca bifele să pornească iar „toți”.
           <BazaVoluntari key={gasiti.map((v) => v.id).join(",")} voluntari={lista} areEmail={areEmail()} />
@@ -276,7 +276,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                   </p>
                   <details className="mt-3">
                     <summary className="cursor-pointer text-mic font-semibold text-caramiziu-700">
-                      Cine a răspuns, și WhatsApp pentru ceilalți
+                      Cine a răspuns și WhatsApp pentru ceilalți
                     </summary>
                     <ul className="mt-3 grid gap-2">
                       {ai

@@ -77,7 +77,7 @@ function BlocPoza({ k }: { k: string }) {
         }}
         className="text-mic"
       />
-      <input name={`bp_alt_${k}`} maxLength={200} placeholder="Ce se vede în poză (pentru cine n-o vede)" className={camp} />
+      <input name={`bp_alt_${k}`} maxLength={200} placeholder="Descrierea pozei (pentru cei care nu o pot vedea)" className={camp} />
       {stare.mesaj && <p className="text-nota font-semibold text-caramiziu-800">{stare.mesaj}</p>}
     </div>
   );

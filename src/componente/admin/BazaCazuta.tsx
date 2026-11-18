@@ -15,8 +15,7 @@ export default function BazaCazuta({ ce = "lista" }: { ce?: string }) {
       <strong className="font-titlu font-bold text-caramiziu-800">
         Baza de date nu răspunde acum
       </strong>
-      , deci {ce} nu se poate citi. Nu s-a pierdut nimic. Reîncarcă pagina
-      peste un minut; dacă se repetă, spune-i dezvoltatorului.
+      , deci {ce} nu se poate citi acum. Nu s-a pierdut nimic. Reîncarcă pagina peste un minut; dacă problema se repetă, anunță dezvoltatorul.
     </p>
   );
 }

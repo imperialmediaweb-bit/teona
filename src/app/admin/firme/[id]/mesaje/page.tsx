@@ -202,7 +202,7 @@ async function Continut({
         </h2>
         {nou && (
           <p role="status" className="mb-4 colt-mic-a bg-turcoaz-50 px-4 py-3 text-mic font-semibold text-turcoaz-900">
-            Firma e adăugată ca lead. Scrie-i primul e-mail.
+            Firma a fost adăugată. Scrie-i primul e-mail.
           </p>
         )}
         {era && (
@@ -212,7 +212,7 @@ async function Continut({
         )}
         {!f.faraEmailuri && !["semnat", "incasat", "renuntat"].includes(f.stadiu) && trimiseFaraRaspuns(mesaje) >= NU_RASPUNDE_DUPA && (
           <p data-nu-raspunde className="mb-4 colt-mic-a bg-hartie-umbra/70 px-4 py-3 text-mic font-semibold text-cerneala">
-            Nu răspunde: i-ai scris de {cate(trimiseFaraRaspuns(mesaje), "dată", "ori")} fără niciun răspuns. Mai bine o lași în pace sau o suni.
+            Nu răspunde: i-ai scris de {cate(trimiseFaraRaspuns(mesaje), "dată", "ori")} fără niciun răspuns. Mai bine o suni decât să-i mai scrii.
           </p>
         )}
         {refuza && !f.faraEmailuri && (
@@ -222,12 +222,12 @@ async function Continut({
         )}
         {trimis && (
           <p role="status" className="mb-4 colt-mic-a bg-turcoaz-50 px-4 py-3 text-mic font-semibold text-turcoaz-900">
-            A plecat. Îl vezi mai sus; când îl deschide, scrie „Deschis”.
+            E-mailul a plecat. Îl vezi mai sus; când firma îl deschide, apare „Deschis”.
           </p>
         )}
         {ratat && (
           <p role="alert" className="mb-4 colt-mic-a bg-caramiziu-50 px-4 py-3 text-mic font-semibold text-caramiziu-900">
-            N-a plecat: serverul de e-mail n-a răspuns. Ce ai scris e tot în caseta de mai jos; încearcă din nou peste câteva minute.
+            E-mailul n-a putut pleca. Textul tău e tot în caseta de mai jos; încearcă din nou peste câteva minute.
           </p>
         )}
         {f.faraEmailuri ? (

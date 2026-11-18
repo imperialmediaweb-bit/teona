@@ -90,7 +90,7 @@ async function Continut({
   return (
     <Cadru
       titlu="Documente"
-      descriere="Fișierele pe care le descarcă oamenii și firmele de pe site."
+      descriere="Documentele care se descarcă de pe site: Formularul 230, contractele, declarațiile."
       activ="/admin/documente"
     >
       {mesaj && (
@@ -114,26 +114,22 @@ async function Continut({
         </p>
         <ul className="mt-2 grid gap-1 text-mic text-cerneala-moale">
           <li>
-            Alegi fișierul PDF și apeși „Urcă”. Butonul de pe site duce de
-            atunci la el, pe <strong>aceeași adresă</strong> — deci un link pus
-            într-un e-mail acum trei luni duce la modelul de acum.
+            Alegi fișierul PDF și apeși „Urcă”. Butonul de pe site duce
+            imediat la el, pe <strong>aceeași adresă</strong>, așa că și
+            linkurile trimise mai demult duc la varianta nouă.
           </li>
           <li>
-            Numai PDF, cel mult 10 MB. Fișierul vechi e înlocuit, nu păstrat:
-            două modele de contract în circulație înseamnă două contracte
-            diferite semnate.
+            Numai PDF, cel mult 10 MB. Fișierul nou îl înlocuiește pe cel vechi.
           </li>
           <li>
-            Verifică documentul înainte: nu-l citește nimeni după tine, și
-            pleacă direct la firme.
+            Verifică documentul înainte să-l încarci: ajunge direct la firme.
           </li>
         </ul>
       </div>
 
       {!depozit && (
         <p className="mb-8 max-w-3xl colt-mic-a border border-caramiziu-200 bg-caramiziu-50 px-5 py-4 text-mic text-caramiziu-900">
-          Depozitul de fișiere nu e pornit, deci nu se poate urca nimic acum.
-          Documentele care au deja un fișier pe site se descarcă în continuare.
+          Încărcarea fișierelor nu e pornită acum. Documentele existente se descarcă în continuare.
         </p>
       )}
 
@@ -169,7 +165,7 @@ async function Continut({
                 </p>
               ) : (
                 <p className="mt-2 text-mic font-semibold text-caramiziu-800">
-                  Lipsește. Butonul de pe site e inactiv până îl urci aici.
+                  Lipsește. Butonul de pe site e inactiv până îl încarci.
                 </p>
               )}
             </div>

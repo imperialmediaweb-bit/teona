@@ -166,9 +166,7 @@ async function Continut({
             Fără descriere · {faraText.length}
           </h2>
           <p className="mt-2 max-w-2xl text-mic text-cerneala-moale">
-            Taberele astea sunt pe site cu titlul și fotografiile lor, dar fără
-            text. Apasă pe una și scrie-i descrierea — pagina ei de pe site se
-            schimbă, nu se face alta nouă.
+            Aceste tabere apar pe site cu titlu și fotografii, dar fără descriere. Apasă pe una și scrie-i descrierea; se actualizează pagina existentă.
           </p>
           <ul className="mt-4 grid gap-2">
             {faraText.map((p) => (

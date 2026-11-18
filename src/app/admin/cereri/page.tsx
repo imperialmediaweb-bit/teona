@@ -155,8 +155,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
 
       {lista.length === 0 ? (
         <p className="mt-10 text-amplu text-cerneala-moale">
-          Nicio cerere aici. Apar singure când cineva cere pașii pentru 3,5%, se
-          înscrie ca voluntar sau scrie prin formularul de contact.
+          Nicio cerere aici. Cererile apar singure când cineva completează un formular pe site: 3,5%, voluntariat sau contact.
         </p>
       ) : (
         <ul className="mt-8 grid gap-4">

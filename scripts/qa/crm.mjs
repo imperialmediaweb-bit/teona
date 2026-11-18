@@ -208,7 +208,7 @@ verifica("jurnalul stă pe pagina firmei", (await page.locator('form[action="/ap
 const textJurnal = await page.locator("#panou-admin").innerText();
 verifica(
   "jurnalul arată ori că e gol, ori ce scrie în el",
-  textJurnal.includes("Nimic scris încă") || /Telefon|Notiță|E-mail|Întâlnire/.test(textJurnal),
+  textJurnal.includes("Nimic notat încă") || /Telefon|Notiță|E-mail|Întâlnire/.test(textJurnal),
 );
 
 await page.selectOption('form[action="/api/admin/jurnal"] select[name="fel"]', "telefon");

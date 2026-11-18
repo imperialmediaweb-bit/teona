@@ -19,7 +19,7 @@ export default function StergeFirma({ id, denumire }: { id: string; denumire: st
         Șterge firma, cu discuția și atașamentele ei
       </button>
       <p className="mt-1 text-nota text-cerneala-slab">
-        Dacă are contracte sau donații, nu se șterge: se arhivează (dispare din liste, rămâne în registru).
+        Dacă are contracte sau donații, firma se arhivează în loc să fie ștearsă: dispare din liste, dar rămâne în registru.
       </p>
     </form>
   );

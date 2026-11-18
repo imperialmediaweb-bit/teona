@@ -115,7 +115,7 @@ async function Continut({
   return (
     <Cadru
       titlu="Testimoniale"
-      descriere="Ce spun familiile și voluntarii, pe prima pagină."
+      descriere="Mărturiile familiilor și ale voluntarilor, de pe prima pagină."
       activ="/admin/testimoniale"
     >
       {mesaj && (
@@ -147,12 +147,10 @@ async function Continut({
             băiat din tabără”, „Andrei, voluntar”.
           </li>
           <li>
-            Fără nume de familie și fără fotografii. Oamenii care vorbesc
-            despre copiii lor n-au cerut să fie recunoscuți de tot internetul.
+            Fără nume de familie și fără fotografii, ca familiile să nu poată fi recunoscute.
           </li>
           <li>
-            Dacă e o recenzie publică de pe Facebook, scrie asta la „De unde”:
-            cine citește trebuie să știe că n-am cules-o noi.
+            Dacă e o recenzie publică de pe Facebook, scrie asta la „De unde”.
           </li>
           <li>
             A scris mai mult? Pune fraza cea mai bună la „Citatul” și

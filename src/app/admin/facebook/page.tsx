@@ -109,7 +109,7 @@ async function Continut({
   return (
     <Cadru
       titlu="Facebook"
-      descriere="Cifrele paginii și trimiterea unei noutăți pe ea."
+      descriere="Cifrele paginii de Facebook și publicarea noutăților pe ea."
       activ="/admin/facebook"
     >
       {ratat && RATAT[ratat] && (
@@ -130,15 +130,13 @@ async function Continut({
             Trimite pe pagină
           </h2>
           <p className="text-nota text-cerneala-slab">
-            Noutățile și campaniile publicate pe site. Pleacă la apăsare, o
-            singură dată.
+            Noutățile și campaniile publicate pe site. Fiecare se poate trimite o singură dată.
           </p>
         </div>
 
         {publicate.length === 0 ? (
           <p className="max-w-2xl text-amplu text-cerneala-moale">
-            Nu e nimic publicat încă. Scrie o noutate la „Scrie pe site” și
-            publică-o; de-acolo ajunge aici.
+            Nu e nimic publicat încă. Scrie un articol pe blog și publică-l; apoi apare aici.
           </p>
         ) : (
           <ul className="grid gap-3">
@@ -190,9 +188,7 @@ async function Continut({
                               className="w-full min-w-72 colt-mic-a border border-hartie-umbra bg-hartie p-3 text-mic text-cerneala"
                             />
                             <span className="text-nota text-cerneala-slab">
-                              Linkul spre pagina de pe site se adaugă singur,
-                              cu etichetă, ca donațiile venite de aici să se
-                              vadă separat.
+                              Linkul spre site se adaugă singur, ca donațiile venite de pe Facebook să se vadă separat.
                             </span>
                           </label>
                           <div>
@@ -273,10 +269,9 @@ function Cifrele({ p }: { p: Pagina }) {
         />
       </div>
       <p className="mt-4 max-w-3xl text-nota text-cerneala-slab">
-        Cifrele astea le numără Facebook și spun cât s-a văzut, nu cât s-a
-        strâns. Ce a adus pagina în bani se vede la{" "}
+        Aceste cifre vin de la Facebook și arată câți au văzut postările, nu câți bani s-au strâns. Banii aduși de pagină se văd la{" "}
         <strong className="text-cerneala-moale">Analiză</strong>, pe rândul
-        „Facebook, neplătit" — două măsurători diferite, nu una.
+        „Facebook, neplătit”.
       </p>
     </>
   );
@@ -297,9 +292,7 @@ function CumSeLeaga() {
         Pagina de Facebook nu e legată încă de site
       </h2>
       <p className="mt-2 max-w-3xl text-amplu text-cerneala-moale">
-        Dacă asociația va dori, vom conecta pagina de Facebook la site în
-        viitor. Atunci se vor vedea aici cifrele paginii și se vor putea
-        trimite noutățile pe ea dintr-un buton.
+        Când pagina de Facebook va fi conectată, aici vei vedea cifrele ei și vei putea publica noutățile cu un singur buton.
       </p>
     </div>
   );

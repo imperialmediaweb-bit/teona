@@ -197,13 +197,11 @@ async function Continut({
   return (
     <Cadru
       titlu="Rapoarte"
-      descriere="Cifrele unei perioade încheiate, scoase ca PDF."
+      descriere="Rapoarte lunare, anuale și pe campanie, în PDF."
       activ="/admin/rapoarte"
     >
       <p className="mb-6 max-w-3xl text-amplu text-cerneala-moale">
-        Toate cuprind numai donațiile încasate. Un transfer anunțat de donator,
-        dar negăsit încă în extrasul de cont, nu intră în niciun total — apare
-        separat, ca lucru de verificat. Sumele în euro se arată neconvertite.
+        Rapoartele cuprind numai donațiile încasate. Transferurile anunțate, dar negăsite încă în extras, apar separat, de verificat. Sumele în euro rămân neconvertite.
       </p>
 
       <div className="grid gap-5 lg:grid-cols-3">
@@ -320,9 +318,7 @@ async function Continut({
           Listele întregi, pentru Excel
         </h2>
         <p className="mt-1 max-w-3xl text-mic text-cerneala-moale">
-          Rând cu rând, cu toate coloanele, de deschis în Excel sau Google
-          Sheets. Fișierele astea au nume, adrese de e-mail și sume: sunt date
-          personale și rămân în asociație.
+          Toate datele, de deschis în Excel sau Google Sheets. Fișierele conțin nume, e-mailuri și sume: sunt date personale și nu se trimit în afara asociației.
         </p>
         <ul className="mt-4 flex flex-wrap gap-2.5">
           {LISTE.map((l) => (

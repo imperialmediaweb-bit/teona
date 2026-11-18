@@ -173,7 +173,7 @@ async function Continut({
   return (
     <Cadru
       titlu="E-mailuri"
-      descriere="Două șabloane de campanie, cu toate butoanele în ele. Tu scrii titlul, textul și pui poza."
+      descriere="Șabloane de e-mail pentru campanii: scrii titlul și textul, adaugi o poză, iar butoanele de donație sunt deja puse."
       activ="/admin/sabloane"
     >
       <FileEmailuri aici="sabloane" />
@@ -432,10 +432,7 @@ async function Continut({
               E-mailul pleacă direct de aici
             </h2>
             <p className="mt-1 text-nota text-cerneala-moale">
-              Bifezi lista, confirmi și apeși „Trimite campania acum”. Nu e
-              nevoie să intri în MailerLite: trimiterea se face prin contul
-              asociației de acolo, nu de pe serverul site-ului. Linkul de
-              dezabonare e pus singur.
+              Bifezi lista, confirmi și apeși „Trimite campania acum”. Campania pleacă prin contul MailerLite al asociației, fără să intri acolo. Linkul de dezabonare se pune automat.
             </p>
           </div>
         </div>

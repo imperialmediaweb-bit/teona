@@ -85,7 +85,7 @@ function PozaPrincipala({ implicita }: { implicita: { adresa: string; alt: strin
         id="poza_alt"
         name="poza_alt"
         maxLength={200}
-        placeholder="Ce se vede în poză (pentru cine n-o vede) — dacă lași gol, se ia titlul"
+        placeholder="Descrierea pozei (pentru cei care nu o pot vedea); dacă lași gol, se folosește titlul"
         className="block w-full border-b border-dashed border-hartie-umbra bg-hartie-calda/60 px-8 py-2 text-nota text-cerneala-moale outline-none focus:bg-caramiziu-50"
       />
     </div>
@@ -184,7 +184,7 @@ function BlocPoza({ k }: { k: string }) {
       <input
         name={`bp_alt_${k}`}
         maxLength={200}
-        placeholder="Ce se vede în poză (pentru cine n-o vede)"
+        placeholder="Descrierea pozei (pentru cei care nu o pot vedea)"
         className="rounded-moale border border-hartie-umbra bg-hartie px-3 py-1.5 text-nota text-cerneala"
       />
       {stare.mesaj && !stare.lucreaza && (

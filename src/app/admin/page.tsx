@@ -213,7 +213,7 @@ async function Continut({
   return (
     <Cadru
       titlu="Tabloul de bord"
-      descriere="Cum stă asociația cu banii și ce așteaptă un răspuns."
+      descriere="Situația banilor și ce așteaptă un răspuns."
       activ="/admin"
     >
       {/* Notificările se pornesc numai din conturile cu nume (vezi /api/admin/push). */}
@@ -236,8 +236,7 @@ async function Continut({
       >
         {deFacut.length === 0 ? (
           <p className="text-amplu text-cerneala-moale">
-            Nimic nu așteaptă un răspuns. Toate cererile sunt rezolvate,
-            aniversările aprobate și nu e niciun text nepublicat.
+            Totul e la zi: nicio cerere nouă, nicio aniversare de aprobat, niciun text nepublicat.
           </p>
         ) : (
           <>
@@ -320,7 +319,7 @@ async function Continut({
 
       <Sectiune
         titlu="Banii"
-        nota="Cât a intrat, de unde vine și pe ce se duce."
+        nota="Cât a intrat, pe ce cale și pentru ce."
       >
         <div className="grid gap-6">
           <div className="min-w-0">
@@ -371,7 +370,7 @@ async function Continut({
 
       <Sectiune
         titlu="Donatorii"
-        nota="Cine a dat în ultima vreme și dacă vin oameni noi."
+        nota="Cine a donat recent și dacă vin susținători noi."
       >
         <div className="grid gap-6 lg:grid-cols-2">
           {/*
@@ -381,7 +380,7 @@ async function Continut({
             azi. Adresa de e-mail nu se arată întreagă: panoul se deschide și
             într-un birou prin care trec oameni.
           */}
-          <Card titlu="Ultimele donații" nota="Cele mai recente opt, încasate.">
+          <Card titlu="Ultimele donații" nota="Ultimele opt donații încasate.">
             {ultimele.length === 0 ? (
               <p className="text-mic text-cerneala-moale">
                 Nicio donație încasată încă.
@@ -415,7 +414,7 @@ async function Continut({
 
           <Card
             titlu="Donatori noi"
-            nota="Oameni la prima lor donație. Arată dacă asociația crește sau se bazează pe aceiași."
+            nota="Cei care au donat prima dată. Arată dacă vin susținători noi."
           >
             <DonatoriNoi date={luni} />
           </Card>
@@ -424,7 +423,7 @@ async function Continut({
 
       <Sectiune
         titlu="Campanii, firme și cereri"
-        nota="Ce e pornit și ce așteaptă un răspuns de la noi."
+        nota="Ce e în desfășurare și ce așteaptă un răspuns."
       >
         <div className="grid gap-6 lg:grid-cols-2">
           {/*
@@ -497,7 +496,7 @@ async function Continut({
 
           <Card
             titlu="Sponsorizări de la firme"
-            nota="Unde a ajuns fiecare firmă."
+            nota="În ce stadiu e fiecare firmă."
           >
             {/*
               Culoarea nu mai vine de aici: stadiile au ordine, iar pâlnia le
@@ -546,7 +545,7 @@ async function Continut({
           {apasari.length > 0 && (
             <Card
               titlu="Apăsări pe linkurile din afară"
-              nota="Revolut și Galantom nu trec prin site, deci asta e intenția, nu donația. Nu se adună la total."
+              nota="Revolut și Galantom nu trec prin site: aici vezi câți au apăsat, nu câți au donat. Nu intră în total."
             >
               <ul className="grid gap-2">
                 {apasari.map((a) => (

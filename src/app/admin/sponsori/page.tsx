@@ -124,7 +124,7 @@ async function Continut({
   return (
     <Cadru
       titlu="Sponsori"
-      descriere="Siglele firmelor care vă susțin, de pe prima pagină și de pe pagina de sponsori."
+      descriere="Siglele sponsorilor, afișate pe prima pagină și pe pagina de sponsori."
       activ="/admin/sponsori"
     >
       {mesaj && (
@@ -146,9 +146,7 @@ async function Continut({
         <p className="font-titlu font-bold text-cerneala">Ce e bine de știut</p>
         <ul className="mt-2 grid gap-1 text-mic text-cerneala-moale">
           <li>
-            <strong>Numele firmei e obligatoriu.</strong> Fără el, cine
-            folosește un cititor de ecran aude „siglă de sponsor”, iar sub siglă
-            n-am ce scrie.
+            <strong>Numele firmei e obligatoriu.</strong> Numele apare sub siglă și e citit de programele pentru nevăzători.
           </li>
           <li>
             Pe prima pagină intră <strong>primele {PE_PRIMA_PAGINA}</strong>, în
@@ -156,14 +154,10 @@ async function Continut({
             ↓.
           </li>
           <li>
-            Urc-o <strong>cum o ai</strong>: PNG, JPG, WebP sau SVG. Marginile
-            goale se taie singure, mărimea se potrivește singură, iar o siglă
-            albă pe fundal transparent se pune singură pe o plăcuță închisă, ca
-            să se vadă.
+            Urc-o <strong>cum o ai</strong>: PNG, JPG, WebP sau SVG. Marginile goale și mărimea se potrivesc automat, iar o siglă albă primește un fundal închis, ca să se vadă.
           </li>
           <li>
-            Nimic nu se șterge: „Scoate de pe site” o ascunde, iar dacă firma
-            revine o pui înapoi cu un apăsat.
+            „Scoate de pe site” ascunde sigla fără s-o șteargă. Dacă firma revine, o pui înapoi cu un clic.
           </li>
         </ul>
       </div>
@@ -175,8 +169,7 @@ async function Continut({
 
         {!poze ? (
           <p className="mt-4 max-w-2xl colt-mic-a border border-caramiziu-200 bg-caramiziu-50 px-5 py-4 text-mic text-caramiziu-900">
-            Locul în care se păstrează pozele nu e pornit, deci nu se poate urca
-            nimic acum. Cere-i dezvoltatorului.
+            Încărcarea pozelor nu e pornită încă. Cere-i dezvoltatorului.
           </p>
         ) : (
           <form

@@ -147,7 +147,7 @@ async function Continut({
   return (
     <Cadru
       titlu="Radar de finanțări"
-      descriere="Ce a găsit căutarea automată pe internet. Piste de verificat, nu certitudini."
+      descriere="Finanțări găsite automat pe internet. Verifică fiecare la sursă înainte să te bazezi pe ea."
       activ="/admin/radar"
       actiuni={
         areRadar() ? (
@@ -234,8 +234,7 @@ async function Continut({
             Ultimele scanări
           </h2>
           <p className="mt-1 text-nota text-cerneala-slab">
-            Un radar care a murit în tăcere e mai rău decât niciunul: liniștea
-            arată la fel ca „n-a apărut nimic nou”.
+            Dacă radarul s-a oprit, nu vei vedea nicio eroare, ci doar nimic nou. De aceea ultima scanare apare aici.
           </p>
         </div>
         {ultimele.length === 0 ? (
