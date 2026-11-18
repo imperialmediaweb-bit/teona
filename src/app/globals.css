@@ -276,6 +276,110 @@
   }
 
   /*
+    Noiembrie 2026, „design cu carduri, calde, pe toate paginile”: tot ce e
+    casetă albă cu bordură devine card — fără bordură, umbră caldă, colțuri
+    de 16 px. Câmpurile și butoanele își păstrează bordura (`:is(...)` ține
+    numai cutiile). Tabelele primesc antet discret și rândul sub mouse
+    luminat; fundalul e gri cald, nu rece.
+  */
+  body:has(#panou-admin),
+  #panou-admin,
+  #panou-admin .bg-hartie-calda {
+    background-color: #f6f4f1;
+  }
+
+  #panou-admin
+    :is(div, section, li, article, ul, ol, details, form, aside)[class~="bg-hartie"][class~="border"] {
+    border-color: transparent;
+    border-radius: 1rem;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.9),
+      0 1px 2px rgb(30 20 10 / 0.06),
+      0 6px 16px -4px rgb(30 20 10 / 0.08),
+      0 14px 32px -12px rgb(30 20 10 / 0.1);
+    transition:
+      box-shadow 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  #panou-admin :is(div, section, li, article)[class~="bg-hartie"][class~="border"]:hover {
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.9),
+      0 2px 4px rgb(30 20 10 / 0.06),
+      0 12px 24px -6px rgb(30 20 10 / 0.12),
+      0 24px 48px -16px rgb(30 20 10 / 0.14);
+  }
+
+  #panou-admin a[class~="bg-hartie"][class~="border"] {
+    border-color: transparent;
+    border-radius: 1rem;
+  }
+
+  #continut-panou table {
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow:
+      0 1px 2px rgb(30 20 10 / 0.05),
+      0 4px 14px rgb(30 20 10 / 0.05);
+  }
+
+  #continut-panou thead th {
+    background: #faf8f5;
+    padding: 0.75rem 1rem;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #8a8178;
+    border-bottom: 1px solid #efebe6;
+  }
+
+  #continut-panou tbody td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid #f2efeb;
+  }
+
+  #continut-panou tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  #continut-panou tbody tr {
+    transition: background-color 0.15s ease;
+  }
+
+  #continut-panou tbody tr:hover {
+    background: #fcf8f4;
+  }
+
+  #continut-panou details > summary {
+    cursor: pointer;
+    transition: color 0.15s ease;
+  }
+
+  #continut-panou details > summary:hover {
+    color: var(--color-caramiziu-700);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    #continut-panou > * {
+      animation: panou-apare 0.25s ease-out both;
+    }
+  }
+
+  @keyframes panou-apare {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /*
     Hârtie cu granulație.
 
     Fundalurile plate arată a șablon. Un strat foarte fin de zgomot, generat de

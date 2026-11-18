@@ -138,13 +138,22 @@ function Element({ p, culoare, aici, nr }: { p: IntrareMeniu; culoare: string; a
       title={p.eticheta}
       style={{ "--sectiune": culoare } as React.CSSProperties}
       data-meniu={p.href}
-      className={`relative flex h-9 items-center gap-3 rounded-[10px] px-3 font-titlu text-[13.5px] font-semibold whitespace-nowrap transition-colors duration-150 group-data-[restrans=true]/bara:justify-center group-data-[restrans=true]/bara:px-0 ${
+      className={`group/el relative flex h-9 items-center gap-3 rounded-xl px-2 font-titlu text-[13.5px] font-semibold whitespace-nowrap transition-all duration-200 group-data-[restrans=true]/bara:justify-center group-data-[restrans=true]/bara:px-0 ${
         aici
-          ? "bg-[color-mix(in_srgb,var(--sectiune)_16%,transparent)] text-white before:absolute before:top-1.5 before:bottom-1.5 before:left-0 before:w-[3px] before:rounded-r before:bg-[var(--sectiune)]"
-          : "text-white/70 hover:bg-white/[0.06] hover:text-white"
+          ? "bg-[linear-gradient(90deg,color-mix(in_srgb,var(--sectiune)_26%,transparent),color-mix(in_srgb,var(--sectiune)_6%,transparent))] text-white shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--sectiune)_25%,transparent)]"
+          : "text-white/72 hover:bg-white/[0.06] hover:text-white motion-safe:hover:translate-x-0.5"
       }`}
     >
-      <I aria-hidden="true" className={`size-[18px] shrink-0 ${aici ? "text-[var(--sectiune)]" : ""}`} strokeWidth={1.9} />
+      <span
+        aria-hidden="true"
+        className={`grid size-7 shrink-0 place-items-center rounded-lg transition-all duration-200 ${
+          aici
+            ? "bg-[var(--sectiune)] text-[#231e1b] shadow-[0_2px_10px_color-mix(in_srgb,var(--sectiune)_55%,transparent)]"
+            : "bg-[color-mix(in_srgb,var(--sectiune)_14%,transparent)] text-[var(--sectiune)] group-hover/el:bg-[color-mix(in_srgb,var(--sectiune)_24%,transparent)]"
+        }`}
+      >
+        <I className="size-[16px]" strokeWidth={2} />
+      </span>
       <span className="min-w-0 truncate group-data-[restrans=true]/bara:sr-only">{p.eticheta}</span>
       <Bulina nr={nr} aici={aici} />
     </Link>
@@ -210,7 +219,7 @@ export default function MeniuPanou({
           // Pe telefon, un clic pe un link din sertar îl închide.
           if ((e.target as HTMLElement).closest("a")) inchide();
         }}
-        className={`group/bara fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col bg-[#272320] text-white shadow-2xl transition-transform duration-200 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:max-w-none lg:translate-x-0 lg:shrink-0 lg:shadow-none lg:transition-[width] ${
+        className={`group/bara fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col bg-[radial-gradient(120%_40%_at_0%_0%,rgb(249_115_65/0.16),transparent_60%),linear-gradient(180deg,#2c2521_0%,#241f1c_55%,#1d1916_100%)] text-white shadow-2xl transition-transform duration-200 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:max-w-none lg:translate-x-0 lg:shrink-0 lg:shadow-none lg:transition-[width] ${
           deschis ? "translate-x-0" : "-translate-x-full"
         } ${restrans ? "lg:w-[68px]" : "lg:w-64"}`}
       >
@@ -242,7 +251,8 @@ export default function MeniuPanou({
             </ul>
             {grupuri.map((g) => (
               <div key={g.titlu}>
-                <p className="mb-1 px-3 text-[11px] font-bold tracking-[0.08em] whitespace-nowrap text-white/40 uppercase group-data-[restrans=true]/bara:sr-only">
+                <p className="mb-1.5 flex items-center gap-2 px-2.5 text-[10.5px] font-bold tracking-[0.1em] whitespace-nowrap text-white/40 uppercase group-data-[restrans=true]/bara:sr-only">
+                  <span aria-hidden="true" className="size-1.5 rounded-full" style={{ background: g.culoare }} />
                   {g.titlu}
                 </p>
                 <div aria-hidden="true" className="mx-3 mb-2 hidden h-px bg-white/10 group-data-[restrans=true]/bara:block" />

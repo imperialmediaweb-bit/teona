@@ -5,6 +5,9 @@ import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/adm
 import { areBazaDeDate } from "@/lib/baza";
 import { donatori, rezumat, type Filtru } from "@/lib/plati/donatori";
 import { scrieSuma } from "@/lib/suma";
+import { cate } from "@/lib/numere-ro";
+import { CARD_ACTIV, CardCifra, Eticheta, File, StareGoala } from "@/componente/admin/ui";
+import { Building2, CalendarDays, Repeat, Search, Users, Wallet } from "lucide-react";
 import Cadru from "@/componente/admin/Cadru";
 import Descarca from "@/componente/admin/Descarca";
 import Intrare from "@/componente/admin/Intrare";
@@ -30,6 +33,7 @@ const FILTRE: Array<{ id: Filtru; eticheta: string }> = [
 ];
 
 type Cautare = {
+  cine?: string;
   filtru?: string;
   cauta?: string;
   gresit?: string;
@@ -50,7 +54,7 @@ export default function PaginaDonatori({
 
 async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   await connection();
-  const { filtru: cerut, cauta = "", gresit, deschis } = await searchParams;
+  const { filtru: cerut, cauta = "", gresit, deschis, cine } = await searchParams;
 
   if (!areParolaConfigurata()) {
     return (
@@ -86,10 +90,13 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   }
 
   const filtru = (FILTRE.find((f) => f.id === cerut)?.id ?? "toti") as Filtru;
-  const [lista, cifre] = await Promise.all([
+  const [toti, cifre] = await Promise.all([
     donatori(filtru, cauta),
     rezumat(),
   ]);
+  const tip = cine === "firme" || cine === "pf" ? cine : null;
+  const lista = toti.filter((d) => (tip === "firme" ? d.deLaFirma : tip === "pf" ? !d.deLaFirma : true));
+  const nrFirme = toti.filter((d) => d.deLaFirma).length;
 
   // Jurnalul se citește doar pentru donatorul deschis. O listă de 200 de
   // oameni ar face altfel 200 de interogări ca să arate 200 de liste goale.
@@ -99,6 +106,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   const parametri = new URLSearchParams();
   if (filtru !== "toti") parametri.set("filtru", filtru);
   if (cauta) parametri.set("cauta", cauta);
+  if (tip) parametri.set("cine", tip);
   const inapoiLa = `/admin/donatori${parametri.size ? `?${parametri}` : ""}`;
 
   return (
@@ -107,172 +115,152 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
       activ="/admin/donatori"
       actiuni={<Descarca ce="donatori" />}
     >
-      <div className="grid gap-3 sm:grid-cols-4">
-        <Cifra
-          eticheta="Total strâns"
-          valoare={scrieSuma(cifre.totalBani / 100)}
-        />
-        <Cifra
-          eticheta="Luna aceasta"
-          valoare={scrieSuma(cifre.lunaAsta / 100)}
-        />
-        <Cifra eticheta="Donatori" valoare={String(cifre.donatori)} />
-        <Cifra eticheta="Donatori lunari" valoare={String(cifre.lunari)} />
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <CardCifra eticheta="Total strâns" valoare={scrieSuma(cifre.totalBani / 100)} sectiune="bani" I={Wallet} />
+        <CardCifra eticheta="Luna aceasta" valoare={scrieSuma(cifre.lunaAsta / 100)} sectiune="bani" I={CalendarDays} />
+        <CardCifra eticheta="Donatori" valoare={String(cifre.donatori)} sectiune="oameni" I={Users} />
+        <CardCifra eticheta="Donatori lunari" valoare={String(cifre.lunari)} sectiune="oameni" I={Repeat} />
       </div>
 
-      {/*
-        Segmentele de lucru, ca butoane: manualul spune „Apeși pe unul și
-        lista se strânge la ei”. Lista completă de filtre rămâne mai jos.
-      */}
-      <nav aria-label="Segmente" className="mt-8 flex flex-wrap items-center gap-2">
-        <span className="font-titlu text-mic font-bold text-cerneala">Segmente:</span>
-        {[
-          { id: "opriti", eticheta: "S-au oprit" },
-          { id: "mari", eticheta: "Donatori mari" },
-          { id: "toti", eticheta: "Toți" },
-        ].map((sg) => (
-          <a
-            key={sg.id}
-            href={sg.id === "toti" ? "/admin/donatori" : `/admin/donatori?filtru=${sg.id}`}
-            aria-current={filtru === sg.id ? "page" : undefined}
-            className={`rounded-full border px-4 py-1.5 font-titlu text-mic font-bold transition-colors ${
-              filtru === sg.id
-                ? "border-caramiziu-700 bg-caramiziu-700 text-hartie"
-                : "border-hartie-umbra bg-hartie text-cerneala-moale hover:text-cerneala"
-            }`}
-          >
-            {sg.eticheta}
-          </a>
-        ))}
-      </nav>
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+        <File
+          file={[
+            { eticheta: "Toți", href: cuParam(filtru, cauta, null), numar: toti.length, activ: !tip },
+            { eticheta: "Persoane fizice", href: cuParam(filtru, cauta, "pf"), numar: toti.length - nrFirme, activ: tip === "pf" },
+            { eticheta: "Firme", href: cuParam(filtru, cauta, "firme"), numar: nrFirme, activ: tip === "firme" },
+          ]}
+        />
+        {/* Segmentele de lucru: „Apeși pe unul și lista se strânge la ei”. */}
+        <nav aria-label="Segmente" className="flex flex-wrap items-center gap-2">
+          {[
+            { id: "opriti", eticheta: "S-au oprit" },
+            { id: "mari", eticheta: "Donatori mari" },
+            { id: "toti", eticheta: "Toți" },
+          ].map((sg) => (
+            <a
+              key={sg.id}
+              href={cuParam(sg.id as Filtru, cauta, tip)}
+              aria-current={filtru === sg.id ? "page" : undefined}
+              className={`rounded-full border px-3.5 py-1.5 font-titlu text-[13px] font-bold transition-colors duration-150 ${
+                filtru === sg.id
+                  ? "border-caramiziu-700 bg-caramiziu-700 text-hartie"
+                  : "border-hartie-umbra bg-hartie text-cerneala-moale hover:border-caramiziu-400 hover:text-cerneala"
+              }`}
+            >
+              {sg.eticheta}
+            </a>
+          ))}
+        </nav>
+      </div>
 
-      <form method="get" className="mt-4 flex flex-wrap items-end gap-3">
-        <label className="grow">
-          <span className="mb-1 block font-titlu text-mic font-bold">
-            Caută
-          </span>
+      <form method="get" className="mt-4 flex flex-wrap items-center gap-2">
+        {tip && <input type="hidden" name="cine" value={tip} />}
+        <label className="relative min-w-0 basis-full sm:basis-auto sm:flex-1">
+          <Search className="pointer-events-none absolute top-1/2 left-3.5 z-10 size-4 -translate-y-1/2 text-cerneala-slab" aria-hidden="true" />
           <input
             name="cauta"
             defaultValue={cauta}
-            placeholder="nume sau e-mail"
-            className="w-full rounded-moale border border-hartie-umbra bg-hartie px-4 py-2.5"
+            placeholder="Caută după nume sau e-mail"
+            aria-label="Caută"
+            className="h-11 w-full rounded-full border border-hartie-umbra bg-hartie pr-4 pl-10 text-[14px] focus:border-caramiziu-400 focus:outline-none"
           />
         </label>
-        <label>
-          <span className="mb-1 block font-titlu text-mic font-bold">
-            Filtru
-          </span>
-          <select
-            name="filtru"
-            defaultValue={filtru}
-            className="rounded-moale border border-hartie-umbra bg-hartie px-4 py-2.5"
-          >
-            {FILTRE.map((f) => (
-              <option key={f.id} value={f.id}>
-                {f.eticheta}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button
-          type="submit"
-          className="rounded-full bg-cerneala px-6 py-2.5 font-titlu font-bold text-hartie"
+        <select
+          name="filtru"
+          defaultValue={filtru}
+          aria-label="Filtru"
+          className="h-11 rounded-full border border-hartie-umbra bg-hartie px-4 text-[14px]"
         >
+          {FILTRE.map((f) => (
+            <option key={f.id} value={f.id}>
+              {f.eticheta}
+            </option>
+          ))}
+        </select>
+        <button type="submit" className="h-11 rounded-full bg-cerneala px-6 font-titlu text-[14px] font-bold text-hartie hover:bg-cerneala/85">
           Arată
         </button>
       </form>
 
       {lista.length === 0 ? (
-        <p className="mt-8 text-cerneala-moale">
-          Niciun donator care să se potrivească. Deocamdată nu s-a încasat nimic
-          prin site — lista se umple singură, de la prima donație.
-        </p>
-      ) : (
-        <div className="mt-8 overflow-x-auto">
-          <table className="w-full border-collapse text-mic">
-            <thead>
-              <tr className="border-b border-hartie-umbra text-left">
-                <Cap>Donator</Cap>
-                <Cap>Total</Cap>
-                <Cap>Donații</Cap>
-                <Cap>Ultima</Cap>
-                <Cap>Buletin</Cap>
-                <Cap>Șterge datele</Cap>
-              </tr>
-            </thead>
-            <tbody>
-              {lista.map((d) => (
-                <tr key={d.email} className="border-b border-hartie-umbra/60">
-                  <td className="py-3 pr-4 align-top">
-                    {/*
-                      Numele deschide fișa — jurnalul, notițele —, cum spune
-                      manualul („Apeși pe un nume și intri în fișa lui”).
-                      Același link ca „Discuții și notițe” de dedesubt.
-                    */}
-                    <a
-                      href={`${inapoiLa}${inapoiLa.includes("?") ? "&" : "?"}deschis=${encodeURIComponent(d.email)}`}
-                      className="block font-titlu font-bold text-cerneala underline-offset-4 hover:text-caramiziu-700 hover:underline"
-                    >
-                      {d.nume || "(fără nume)"}
-                    </a>
-                    <span className="block text-cerneala-moale">{d.email}</span>
-                    {d.telefon && (
-                      <a
-                        href={`tel:${d.telefon.replace(/\s/g, "")}`}
-                        className="block font-titlu font-bold text-caramiziu-700 underline underline-offset-2"
-                      >
-                        {d.telefon}
-                      </a>
-                    )}
-                    {/*
-                      Jurnalul stă sub donator, nu într-o coloană a lui:
-                      ocupă toată lățimea când e deschis, iar un tabel cu o
-                      coloană care uneori e înaltă cât un ecran devine
-                      ilizibil.
-                    */}
-                    <Jurnal
-                      email={d.email}
-                      deschis={deschis === d.email}
-                      intrari={deschis === d.email ? jurnal : []}
-                      inapoiLa={inapoiLa}
-                    />
-                  </td>
-                  <td className="py-3 pr-4 align-top font-titlu font-bold">
-                    {scrieSuma(d.totalBani / 100)}
-                  </td>
-                  <td className="py-3 pr-4 align-top">
-                    {d.donatii}
-                    {d.lunare > 0 && (
-                      <span className="ml-1 text-caramiziu-700">(lunar)</span>
-                    )}
-                  </td>
-                  <td className="py-3 pr-4 align-top text-cerneala-moale">
-                    {d.ultimaLa ? d.ultimaLa.slice(0, 10) : "—"}
-                  </td>
-                  <td className="py-3 pr-4 align-top">
-                    {d.acordBuletin
-                      ? d.dusLaBuletin
-                        ? "în listă"
-                        : "acord, neurcat"
-                      : "fără acord"}
-                  </td>
-                  <td className="py-3 align-top">
-                    <form action="/api/admin/donatori" method="post">
-                      <input type="hidden" name="email" value={d.email} />
-                      <input type="hidden" name="fapta" value="uita" />
-                      <button
-                        type="submit"
-                        className="rounded-full border border-hartie-umbra px-3 py-1.5 font-titlu font-bold text-cerneala-moale hover:border-caramiziu-400 hover:text-caramiziu-700"
-                      >
-                        Uită-l
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="mt-6">
+          <StareGoala I={Users} text="Niciun donator care să se potrivească." />
         </div>
+      ) : (
+        <ul data-lista-donatori className="mt-6 grid gap-2.5">
+          {lista.map((d) => {
+            const fisa = `${inapoiLa}${inapoiLa.includes("?") ? "&" : "?"}deschis=${encodeURIComponent(d.email)}`;
+            return (
+              <li
+                key={d.email}
+                data-donator={d.deLaFirma ? "firma" : "pf"}
+                className={`${CARD_ACTIV} relative overflow-hidden py-4 pr-4 pl-5`}
+              >
+                <span aria-hidden="true" className={`absolute inset-y-0 left-0 w-1 ${d.deLaFirma ? "bg-orange-400" : "bg-sky-400"}`} />
+                <div className="flex flex-wrap items-center gap-3 sm:flex-nowrap sm:gap-4">
+                  <span
+                    aria-hidden="true"
+                    className={`grid size-11 shrink-0 place-items-center rounded-full font-titlu text-[14px] font-bold ${d.deLaFirma ? "bg-orange-50 text-orange-700" : "bg-sky-50 text-sky-700"}`}
+                  >
+                    {d.deLaFirma ? <Building2 className="size-5" strokeWidth={1.9} /> : initiale(d.nume || d.email)}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                      {/* Numele deschide fișa: jurnalul și notițele. */}
+                      <a href={fisa} className="truncate font-titlu text-[15px] font-bold text-cerneala hover:text-caramiziu-700">
+                        {d.nume || "(fără nume)"}
+                      </a>
+                      {d.deLaFirma && <Eticheta ton="nou">Firmă</Eticheta>}
+                      {d.lunare > 0 && <Eticheta ton="asteptam">lunar</Eticheta>}
+                    </span>
+                    <span className="block truncate text-[13px] text-cerneala-moale">
+                      {d.email}
+                      {d.telefon && (
+                        <>
+                          {" · "}
+                          <a href={`tel:${d.telefon.replace(/\s/g, "")}`} className="font-semibold text-caramiziu-700 hover:underline">
+                            {d.telefon}
+                          </a>
+                        </>
+                      )}
+                    </span>
+                    <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-cerneala-slab">
+                      <span>{cate(d.donatii, "donație", "donații")}</span>
+                      <span>ultima {d.ultimaLa ? ZI.format(new Date(d.ultimaLa)) : "—"}</span>
+                      <Eticheta ton={d.acordBuletin ? (d.dusLaBuletin ? "bani" : "deFacut") : "gri"}>
+                        {d.acordBuletin ? (d.dusLaBuletin ? "în buletin" : "acord, neurcat") : "fără acord buletin"}
+                      </Eticheta>
+                    </span>
+                  </span>
+                  <span className="flex basis-full items-center justify-between gap-3 border-t border-hartie-umbra/60 pt-2.5 sm:basis-auto sm:shrink-0 sm:flex-col sm:items-end sm:justify-start sm:gap-1.5 sm:border-0 sm:pt-0">
+                    <span className="font-titlu text-[18px] font-bold whitespace-nowrap text-emerald-700 tabular-nums">
+                      {scrieSuma(d.totalBani / 100)}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+
+                      <form action="/api/admin/donatori" method="post">
+                        <input type="hidden" name="email" value={d.email} />
+                        <input type="hidden" name="fapta" value="uita" />
+                        <button
+                          type="submit"
+                          className="rounded-full border border-hartie-umbra px-3 py-1 font-titlu text-[12.5px] font-bold text-cerneala-slab hover:border-caramiziu-400 hover:text-caramiziu-700"
+                        >
+                          Uită-l
+                        </button>
+                      </form>
+                    </span>
+                  </span>
+                </div>
+                <Jurnal
+                  email={d.email}
+                  deschis={deschis === d.email}
+                  intrari={deschis === d.email ? jurnal : []}
+                  inapoiLa={inapoiLa}
+                />
+              </li>
+            );
+          })}
+        </ul>
       )}
 
       <p className="mt-6 max-w-3xl text-mic text-cerneala-moale">
@@ -285,23 +273,17 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   );
 }
 
-function Cifra({ eticheta, valoare }: { eticheta: string; valoare: string }) {
-  return (
-    <div className="rounded-card border border-hartie-umbra bg-hartie p-5">
-      <p className="font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
-        {eticheta}
-      </p>
-      <p className="mt-1 font-titlu text-h4 font-extrabold text-cerneala">
-        {valoare}
-      </p>
-    </div>
-  );
+function cuParam(filtru: Filtru, cauta: string, cine: string | null): string {
+  const q = new URLSearchParams();
+  if (filtru !== "toti") q.set("filtru", filtru);
+  if (cauta) q.set("cauta", cauta);
+  if (cine) q.set("cine", cine);
+  return `/admin/donatori${q.size ? `?${q}` : ""}`;
 }
 
-function Cap({ children }: { children: React.ReactNode }) {
-  return (
-    <th className="py-2 pr-4 font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
-      {children}
-    </th>
-  );
+function initiale(t: string): string {
+  const c = t.replace(/@.*/, "").split(/[\s._-]+/).filter(Boolean);
+  return ((c[0]?.[0] ?? "") + (c[1]?.[0] ?? "")).toUpperCase() || "?";
 }
+
+const ZI = new Intl.DateTimeFormat("ro-RO", { day: "numeric", month: "short", year: "numeric", timeZone: "Europe/Bucharest" });

@@ -29,6 +29,8 @@ export type Donator = {
   acordBuletin: boolean;
   dusLaBuletin: boolean;
   notita: string | null;
+  /** O firmă (persoană juridică), după `SQL_DE_LA_FIRMA`. */
+  deLaFirma?: boolean;
 };
 
 type Rand = {
@@ -43,6 +45,7 @@ type Rand = {
   acord_buletin: boolean;
   dus_la_buletin: boolean;
   notita: string | null;
+  firma: boolean | null;
 };
 
 /** Filtrele listei. Fiecare răspunde la o întrebare pe care chiar o pune cineva. */
@@ -109,7 +112,8 @@ export async function donatori(
         MAX(d.platita_la)                                       AS ultima_la,
         bool_or(d.acord_buletin)                                AS acord_buletin,
         bool_or(d.dus_la_buletin)                               AS dus_la_buletin,
-        MAX(n.text)                                             AS notita
+        MAX(n.text)                                             AS notita,
+        bool_or(${SQL_DE_LA_FIRMA})                             AS firma
        FROM donatii d
        LEFT JOIN note_donatori n ON n.email = d.email
       WHERE d.stare = 'platita'
@@ -135,6 +139,7 @@ export async function donatori(
     acordBuletin: r.acord_buletin,
     dusLaBuletin: r.dus_la_buletin,
     notita: r.notita,
+    deLaFirma: Boolean(r.firma),
   }));
 }
 

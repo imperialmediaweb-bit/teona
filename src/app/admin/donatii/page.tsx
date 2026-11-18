@@ -16,7 +16,7 @@ import { cate } from "@/lib/numere-ro";
 import { platiEsuate } from "@/lib/plati/esuate";
 import Cadru from "@/componente/admin/Cadru";
 import { Sertar } from "@/componente/admin/ui-client";
-import { CardCifra, CARD, Eticheta, File } from "@/componente/admin/ui";
+import { CardCifra, CARD_ACTIV, Eticheta, File } from "@/componente/admin/ui";
 import { Building2, CreditCard, Landmark, User, Users } from "lucide-react";
 import TextCuAdrese from "@/componente/admin/TextCuAdrese";
 import { verificaInainte } from "@/lib/plati/confirmare";
@@ -408,7 +408,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
       </h2>
 
       {pe && (
-        <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="mb-5 grid grid-cols-2 gap-3 sm:gap-4">
           <CardCifra
             eticheta={`Persoane fizice, în ${new Date().getFullYear()}`}
             valoare={scrieSuma(pe.pf.bani / 100, "RON")}
@@ -451,7 +451,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
               <li
                 key={d.id}
                 data-donatie={d.deLaFirma ? "firma" : "pf"}
-                className={`${CARD} relative flex items-center gap-3 overflow-hidden py-3.5 pr-4 pl-5 sm:gap-4`}
+                className={`${CARD_ACTIV} relative flex items-center gap-3 overflow-hidden py-3.5 pr-4 pl-5 sm:gap-4`}
               >
                 <span aria-hidden="true" className={`absolute inset-y-0 left-0 w-1 ${d.deLaFirma ? "bg-orange-400" : "bg-sky-400"}`} />
                 <span

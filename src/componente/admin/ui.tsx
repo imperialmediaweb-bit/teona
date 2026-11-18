@@ -38,20 +38,20 @@ const TON_PUNCT: Record<Ton, string> = {
 
 /** Accentul fiecărei secțiuni a meniului, folosit discret (cerc cu iconița, bara de 3 px). */
 export type Sectiune = "bani" | "sponsori" | "oameni" | "site" | "promovare" | "rapoarte";
-const SECTIUNE: Record<Sectiune, { cerc: string; bara: string }> = {
-  bani: { cerc: "bg-emerald-50 text-emerald-700", bara: "bg-emerald-400" },
-  sponsori: { cerc: "bg-orange-50 text-orange-700", bara: "bg-orange-400" },
-  oameni: { cerc: "bg-sky-50 text-sky-700", bara: "bg-sky-400" },
-  site: { cerc: "bg-violet-50 text-violet-700", bara: "bg-violet-400" },
-  promovare: { cerc: "bg-pink-50 text-pink-700", bara: "bg-pink-400" },
-  rapoarte: { cerc: "bg-slate-100 text-slate-600", bara: "bg-slate-400" },
+const SECTIUNE: Record<Sectiune, { cerc: string; bara: string; plin: string; fond: string }> = {
+  bani: { cerc: "bg-emerald-50 text-emerald-700", bara: "bg-emerald-400", plin: "from-emerald-400 to-emerald-600 shadow-emerald-500/30", fond: "from-emerald-50/80" },
+  sponsori: { cerc: "bg-orange-50 text-orange-700", bara: "bg-orange-400", plin: "from-orange-400 to-orange-600 shadow-orange-500/30", fond: "from-orange-50/80" },
+  oameni: { cerc: "bg-sky-50 text-sky-700", bara: "bg-sky-400", plin: "from-sky-400 to-sky-600 shadow-sky-500/30", fond: "from-sky-50/80" },
+  site: { cerc: "bg-violet-50 text-violet-700", bara: "bg-violet-400", plin: "from-violet-400 to-violet-600 shadow-violet-500/30", fond: "from-violet-50/80" },
+  promovare: { cerc: "bg-pink-50 text-pink-700", bara: "bg-pink-400", plin: "from-pink-400 to-pink-600 shadow-pink-500/30", fond: "from-pink-50/80" },
+  rapoarte: { cerc: "bg-slate-100 text-slate-600", bara: "bg-slate-400", plin: "from-slate-400 to-slate-600 shadow-slate-500/30", fond: "from-slate-100/80" },
 };
 
 /** Clasa unui card: alb, colțuri 16 px, umbră fină. */
 export const CARD =
-  "rounded-2xl bg-hartie shadow-[0_1px_2px_rgb(30_20_10/0.05),0_4px_12px_rgb(30_20_10/0.05)]";
+  "rounded-2xl bg-hartie shadow-[inset_0_1px_0_rgb(255_255_255/0.9),0_1px_2px_rgb(30_20_10/0.06),0_6px_16px_-4px_rgb(30_20_10/0.08),0_14px_32px_-12px_rgb(30_20_10/0.10)]";
 /** Același card, care se ridică puțin sub mouse (pentru cele pe care se apasă). */
-export const CARD_ACTIV = `${CARD} transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgb(30_20_10/0.06),0_8px_20px_rgb(30_20_10/0.08)]`;
+export const CARD_ACTIV = `${CARD} transition duration-200 motion-safe:hover:-translate-y-1 hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.9),0_2px_4px_rgb(30_20_10/0.06),0_12px_24px_-6px_rgb(30_20_10/0.14),0_24px_48px_-16px_rgb(30_20_10/0.16)]`;
 
 /** Eticheta de stadiu: un punct și un cuvânt, în culoarea sensului ei. */
 export function Eticheta({ ton, children }: { ton: Ton; children: React.ReactNode }) {
@@ -103,18 +103,22 @@ export function CardCifra({
   const s = SECTIUNE[sectiune];
   const continut = (
     <>
+      <span aria-hidden="true" className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${s.fond} via-transparent to-transparent`} />
       <span aria-hidden="true" className={`absolute inset-x-5 top-0 h-[3px] rounded-b ${s.bara}`} />
       {I && (
-        <span aria-hidden="true" className={`absolute top-4 right-4 grid size-9 place-items-center rounded-full ${s.cerc}`}>
-          <I className="size-[18px]" strokeWidth={1.9} />
+        <span
+          aria-hidden="true"
+          className={`absolute top-3 right-3 grid size-8 place-items-center rounded-xl sm:top-4 sm:right-4 sm:size-10 bg-gradient-to-br text-white shadow-lg ring-1 ring-white/40 transition-transform duration-200 group-hover/cifra:scale-110 group-hover/cifra:-rotate-3 ${s.plin}`}
+        >
+          <I className="size-[19px]" strokeWidth={2} />
         </span>
       )}
-      <span className="block pr-10 text-[13px] font-semibold text-cerneala-moale">{eticheta}</span>
-      <span className="mt-1 block font-titlu text-[30px] leading-tight font-semibold text-cerneala tabular-nums">{valoare}</span>
-      {context && <span className="mt-0.5 block text-[13px] text-cerneala-slab">{context}</span>}
+      <span className="relative block pr-9 text-[13px] sm:pr-12 font-semibold text-cerneala-moale">{eticheta}</span>
+      <span className="relative mt-1 block font-titlu text-[23px] leading-tight font-bold text-cerneala tabular-nums sm:text-[30px]">{valoare}</span>
+      {context && <span className="relative mt-0.5 block text-[13px] text-cerneala-slab">{context}</span>}
     </>
   );
-  const clasa = `relative block overflow-hidden p-5 ${href ? CARD_ACTIV : CARD} ${activ ? "ring-2 ring-caramiziu-600" : ""}`;
+  const clasa = `group/cifra relative block min-w-0 overflow-hidden p-4 sm:p-5 ${CARD_ACTIV} ${activ ? "ring-2 ring-caramiziu-600" : ""}`;
   return href ? (
     <Link href={href} prefetch={false} aria-current={activ ? "true" : undefined} data-card-cifra className={clasa}>
       {continut}
