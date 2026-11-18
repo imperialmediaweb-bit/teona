@@ -269,7 +269,7 @@ export async function peMonede(): Promise<
  * ocupă jumătate de ecran.
  */
 export async function deFacutAcum(): Promise<
-  Array<{ eticheta: string; nr: number; unde: string }>
+  Array<{ eticheta: string; nr: number; unde: string; meniu?: string }>
 > {
   const [cereri, aniversari, ciorne, firme, transferuri, esuate, raspunsuri] =
     await Promise.all([
@@ -308,11 +308,21 @@ export async function deFacutAcum(): Promise<
   ]);
 
   // Eticheta vine după număr („1 cerere”, „2 cereri”, „20 de cereri”): pe ecran numărul stă în pastilă, lângă ea.
-  const rand = (nr: number, unu: string, multe: string, unde: string) => ({ eticheta: forma(nr, unu, multe), nr, unde });
+  /*
+    `unde` e linkul cardului (cu filtrul potrivit); `meniu` e intrarea din bara
+    din stânga care primește bulina. Fără `meniu`, rândul n-are bulină: „firme
+    fără răspuns de două săptămâni” nu e ceva nou de citit, ci o listă de lucru.
+  */
+  const rand = (nr: number, unu: string, multe: string, unde: string, meniu?: string) => ({
+    eticheta: forma(nr, unu, multe),
+    nr,
+    unde,
+    meniu: meniu ?? (unde.includes("?") ? undefined : unde),
+  });
   return [
     rand(Number(esuate[0]?.nr ?? 0), "donație lunară care n-a trecut", "donații lunare care n-au trecut", "/admin/donatii"),
-    rand(Number(raspunsuri[0]?.nr ?? 0), "răspuns de la o firmă, necitit", "răspunsuri de la firme necitite", "/admin/firme/mesaje"),
-    rand(Number(cereri[0]?.nr ?? 0), "cerere care așteaptă un răspuns", "cereri care așteaptă un răspuns", "/admin/cereri?stadiu=nerezolvate"),
+    rand(Number(raspunsuri[0]?.nr ?? 0), "răspuns de la o firmă, necitit", "răspunsuri de la firme necitite", "/admin/firme?fila=raspuns&necitite=1", "/admin/firme"),
+    rand(Number(cereri[0]?.nr ?? 0), "cerere care așteaptă un răspuns", "cereri care așteaptă un răspuns", "/admin/cereri?stadiu=nerezolvate", "/admin/cereri"),
     rand(Number(transferuri[0]?.nr ?? 0), "transfer de căutat în extras", "transferuri de căutat în extras", "/admin/donatii"),
     rand(Number(aniversari[0]?.nr ?? 0), "aniversare de aprobat", "aniversări de aprobat", "/admin/aniversari"),
     rand(Number(firme[0]?.nr ?? 0), "firmă fără răspuns de două săptămâni", "firme fără răspuns de două săptămâni", "/admin/firme?uitate=1"),

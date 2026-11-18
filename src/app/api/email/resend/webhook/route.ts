@@ -153,7 +153,7 @@ async function raspunsPrimit(d: Primit): Promise<void> {
   */
   if (!fi && !locDeAnuntNelegat()) return;
   const cine = fi?.denumire ?? deLa;
-  const unde = fi ? `/admin/firme/${fi.id}/mesaje` : "/admin/firme/mesaje";
+  const unde = fi ? `/admin/firme/${fi.id}/mesaje` : "/admin/firme?fila=raspuns";
   await notificaPanoul({ titlu: `Răspuns de la ${cine}`, text: subiect, adresa: unde }).catch(() => 0);
   /*
     Răspunsul nu mai ajunge într-o căsuță obișnuită (vine pe adresa firmei,

@@ -38,8 +38,12 @@ export async function POST(cerere: Request) {
   const brut = String(formular.get("suma") ?? "").trim();
   const citita = brut ? citesteSuma(brut) : { suma: null, eroare: undefined };
 
+  // Din pagina firmei se mută stadiul fără a pleca de acolo.
+  const inapoi = String(formular.get("inapoi") ?? "");
+  const dinFirma = /^\/admin\/firme\/[0-9a-f-]{36}\/mesaje$/i.test(inapoi) ? inapoi : `/admin/firme/${id}/mesaje`;
+
   if (brut && (citita.eroare || citita.suma === null)) {
-    return trimiteLa(`/admin/firme?eroare=${encodeURIComponent(citita.eroare ?? "Nu am înțeles suma.")}#${id}`);
+    return trimiteLa(`${dinFirma}?eroare=${encodeURIComponent(citita.eroare ?? "Nu am înțeles suma.")}#crm`);
   }
 
   await schimbaStadiulFirmei(
@@ -48,8 +52,5 @@ export async function POST(cerere: Request) {
     citita.suma === null ? null : inBani(citita.suma),
   );
 
-  // Din discuția cu firma se mută stadiul fără a pleca de acolo.
-  const inapoi = String(formular.get("inapoi") ?? "");
-  if (/^\/admin\/firme\/[0-9a-f-]{36}\/mesaje$/i.test(inapoi)) return trimiteLa(`${inapoi}?stadiu=schimbat#crm`);
-  return trimiteLa(`/admin/firme#${id}`);
+  return trimiteLa(`${dinFirma}?stadiu=schimbat#crm`);
 }

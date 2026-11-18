@@ -321,7 +321,7 @@ async function Continut({
             type="checkbox"
             name="muta"
             value="da"
-            defaultChecked={firma.stadiu === "cerere" || firma.stadiu === "prospect"}
+            defaultChecked={["cerere", "prospect", "contactat", "a_raspuns"].includes(firma.stadiu)}
             className="mt-0.5 size-5"
           />
           <span>

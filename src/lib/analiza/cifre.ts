@@ -432,7 +432,9 @@ export type ProfilFirme = {
 };
 
 const STADII = [
-  ["prospect", "Lead: de contactat"],
+  ["prospect", "Nou (lead)"],
+  ["contactat", "Contactat"],
+  ["a_raspuns", "A răspuns"],
   ["cerere", "Cerere primită"],
   ["contract_trimis", "Contract trimis"],
   ["semnat", "Contract semnat"],
@@ -466,7 +468,8 @@ export async function profilulFirmelor(): Promise<ProfilFirme> {
   const peStadiu = new Map(stadii.map((s) => [s.stadiu, Number(s.nr)]));
   // Procentele se socotesc din firmele intrate în pâlnie: 30 de lead-uri
   // adăugate ieri n-au cum să fie „firme care n-au virat banii”.
-  const leaduri = peStadiu.get("prospect") ?? 0;
+  // Firmele găsite de asociație, încă înainte de contract: „Nou”, „Contactat”, „A răspuns”.
+  const leaduri = (peStadiu.get("prospect") ?? 0) + (peStadiu.get("contactat") ?? 0) + (peStadiu.get("a_raspuns") ?? 0);
   const toate = stadii.reduce((s, r) => s + Number(r.nr), 0) - leaduri;
 
   return {

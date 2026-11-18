@@ -20,6 +20,8 @@ const CAND = new Intl.DateTimeFormat("ro-RO", {
   year: "numeric",
   hour: "2-digit",
   minute: "2-digit",
+  // Ora României, ca la e-mailuri: serverul de pe Railway e pe UTC.
+  timeZone: "Europe/Bucharest",
 });
 
 export default function Jurnal({
@@ -28,6 +30,7 @@ export default function Jurnal({
   deschis,
   intrari,
   inapoiLa,
+  inchide = true,
 }: {
   email?: string;
   firmaId?: string;
@@ -35,6 +38,8 @@ export default function Jurnal({
   intrari: Interactiune[];
   /** Unde duce „închide” — aceeași listă, cu aceleași filtre. */
   inapoiLa: string;
+  /** Pe pagina unei firme jurnalul stă mereu deschis: fără „Închide”. */
+  inchide?: boolean;
 }) {
   const cheie = firmaId ?? email ?? "";
   const separator = inapoiLa.includes("?") ? "&" : "?";
@@ -57,12 +62,14 @@ export default function Jurnal({
         <h3 className="font-titlu text-mic font-bold text-cerneala">
           Discuții și notițe
         </h3>
-        <a
-          href={`${inapoiLa}${ancora}`}
-          className="text-nota text-cerneala-slab underline underline-offset-2"
-        >
-          Închide
-        </a>
+        {inchide && (
+          <a
+            href={`${inapoiLa}${ancora}`}
+            className="text-nota text-cerneala-slab underline underline-offset-2"
+          >
+            Închide
+          </a>
+        )}
       </div>
 
       <form

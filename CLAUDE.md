@@ -1545,6 +1545,48 @@ există trimitere unu-la-unu și nici atașamente. Pleacă prin Resend
   rulate împreună de `scratchpad/mf/toate.sh`, care repornește serverul
   între ele (limita de 5 intrări în 15 minute).
 
+### Firme / Sponsori: o singură pagină (18 noiembrie 2026)
+
+Cerut de asociație: „/admin/firme/mesaje e greu de folosit”. „Firme” și
+„Mesaje cu firmele” s-au unit la **`/admin/firme`**, în secțiunea de meniu
+„Firme / Sponsori” (cu „Contracte”), scoasă de sub „Banii”.
+`/admin/firme/mesaje` duce acolo (`next.config.ts`, cu tot ce e după „?”), iar
+`/admin/firme?deschis=<id>` duce la pagina firmei.
+
+- **Lista** (`listaFirmelor`, `cifreleFirmelor` din `lib/mesaje-firme.ts`):
+  file Toate · Așteaptă răspuns · Au răspuns · Contract semnat, căutare după
+  nume/e-mail/CUI, un filtru de stadiu, Excel. Sus trei cifre, fiecare un
+  filtru: contactate, au răspuns, contract semnat (semnat + bani încasați;
+  fără procent, fiindcă pot fi și firme cărora nu le-am scris din panou).
+  Rândul: inițialele, numele, stadiul colorat (`componente/admin/firme/Stadiu.tsx`),
+  ultimul mesaj (cine, când, primele cuvinte, fără rândul de dezabonare),
+  „nou” pentru răspunsuri necitite. Clic → `/admin/firme/<id>/mesaje`.
+- **Pagina firmei** are acum tot ce era pe fișa din listă: contact, telefon,
+  CUI, mesajul din formular, „Generează contractul”, stadiul cu suma încasată
+  și jurnalul (mereu deschis; `jurnal` acceptă `inapoi` spre pagina firmei).
+- **Stadiile noi, puse singure, numai înainte**: `contactat` (primul e-mail
+  trimis unei firme pe „Nou”) și `a_raspuns` (răspuns venit pe „Nou” sau
+  „Contactat”). O cerere de pe site, un contract sau „A renunțat” nu se
+  ating. `prospect` se cheamă acum „Nou”, `cerere` „Cerere de pe site”. În
+  analiză, „lead-urile” scoase din procente sunt Nou + Contactat + A răspuns.
+- **„Nu răspunde”** apare numai cât nu există niciun răspuns după ultimul
+  e-mail trimis și numără numai e-mailurile de după ultimul răspuns (de la 2
+  în sus); nu la contract semnat, renunțat sau „nu vrea e-mailuri”.
+- **„E-mail nou”** (`/admin/firme/scrie`, `?firma=<id>` o bifează): „Către
+  cine?” — caută și bifează una sau mai multe, sau „Firmă nouă” (nume,
+  persoană, e-mail, CUI opțional; `nou_*` în ruta `mesaje`, prin
+  `adaugaLead`). Confirmarea se cere numai la mai multe; o singură firmă te
+  duce pe pagina ei. Firma nouă cu CUI-ul sau adresa uneia existente dar cu
+  alt e-mail e refuzată cu numele ei: e-mailul n-ar pleca unde crede omul.
+  Formularul vechi de lead a fost scos (ruta `/api/admin/firme/lead` rămâne).
+- **Bulina „Firme” din meniu și cardul din „De făcut acum”** duc la
+  `?fila=raspuns&necitite=1`. `deFacutAcum` are acum `meniu` (intrarea care
+  primește bulina) separat de `unde` (linkul cardului) — înainte, un link cu
+  „?” nu-și mai găsea intrarea, deci cererile n-aveau bulină.
+- **„Cum se pornește”** e la **`/admin/setari`** (Contul → Setări).
+- Orele din jurnal sunt la ora României (`timeZone`), ca la e-mailuri.
+- Probă: `scratchpad/mf/ux.mjs` (47), plus cele vechi, adaptate.
+
 ## Site-ul nu face campanii de e-mail
 
 Asociația a fost oprită odată de Railway pentru e-mailuri trimise în masă.

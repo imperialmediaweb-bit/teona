@@ -244,7 +244,7 @@ async function Continut({
                 <span className="font-titlu font-bold text-cerneala">
                   {f.firmaId ? (
                     <Link
-                      href={`/admin/firme?deschis=${f.firmaId}#${f.firmaId}`}
+                      href={`/admin/firme/${f.firmaId}/mesaje`}
                       className="underline underline-offset-2"
                     >
                       {f.denumire}

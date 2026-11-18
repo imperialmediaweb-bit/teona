@@ -11,7 +11,8 @@ import {
 } from "@/lib/api";
 import { arePermisiune, cineEsteConectat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
-import { firma as citesteFirma } from "@/lib/crm";
+import { adaugaLead, firma as citesteFirma, scrieInteractiune } from "@/lib/crm";
+import { cuiValid, curataCui } from "@/lib/cui";
 import { areEmail } from "@/lib/email/trimite";
 import { tipDinOcteti } from "@/lib/poza-urcata";
 import { textSimplu } from "@/lib/text-bogat";
@@ -114,12 +115,51 @@ export async function POST(cerere: Request) {
     return trimiteLa(`/admin/firme/${fi.id}/mesaje?${semn}#jos`);
   }
 
-  // Mai multe firme: fiecare primește e-mailul ei.
-  if (f.get("confirm") !== "da") return nuTrece("Bifează confirmarea de sub buton.");
+  // „+ E-mail nou”: firmele bifate și, poate, o firmă nouă scrisă pe loc.
   const ids = [...new Set(f.getAll("firme").map(String).filter((x) => UUID.test(x)))];
-  if (!ids.length) return nuTrece("Bifează cel puțin o firmă.");
-  if (ids.length > LIMITA_LOT)
+  const areNoua = Boolean(text(f.get("nou_denumire"), 200) || text(f.get("nou_email"), 200));
+  if (!ids.length && !areNoua) return nuTrece("Alege cel puțin o firmă, sau adaugă una nouă.");
+  if (ids.length + (areNoua ? 1 : 0) > LIMITA_LOT)
     return nuTrece(`Cel mult ${LIMITA_LOT} firme o dată. Pentru o listă mare se folosește MailerLite.`);
+  // Confirmarea se cere numai când pleacă la mai multe firme deodată.
+  if (ids.length + (areNoua ? 1 : 0) > 1 && f.get("confirm") !== "da") return nuTrece("Bifează confirmarea de sub buton.");
+  let noua: string | null = null;
+  if (areNoua) {
+    const denumire = text(f.get("nou_denumire"), 200);
+    if (!denumire) return nuTrece("Scrie numele firmei noi.");
+    const email = emailValid(f.get("nou_email"));
+    if (!email) return nuTrece("Adresa de e-mail a firmei noi nu e scrisă corect.");
+    // Cheia de probă adaugă numai firme cu adresa de probă, ca `curata-proba` să le găsească.
+    if (!(await probaAreVoie("email", email))) return new Response("Proba lucrează numai pe rândurile ei.", { status: 403 });
+    const cuiBrut = text(f.get("nou_cui"), 20);
+    if (cuiBrut) {
+      const cuiNr = curataCui(cuiBrut);
+      if (cuiNr === null || !cuiValid(cuiNr))
+        return nuTrece("CUI-ul firmei noi nu e scris corect (are doar cifre, poate începe cu RO, iar ultima cifră e de control). Dacă nu-l știi, lasă-l gol.");
+    }
+    const r = await adaugaLead({
+      cui: cuiBrut,
+      denumire,
+      persoana: text(f.get("nou_persoana"), 150) ?? "Echipa " + denumire,
+      email,
+      telefon: null,
+      nota: null,
+    });
+    /*
+      Firma era deja în listă (același CUI sau aceeași adresă). Dacă adresa
+      scrisă acum e alta decât cea din fișă, e-mailul n-ar pleca acolo unde
+      crede omul: îi spunem să o aleagă din listă, nu-l trimitem altundeva.
+    */
+    if (r.eraDeja) {
+      const era = await citesteFirma(r.id);
+      if (era && era.email.toLowerCase() !== email.toLowerCase())
+        return nuTrece(`Firma e deja în listă: „${era.denumire}”, cu adresa ${era.email}. Caut-o la „Către cine?” și bifeaz-o.`);
+    }
+    if (!r.eraDeja)
+      await scrieInteractiune({ firmaId: r.id, fel: "notita", rezumat: "Adăugată din panou, la „E-mail nou”.", scrisDe: trimisDe }).catch(() => false);
+    noua = r.id;
+    if (!ids.includes(r.id)) ids.push(r.id);
+  }
   const lot = randomUUID();
   let plecate = 0;
   const ratate: string[] = [];
@@ -148,11 +188,19 @@ export async function POST(cerere: Request) {
     else if (rez === "refuza") refuza.push(fi.denumire);
     else ratate.push(fi.denumire);
   }
-  // `salvat=1`: TineCiorna golește formularul, altfel textul ar rămâne pentru data viitoare.
+  /*
+    O singură firmă: omul ajunge în discuția ei, unde vede e-mailul plecat.
+    `salvat=1`: TineCiorna golește formularul, altfel textul ar rămâne pentru
+    data viitoare.
+  */
+  if (ids.length === 1) {
+    const semn = plecate ? "trimis=1" : refuza.length ? "refuza=1" : "ratat=1";
+    return trimiteLa(`/admin/firme/${ids[0]}/mesaje?${semn}${plecate ? "&salvat=1" : ""}${noua && !plecate ? "&nou=1" : ""}#jos`);
+  }
   const unde = new URLSearchParams({ trimise: String(plecate), ...(plecate ? { salvat: "1" } : {}) });
   if (ratate.length) unde.set("ratate", ratate.join(", ").slice(0, 500));
   if (refuza.length) unde.set("refuza", refuza.join(", ").slice(0, 500));
-  return trimiteLa(`/admin/firme/mesaje?${unde}`);
+  return trimiteLa(`/admin/firme?${unde}`);
 }
 
 export const GET = () => raspuns("Metodă nepermisă.", 405);

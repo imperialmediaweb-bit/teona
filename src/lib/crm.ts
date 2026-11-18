@@ -17,8 +17,15 @@ import { intreaba } from "./baza";
 /** Stadiile prin care trece o sponsorizare, în ordine. */
 export const STADII_FIRMA = [
   /* O firmă găsită de asociație, căreia încă nu i-a scris nimeni (noiembrie 2026). */
-  { id: "prospect", eticheta: "Lead: de contactat", culoare: "cerneala" },
-  { id: "cerere", eticheta: "Cerere nouă", culoare: "miere" },
+  { id: "prospect", eticheta: "Nou", culoare: "cerneala" },
+  { id: "cerere", eticheta: "Cerere de pe site", culoare: "miere" },
+  /*
+    Cele două de mai jos se pun singure (noiembrie 2026): „Contactat” după
+    primul e-mail trimis din panou unei firme noi, „A răspuns” când vine
+    răspunsul ei. Numai înainte: o firmă cu contract nu se întoarce aici.
+  */
+  { id: "contactat", eticheta: "Contactat", culoare: "cerneala" },
+  { id: "a_raspuns", eticheta: "A răspuns", culoare: "miere" },
   { id: "contract_trimis", eticheta: "Contract trimis", culoare: "turcoaz" },
   { id: "semnat", eticheta: "Contract semnat", culoare: "turcoaz" },
   { id: "incasat", eticheta: "Bani încasați", culoare: "caramiziu" },
@@ -150,7 +157,7 @@ export async function salveazaFirma(date: {
          firmele fără răspuns (audit 11 nov. 2026). Una aflată pe drum
          (contract trimis, semnat, încasat anul ăsta) nu se dă înapoi.
        */
-       stadiu        = CASE WHEN firme.stadiu IN ('renuntat', 'prospect')
+       stadiu        = CASE WHEN firme.stadiu IN ('renuntat', 'prospect', 'contactat', 'a_raspuns')
                               OR (firme.stadiu = 'incasat'
                                   AND date_part('year', firme.schimbat_la AT TIME ZONE 'Europe/Bucharest')
                                     < date_part('year', now() AT TIME ZONE 'Europe/Bucharest'))
@@ -243,7 +250,7 @@ export async function adaugaLead(d: {
  * duce linkul ei (`/admin/firme?uitate=1`).
  */
 export const FIRME_UITATE_SQL = `arhivata_la IS NULL
-  AND stadiu IN ('prospect', 'cerere', 'contract_trimis')
+  AND stadiu IN ('prospect', 'cerere', 'contactat', 'a_raspuns', 'contract_trimis')
   AND fara_emailuri_la IS NULL
   AND schimbat_la < now() - interval '14 days'
   AND NOT EXISTS (SELECT 1 FROM interactiuni i

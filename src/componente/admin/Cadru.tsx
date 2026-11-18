@@ -36,6 +36,8 @@ type Intrare = {
   pictograma: NumePictograma;
   /** Alte adrese pe care intrarea asta e „aici” (paginile strânse sub ea). */
   si?: readonly string[];
+  /** Unde duce intrarea când are bulină (lucrul nou, filtrat). */
+  cuSemn?: string;
 };
 
 /**
@@ -60,8 +62,24 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
     pagini: [
       { href: "/admin/donatii", eticheta: "Donații", pictograma: "inima" },
       { href: "/admin/donatori", eticheta: "Donatori", pictograma: "familie" },
-      { href: "/admin/firme", eticheta: "Firme", pictograma: "cladire" },
-      { href: "/admin/firme/mesaje", eticheta: "Mesaje cu firmele", pictograma: "plic" },
+    ],
+  },
+  /*
+    Firmele și e-mailurile cu ele, o singură pagină (noiembrie 2026): până
+    atunci „Firme” și „Mesaje cu firmele” stăteau una sub alta, sub „Banii”,
+    și omul nu știa în care să caute o firmă care i-a răspuns.
+  */
+  {
+    titlu: "Firme / Sponsori",
+    pagini: [
+      {
+        href: "/admin/firme",
+        eticheta: "Firme",
+        pictograma: "cladire",
+        si: ["/admin/firme/mesaje"],
+        // Cu răspunsuri necitite, intrarea (și bulina ei) duce direct la ele.
+        cuSemn: "/admin/firme?fila=raspuns&necitite=1",
+      },
       { href: "/admin/contracte", eticheta: "Contracte", pictograma: "document" },
     ],
   },
@@ -129,6 +147,7 @@ const GRUPURI: ReadonlyArray<{ titlu: string; pagini: readonly Intrare[] }> = [
     pagini: [
       { href: "/admin/utilizatori", eticheta: "Utilizatori", pictograma: "familie" },
       { href: "/admin/parola", eticheta: "Parola mea", pictograma: "stea" },
+      { href: "/admin/setari", eticheta: "Setări", pictograma: "panou" },
     ],
   },
 ];
@@ -154,7 +173,8 @@ const semne = cache(async (): Promise<ReadonlyMap<string, number>> => {
   const lucruri = await deFacutAcum().catch(() => []);
   const pe = new Map<string, number>();
   for (const lucru of lucruri) {
-    pe.set(lucru.unde, (pe.get(lucru.unde) ?? 0) + lucru.nr);
+    if (!lucru.meniu) continue;
+    pe.set(lucru.meniu, (pe.get(lucru.meniu) ?? 0) + lucru.nr);
   }
   return pe;
 });
@@ -219,6 +239,7 @@ async function Nav({ activ }: { activ?: string }) {
     în nicio grupă, se deschide prima.
   */
   const areActiv = grupuri.some((g) => g.pagini.some(eAici));
+  const peSemne = await semne();
 
   return (
     <div className="grid gap-1">
@@ -247,7 +268,7 @@ async function Nav({ activ }: { activ?: string }) {
                 return (
                   <li key={p.href}>
                     <Link
-                      href={p.href}
+                      href={p.cuSemn && (peSemne.get(p.href) ?? 0) > 0 ? p.cuSemn : p.href}
                       /* Fără preîncărcare: fiecare pagină de panou interoghează baza. */
                       prefetch={false}
                       aria-current={aici ? "page" : undefined}

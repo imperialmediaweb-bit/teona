@@ -6,7 +6,7 @@ import { cheiaDeSemnat, semnaturaLinkuluiTine, semneazaText } from "@/lib/cheie-
 import { curataHtml } from "@/lib/curata-html";
 import { textSimplu } from "@/lib/text-bogat";
 import { adresaDeLa, trimiteEmailCuId } from "@/lib/email/trimite";
-import { scrieInteractiune, type Firma } from "@/lib/crm";
+import { FIRME_UITATE_SQL as FIRME_UITATE, scrieInteractiune, type Firma } from "@/lib/crm";
 import { mediu } from "@/lib/mediu";
 import { cate } from "@/lib/numere-ro";
 import { esteProba } from "@/lib/proba";
@@ -146,7 +146,7 @@ export async function firmaInteresata(firmaId: string): Promise<boolean> {
     [firmaId],
   );
   if (Number(deja?.nr ?? 0) > 0) return false;
-  await intreaba(`UPDATE firme SET stadiu = 'cerere', schimbat_la = now() WHERE id = $1 AND stadiu = 'prospect'`, [firmaId]);
+  await intreaba(`UPDATE firme SET stadiu = 'cerere', schimbat_la = now() WHERE id = $1 AND stadiu IN ('prospect', 'contactat', 'a_raspuns')`, [firmaId]);
   await scrieInteractiune({
     firmaId,
     fel: "email",
@@ -421,6 +421,10 @@ export async function trimiteFirmei(d: {
   for (const a of d.atasamente) {
     await puneAtasament(String(rand.id), a);
   }
+  // „Nou” → „Contactat”, singur. Numai de pe „Nou”: restul stadiilor sunt mai departe.
+  await intreaba(`UPDATE firme SET stadiu = 'contactat', schimbat_la = now() WHERE id = $1 AND stadiu = 'prospect'`, [
+    d.firma.id,
+  ]).catch(() => undefined);
   await scrieInteractiune({
     firmaId: d.firma.id,
     fel: "email",
@@ -508,20 +512,6 @@ export async function marcheazaCitite(firmaId: string): Promise<void> {
   );
 }
 
-export type Discutie = {
-  firmaId: string | null;
-  denumire: string;
-  persoana: string | null;
-  ultimul: { subiect: string; directie: "trimis" | "primit"; cand: string; deLa: string };
-  necitite: number;
-  trimise: number;
-  deschise: number;
-  /** E-mailuri trimise de la ultimul răspuns al firmei (sau de la început). */
-  faraRaspuns: number;
-  /** Stadiul firmei în CRM; `null` la un răspuns nelegat. */
-  stadiu: string | null;
-};
-
 /** Câte e-mailuri i s-au trimis de la ultimul ei răspuns. */
 export function trimiseFaraRaspuns(mesaje: Pick<Mesaj, "directie">[]): number {
   let n = 0;
@@ -531,75 +521,6 @@ export function trimiseFaraRaspuns(mesaje: Pick<Mesaj, "directie">[]): number {
 
 /** De la câte e-mailuri fără răspuns se spune „nu răspunde”. */
 export const NU_RASPUNDE_DUPA = 2;
-
-/** Discuțiile, cele cu răspunsuri necitite primele, apoi cele mai noi. */
-export async function discutii(): Promise<Discutie[]> {
-  const r = await intreaba<{
-    firma_id: string | null;
-    denumire: string | null;
-    persoana: string | null;
-    stadiu: string | null;
-    subiect: string;
-    directie: "trimis" | "primit";
-    creat_la: Date;
-    de_la: string;
-    necitite: string;
-    trimise: string;
-    deschise: string;
-    fara_raspuns: string;
-  }>(
-    `WITH ult AS (
-       SELECT DISTINCT ON (coalesce(firma_id::text, 'm' || id::text)) *
-         FROM mesaje_firme ORDER BY coalesce(firma_id::text, 'm' || id::text), creat_la DESC
-     )
-     SELECT u.firma_id, f.denumire, f.persoana, f.stadiu, u.subiect, u.directie, u.creat_la, u.de_la,
-            (SELECT count(*) FROM mesaje_firme m WHERE m.directie = 'primit' AND m.citit_la IS NULL
-               AND (m.firma_id = u.firma_id OR (u.firma_id IS NULL AND m.id = u.id))) AS necitite,
-            (SELECT count(*) FROM mesaje_firme m WHERE m.firma_id = u.firma_id AND m.directie = 'trimis') AS trimise,
-            (SELECT count(*) FROM mesaje_firme m WHERE m.firma_id = u.firma_id AND m.directie = 'trimis' AND m.deschideri > 0) AS deschise,
-            (SELECT count(*) FROM mesaje_firme m WHERE m.firma_id = u.firma_id AND m.directie = 'trimis'
-               AND m.creat_la > coalesce((SELECT max(p.creat_la) FROM mesaje_firme p WHERE p.firma_id = u.firma_id AND p.directie = 'primit'), '-infinity')) AS fara_raspuns
-       FROM ult u LEFT JOIN firme f ON f.id = u.firma_id
-      WHERE f.arhivata_la IS NULL
-      ORDER BY (SELECT count(*) FROM mesaje_firme m WHERE m.directie = 'primit' AND m.citit_la IS NULL
-                  AND (m.firma_id = u.firma_id OR (u.firma_id IS NULL AND m.id = u.id))) > 0 DESC,
-               u.creat_la DESC
-      LIMIT 300`,
-  );
-  return r.map((x) => ({
-    firmaId: x.firma_id,
-    denumire: x.denumire ?? x.de_la,
-    persoana: x.persoana,
-    ultimul: { subiect: x.subiect, directie: x.directie, cand: x.creat_la.toISOString(), deLa: x.de_la },
-    necitite: Number(x.necitite),
-    trimise: Number(x.trimise),
-    deschise: Number(x.deschise),
-    faraRaspuns: Number(x.fara_raspuns),
-    stadiu: x.stadiu,
-  }));
-}
-
-/** Stadiile în care o firmă căreia i s-a scris e socotită convertită: a ajuns la contract. */
-export const STADII_CONVERTITE = ["contract_trimis", "semnat", "incasat"] as const;
-
-/**
- * Cifrele de sus de la „Mesaje cu firmele”: câtor firme le-am scris, câte au
- * răspuns, câte au ajuns la contract. Numai firmele cu cel puțin un e-mail
- * trimis din panou, nearhivate.
- */
-export async function cifreleMesajelor(): Promise<{ scrise: number; raspuns: number; convertite: number; semnate: number }> {
-  const [r] = await intreaba<{ scrise: string; raspuns: string; convertite: string; semnate: string }>(
-    `SELECT count(*) AS scrise,
-            count(*) FILTER (WHERE EXISTS (SELECT 1 FROM mesaje_firme p WHERE p.firma_id = f.id AND p.directie = 'primit')) AS raspuns,
-            count(*) FILTER (WHERE f.stadiu = ANY($1::text[])) AS convertite,
-            count(*) FILTER (WHERE f.stadiu IN ('semnat', 'incasat')) AS semnate
-       FROM firme f
-      WHERE f.arhivata_la IS NULL
-        AND EXISTS (SELECT 1 FROM mesaje_firme t WHERE t.firma_id = f.id AND t.directie = 'trimis')`,
-    [[...STADII_CONVERTITE]],
-  );
-  return { scrise: Number(r?.scrise ?? 0), raspuns: Number(r?.raspuns ?? 0), convertite: Number(r?.convertite ?? 0), semnate: Number(r?.semnate ?? 0) };
-}
 
 /** Răspunsurile care n-au fost legate de nicio firmă, cu tot cu text. */
 export async function mesajeNelegate(): Promise<Mesaj[]> {
@@ -812,6 +733,16 @@ export async function salveazaPrimit(d: {
   for (const a of d.atasamente) {
     await puneAtasament(String(id), a);
   }
+  /*
+    „Nou” sau „Contactat” → „A răspuns”, singur. O cerere de pe site, un
+    contract trimis sau semnat nu se dau înapoi; „A renunțat” e hotărârea
+    unui om și rămâne.
+  */
+  if (d.firmaId)
+    await intreaba(
+      `UPDATE firme SET stadiu = 'a_raspuns', schimbat_la = now() WHERE id = $1 AND stadiu IN ('prospect', 'contactat')`,
+      [d.firmaId],
+    ).catch(() => undefined);
   return String(id);
 }
 
@@ -822,4 +753,161 @@ export async function firmaDupaEmail(email: string): Promise<string | null> {
     [email],
   );
   return r.length === 1 ? r[0].id : null;
+}
+
+/* ── Lista „Firme / Sponsori” ────────────────────────────────────────── */
+
+/**
+ * Filele paginii de firme. „Așteaptă răspuns”: le-am scris și n-au răspuns
+ * după ultimul nostru e-mail. „Au răspuns”: au răspuns cel puțin o dată.
+ * „Contract semnat”: semnat sau cu banii deja încasați. „Contactate” nu e
+ * filă, e cifra de sus, care se poate apăsa.
+ */
+export const FILE_FIRME = [
+  { id: "toate", eticheta: "Toate" },
+  { id: "asteapta", eticheta: "Așteaptă răspuns" },
+  { id: "raspuns", eticheta: "Au răspuns" },
+  { id: "semnat", eticheta: "Contract semnat" },
+] as const;
+export type FilaFirme = (typeof FILE_FIRME)[number]["id"] | "contactate";
+
+export type RandListaFirme = {
+  id: string;
+  denumire: string;
+  persoana: string;
+  email: string;
+  cui: string;
+  stadiu: string;
+  faraEmailuri: boolean;
+  trimise: number;
+  primite: number;
+  necitite: number;
+  /** E-mailuri trimise după ultimul răspuns al firmei (toate, dacă n-a răspuns niciodată). */
+  faraRaspuns: number;
+  ultimul: { directie: "trimis" | "primit"; cand: string; cine: string; subiect: string; inceput: string } | null;
+};
+
+const FD = (x: string) => `translate(lower(${x}), 'ăâîșşțţ', 'aaisstt')`;
+
+/** Statistica de mesaje a fiecărei firme, ca subinterogare reluată în listă și în cifre. */
+const STATISTICA = `
+  LEFT JOIN LATERAL (
+    SELECT count(*) FILTER (WHERE m.directie = 'trimis') AS trimise,
+           count(*) FILTER (WHERE m.directie = 'primit') AS primite,
+           count(*) FILTER (WHERE m.directie = 'primit' AND m.citit_la IS NULL) AS necitite,
+           count(*) FILTER (WHERE m.directie = 'trimis' AND m.creat_la > coalesce(
+             (SELECT max(p.creat_la) FROM mesaje_firme p WHERE p.firma_id = f.id AND p.directie = 'primit'), '-infinity')) AS fara_raspuns,
+           max(m.creat_la) AS ultima
+      FROM mesaje_firme m WHERE m.firma_id = f.id
+  ) s ON true`;
+
+const CONDITIE_FILA: Record<FilaFirme, string> = {
+  toate: "true",
+  contactate: "s.trimise > 0",
+  asteapta: "s.fara_raspuns > 0 AND f.stadiu NOT IN ('semnat', 'incasat', 'renuntat')",
+  raspuns: "s.primite > 0",
+  semnat: "f.stadiu IN ('semnat', 'incasat')",
+};
+
+export async function listaFirmelor(o: {
+  fila: FilaFirme;
+  cauta?: string;
+  necitite?: boolean;
+  stadiu?: string;
+  uitate?: boolean;
+}): Promise<RandListaFirme[]> {
+  const cauta = (o.cauta ?? "").trim();
+  const r = await intreaba<{
+    id: string;
+    denumire: string;
+    persoana: string;
+    email: string;
+    cui: string;
+    stadiu: string;
+    fara_emailuri_la: Date | null;
+    trimise: string;
+    primite: string;
+    necitite: string;
+    fara_raspuns: string;
+    u_directie: "trimis" | "primit" | null;
+    u_cand: Date | null;
+    u_de_la: string | null;
+    u_trimis_de: string | null;
+    u_subiect: string | null;
+    u_inceput: string | null;
+  }>(
+    `SELECT f.id, f.denumire, f.persoana, f.email, f.cui, f.stadiu, f.fara_emailuri_la,
+            s.trimise, s.primite, s.necitite, s.fara_raspuns,
+            u.directie AS u_directie, u.creat_la AS u_cand, u.de_la AS u_de_la, u.trimis_de AS u_trimis_de,
+            u.subiect AS u_subiect, u.inceput AS u_inceput
+       FROM firme f
+       ${STATISTICA}
+       LEFT JOIN LATERAL (
+         SELECT x.directie, x.creat_la, x.de_la, x.trimis_de, x.subiect,
+                left(regexp_replace(split_part(x.text_simplu, 'Dacă nu doriți să mai primiți', 1), '\\s+', ' ', 'g'), 160) AS inceput
+           FROM mesaje_firme x WHERE x.firma_id = f.id ORDER BY x.creat_la DESC LIMIT 1
+       ) u ON true
+      WHERE f.arhivata_la IS NULL
+        AND ${CONDITIE_FILA[o.fila]}
+        AND ($1 = '' OR ${FD("f.denumire")} LIKE '%' || ${FD("$1")} || '%'
+             OR f.cui ILIKE '%' || regexp_replace($1, '^\\s*ro\\s*|[\\s.\\-]', '', 'gi') || '%'
+             OR ${FD("f.persoana")} LIKE '%' || ${FD("$1")} || '%'
+             OR f.email ILIKE '%' || $1 || '%')
+        AND ($2::boolean IS NOT TRUE OR s.necitite > 0)
+        AND ($3::text IS NULL OR f.stadiu = $3)
+        ${o.uitate ? `AND f.id IN (SELECT id FROM firme WHERE ${FIRME_UITATE}) ` : ""}
+      ORDER BY s.necitite > 0 DESC, coalesce(s.ultima, f.schimbat_la) DESC
+      LIMIT 300`,
+    [cauta, o.necitite ?? false, o.stadiu ?? null],
+  );
+  return r.map((x) => ({
+    id: x.id,
+    denumire: x.denumire,
+    persoana: x.persoana,
+    email: x.email,
+    cui: x.cui,
+    stadiu: x.stadiu,
+    faraEmailuri: Boolean(x.fara_emailuri_la),
+    trimise: Number(x.trimise),
+    primite: Number(x.primite),
+    necitite: Number(x.necitite),
+    faraRaspuns: Number(x.fara_raspuns),
+    ultimul:
+      x.u_directie && x.u_cand
+        ? {
+            directie: x.u_directie,
+            cand: x.u_cand.toISOString(),
+            // „Ion Pop <ion@firma.ro>” → „Ion Pop”; fără nume, adresa.
+            cine:
+              x.u_directie === "primit"
+                ? (x.u_de_la ?? "").replace(/\s*<[^>]*>\s*$/, "").replace(/^"|"$/g, "").trim() || (x.u_de_la ?? "")
+                : (x.u_trimis_de ?? "Asociația"),
+            subiect: x.u_subiect ?? "",
+            inceput: x.u_inceput ?? "",
+          }
+        : null,
+  }));
+}
+
+/** Cifrele de sus și pe file: aceleași condiții ca lista, peste toate firmele nearhivate. */
+export async function cifreleFirmelor(): Promise<{
+  contactate: number;
+  raspuns: number;
+  semnat: number;
+  asteapta: number;
+  necitite: number;
+  toate: number;
+}> {
+  const [r] = await intreaba<Record<string, string>>(
+    `SELECT count(*) AS toate,
+            count(*) FILTER (WHERE ${CONDITIE_FILA.contactate}) AS contactate,
+            count(*) FILTER (WHERE ${CONDITIE_FILA.raspuns}) AS raspuns,
+            count(*) FILTER (WHERE ${CONDITIE_FILA.semnat}) AS semnat,
+            count(*) FILTER (WHERE ${CONDITIE_FILA.asteapta}) AS asteapta,
+            count(*) FILTER (WHERE s.necitite > 0) AS necitite
+       FROM firme f ${STATISTICA}
+      WHERE f.arhivata_la IS NULL`,
+  );
+  const n = (k: string) => Number(r?.[k] ?? 0);
+  return { contactate: n("contactate"), raspuns: n("raspuns"), semnat: n("semnat"), asteapta: n("asteapta"), necitite: n("necitite"), toate: n("toate") };
 }

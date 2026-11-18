@@ -21,7 +21,7 @@ export async function POST(cerere: Request) {
   const r = await opresteAdresa(adresa);
   if (r.nou) {
     const cine = r.firme.length ? r.firme.join(", ") : adresa;
-    await notificaPanoul({ titlu: `${cine} nu mai vrea e-mailuri`, text: adresa, adresa: "/admin/firme/mesaje" }).catch(() => 0);
+    await notificaPanoul({ titlu: `${cine} nu mai vrea e-mailuri`, text: adresa, adresa: "/admin/firme" }).catch(() => 0);
     await trimiteEmail({
       catre: CATRE_ASOCIATIE,
       subiect: `${cine} nu mai vrea e-mailuri de la noi`,

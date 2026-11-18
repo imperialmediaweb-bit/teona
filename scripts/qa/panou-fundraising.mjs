@@ -130,8 +130,9 @@ verifica(nelista.status === 400, `o listă inventată e refuzată (${nelista.sta
 
 // ─── Căutarea peste tot ───────────────────────────────────────────────────
 const firme = await (await cere("/admin/firme")).text();
-const idFirma = (firme.match(/\/admin\/firme\/([0-9a-f-]{36})\/contract/) ?? [])[1];
-verifica(Boolean(idFirma), "fișa unei firme are link către contract");
+const idFirma = (firme.match(/\/admin\/firme\/([0-9a-f-]{36})\/mesaje/) ?? [])[1];
+const fisa = idFirma ? await (await cere(`/admin/firme/${idFirma}/mesaje`)).text() : "";
+verifica(Boolean(idFirma) && fisa.includes(`/admin/firme/${idFirma}/contract`), "pagina unei firme are link către contract");
 
 if (idFirma) {
   const pagina = await (await cere(`/admin/firme/${idFirma}/contract`)).text();

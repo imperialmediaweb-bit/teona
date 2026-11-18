@@ -38,7 +38,12 @@ export async function POST(cerere: Request) {
   const campanii = areBazaDeDate() ? await campaniileAlese(f.getAll("campanii")) : [];
   const s = scrisoarea({
     // Butoanele din previzualizare nu duc nicăieri: nu se face un link semnat pentru o vizualizare.
-    firma: fi ? { denumire: fi.denumire, persoana: fi.persoana } : EXEMPLU,
+    // Fără firmă din listă, dar cu una nouă scrisă pe loc: cu numele ei.
+    firma: fi
+      ? { denumire: fi.denumire, persoana: fi.persoana }
+      : text(f.get("nou_denumire"), 200)
+        ? { denumire: text(f.get("nou_denumire"), 200)!, persoana: text(f.get("nou_persoana"), 150) ?? EXEMPLU.persoana }
+        : EXEMPLU,
     subiect: subiectScris || "(fără subiect)",
     html: continut || "<p>(textul e încă gol)</p>",
     trimisDe,
@@ -48,7 +53,7 @@ export async function POST(cerere: Request) {
 
   if (f.get("fac") !== "proba") {
     return NextResponse.json(
-      { html: s.html, deLa: `${s.expeditorNume} <${s.dela}>`, subiect: s.subiect, pentru: fi?.denumire ?? null },
+      { html: s.html, deLa: `${s.expeditorNume} <${s.dela}>`, subiect: s.subiect, pentru: fi?.denumire ?? text(f.get("nou_denumire"), 200) ?? null },
       { headers: { "Cache-Control": "no-store, no-transform" } },
     );
   }

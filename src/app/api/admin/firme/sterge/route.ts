@@ -15,7 +15,7 @@ export const POST = cuBaza(async (cerere: Request) => {
   if (!/^[0-9a-f-]{36}$/i.test(id)) return raspuns("Firma nu există.", 400);
   const rez = await stergeSauArhiveazaFirma(id);
   if (rez === "nu-exista") return raspuns("Firma nu există.", 404);
-  return trimiteLa(`/admin/firme/mesaje?${rez === "stearsa" ? "stearsa" : "arhivata"}=1`);
+  return trimiteLa(`/admin/firme?${rez === "stearsa" ? "stearsa" : "arhivata"}=1`);
 });
 
 export const GET = () => raspuns("Metodă nepermisă.", 405);

@@ -223,6 +223,15 @@ const nextConfig: NextConfig = {
       permanent: false,
     });
 
+    // „Mesaje cu firmele” s-a unit cu „Firme” (noiembrie 2026). Linkurile vechi
+    // (notificări, e-mailuri către asociație, semne de carte) duc la lista nouă,
+    // cu tot cu ce poartă după „?”.
+    reguli.push({
+      source: "/admin/firme/mesaje",
+      destination: "/admin/firme",
+      permanent: false,
+    });
+
     // Ultima, după cele punctuale: orice altă adresă veche de proiect duce la
     // lista de proiecte, nu la 404.
     reguli.push({

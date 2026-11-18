@@ -17,7 +17,8 @@ import { esteFelInteractiune, scrieInteractiune } from "@/lib/crm";
  * scrie, în loc de un drept comun care ar lăsat ruta deschisă pentru cine
  * n-are voie pe niciuna dintre cele trei.
  */
-const INAPOI = /^\/admin\/(firme|donatori|cereri)(\?[\w=&%.\-+]*)?$/;
+// Și pagina unei firme (`/admin/firme/<id>/mesaje`), unde jurnalul stă sub discuție.
+const INAPOI = /^\/admin\/(firme|donatori|cereri)(?:\/[0-9a-f-]{36}\/mesaje)?(\?[\w=&%.\-+]*)?$/i;
 
 export const POST = cuBaza(posteaza);
 

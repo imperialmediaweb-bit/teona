@@ -85,6 +85,17 @@ const CAI: Record<string, string | string[]> = {
     "M12 13a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z",
   ],
   sageata: "M4.5 12h15M13.5 6l6 6-6 6",
+  /** Lupa: căutarea. */
+  lupa: ["M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13z", "M15.5 15.5l4.5 4.5"],
+  plus: "M12 5v14M5 12h14",
+  /** Săgeata întoarsă: un răspuns venit. */
+  raspuns: ["M9.5 7.5L4.5 12l5 4.5", "M5 12h9a5.5 5.5 0 0 1 5.5 5.5V19"],
+  /** Avionul de hârtie: un e-mail trimis. */
+  trimis: ["M20.5 3.5L10 14", "M20.5 3.5L14 20.5l-4-6.5-6.5-4 17-6.5z"],
+  /** Bifa în cerc: încheiat, semnat. */
+  bifa: ["M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17z", "M8 12.2l2.7 2.7L16 9.6"],
+  /** Ceasul: în așteptare. */
+  ceas: ["M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17z", "M12 7.5V12l3 2"],
 
   // ── Panoul de administrare ──────────────────────────────────────────────
   // Patru cadrane: semnul obișnuit pentru „tabloul de bord”, înțeles fără

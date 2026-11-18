@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import EditorText from "@/componente/admin/EditorText";
+import Pictograma from "@/componente/Pictograma";
 
 /**
  * Scrisoarea către o firmă (sau către mai multe, fiecare cu a ei), cu
@@ -118,10 +119,28 @@ function Atasamente({ intrare }: { intrare: React.RefObject<HTMLInputElement | n
   );
 }
 
-function AlegeFirme({ firme, limita }: { firme: FirmaDeAles[]; limita: number }) {
+/**
+ * „Către cine?”: firmele din listă, bifate (una sau mai multe), și cel mult o
+ * firmă nouă scrisă pe loc. Firma nouă se pune în listă, ca „Nou”, și
+ * primește e-mailul odată cu celelalte.
+ */
+function AlegeFirme({
+  firme,
+  limita,
+  alese,
+  setAlese,
+  nou,
+  setNou,
+}: {
+  firme: FirmaDeAles[];
+  limita: number;
+  alese: Set<string>;
+  setAlese: React.Dispatch<React.SetStateAction<Set<string>>>;
+  nou: boolean;
+  setNou: (x: boolean) => void;
+}) {
   const [cauta, setCauta] = useState("");
   const [stadiu, setStadiu] = useState("");
-  const [alese, setAlese] = useState<Set<string>>(new Set());
   const stadii = useMemo(() => [...new Map(firme.map((f) => [f.stadiu, f.eticheta])).entries()], [firme]);
   const fd = (s: string) => s.toLowerCase().normalize("NFD").replace(/\p{M}/gu, "");
   const vizibile = firme.filter(
@@ -136,29 +155,33 @@ function AlegeFirme({ firme, limita }: { firme: FirmaDeAles[]; limita: number })
       else n.delete(id);
       return n;
     });
+  const total = alese.size + (nou ? 1 : 0);
+  const peNume = new Map(firme.map((f) => [f.id, f.denumire]));
   return (
-    <fieldset className="grid gap-3 rounded-moale border border-hartie-umbra bg-hartie p-4">
-      <legend className="px-1 font-titlu text-mic font-bold text-cerneala">Către ce firme</legend>
-      <div className="flex flex-wrap gap-2">
-        <input value={cauta} onChange={(e) => setCauta(e.target.value)} placeholder="Caută firma" className={`${camp} max-w-xs`} />
-        <select value={stadiu} onChange={(e) => setStadiu(e.target.value)} className={`${camp} w-auto`} aria-label="Stadiul">
-          <option value="">Toate stadiile</option>
-          {stadii.map(([id, et]) => (
-            <option key={id} value={id}>
-              {et}
-            </option>
+    <fieldset className="grid gap-3 rounded-moale border border-hartie-umbra bg-hartie p-4" data-catre-cine>
+      <legend className="px-1 font-titlu text-mic font-bold text-cerneala">Către cine?</legend>
+
+      {/* Ce e ales, la vedere: omul vede pe loc cui pleacă e-mailul. */}
+      {total > 0 ? (
+        <ul className="flex flex-wrap gap-1.5" aria-label="Firmele alese">
+          {[...alese].map((id) => (
+            <li key={id} className="flex items-center gap-1 rounded-full bg-caramiziu-50 py-0.5 pr-1 pl-3 text-mic font-semibold text-caramiziu-900">
+              {peNume.get(id) ?? "firmă"}
+              <button type="button" onClick={() => comuta(id, false)} aria-label={`Scoate ${peNume.get(id) ?? "firma"}`} className="px-1.5 font-bold">
+                ✕
+              </button>
+            </li>
           ))}
-        </select>
-        <button type="button" className="text-mic font-semibold text-caramiziu-700 underline" onClick={() => vizibile.filter((f) => !f.faraEmailuri).forEach((f) => comuta(f.id, true))}>
-          Bifează-le pe toate de mai jos
-        </button>
-        <button type="button" className="text-mic font-semibold text-cerneala-moale underline" onClick={() => setAlese(new Set())}>
-          Niciuna
-        </button>
-      </div>
-      <p className={`text-mic font-semibold ${alese.size > limita ? "text-caramiziu-800" : "text-cerneala"}`}>
-        {alese.size} bifate{alese.size > limita ? ` — cel mult ${limita} o dată` : ""}
-      </p>
+          {nou && <li className="rounded-full bg-turcoaz-50 px-3 py-0.5 text-mic font-semibold text-turcoaz-900">firmă nouă</li>}
+        </ul>
+      ) : (
+        <p className="text-mic text-cerneala-slab">Caută o firmă și bifeaz-o, sau adaugă una nouă. Poți alege mai multe.</p>
+      )}
+      {total > limita && (
+        <p role="alert" className="text-mic font-semibold text-caramiziu-800">
+          Cel mult {limita} firme o dată. Scoate {total - limita}.
+        </p>
+      )}
       {/*
         Ce pleacă la server sunt bifele, nu căsuțele de pe ecran: o firmă
         bifată și ascunsă apoi de căutare tot primește e-mailul.
@@ -166,28 +189,105 @@ function AlegeFirme({ firme, limita }: { firme: FirmaDeAles[]; limita: number })
       {[...alese].map((id) => (
         <input key={id} type="hidden" name="firme" value={id} />
       ))}
-      <ul className="grid max-h-80 min-w-0 gap-1 overflow-y-auto">
-        {vizibile.map((f) => (
-          <li key={f.id}>
-            <label className="flex cursor-pointer items-start gap-2.5 rounded-moale px-2 py-1.5 hover:bg-hartie-calda">
-              <input
-                type="checkbox"
-                value={f.id}
-                checked={alese.has(f.id)}
-                disabled={f.faraEmailuri}
-                onChange={(e) => comuta(f.id, e.target.checked)}
-                className="mt-1 size-4 shrink-0 accent-caramiziu-700"
-              />
-              <span className="min-w-0 text-mic break-words [overflow-wrap:anywhere]">
-                <span className="font-semibold text-cerneala">{f.denumire}</span>
-                <span className="text-cerneala-slab"> · {f.persoana} · {f.email} · {f.eticheta}</span>
-                {f.faraEmailuri && <span className="ml-1 font-semibold text-caramiziu-800">· nu vrea e-mailuri</span>}
-              </span>
-            </label>
-          </li>
-        ))}
-        {vizibile.length === 0 && <li className="px-2 text-mic text-cerneala-slab">Nicio firmă.</li>}
-      </ul>
+
+      <div className="flex flex-wrap gap-2">
+        <label className="relative min-w-0 flex-1 basis-56">
+          <Pictograma nume="lupa" className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-cerneala-slab" />
+          <input
+            type="search"
+            value={cauta}
+            onChange={(e) => setCauta(e.target.value)}
+            placeholder="Caută firma după nume, persoană sau e-mail"
+            aria-label="Caută firma"
+            className={`${camp} pl-9`}
+          />
+        </label>
+        {stadii.length > 1 && (
+          <select value={stadiu} onChange={(e) => setStadiu(e.target.value)} className={`${camp} sm:w-auto`} aria-label="Stadiul">
+            <option value="">Orice stadiu</option>
+            {stadii.map(([id, et]) => (
+              <option key={id} value={id}>
+                {et}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
+      {firme.length > 0 && (
+        <>
+          <ul className="grid max-h-72 min-w-0 gap-1 overflow-y-auto">
+            {vizibile.map((f) => (
+              <li key={f.id}>
+                <label className="flex cursor-pointer items-start gap-2.5 rounded-moale px-2 py-1.5 hover:bg-hartie-calda">
+                  <input
+                    type="checkbox"
+                    value={f.id}
+                    checked={alese.has(f.id)}
+                    disabled={f.faraEmailuri}
+                    onChange={(e) => comuta(f.id, e.target.checked)}
+                    className="mt-1 size-4 shrink-0 accent-caramiziu-700"
+                  />
+                  <span className="min-w-0 text-mic break-words [overflow-wrap:anywhere]">
+                    <span className="font-semibold text-cerneala">{f.denumire}</span>
+                    <span className="text-cerneala-slab"> · {f.persoana} · {f.email} · {f.eticheta}</span>
+                    {f.faraEmailuri && <span className="ml-1 font-semibold text-caramiziu-800">· nu vrea e-mailuri</span>}
+                  </span>
+                </label>
+              </li>
+            ))}
+            {vizibile.length === 0 && <li className="px-2 text-mic text-cerneala-slab">Nicio firmă cu numele ăsta. Adaug-o mai jos, ca firmă nouă.</li>}
+          </ul>
+          {vizibile.length > 1 && (
+            <p className="flex flex-wrap gap-x-4 text-nota">
+              <button type="button" className="font-semibold text-caramiziu-700 underline" onClick={() => vizibile.filter((f) => !f.faraEmailuri).forEach((f) => comuta(f.id, true))}>
+                Bifează-le pe toate cele de mai sus
+              </button>
+              {alese.size > 0 && (
+                <button type="button" className="font-semibold text-cerneala-moale underline" onClick={() => setAlese(new Set())}>
+                  Scoate toate bifele
+                </button>
+              )}
+            </p>
+          )}
+        </>
+      )}
+
+      {nou ? (
+        <div className="grid gap-3 rounded-moale border border-turcoaz-200 bg-turcoaz-50/40 p-3 sm:grid-cols-2" data-firma-noua>
+          <p className="flex items-center justify-between font-titlu text-mic font-bold text-cerneala sm:col-span-2">
+            Firmă nouă
+            <button type="button" onClick={() => setNou(false)} className="text-nota font-semibold text-cerneala-moale underline">
+              Renunț
+            </button>
+          </p>
+          <label className="grid gap-1 text-mic">
+            Numele firmei
+            <input name="nou_denumire" required maxLength={200} className={camp} />
+          </label>
+          <label className="grid gap-1 text-mic">
+            Persoana de contact
+            <input name="nou_persoana" maxLength={150} placeholder="Ex.: Maria Popescu" className={camp} />
+          </label>
+          <label className="grid gap-1 text-mic">
+            E-mail
+            <input name="nou_email" type="email" required className={camp} />
+          </label>
+          <label className="grid gap-1 text-mic">
+            CUI (dacă îl știi)
+            <input name="nou_cui" inputMode="numeric" maxLength={20} className={camp} />
+          </label>
+          <p className="text-nota text-cerneala-slab sm:col-span-2">Se adaugă în lista de firme, cu stadiul „Nou”; după trimitere trece singură pe „Contactat”.</p>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setNou(true)}
+          className="inline-flex items-center gap-1.5 justify-self-start rounded-full border border-turcoaz-600 px-4 py-1.5 text-mic font-semibold text-turcoaz-900 hover:bg-turcoaz-50"
+        >
+          <Pictograma nume="plus" className="size-4" strokeWidth={2.25} />
+          Firmă nouă
+        </button>
+      )}
     </fieldset>
   );
 }
@@ -317,7 +417,10 @@ export default function ScrieFirmei({
   firme,
   limita = 30,
   campanii = [],
+  aleseLaInceput = [],
 }: {
+  /** Firmele bifate deja când se deschide pagina (de pe pagina unei firme, de pildă). */
+  aleseLaInceput?: string[];
   campanii?: Array<{ id: string; titlu: string }>;
   firmaId?: string;
   catre?: string;
@@ -330,6 +433,9 @@ export default function ScrieFirmei({
   const fisiere = useRef<HTMLInputElement>(null);
   const formular = useRef<HTMLFormElement>(null);
   const lot = Boolean(firme);
+  const [alese, setAlese] = useState<Set<string>>(() => new Set(aleseLaInceput));
+  const [nou, setNou] = useState(false);
+  const destinatari = alese.size + (nou ? 1 : 0);
   // Înapoi din browser aduce pagina din memorie, cu butonul încă „Se trimite…”.
   useEffect(() => {
     const la = () => setTrimite(false);
@@ -352,9 +458,14 @@ export default function ScrieFirmei({
           setEroare(p);
           return;
         }
-        if (lot && !e.currentTarget.querySelector('input[name="firme"]')) {
+        if (lot && destinatari === 0) {
           e.preventDefault();
-          setEroare("Bifează cel puțin o firmă.");
+          setEroare("Alege cel puțin o firmă, sau adaugă una nouă.");
+          return;
+        }
+        if (lot && destinatari > limita) {
+          e.preventDefault();
+          setEroare(`Cel mult ${limita} firme o dată.`);
           return;
         }
         setEroare(null);
@@ -362,7 +473,7 @@ export default function ScrieFirmei({
       }}
     >
       {firmaId && <input type="hidden" name="firma" value={firmaId} />}
-      {firme && <AlegeFirme firme={firme} limita={limita} />}
+      {firme && <AlegeFirme firme={firme} limita={limita} alese={alese} setAlese={setAlese} nou={nou} setNou={setNou} />}
       {!lot && (
         <label className="grid gap-1.5">
           <span className="font-titlu text-mic font-bold text-cerneala">Către</span>
@@ -387,14 +498,14 @@ export default function ScrieFirmei({
         <span className="text-nota text-cerneala-slab">
           Scrie <code className="rounded bg-hartie-umbra px-1">{"{firma}"}</code> sau{" "}
           <code className="rounded bg-hartie-umbra px-1">{"{persoana}"}</code> și se pun singure numele firmei
-          și al omului. Din bara editorului pui poze în text (Poză) și linkuri (selectezi cuvintele, apoi Link). Jos se pun singure: rândul „Dacă nu doriți să mai primiți mesaje de la noi, răspundeți cu «NU»…” și semnătura cu numele tău și datele asociației.
+          și al omului. Din bara editorului pui poze în text (Poză) și linkuri (selectezi cuvintele, apoi Link). Jos se pun singure semnătura cu numele tău și datele asociației, și rândul „Dacă nu doriți să mai primiți mesaje de la noi, apăsați aici.”
         </span>
         <EditorText name="continut" defaultValue="" minim={2} />
       </div>
       <AlegeCampanii campanii={campanii} />
       <Atasamente intrare={fisiere} />
       <Previzualizare formular={formular} />
-      {lot && (
+      {lot && destinatari > 1 && (
         <label className="flex items-start gap-2.5 text-mic text-cerneala">
           <input type="checkbox" name="confirm" value="da" required className="mt-0.5 size-4 shrink-0 accent-caramiziu-700" />
           Am citit e-mailul. Fiecare firmă bifată îl primește separat, cu numele ei.
@@ -409,9 +520,10 @@ export default function ScrieFirmei({
         <button
           type="submit"
           disabled={trimite}
-          className="rounded-full bg-caramiziu-700 px-6 py-2.5 font-titlu text-mic font-bold text-hartie hover:bg-caramiziu-800 disabled:bg-cerneala-slab"
+          className="inline-flex items-center gap-2 rounded-full bg-caramiziu-700 px-6 py-2.5 font-titlu text-mic font-bold text-hartie shadow-sm hover:bg-caramiziu-800 disabled:bg-cerneala-slab"
         >
-          {trimite ? "Se trimite…" : lot ? "Trimite fiecărei firme" : "Trimite"}
+          {!trimite && <Pictograma nume="trimis" className="size-4" />}
+          {trimite ? "Se trimite…" : lot && destinatari > 1 ? `Trimite celor ${destinatari} firme` : "Trimite"}
         </button>
       </div>
     </form>

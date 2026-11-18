@@ -135,27 +135,34 @@ const iesite = await page.evaluate(() => {
 verifica("nicio etichetă nu iese din card", iesite.length === 0, JSON.stringify(iesite));
 
 // ─── Firme: filtre, căutare, mutare între stadii ──────────────────────────
+/*
+  Din 18 noiembrie 2026 lista e numai de citit: un rând = o firmă, clic pe el
+  = pagina firmei, unde se mută stadiul, se scrie suma și notițele.
+*/
 console.log("\n=== Firme ===");
+const RAND = "[data-discutie]";
 await page.goto(BAZA + "/admin/firme", { waitUntil: "load" });
 await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
-const toate = await page.locator("#continut-panou ul > li").count();
+const toate = await page.locator(RAND).count();
 verifica("lista are firme", toate >= 2, `${toate} firme`);
 
 /*
   Proba își pune singură o firmă în stadiul pe care apoi îl filtrează.
-
-  Înainte se baza pe o firmă lăsată „semnat" de o rulare anterioară — iar
-  rulările următoare o mutau, deci filtrul găsea zero și proba pica fără să
-  fie nimic stricat. O probă nu trebuie să depindă de ce a lăsat în urmă alta.
+  O probă nu trebuie să depindă de ce a lăsat în urmă alta.
 */
-const deFiltrat = page.locator("#continut-panou ul > li").first();
-await deFiltrat.locator('select[name="stadiu"]').selectOption("semnat");
-await deFiltrat.locator('button:has-text("Salvează")').click();
+const laFirma = async (rand) => {
+  await rand.click();
+  await page.waitForURL(/\/admin\/firme\/[0-9a-f-]{36}\/mesaje/);
+  await page.locator("#crm select[name=stadiu]").waitFor();
+};
+await laFirma(page.locator(RAND).first());
+await page.locator("#crm select[name=stadiu]").selectOption("semnat");
+await page.locator('#crm button:has-text("Salvează")').click();
 await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 
 await page.goto(BAZA + "/admin/firme?stadiu=semnat", { waitUntil: "load" });
 await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
-const semnate = await page.locator("#continut-panou ul > li").count();
+const semnate = await page.locator(RAND).count();
 verifica("filtrul pe stadiu reduce lista", semnate >= 1 && semnate < toate, `${semnate} din ${toate}`);
 
 await page.goto(BAZA + "/admin/firme", { waitUntil: "load" });
@@ -164,46 +171,40 @@ await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 await page.fill('input[name="cauta"]', "bucovinei");
 await page.click('button:has-text("Caută")');
 await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
-verifica("căutarea după denumire", (await page.locator("#continut-panou ul > li").count()) === 1);
+verifica("căutarea după denumire", (await page.locator(RAND).count()) === 1);
 await page.fill('input[name="cauta"]', "zzzz");
 await page.click('button:has-text("Caută")');
 await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
 verifica("căutare fără rezultat spune asta", (await page.locator("#panou-admin").innerText()).includes("Nicio firmă"));
 
-// Mutarea unei firme + suma încasată.
+// Mutarea unei firme + suma încasată, de pe pagina ei.
 await page.goto(BAZA + "/admin/firme", { waitUntil: "load" });
 await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
-const primul = page.locator("#continut-panou ul > li").first();
-const numeFirma = await primul.locator("p").first().innerText();
-await primul.locator('select[name="stadiu"]').selectOption("incasat");
-await primul.locator('input[name="suma"]').fill("12.500");
-await primul.locator('button:has-text("Salvează")').click();
+await laFirma(page.locator(RAND).first());
+const adresaFirmei = new URL(page.url()).pathname;
+await page.locator("#crm select[name=stadiu]").selectOption("incasat");
+await page.locator('#crm input[name="suma"]').fill("12.500");
+await page.locator('#crm button:has-text("Salvează")').click();
+await page.waitForURL(/stadiu=schimbat/).catch(() => {});
 await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
-verifica("mutarea duce înapoi la lista de firme", new URL(page.url()).pathname === "/admin/firme", page.url());
+verifica("mutarea te lasă pe pagina firmei", new URL(page.url()).pathname === adresaFirmei, page.url());
+const textDupa = await page.locator("#panou-admin").innerText();
+verifica("stadiul s-a schimbat", textDupa.includes("Bani încasați"));
+verifica("suma scrisă cu punct de mii s-a citit corect", textDupa.includes("12.500 lei"));
 
-const dupa = page.locator("#continut-panou ul > li").filter({ hasText: numeFirma }).first();
-const textDupa = await dupa.innerText();
-verifica("stadiul s-a schimbat", textDupa.includes("Bani încasați"), textDupa.split("\n")[0]);
-verifica("suma scrisă cu punct de mii s-a citit corect", textDupa.includes("12.500 lei"), textDupa.replace(/\n/g, " | ").slice(0, 160));
-
-// Suma scrisă aiurea nu trebuie să piardă mutarea stadiului.
-await dupa.locator('select[name="stadiu"]').selectOption("contract_trimis");
-await dupa.locator('input[name="suma"]').fill("aiurea");
-await dupa.locator('button:has-text("Salvează")').click();
+// Suma scrisă aiurea: omul află, nimic nu se strică.
+await page.locator("#crm select[name=stadiu]").selectOption("contract_trimis");
+await page.locator('#crm input[name="suma"]').fill("aiurea");
+await page.locator('#crm button:has-text("Salvează")').click();
+await page.waitForURL(/eroare=/).catch(() => {});
 await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
-const dupa2 = await page.locator("#continut-panou ul > li").filter({ hasText: numeFirma }).first().innerText();
-verifica("o sumă scrisă greșit nu anulează mutarea", dupa2.includes("Contract trimis"), dupa2.split("\n")[0]);
+const dupa2 = await page.locator("#panou-admin").innerText();
+verifica("o sumă scrisă greșit se spune pe pagină", /[Ss]um/.test((await page.locator("#crm [role=alert]").innerText().catch(() => ""))));
 verifica("și nu șterge suma dinainte", dupa2.includes("12.500 lei"));
 
 // ─── Jurnalul discuțiilor ─────────────────────────────────────────────────
 console.log("\n=== Jurnal ===");
-await page.goto(BAZA + "/admin/firme", { waitUntil: "load" });
-await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
-await page.locator("#continut-panou ul > li").first().locator('a:has-text("Discuții și notițe")').click();
-await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
-verifica("jurnalul se deschide", (await page.locator('form[action="/api/admin/jurnal"]').count()) === 1);
-// Pe o bază curată jurnalul e gol; la a doua rulare are deja intrări. Se
-// verifică doar că spune una dintre cele două, nu că e neapărat gol.
+verifica("jurnalul stă pe pagina firmei", (await page.locator('form[action="/api/admin/jurnal"]').count()) === 1);
 const textJurnal = await page.locator("#panou-admin").innerText();
 verifica(
   "jurnalul arată ori că e gol, ori ce scrie în el",
@@ -357,8 +358,11 @@ if (randuri === 0) {
   verifica("se salvează pe donator", (await page.locator("#panou-admin").innerText()).includes("vrea să treacă pe donație lunară"));
   verifica("rămâne pe pagina de donatori", new URL(page.url()).pathname === "/admin/donatori", page.url());
   // Telefonul apare doar dacă donatorul l-a lăsat; pe firme e întotdeauna.
-  await page.goto(BAZA + "/admin/firme", { waitUntil: "load" });
-await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
+  // Pe pagina firmei (lista arată numai numele și ultimul mesaj).
+  await page.goto(BAZA + "/admin/firme?cauta=bucovinei", { waitUntil: "load" });
+  await page.locator("[data-discutie]").first().click();
+  await page.waitForURL(/\/mesaje/).catch(() => {});
+  await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   const tel = await page.locator('#panou-admin a[href^="tel:"]').count();
   verifica("telefoanele sunt apelabile dintr-un clic", tel >= 1, `${tel} linkuri tel:`);
 }
