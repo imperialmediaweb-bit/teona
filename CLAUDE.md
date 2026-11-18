@@ -1545,6 +1545,24 @@ există trimitere unu-la-unu și nici atașamente. Pleacă prin Resend
   rulate împreună de `scratchpad/mf/toate.sh`, care repornește serverul
   între ele (limita de 5 intrări în 15 minute).
 
+### Firme / Sponsori ca panou pe coloane (18 noiembrie 2026, a doua cerere)
+
+Lista a devenit panou (`componente/admin/firme/PanouFirme.tsx`): De contactat ·
+Așteaptă răspuns · Au răspuns · Contract semnat, cu numărul în antet; „Au
+renunțat (N)” pliat dedesubt. Coloana o hotărăște `coloanaFirmei()` din
+`lib/mesaje-firme.ts`: semnat sau încasat → Contract semnat (are prioritate);
+renunțat → pliat; fără e-mail → De contactat; ultimul mesaj al nostru →
+Așteaptă; al lor → Au răspuns. Fără drag-and-drop: se mută singur.
+Cardul: inițiale, nume, persoana, o linie „Ei/Noi: primele cuvinte · azi/ieri/
+acum N zile/dată” (compusă pe server, la ora României), „3 trimise · 3
+deschise”, punct și „nou” la răspuns necitit, „de N zile fără răspuns” pe
+Așteaptă peste 7 zile; „Scrie” la hover (`/admin/firme/scrie?firma=<id>`),
+vizibil mereu pe ecranele fără hover. Căutarea filtrează pe loc, în browser.
+Pe telefon coloanele sunt file; `?fila=raspuns` o deschide pe aceea (bulina
+din meniu). Filele, cifrele de sus, „Orice stadiu” și „Caută” au fost scoase.
+**Cardurile din grilă cer `grid-cols-1`/`min-w-0`**: fără ele, un text lung
+lățește coloana și toată pagina. Probă: `scratchpad/mf/panou.mjs` (34).
+
 ### Firme / Sponsori: o singură pagină (18 noiembrie 2026)
 
 Cerut de asociație: „/admin/firme/mesaje e greu de folosit”. „Firme” și
