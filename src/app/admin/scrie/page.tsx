@@ -8,6 +8,8 @@ import { esteFel, felul, toateTextele } from "@/lib/texte";
 import { adresaPoza } from "@/lib/poza-urcata";
 import { proiecteAfisate } from "@/date/proiecte";
 import Cadru from "@/componente/admin/Cadru";
+import { PenLine } from "lucide-react";
+import { StareGoala } from "@/componente/admin/ui";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 
@@ -144,10 +146,8 @@ async function Continut({
       )}
 
       {texte.length === 0 ? (
-        <div className="mt-8 max-w-2xl colt-a border border-hartie-umbra bg-hartie p-7">
-          <p className="text-amplu text-cerneala-moale">
-            Nu e nimic aici încă. Apasă „{acesta.butonNou}”, sus.
-          </p>
+        <div className="mt-8">
+          <StareGoala I={PenLine} text={`Nu e nimic aici încă. Apasă „${acesta.butonNou}”, sus.`} />
         </div>
       ) : (
         <div className="mt-8 grid gap-10">

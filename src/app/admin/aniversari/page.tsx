@@ -10,6 +10,8 @@ import { etichetaOcaziei } from "@/date/aniversari";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import Cadru from "@/componente/admin/Cadru";
+import { Cake } from "lucide-react";
+import { StareGoala } from "@/componente/admin/ui";
 import TextCuAdrese from "@/componente/admin/TextCuAdrese";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
@@ -128,9 +130,7 @@ async function Continut({
         </p>
       )}
       {campanii.length === 0 && (
-        <p className="text-amplu text-cerneala-moale">
-          Nimic de verificat acum.
-        </p>
+        <StareGoala I={Cake} text="Nicio campanie de ziua cuiva de aprobat acum. Când cineva își face pagina pe site, apare aici." />
       )}
 
       {/*

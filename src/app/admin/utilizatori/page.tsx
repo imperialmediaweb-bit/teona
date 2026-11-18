@@ -62,6 +62,11 @@ const NUME_PAGINA: Record<string, string> = {
   "/admin/pagini": "Pagini",
   "/admin/facebook": "Facebook",
   "/admin/utilizatori": "Utilizatori",
+  "/admin/firme/mesaje": "Discuțiile cu firmele",
+  "/admin/firme/scrie": "E-mail nou către firme",
+  "/admin/voluntari": "Voluntari",
+  "/admin/abonati": "Abonați",
+  "/admin/abonati/incarca": "Încărcarea abonaților",
 };
 
 export const metadata: Metadata = {

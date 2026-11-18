@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CardCifra } from "@/componente/admin/ui";
+import { CardCifra, StareGoala } from "@/componente/admin/ui";
 import { cate, forma } from "@/lib/numere-ro";
 import { Suspense } from "react";
 import { connection } from "next/server";
@@ -7,6 +7,7 @@ import Link from "next/link";
 import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
 import { areBazaDeDate } from "@/lib/baza";
 import Cadru from "@/componente/admin/Cadru";
+import { Coins, FileSignature, Hourglass, Wallet } from "lucide-react";
 import TextCuAdrese from "@/componente/admin/TextCuAdrese";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
@@ -196,17 +197,15 @@ async function Continut({
         </div>
 
         {lista.length === 0 ? (
-          <p className="max-w-3xl text-amplu text-cerneala-moale">
-            Niciun contract pe {an}. Se scriu singure aici, de fiecare dată
-            când se generează un contract din{" "}
-            <Link
-              href="/admin/firme"
-              className="font-titlu font-semibold text-caramiziu-700 underline underline-offset-2"
-            >
-              fișa unei firme
-            </Link>
-            .
-          </p>
+          <StareGoala
+            I={FileSignature}
+            text={`Niciun contract pe ${an}. Apar singure aici, când generezi un contract din pagina unei firme.`}
+            actiune={
+              <Link href="/admin/firme" className="font-titlu text-mic font-bold text-caramiziu-700 hover:underline">
+                Mergi la firme →
+              </Link>
+            }
+          />
         ) : (
           <ul className="grid gap-3">
             {lista.map((c) => (
@@ -271,7 +270,8 @@ async function Continut({
 }
 
 function Cifra({ eticheta, valoare, nota }: { eticheta: string; valoare: string; nota?: string }) {
-  return <CardCifra eticheta={eticheta} valoare={valoare} context={nota} sectiune="sponsori" />;
+  const I = /^Contracte/.test(eticheta) ? FileSignature : /Încasat/.test(eticheta) ? Wallet : /neintrați/.test(eticheta) ? Hourglass : Coins;
+  return <CardCifra eticheta={eticheta} valoare={valoare} context={nota} sectiune="sponsori" I={I} />;
 }
 
 function Rand({ c, an }: { c: Contract; an: number }) {

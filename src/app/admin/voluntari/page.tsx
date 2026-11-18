@@ -24,6 +24,8 @@ import {
   totiVoluntarii,
 } from "@/lib/voluntari";
 import Cadru from "@/componente/admin/Cadru";
+import { CardCifra, CifreSus } from "@/componente/admin/ui";
+import { Baby, Car, Megaphone, Users } from "lucide-react";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 import BazaVoluntari, { type VoluntarInLista } from "@/componente/admin/BazaVoluntari";
@@ -160,7 +162,13 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   const locuri = localitati(toti);
 
   return (
-    <Cadru titlu="Voluntari" activ="/admin/voluntari">
+    <Cadru titlu="Voluntari" descriere="Oamenii înscriși ca voluntari pe site. Caută-i după ce ai nevoie și trimite-le un apel." activ="/admin/voluntari">
+      <CifreSus>
+        <CardCifra eticheta="Voluntari înscriși" valoare={String(toti.length)} sectiune="oameni" I={Users} />
+        <CardCifra eticheta="Au permis" valoare={String(toti.filter((v) => v.permis).length)} sectiune="oameni" I={Car} />
+        <CardCifra eticheta="Experiență cu copii" valoare={String(toti.filter((v) => v.copii).length)} sectiune="oameni" I={Baby} />
+        <CardCifra eticheta="Apeluri trimise" valoare={String(listaApeluri.length)} sectiune="oameni" I={Megaphone} />
+      </CifreSus>
       {cauta.apel && (
         <p role="status" className="mb-6 colt-mic-a border border-turcoaz-200 bg-turcoaz-50 px-5 py-4 text-turcoaz-900">
           Apelul a fost trimis la {cauta.intrebati} {cauta.intrebati === "1" ? "voluntar" : "voluntari"}

@@ -353,6 +353,56 @@
     background: #fcf8f4;
   }
 
+  /*
+    Piesele vechi ale paginilor, aduse la noul stil fără să rescriem fiecare
+    pagină: butoanele devin pastile, titlurile de secțiune mărunte și
+    majuscule devin titluri obișnuite, casetele de stare au colțuri moi.
+  */
+  #panou-admin :is(button, a)[class~="colt-mic-a"][class~="font-bold"]:not([class~="w-full"]):not([class~="text-left"]) {
+    border-radius: 999px;
+  }
+
+  #panou-admin :is(button, a)[class~="bg-caramiziu-700"] {
+    box-shadow: 0 1px 2px rgb(184 43 9 / 0.2), 0 4px 10px -2px rgb(184 43 9 / 0.25);
+  }
+
+  /* Casetele „Ce e bine de știut”: notă caldă cu bară în stânga, nu dungă sus. */
+  #continut-panou [class~="border-t-4"][class~="border-miere-400"] {
+    border-top-width: 0 !important;
+    border-left: 4px solid var(--color-miere-400) !important;
+    border-radius: 0.9rem !important;
+    background: #fffaf0 !important;
+    box-shadow: 0 1px 2px rgb(30 20 10 / 0.04);
+  }
+
+  #continut-panou h2[class~="uppercase"] {
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    font-size: 17px !important;
+    color: var(--color-cerneala) !important;
+  }
+
+  #panou-admin p[class~="colt-mic-a"],
+  #panou-admin div[class~="colt-mic-a"] {
+    border-radius: 0.9rem;
+  }
+
+  #panou-admin input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([class~="rounded-full"]),
+  #panou-admin select:not([class~="rounded-full"]),
+  #panou-admin textarea {
+    border-color: #e4e1dc;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  #panou-admin input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+  #panou-admin select:focus,
+  #panou-admin textarea:focus {
+    border-color: var(--color-caramiziu-400);
+    box-shadow: 0 0 0 3px rgb(249 115 65 / 0.15);
+  }
+
   /* Câmpurile de fișier rămase în stilul browserului: butonul ca o pastilă. */
   #panou-admin input[type="file"]::file-selector-button {
     margin-right: 0.75rem;
