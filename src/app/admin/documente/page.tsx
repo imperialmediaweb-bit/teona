@@ -11,6 +11,7 @@ import { areR2 } from "@/lib/r2";
 import { DOCUMENTE } from "@/lib/documente";
 import { documenteGata } from "@/lib/documente-gata";
 import Cadru from "@/componente/admin/Cadru";
+import CampFisier from "@/componente/admin/CampFisier";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 
@@ -177,14 +178,7 @@ async function Continut({
               className="flex flex-wrap items-center gap-3"
             >
               <input type="hidden" name="slug" value={d.slug} />
-              <input
-                type="file"
-                name="fisier"
-                accept="application/pdf,.pdf"
-                required
-                disabled={!depozit}
-                className="colt-mic-a w-full min-w-0 max-w-full border-2 border-hartie-umbra bg-hartie px-3 py-2 text-mic file:mr-3 sm:w-auto file:border-0 file:bg-transparent file:font-titlu file:font-bold file:text-caramiziu-700 disabled:opacity-50"
-              />
+              <CampFisier name="fisier" accept="application/pdf,.pdf" required disabled={!depozit} indemn="Alege PDF-ul sau trage-l aici" nota="Numai PDF, cel mult 10 MB" />
               <button
                 type="submit"
                 disabled={!depozit}

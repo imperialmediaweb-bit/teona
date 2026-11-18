@@ -16,6 +16,7 @@ import {
   type SiglaPanou,
 } from "@/lib/sponsori";
 import Cadru from "@/componente/admin/Cadru";
+import CampFisier from "@/componente/admin/CampFisier";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 
@@ -207,13 +208,7 @@ async function Continut({
               <span className="font-titlu text-mic font-bold text-cerneala">
                 Sigla
               </span>
-              <input
-                type="file"
-                name="poza"
-                accept="image/png,image/jpeg,image/webp,image/svg+xml"
-                required
-                className="colt-mic-a border-2 border-hartie-umbra bg-hartie px-3 py-2 text-mic file:mr-3 file:border-0 file:bg-transparent file:font-titlu file:font-bold file:text-caramiziu-700"
-              />
+              <CampFisier name="poza" accept="image/png,image/jpeg,image/webp,image/svg+xml" required indemn="Alege sigla sau trage-o aici" nota="PNG, JPG, WebP sau SVG" />
             </label>
             <div>
               <button

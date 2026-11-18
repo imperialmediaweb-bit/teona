@@ -7,6 +7,7 @@ import { areBazaDeDate } from "@/lib/baza";
 import { areCloudinary } from "@/lib/poza-urcata";
 import { echipaPanou } from "@/lib/echipa";
 import Cadru from "@/componente/admin/Cadru";
+import CampFisier from "@/componente/admin/CampFisier";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 import BazaCazuta from "@/componente/admin/BazaCazuta";
@@ -60,8 +61,6 @@ async function Continut({ searchParams }: { searchParams: Cautare }) {
     return <Cadru titlu="Echipa" activ={CALE}><BazaCazuta ce="echipa" /></Cadru>;
   }
   const poze = areCloudinary();
-  const fisier =
-    "colt-mic-a border-2 border-hartie-umbra bg-hartie px-3 py-2 text-mic min-w-0 file:mr-3 file:border-0 file:bg-transparent file:font-titlu file:font-bold file:text-caramiziu-700";
 
   return (
     <Cadru titlu="Echipa" descriere="Echipa de pe pagina „Despre noi”: poză, rol și o scurtă prezentare." activ={CALE}>
@@ -80,7 +79,7 @@ async function Continut({ searchParams }: { searchParams: Cautare }) {
             <label className="grid gap-1.5"><Eticheta text="Rolul" nota="poate rămâne gol" /><input name="rol" maxLength={80} placeholder="Manager fundraising" className={CAMP} /></label>
           </div>
           <label className="grid gap-1.5"><Eticheta text="O frază despre el" nota="poate rămâne goală" /><textarea name="descriere" maxLength={400} rows={3} className={CAMP} /></label>
-          {poze && <label className="grid gap-1.5"><Eticheta text="Poza" nota="poate lipsi" /><input type="file" name="poza" accept="image/jpeg,image/png,image/webp" className={fisier} /></label>}
+          {poze && <label className="grid gap-1.5"><Eticheta text="Poza" nota="poate lipsi" /><CampFisier name="poza" accept="image/jpeg,image/png,image/webp" indemn="Alege poza sau trage-o aici" /></label>}
           <div><button type="submit" className="colt-mic-a bg-caramiziu-700 px-6 py-3 font-titlu font-bold text-hartie transition-colors hover:bg-caramiziu-800">Adaugă</button></div>
         </form>
       </section>
@@ -106,7 +105,7 @@ async function Continut({ searchParams }: { searchParams: Cautare }) {
                     <label className="grid gap-1.5"><Eticheta text="Rolul" /><input name="rol" maxLength={80} defaultValue={m.rol ?? ""} className={CAMP} /></label>
                   </div>
                   <label className="grid gap-1.5"><Eticheta text="O frază despre el" /><textarea name="descriere" maxLength={400} rows={3} defaultValue={m.descriere ?? ""} className={CAMP} /></label>
-                  {poze && <label className="grid gap-1.5"><Eticheta text={m.poza ? "Altă poză" : "Pune o poză"} nota="lasă gol ca să rămână cum e" /><input type="file" name="poza" accept="image/jpeg,image/png,image/webp" className={fisier} /></label>}
+                  {poze && <label className="grid gap-1.5"><Eticheta text={m.poza ? "Altă poză" : "Pune o poză"} nota="lasă gol ca să rămână cum e" /><CampFisier name="poza" accept="image/jpeg,image/png,image/webp" indemn="Alege poza sau trage-o aici" /></label>}
                   <Butoane activ={m.activ} primul={i === 0} ultimul={i === toti.length - 1} cine={m.nume} />
                 </div>
               </form>

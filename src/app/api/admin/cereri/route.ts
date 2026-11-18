@@ -108,6 +108,8 @@ async function posteaza(cerere: Request) {
 
   await schimbaStadiulCererii(id, stadiu);
 
+  // Schimbat de la Formular 230: înapoi acolo, nu la Cereri.
+  if (camp("inapoi") === "/admin/formulare") return trimiteLa("/admin/formulare?gata=mutat");
   const fel = String(formular.get("fel") ?? "");
   return trimiteLa(`/admin/cereri${/^\w+$/.test(fel) ? `?fel=${fel}` : ""}`);
 }
