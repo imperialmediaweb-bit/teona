@@ -458,15 +458,21 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                     </span>
                     {d.deLaFirma && <Eticheta ton="nou">Firmă</Eticheta>}
                     {d.frecventa === "lunar" && <Eticheta ton="asteptam">lunar</Eticheta>}
-                    {d.canal && (
-                      <span
-                        data-canal
-                        title={lamurireCanal(d.canal)}
-                        className="inline-flex shrink-0 items-center rounded-full bg-violet-50 px-2.5 py-0.5 font-titlu text-[12.5px] font-bold whitespace-nowrap text-violet-800"
-                      >
-                        {numeCanal(d.canal)}
-                      </span>
-                    )}
+                    <span
+                      data-canal
+                      title={
+                        d.canal
+                          ? lamurireCanal(d.canal)
+                          : d.procesator.startsWith("manual")
+                            ? "Adăugată din panou: n-a trecut prin site."
+                            : "Donație de dinainte de 18 noiembrie 2026, când a început urmărirea."
+                      }
+                      className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 font-titlu text-[12.5px] font-bold whitespace-nowrap ${
+                        d.canal ? "bg-violet-50 text-violet-800" : "bg-slate-100 text-slate-600"
+                      }`}
+                    >
+                      {d.canal ? numeCanal(d.canal) : d.procesator.startsWith("manual") ? "Adăugată din panou" : "Fără urmă"}
+                    </span>
                   </span>
                   <span className="block truncate text-[13px] text-cerneala-moale">
                     {[d.nume ? d.email : null, pentru, numeleMetodei(d.procesator)].filter(Boolean).join(" · ")}

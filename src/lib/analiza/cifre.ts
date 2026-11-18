@@ -559,6 +559,9 @@ export async function canale(): Promise<{
   lista: Canalul[];
   nelegate: number;
   baniNelegate: number;
+  /** Adăugate din panou (transfer, numerar, SMS…): n-au trecut prin site, deci n-au canal. */
+  deMana: number;
+  baniDeMana: number;
 }> {
   const [pe, fara] = await Promise.all([
     intreaba<{
@@ -579,12 +582,15 @@ export async function canale(): Promise<{
         GROUP BY canal
         ORDER BY sum(suma_bani) DESC`,
     ),
-    intreaba<{ nr: string; bani: string }>(
-      `SELECT count(*) AS nr, coalesce(sum(suma_bani), 0) AS bani
+    intreaba<{ mana: boolean; nr: string; bani: string }>(
+      `SELECT procesator LIKE 'manual%' AS mana, count(*) AS nr, coalesce(sum(suma_bani), 0) AS bani
          FROM donatii
-        WHERE ${INCASATE} AND canal IS NULL`,
+        WHERE ${INCASATE} AND canal IS NULL
+        GROUP BY 1`,
     ),
   ]);
+  const site = fara.find((r) => !r.mana);
+  const mana = fara.find((r) => r.mana);
 
   return {
     lista: pe.map((r) => ({
@@ -594,7 +600,9 @@ export async function canale(): Promise<{
       donatori: Number(r.donatori),
       urme: r.urme ?? [],
     })),
-    nelegate: Number(fara[0]?.nr ?? 0),
-    baniNelegate: Number(fara[0]?.bani ?? 0),
+    nelegate: Number(site?.nr ?? 0),
+    baniNelegate: Number(site?.bani ?? 0),
+    deMana: Number(mana?.nr ?? 0),
+    baniDeMana: Number(mana?.bani ?? 0),
   };
 }

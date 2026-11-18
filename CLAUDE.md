@@ -494,7 +494,12 @@ făcut pe site** (`firme.canal`, prima urmă: `COALESCE(firme.canal, …)`) și 
 **3,5%** (în detaliile cererii, „A venit din”). Formularele trimit
 `atribuireaCurenta()?.canal ?? "direct"`; serverul primește numai numele din
 `CANALE`. Se vede pe pagina firmei și, la donații, pe fiecare card din listă.
-Firmele de dinainte n-au canal. Probă: `… node scripts/qa/canal-firme.mjs` — 7.
+Firmele de dinainte n-au canal.
+**Tot de atunci, și donațiile fără urmă se scriu „Direct”** (card, PayPal,
+transfer anunțat), iar fiecare donație din listă are o etichetă: canalul,
+„Adăugată din panou” (`manual-*`, n-a trecut prin site) sau „Fără urmă”
+(de pe site, de dinainte). În Analiză cele două se numără separat
+(`deMana`, `nelegate`). Probă: `… node scripts/qa/canal-firme.mjs` — 10.
 
 ### Reclamele Meta
 

@@ -86,6 +86,15 @@ await p.goto(`${B}/admin/donatii`);
 await p.locator("[data-lista-donatii]").waitFor({ timeout: 8000 }).catch(() => {});
 const rand = p.locator("[data-donatie]", { hasText: "Donator Canal" });
 v(/QR/i.test(await rand.locator("[data-canal]").innerText().catch(() => "")), "lista de donații: donația arată canalul");
+sql(`INSERT INTO donatii (procesator,referinta,suma_bani,moneda,frecventa,destinatie,email,nume,stare,platita_la) VALUES ('manual-transfer','mana-${t}',7000,'RON','o-data','oriunde','mana-${t}@gmail.com','Donator Mana','platita',now())`);
+await p.goto(`${B}/admin/donatii`);
+await p.locator("[data-lista-donatii]").waitFor({ timeout: 8000 }).catch(() => {});
+v((await p.locator("[data-donatie]", { hasText: "Donator Mana" }).locator("[data-canal]").innerText().catch(() => "")) === "Adăugată din panou", "donația adăugată din panou: „Adăugată din panou”");
+v((await p.locator("[data-donatie]").count()) === (await p.locator("[data-donatie] [data-canal]").count()), "fiecare donație din listă are eticheta sursei");
+await p.goto(`${B}/admin/analiza?fila=vizite`);
+await p.getByText("adăugat", { exact: false }).first().waitFor({ timeout: 8000 }).catch(() => {});
+v(/donați[ei] adăugat[eă] din panou/.test(await p.locator("main").innerText()), "Analiză: cele adăugate din panou se numără separat");
+sql(`DELETE FROM donatii WHERE referinta='mana-${t}'`);
 await b.close();
 
 sql(`DELETE FROM donatii WHERE referinta='canal-${t}'`);

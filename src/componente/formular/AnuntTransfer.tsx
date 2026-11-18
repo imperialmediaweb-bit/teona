@@ -93,10 +93,9 @@ export default function AnuntTransfer() {
     setStare({ fel: "trimite" });
     // De unde a venit omul — vezi `src/lib/atribuire-browser.ts`.
     const deUnde = atribuireaCurenta();
-    if (deUnde) {
-      date.set("canal", deUnde.canal);
-      date.set("sursa", deUnde.bruta);
-    }
+    // Fără nicio urmă = a scris adresa de mână sau a venit dintr-o aplicație: „Direct”.
+    date.set("canal", deUnde?.canal ?? "direct");
+    if (deUnde) date.set("sursa", deUnde.bruta);
     try {
       const raspuns = await fetch("/api/donatii/transfer", {
         method: "POST",

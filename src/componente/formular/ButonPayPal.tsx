@@ -93,7 +93,7 @@ export default function ButonPayPal({
           euro: suma,
           destinatie,
           // De unde a venit omul — vezi `src/lib/atribuire-browser.ts`.
-          ...(deUnde ? { canal: deUnde.canal } : {}),
+          canal: deUnde?.canal ?? "direct",
         }),
       });
       const corp = (await raspuns.json().catch(() => ({}))) as {

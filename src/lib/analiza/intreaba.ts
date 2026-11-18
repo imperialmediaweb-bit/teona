@@ -99,6 +99,8 @@ export function rezumat(
     lista: Canalul[];
     nelegate: number;
     baniNelegate: number;
+    deMana?: number;
+    baniDeMana?: number;
   } | null,
   rec?: Reclame | null,
 ): string {
@@ -288,7 +290,8 @@ export function rezumat(
       );
     }
     randuri.push(
-      `- ${cate(can.nelegate, "donație nu are", "donații nu au")} niciun canal (${lei(can.baniNelegate)}): sunt cele dinainte ca site-ul să-l scrie, cele adăugate de mână din extrasul de cont și cele ale oamenilor care au scris adresa de mână. Nu se împart pe canale.`,
+      `- ${cate(can.nelegate, "donație nu are", "donații nu au")} niciun canal (${lei(can.baniNelegate)}): sunt donații de pe site de dinainte ca site-ul să-l scrie. Nu se împart pe canale.`,
+      ...(can.deMana ? [`- ${cate(can.deMana, "donație adăugată", "donații adăugate")} din panou (${lei(can.baniDeMana ?? 0)}): transfer, numerar, SMS, Galantom; n-au trecut prin site, deci n-au canal.`] : []),
     );
   }
 

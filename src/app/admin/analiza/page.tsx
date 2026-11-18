@@ -458,7 +458,7 @@ function DeUndeVin({
   c,
   v,
 }: {
-  c: { lista: Canalul[]; nelegate: number; baniNelegate: number };
+  c: { lista: Canalul[]; nelegate: number; baniNelegate: number; deMana: number; baniDeMana: number };
   v: Vizite | null;
 }) {
   const vizitePe = new Map<string, number>(
@@ -561,15 +561,21 @@ function DeUndeVin({
         </strong>{" "}
         Sunt două măsurători diferite, puse alături, nu adunate; când nu se
         potrivesc, baza de date are dreptate.{" "}
+        {c.deMana > 0 && (
+          <>
+            <strong className="text-cerneala-moale">
+              {cate(c.deMana, "donație adăugată", "donații adăugate")} din panou ({lei(c.baniDeMana)})
+            </strong>{" "}
+            (transfer, numerar, SMS, Galantom) n-au trecut prin site, deci n-au canal.{" "}
+          </>
+        )}
         {c.nelegate > 0 && (
           <>
             <strong className="text-cerneala-moale">
-              {cate(c.nelegate, "donație", "donații")} ({lei(c.baniNelegate)})
+              {cate(c.nelegate, "donație", "donații")} de pe site ({lei(c.baniNelegate)})
             </strong>{" "}
-            n-au niciun canal: sunt cele dinainte ca site-ul să-l scrie, cele
-            adăugate de mână din extrasul de cont și cele ale oamenilor care au
-            scris adresa site-ului de mână. Nu le împărțim pe canale — ar fi o
-            cifră inventată.{" "}
+            n-au canal fiindcă sunt de dinainte de 18 noiembrie 2026, când a început urmărirea.
+            Nu le împărțim pe canale, ar fi o cifră inventată.{" "}
           </>
         )}
         {vizitePe.size === 0 &&

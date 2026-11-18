@@ -227,7 +227,9 @@ function Formular({
             randare: urma se scrie la aterizare, iar formularul poate fi
             deschis mai târziu, pe altă pagină.
           */
-          ...(deUnde ? { canal: deUnde.canal, sursa: deUnde.bruta } : {}),
+          // Fără nicio urmă = a scris adresa de mână: „Direct”.
+          canal: deUnde?.canal ?? "direct",
+          ...(deUnde ? { sursa: deUnde.bruta } : {}),
           site_web: date.get("site_web") ?? "",
         }),
       });
