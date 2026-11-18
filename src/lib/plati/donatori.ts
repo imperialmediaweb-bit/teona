@@ -542,13 +542,16 @@ export type Donatie = {
  */
 /**
  * E donația de la o firmă (persoană juridică)? Bifa de la donația de mână, iar
- * fără ea: numele are formă de firmă (SRL, SA, PFA, II…) sau adresa e a unei
- * firme din Firme / Sponsori. Folosit numai la împărțirea din pagina Donații.
+ * fără ea: numele are formă de firmă (SRL, SA, PFA, II…) sau adresa, pe un
+ * domeniu propriu (nu Gmail, Yahoo…), e a unei firme din Firme / Sponsori:
+ * omul de la fundraising, cu Gmail-ul lui, poate fi și contactul unei firme. Folosit numai la împărțirea din pagina Donații.
  */
 export const SQL_DE_LA_FIRMA = `COALESCE(d.de_la_firma,
   concat_ws(' ', d.prenume, d.nume) ~* '\\m(srl|s\\.r\\.l|s\\.a|pfa|snc|scs|ltd|gmbh|llc|business|company|holding|grup|group)\\M'
   OR concat_ws(' ', d.prenume, d.nume) ~ '\\m(SA|II|INC)\\M'
-  OR (d.email IS NOT NULL AND EXISTS (SELECT 1 FROM firme f WHERE lower(f.email) = lower(d.email))))`;
+  OR (d.email IS NOT NULL
+      AND split_part(lower(d.email), '@', 2) NOT IN ('gmail.com','googlemail.com','yahoo.com','yahoo.ro','hotmail.com','hotmail.ro','outlook.com','live.com','icloud.com','me.com','proton.me','protonmail.com','gmx.com','gmx.net','mail.com','yandex.com','aol.com','msn.com')
+      AND EXISTS (SELECT 1 FROM firme f WHERE lower(f.email) = lower(d.email))))`;
 
 /** Totalurile pe anul în curs, persoane fizice și firme separat. */
 export async function totaluriPeTip(): Promise<{ pf: { nr: number; bani: number }; firme: { nr: number; bani: number } }> {
