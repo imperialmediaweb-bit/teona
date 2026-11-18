@@ -302,14 +302,16 @@ export async function adaugaDonatieManuala(date: {
   telefon?: string;
   observatii?: string;
   adaugatDe?: string;
+  /** Bifat „de la o firmă”; lipsă = se recunoaște după nume (`SQL_DE_LA_FIRMA`). */
+  deLaFirma?: boolean;
 }): Promise<{ ok: true } | { ok: false; motiv: "duplicat" | "eroare" }> {
   try {
     const randuri = await intreaba<{ id: string }>(
       `INSERT INTO donatii
          (procesator, referinta, suma_bani, moneda, frecventa, destinatie,
           email, prenume, nume, telefon, stare, platita_la,
-          observatii, adaugat_de)
-       VALUES ($1,$2,$3,'RON','o-data',$4,$5,$6,$7,$8,'platita',$9,$10,$11)
+          observatii, adaugat_de, de_la_firma)
+       VALUES ($1,$2,$3,'RON','o-data',$4,$5,$6,$7,$8,'platita',$9,$10,$11,$12)
        ON CONFLICT (procesator, referinta) DO NOTHING
        RETURNING id`,
       [
@@ -324,6 +326,7 @@ export async function adaugaDonatieManuala(date: {
         date.data,
         date.observatii ?? null,
         date.adaugatDe ?? null,
+        date.deLaFirma ? true : null,
       ],
     );
     return randuri.length > 0 ? { ok: true } : { ok: false, motiv: "duplicat" };
@@ -526,6 +529,8 @@ export type Donatie = {
   nume: string | null;
   platitaLa: string;
   observatii: string | null;
+  /** De la o firmă (persoană juridică), nu de la o persoană fizică. */
+  deLaFirma?: boolean;
 };
 
 /**
@@ -535,6 +540,32 @@ export type Donatie = {
  * amândouă: când cineva întreabă „ce e suma asta din extras?”, răspunsul nu
  * se găsește într-un total.
  */
+/**
+ * E donația de la o firmă (persoană juridică)? Bifa de la donația de mână, iar
+ * fără ea: numele are formă de firmă (SRL, SA, PFA, II…) sau adresa e a unei
+ * firme din Firme / Sponsori. Folosit numai la împărțirea din pagina Donații.
+ */
+export const SQL_DE_LA_FIRMA = `COALESCE(d.de_la_firma,
+  concat_ws(' ', d.prenume, d.nume) ~* '\\m(srl|s\\.r\\.l|s\\.a|pfa|snc|scs|ltd|gmbh|llc|business|company|holding|grup|group)\\M'
+  OR concat_ws(' ', d.prenume, d.nume) ~ '\\m(SA|II|INC)\\M'
+  OR (d.email IS NOT NULL AND EXISTS (SELECT 1 FROM firme f WHERE lower(f.email) = lower(d.email))))`;
+
+/** Totalurile pe anul în curs, persoane fizice și firme separat. */
+export async function totaluriPeTip(): Promise<{ pf: { nr: number; bani: number }; firme: { nr: number; bani: number } }> {
+  const r = await intreaba<{ firma: boolean; nr: string; bani: string }>(
+    `SELECT ${SQL_DE_LA_FIRMA} AS firma, count(*) AS nr, COALESCE(sum(d.suma_bani), 0) AS bani
+       FROM donatii d
+      WHERE d.stare = 'platita' AND d.moneda = 'RON'
+        AND d.platita_la >= date_trunc('year', now())
+      GROUP BY 1`,
+  );
+  const ia = (f: boolean) => {
+    const x = r.find((y) => y.firma === f);
+    return { nr: Number(x?.nr ?? 0), bani: Number(x?.bani ?? 0) };
+  };
+  return { pf: ia(false), firme: ia(true) };
+}
+
 export async function donatii(limita = 100): Promise<Donatie[]> {
   const randuri = await intreaba<{
     id: string;
@@ -549,10 +580,12 @@ export async function donatii(limita = 100): Promise<Donatie[]> {
     nume: string | null;
     platita_la: Date | null;
     observatii: string | null;
+    firma: boolean;
   }>(
     `SELECT id, procesator, referinta, suma_bani, moneda, frecventa,
-            destinatie, email, prenume, nume, platita_la, observatii
-       FROM donatii
+            destinatie, email, prenume, nume, platita_la, observatii,
+            ${SQL_DE_LA_FIRMA} AS firma
+       FROM donatii d
       WHERE stare = 'platita'
       ORDER BY platita_la DESC NULLS LAST
       LIMIT $1`,
@@ -570,6 +603,7 @@ export async function donatii(limita = 100): Promise<Donatie[]> {
     nume: [r.prenume, r.nume].filter(Boolean).join(" ").trim() || null,
     platitaLa: r.platita_la?.toISOString() ?? "",
     observatii: r.observatii,
+    deLaFirma: r.firma,
   }));
 }
 

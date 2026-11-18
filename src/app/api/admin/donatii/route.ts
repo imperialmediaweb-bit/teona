@@ -79,6 +79,7 @@ export async function POST(cerere: Request) {
     telefon: text(formular.get("telefon"), 40) ?? undefined,
     observatii: text(formular.get("observatii"), 1_000) ?? undefined,
     adaugatDe: "panou",
+    deLaFirma: formular.get("firma") === "1",
   });
 
   if (!rezultat.ok) {

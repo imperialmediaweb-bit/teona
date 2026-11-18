@@ -672,6 +672,8 @@ const ADAOSURI = `
     scurta a mesajelor oprite (30 de zile), ca un mesaj bun oprit din greseala
     sa poata fi gasit la Setari.
   */
+  /* Donatia de la o firma (persoana juridica), bifata la donatia de mana; NULL = se recunoaste dupa nume. */
+  ALTER TABLE donatii ADD COLUMN IF NOT EXISTS de_la_firma boolean;
   CREATE TABLE IF NOT EXISTS expeditori_blocati (
     valoare     text PRIMARY KEY,
     motiv       text,

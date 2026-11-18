@@ -7,13 +7,17 @@ import {
   METODE_MANUALE,
   donatii,
   numeleMetodei,
+  totaluriPeTip,
   transferuriAnuntate,
 } from "@/lib/plati/donatori";
 import { DESTINATII_DONATIE } from "@/date/asociatie";
 import { scrieSuma } from "@/lib/suma";
+import { cate } from "@/lib/numere-ro";
 import { platiEsuate } from "@/lib/plati/esuate";
 import Cadru from "@/componente/admin/Cadru";
 import { Sertar } from "@/componente/admin/ui-client";
+import { CardCifra, CARD, Eticheta, File } from "@/componente/admin/ui";
+import { Building2, CreditCard, Landmark, User, Users } from "lucide-react";
 import TextCuAdrese from "@/componente/admin/TextCuAdrese";
 import { verificaInainte } from "@/lib/plati/confirmare";
 import Descarca from "@/componente/admin/Descarca";
@@ -27,6 +31,7 @@ export const metadata: Metadata = {
 
 type Cautare = {
   gata?: string;
+  cine?: string;
   respins?: string;
   eroare?: string;
   gresit?: string; "de-mana"?: string };
@@ -51,7 +56,7 @@ export default function PaginaDonatii({
 
 async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   await connection();
-  const { gata, respins, eroare, gresit, "de-mana": deMana } = await searchParams;
+  const { gata, respins, eroare, gresit, "de-mana": deMana, cine } = await searchParams;
 
   if (!areParolaConfigurata()) {
     return (
@@ -89,7 +94,10 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   }
 
   await verificaInainte();
-  const lista = await donatii(100);
+  const toate = await donatii(200);
+  const tip = cine === "firme" || cine === "pf" ? cine : null;
+  const lista = toate.filter((d) => (tip === "firme" ? d.deLaFirma : tip === "pf" ? !d.deLaFirma : true)).slice(0, 100);
+  const pe = await totaluriPeTip().catch(() => null);
   const anuntate = await transferuriAnuntate();
   const esuate = await platiEsuate().catch(() => []);
   const camp =
@@ -187,6 +195,11 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
               <span className="font-normal text-cerneala-slab">(opțional)</span>
             </span>
             <input name="nume" maxLength={120} className={camp} />
+          </label>
+
+          <label className="flex items-center gap-2 text-mic text-cerneala">
+            <input type="checkbox" name="firma" value="1" className="size-4" />
+            De la o firmă (persoană juridică)
           </label>
 
           <label>
@@ -390,81 +403,93 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
       )}
 
 
-      <h2 className="mt-10 font-titlu text-amplu font-bold text-cerneala">
+      <h2 className="mt-10 mb-4 font-titlu text-amplu font-bold text-cerneala">
         Ultimele donații
       </h2>
 
-      {lista.length === 0 ? (
-        <p className="mt-4 text-amplu text-cerneala-moale">
-          Nicio donație încasată încă.
-        </p>
-      ) : (
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-3xl text-left text-mic">
-            <thead>
-              <tr className="border-b border-hartie-umbra">
-                <Cap>Data</Cap>
-                <Cap>Sumă</Cap>
-                <Cap>Donator</Cap>
-                <Cap>Pentru</Cap>
-                <Cap>Cale</Cap>
-                <Cap>Referință</Cap>
-              </tr>
-            </thead>
-            <tbody>
-              {lista.map((d) => (
-                <tr
-                  key={d.id}
-                  className="border-b border-hartie-umbra/60 last:border-0"
-                >
-                  <td className="py-2.5 pr-4 whitespace-nowrap text-cerneala-moale">
-                    {d.platitaLa ? CAND.format(new Date(d.platitaLa)) : "—"}
-                  </td>
-                  <td className="py-2.5 pr-4 font-titlu font-bold whitespace-nowrap text-cerneala">
-                    {scrieSuma(d.sumaBani / 100, d.moneda)}
-                    {d.frecventa === "lunar" && (
-                      <span className="ml-1.5 rounded-full bg-turcoaz-100 px-2 py-0.5 text-nota font-bold text-turcoaz-900">
-                        lunar
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-2.5 pr-4 text-cerneala-moale">
-                    {d.nume ?? <span className="text-cerneala-slab">—</span>}
-                    {d.email && (
-                      <span className="block text-nota break-all text-cerneala-slab">
-                        {d.email}
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-2.5 pr-4 text-cerneala-moale">
-                    {DESTINATII_DONATIE.find((x) => x.id === d.destinatie)
-                      ?.eticheta ?? d.destinatie}
-                  </td>
-                  <td className="py-2.5 pr-4 whitespace-nowrap text-cerneala-moale">
-                    {numeleMetodei(d.procesator)}
-                  </td>
-                  <td className="py-2.5 text-nota break-all text-cerneala-slab">
-                    <TextCuAdrese>{d.referinta}</TextCuAdrese>
-                    {d.observatii && (
-                      <span className="block text-cerneala-moale">
-                        <TextCuAdrese>{d.observatii}</TextCuAdrese>
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {pe && (
+        <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <CardCifra
+            eticheta={`Persoane fizice, în ${new Date().getFullYear()}`}
+            valoare={scrieSuma(pe.pf.bani / 100, "RON")}
+            context={cate(pe.pf.nr, "donație", "donații")}
+            sectiune="oameni"
+            I={Users}
+            href={tip === "pf" ? "/admin/donatii" : "/admin/donatii?cine=pf"}
+            activ={tip === "pf"}
+          />
+          <CardCifra
+            eticheta={`Firme, în ${new Date().getFullYear()}`}
+            valoare={scrieSuma(pe.firme.bani / 100, "RON")}
+            context={cate(pe.firme.nr, "donație", "donații")}
+            sectiune="sponsori"
+            I={Building2}
+            href={tip === "firme" ? "/admin/donatii" : "/admin/donatii?cine=firme"}
+            activ={tip === "firme"}
+          />
         </div>
       )}
-    </Cadru>
-  );
-}
 
-function Cap({ children }: { children: React.ReactNode }) {
-  return (
-    <th className="py-2 pr-4 font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
-      {children}
-    </th>
+      <File
+        file={[
+          { eticheta: "Toate", href: "/admin/donatii", activ: !tip },
+          { eticheta: "Persoane fizice", href: "/admin/donatii?cine=pf", activ: tip === "pf" },
+          { eticheta: "Firme", href: "/admin/donatii?cine=firme", activ: tip === "firme" },
+        ]}
+      />
+
+      {lista.length === 0 ? (
+        <p className="mt-4 text-amplu text-cerneala-moale">
+          {tip ? "Nicio donație aici încă." : "Nicio donație încasată încă."}
+        </p>
+      ) : (
+        <ul data-lista-donatii className="mt-3 grid gap-2.5">
+          {lista.map((d) => {
+            const Semn = d.deLaFirma ? Building2 : d.procesator.startsWith("manual") ? Landmark : d.nume ? User : CreditCard;
+            const pentru = DESTINATII_DONATIE.find((x) => x.id === d.destinatie)?.eticheta ?? d.destinatie;
+            return (
+              <li
+                key={d.id}
+                data-donatie={d.deLaFirma ? "firma" : "pf"}
+                className={`${CARD} relative flex items-center gap-3 overflow-hidden py-3.5 pr-4 pl-5 sm:gap-4`}
+              >
+                <span aria-hidden="true" className={`absolute inset-y-0 left-0 w-1 ${d.deLaFirma ? "bg-orange-400" : "bg-sky-400"}`} />
+                <span
+                  aria-hidden="true"
+                  className={`grid size-11 shrink-0 place-items-center rounded-full ${d.deLaFirma ? "bg-orange-50 text-orange-700" : "bg-sky-50 text-sky-700"}`}
+                >
+                  <Semn className="size-5" strokeWidth={1.9} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="flex min-w-0 items-center gap-2">
+                    <span className="truncate font-titlu text-[15px] font-bold text-cerneala">
+                      {d.nume ?? d.email ?? "Donator anonim"}
+                    </span>
+                    {d.deLaFirma && <Eticheta ton="nou">Firmă</Eticheta>}
+                    {d.frecventa === "lunar" && <Eticheta ton="asteptam">lunar</Eticheta>}
+                  </span>
+                  <span className="block truncate text-[13px] text-cerneala-moale">
+                    {[d.nume ? d.email : null, pentru, numeleMetodei(d.procesator)].filter(Boolean).join(" · ")}
+                  </span>
+                  {(d.referinta || d.observatii) && (
+                    <span className="block truncate text-[12px] text-cerneala-slab" title={[d.referinta, d.observatii].filter(Boolean).join(" · ")}>
+                      {[d.referinta, d.observatii].filter(Boolean).join(" · ").replace(/\s+/g, " ")}
+                    </span>
+                  )}
+                </span>
+                <span className="shrink-0 text-right">
+                  <span className="block font-titlu text-[17px] font-bold whitespace-nowrap text-emerald-700 tabular-nums">
+                    {scrieSuma(d.sumaBani / 100, d.moneda)}
+                  </span>
+                  <span className="block text-[12.5px] whitespace-nowrap text-cerneala-slab">
+                    {d.platitaLa ? CAND.format(new Date(d.platitaLa)) : "—"}
+                  </span>
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </Cadru>
   );
 }
