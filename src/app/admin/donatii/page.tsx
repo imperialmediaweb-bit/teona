@@ -28,8 +28,7 @@ type Cautare = {
   gata?: string;
   respins?: string;
   eroare?: string;
-  gresit?: string;
-};
+  gresit?: string; "de-mana"?: string };
 
 const CAND = new Intl.DateTimeFormat("ro-RO", {
   day: "numeric",
@@ -51,7 +50,7 @@ export default function PaginaDonatii({
 
 async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   await connection();
-  const { gata, respins, eroare, gresit } = await searchParams;
+  const { gata, respins, eroare, gresit, "de-mana": deMana } = await searchParams;
 
   if (!areParolaConfigurata()) {
     return (
@@ -269,7 +268,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
         </section>
       )}
 
-      <details className="rounded-card border border-hartie-umbra bg-hartie p-5">
+      <details id="de-mana" open={deMana === "1"} className="scroll-mt-20 rounded-card border border-hartie-umbra bg-hartie p-5">
         <summary className="cursor-pointer font-titlu text-amplu font-bold text-cerneala">
           Trece o donație de mână
         </summary>

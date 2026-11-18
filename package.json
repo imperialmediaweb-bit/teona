@@ -19,6 +19,7 @@
     "@tiptap/starter-kit": "^3.33.1",
     "@types/pg": "^8.23.1",
     "docx": "^9.7.1",
+    "lucide-react": "0.511.0",
     "motion": "^12.23.12",
     "next": "16.4.3",
     "pdf-lib": "^1.17.1",

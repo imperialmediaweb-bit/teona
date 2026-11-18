@@ -5,6 +5,7 @@ import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/adm
 import { areEmail } from "@/lib/email/trimite";
 import { exemple } from "@/lib/email/exemple";
 import Cadru from "@/componente/admin/Cadru";
+import FileEmailuri from "@/componente/admin/FileEmailuri";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 import Link from "next/link";
@@ -134,10 +135,11 @@ async function Continut({
 
   return (
     <Cadru
-      titlu="Mesajele trimise"
+      titlu="E-mailuri"
       descriere="Toate e-mailurile pe care le trimite site-ul, cu date de probă."
       activ="/admin/emailuri"
     >
+      <FileEmailuri aici="trimise" />
       <p className="mb-6 max-w-3xl text-amplu text-cerneala-moale">
         Mesajele astea pleacă singure, în numele asociației. Deschide-le din
         când în când: un telefon schimbat sau o frază care nu mai e adevărată se

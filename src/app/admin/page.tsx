@@ -229,8 +229,9 @@ async function Continut({
         întâi să vadă unde să apese.
       */}
       <section
+        id="de-facut"
         aria-label="De făcut acum"
-        className="mb-6 colt-a border border-hartie-umbra bg-hartie p-5 sm:p-6"
+        className="mb-6 scroll-mt-20 colt-a border border-hartie-umbra bg-hartie p-5 sm:p-6"
       >
         {deFacut.length === 0 ? (
           <p className="text-amplu text-cerneala-moale">

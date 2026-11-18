@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
 import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
 import { GRUPURI_CAUTARE, type FelGasit } from "@/lib/cautare-grupuri";
 
@@ -51,17 +52,51 @@ function tineMinte(r: Rand) {
   } catch {}
 }
 
+/** Deschide căutarea rapidă de oriunde (câmpul din meniu, bara de jos de pe telefon). */
+export function deschideCautarea() {
+  window.dispatchEvent(new Event("teona:cauta"));
+}
+
+/**
+ * Câmpul din meniu: numai un buton care deschide fereastra. Fereastra e una
+ * singură pe tot panoul (în `admin/layout.tsx`), nu una pe fiecare pagină:
+ * cu câte una pe pagină, la trecerea de la o pagină la alta erau o clipă
+ * două, amândouă ascultând de Ctrl K.
+ */
+export function ButonCautare() {
+  // Pe server și la prima desenare scrie „Ctrl K”; pe Mac, apoi „⌘K”.
+  const eMac = useSyncExternalStore(
+    () => () => {},
+    () => /Mac|iPhone|iPad/.test(navigator.platform),
+    () => false,
+  );
+  return (
+    <>
+      <button
+        type="button"
+        onClick={deschideCautarea}
+        data-cautare-rapida
+        title="Caută (Ctrl K)"
+        className="flex h-9 w-full items-center gap-2 rounded-[10px] border border-white/10 bg-white/[0.06] px-3 text-left text-[13px] text-white/55 transition-colors hover:border-white/25 hover:text-white/80 group-data-[restrans=true]/bara:justify-center group-data-[restrans=true]/bara:px-0"
+      >
+        <Pictograma nume="lupa" className="size-4 shrink-0" />
+        <span className="min-w-0 flex-1 truncate group-data-[restrans=true]/bara:hidden">Caută…</span>
+        <kbd className="hidden rounded border border-white/15 px-1.5 font-sans text-[11px] text-white/45 lg:inline group-data-[restrans=true]/bara:!hidden">{eMac ? "⌘K" : "Ctrl K"}</kbd>
+      </button>
+    </>
+  );
+}
+
 export default function CautareRapida({ pagini, actiuni }: { pagini: IntrareRapida[]; actiuni: IntrareRapida[] }) {
   const router = useRouter();
   const [deschis, setDeschis] = useState(false);
   const [q, setQ] = useState("");
-  const [gasite, setGasite] = useState<Gasit[]>([]);
-  const [lucreaza, setLucreaza] = useState(false);
+  // Rezultatele țin minte pentru ce text au venit: cele vechi nu se arată sub un text nou.
+  const [raspuns, setRaspuns] = useState<{ pentru: string; rezultate: Gasit[] }>({ pentru: "", rezultate: [] });
   const [ales, setAles] = useState(0);
   const [recente, setRecente] = useState<Rand[]>([]);
   const intrare = useRef<HTMLInputElement>(null);
   const lista = useRef<HTMLUListElement>(null);
-  const [eMac, setEMac] = useState(false);
 
   const deschide = useCallback(() => {
     setRecente(citesteRecente());
@@ -70,18 +105,21 @@ export default function CautareRapida({ pagini, actiuni }: { pagini: IntrareRapi
   const inchide = useCallback(() => {
     setDeschis(false);
     setQ("");
-    setGasite([]);
     setAles(0);
   }, []);
 
   // Scurtăturile: Ctrl K / Cmd K oriunde; „/” numai când nu scrii deja într-un câmp.
   useEffect(() => {
-    setEMac(/Mac|iPhone|iPad/.test(navigator.platform));
     const tasta = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         if (deschis) inchide();
         else deschide();
+        return;
+      }
+      if (e.key === "Escape" && deschis) {
+        e.preventDefault();
+        inchide();
         return;
       }
       const t = e.target as HTMLElement | null;
@@ -91,8 +129,14 @@ export default function CautareRapida({ pagini, actiuni }: { pagini: IntrareRapi
         deschide();
       }
     };
+    // Bara de jos de pe telefon și butoanele din pagini o deschid cu un eveniment.
+    const dinAfara = () => deschide();
     window.addEventListener("keydown", tasta);
-    return () => window.removeEventListener("keydown", tasta);
+    window.addEventListener("teona:cauta", dinAfara);
+    return () => {
+      window.removeEventListener("keydown", tasta);
+      window.removeEventListener("teona:cauta", dinAfara);
+    };
   }, [deschis, deschide, inchide]);
 
   useEffect(() => {
@@ -100,29 +144,29 @@ export default function CautareRapida({ pagini, actiuni }: { pagini: IntrareRapi
   }, [deschis]);
 
   // Rezultatele din baza de date, la 150 ms după ultima literă; cererea veche se anulează.
+  const deCautat = deschis && fd(q).length >= 2 ? q.trim() : "";
+  const gasite = useMemo(() => (deCautat && raspuns.pentru === deCautat ? raspuns.rezultate : []), [deCautat, raspuns]);
+  const lucreaza = Boolean(deCautat) && raspuns.pentru !== deCautat;
   useEffect(() => {
-    if (!deschis || fd(q).length < 2) {
-      setGasite([]);
-      setLucreaza(false);
-      return;
-    }
+    if (!deCautat) return;
     const opreste = new AbortController();
-    setLucreaza(true);
     const t = setTimeout(async () => {
+      let rezultate: Gasit[] = [];
       try {
-        const r = await fetch(`/api/admin/cauta?q=${encodeURIComponent(q.trim())}`, { signal: opreste.signal, credentials: "same-origin" });
+        const r = await fetch(`/api/admin/cauta?q=${encodeURIComponent(deCautat)}`, { signal: opreste.signal, credentials: "same-origin" });
         const j = r.ok ? await r.json() : { rezultate: [] };
-        setGasite(Array.isArray(j.rezultate) ? j.rezultate : []);
+        rezultate = Array.isArray(j.rezultate) ? j.rezultate : [];
       } catch {
-        /* anulată sau fără rețea: rămân paginile și acțiunile */
+        if (opreste.signal.aborted) return;
+        /* fără rețea: rămân paginile și acțiunile */
       }
-      setLucreaza(false);
+      setRaspuns({ pentru: deCautat, rezultate });
     }, 150);
     return () => {
       clearTimeout(t);
       opreste.abort();
     };
-  }, [q, deschis]);
+  }, [deCautat]);
 
   const randuri = useMemo<Rand[]>(() => {
     const cuv = fd(q);
@@ -144,7 +188,6 @@ export default function CautareRapida({ pagini, actiuni }: { pagini: IntrareRapi
     ];
   }, [q, pagini, actiuni, gasite, recente]);
 
-  useEffect(() => setAles(0), [q]);
   useEffect(() => {
     lista.current?.querySelector(`[data-index="${ales}"]`)?.scrollIntoView({ block: "nearest" });
   }, [ales]);
@@ -178,20 +221,16 @@ export default function CautareRapida({ pagini, actiuni }: { pagini: IntrareRapi
   let grupAnterior = "";
   return (
     <>
-      <button
-        type="button"
-        onClick={deschide}
-        data-cautare-rapida
-        className="flex w-full items-center gap-2 rounded-lg border border-hartie/15 bg-hartie/[0.07] px-3 py-2 text-left text-mic text-hartie/55 transition-colors hover:border-hartie/30 hover:text-hartie/80"
-      >
-        <Pictograma nume="lupa" className="size-4 shrink-0" />
-        <span className="min-w-0 flex-1 truncate">Caută…</span>
-        <kbd className="hidden rounded border border-hartie/20 px-1.5 font-sans text-[11px] text-hartie/50 lg:inline">{eMac ? "⌘K" : "Ctrl K"}</kbd>
-      </button>
 
-      {deschis && (
+      {/*
+        Fereastra stă direct în `body`, nu în bara din stânga: bara are un
+        `transform` (pentru sertarul de pe telefon), iar un element `fixed`
+        dintr-un părinte transformat e lipit de părinte, nu de ecran — pe
+        telefon, unde bara e ascunsă, fereastra nu se vedea deloc.
+      */}
+      {deschis && createPortal(
         <div
-          className="fixed inset-0 z-[60] flex items-start justify-center bg-cerneala/40 px-3 pt-[10vh] backdrop-blur-[2px] motion-safe:animate-[apare_150ms_ease-out]"
+          className="fixed inset-0 z-[60] flex items-start justify-center bg-cerneala/40 px-3 pt-[10vh] backdrop-blur-[2px] motion-safe:animate-[panou-intra_150ms_ease-out]"
           onMouseDown={(e) => {
             if (e.target === e.currentTarget) inchide();
           }}
@@ -208,7 +247,10 @@ export default function CautareRapida({ pagini, actiuni }: { pagini: IntrareRapi
               <input
                 ref={intrare}
                 value={q}
-                onChange={(e) => setQ(e.target.value)}
+                onChange={(e) => {
+                  setQ(e.target.value);
+                  setAles(0);
+                }}
                 onKeyDown={laTasta}
                 role="combobox"
                 aria-expanded="true"
@@ -276,7 +318,8 @@ export default function CautareRapida({ pagini, actiuni }: { pagini: IntrareRapi
               )}
             </p>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );

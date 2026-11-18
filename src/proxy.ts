@@ -197,6 +197,7 @@ async function estePublicat(fel: string, slug: string): Promise<boolean | null> 
 const RUTE_PROBA = [
   // Căutarea rapidă numai citește, ca paginile panoului pe care proba le vede oricum.
   "/api/admin/cauta",
+  "/api/admin/semne",
   "/api/admin/texte",
   "/api/admin/poze-tabara",
   "/api/admin/poza-in-text",

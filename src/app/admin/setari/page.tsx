@@ -8,6 +8,9 @@ import { ADRESA_SITE } from "@/app/seo";
 import Cadru from "@/componente/admin/Cadru";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
+import InstaleazaAplicatia from "@/componente/admin/InstaleazaAplicatia";
+import Link from "next/link";
+import { KeyRound, Smartphone, Users } from "lucide-react";
 
 /**
  * Setări: ce trebuie pornit o dată, în afara panoului (Resend, Railway,
@@ -63,12 +66,39 @@ async function Continut({ searchParams }: { searchParams: Promise<{ gresit?: str
   }
   if (!(await arePermisiune("/admin/setari"))) return <FaraDrept titlu="Setări" activ="/admin/setari" />;
 
+  const poateUtilizatori = await arePermisiune("/admin/utilizatori");
   const primeste = Boolean(domeniuRaspuns());
   const urmareste = Boolean(mediu("RESEND_WEBHOOK_SECRET"));
   const trimite = Boolean(mediu("RESEND_API_KEY"));
 
   return (
-    <Cadru titlu="Setări" descriere="Ce se pornește o dată, în afara panoului, ca să meargă ce e în panou." activ="/admin/setari">
+    <Cadru titlu="Setări" descriere="Contul tău, oamenii care intră în panou și ce se pornește o singură dată." activ="/admin/setari">
+      <div className="mb-8 grid max-w-3xl gap-3 sm:grid-cols-2">
+        <Link href="/admin/parola" prefetch={false} className="flex items-start gap-3 rounded-2xl bg-hartie p-5 shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_rgb(0_0_0/0.04)] transition hover:-translate-y-0.5">
+          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-600"><KeyRound className="size-5" aria-hidden="true" /></span>
+          <span>
+            <span className="block font-titlu text-mic font-bold text-cerneala">Contul meu</span>
+            <span className="block text-nota text-cerneala-moale">Parola și codul de intrare rapidă</span>
+          </span>
+        </Link>
+        {poateUtilizatori && (
+          <Link href="/admin/utilizatori" prefetch={false} className="flex items-start gap-3 rounded-2xl bg-hartie p-5 shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_rgb(0_0_0/0.04)] transition hover:-translate-y-0.5">
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-600"><Users className="size-5" aria-hidden="true" /></span>
+            <span>
+              <span className="block font-titlu text-mic font-bold text-cerneala">Utilizatori</span>
+              <span className="block text-nota text-cerneala-moale">Cine intră în panou și ce vede</span>
+            </span>
+          </Link>
+        )}
+        <div className="flex items-start gap-3 rounded-2xl bg-hartie p-5 shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_rgb(0_0_0/0.04)] sm:col-span-2">
+          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-600"><Smartphone className="size-5" aria-hidden="true" /></span>
+          <span className="grid gap-2">
+            <span className="block font-titlu text-mic font-bold text-cerneala">Panoul ca aplicație</span>
+            <span className="block text-nota text-cerneala-moale">Pe telefon sau pe calculator, se deschide ca o aplicație și te ține minte.</span>
+            <InstaleazaAplicatia luminos />
+          </span>
+        </div>
+      </div>
       <section id="email-firme" className="max-w-3xl scroll-mt-24 colt-a border border-hartie-umbra bg-hartie p-5">
         <h2 className="font-titlu text-amplu font-bold text-cerneala">E-mailurile cu firmele</h2>
         <ol className="mt-4 grid list-decimal gap-3 pl-5 text-mic text-cerneala-moale">

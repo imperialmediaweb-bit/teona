@@ -120,3 +120,23 @@ paginile cu date sensibile cer confirmare după 12 ore).
 | 9 | Pagini care scriu la deschidere | pagina firmei marchează citite răspunsurile; lista firmelor pe cele nelegate | logic | intenționat (citit = deschis); proba nu le marchează |
 | 10 | Etichete rupte pe două rânduri | nimic găsit la 1440 și 390 px | design | — |
 
+
+## Etapa 1 — găsit rapid și meniul (18 noiembrie 2026)
+
+| Ce | Înainte | Acum |
+|---|---|---|
+| Căutarea | câmp în meniu, nimic până la Enter; numai donatori, firme, cereri | **Ctrl K / Cmd K / „/”** sau clic pe câmp: fereastră cu rezultate cât scrii (150 ms), grupate Pagini · Acțiuni · Firme · Donatori · Cereri · Voluntari · Contracte · Articole și campanii · Presă; fără diacritice; după nume, e-mail, telefon, CUI; săgeți/Enter/Esc; ultimele 5 deschise; Enter pe nimic → `/admin/cauta` (care arată acum toate grupurile). Serverul: `/api/admin/cauta`, cel mult 5 pe grup, numai din paginile pe care rolul le vede; median măsurat local < 300 ms |
+| Acțiuni directe | — | Donație nouă (deschide formularul de pe Donații), E-mail nou către o firmă, Articol nou, Campanie nouă, Comunicat de presă, Raport lunar |
+| Meniul | 7 grupe pliabile („Cum stăm”, „Banii”, „Oameni care așteaptă”, „E-mail și promovare”…), Formular 230 la Oameni, Radar la Cum stăm, Șabloane și Mesaje separate, Încarcă abonați ca intrare | Acasă · Bani (Donații, Donatori, Formular 230) · Sponsori și finanțări (Firme, Contracte, Radar finanțări) · Oameni (Cereri, Voluntari, Aniversări) · Site · Promovare (Calendar, E-mailuri, Abonați, Facebook, Presă, Coduri QR) · Rapoarte (Rapoarte, Analiză); jos Setări și contul. Toate deschise, iconițe Lucide 18 px, 36 px, colțuri 10 px, culoarea secțiunii la elementul activ (fundal 16% + bară de 3 px), bara de derulare subțire, restrângere la iconițe ținută minte |
+| E-mailuri | două intrări | o intrare, cu filele Mesajele trimise · Șabloane |
+| Setări | numai pașii pentru e-mailuri | Contul meu, Utilizatori, Panoul ca aplicație, pașii pentru e-mailuri |
+| Telefon | meniul ca bandă derulată orizontal | sertar din stânga peste pagină + bara de jos Acasă · De făcut · Firme · Cereri · Caută |
+| Meniul se redesena la fiecare pagină | fiecare pagină își desena meniul (de două ori cât timp se încărca) | meniul stă în `admin/layout.tsx`; elementul activ se citește din adresă; bulinele se cer din nou la fiecare schimbare de pagină (`/api/admin/semne`), din aceeași funcție ca „De făcut acum” |
+| Bulina „Cereri” | lipsea (linkul cardului avea „?” și nu-și mai găsea intrarea) | `deFacutAcum` are `meniu` separat de `unde` |
+| Preîncărcare | niciuna | la trecerea mouse-ului peste un link din meniu |
+
+Găsite și reparate pe drum: fereastra de căutare era prinsă în bara laterală
+(un părinte cu `transform` face ca `fixed` să fie relativ la el) — pe telefon
+nu se vedea; stă acum în `body`. Esc o închide de oriunde.
+
+Probă: `scratchpad/mf/cautare.mjs` (38), plus toate cele de dinainte (trec).

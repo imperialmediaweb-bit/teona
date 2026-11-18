@@ -901,3 +901,26 @@ body:has(#panou-admin),
     text-underline-offset: 3px;
   }
 }
+
+/*
+  Bara de derulare a meniului din panou: subțire și vizibilă doar sub mouse
+  (cerută în noiembrie 2026). Fără ea, pe Windows, o bandă gri lată stătea
+  tot timpul lângă meniu.
+*/
+.bara-subtire {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+.bara-subtire:hover {
+  scrollbar-color: rgb(255 255 255 / 0.2) transparent;
+}
+.bara-subtire::-webkit-scrollbar {
+  width: 6px;
+}
+.bara-subtire::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+}
+.bara-subtire:hover::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.2);
+}

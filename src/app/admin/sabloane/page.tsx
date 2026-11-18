@@ -17,6 +17,7 @@ import {
   type FelSablon,
 } from "@/lib/email/campanie-sabloane";
 import Cadru from "@/componente/admin/Cadru";
+import FileEmailuri from "@/componente/admin/FileEmailuri";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 import CumScriem from "@/componente/admin/CumScriem";
@@ -171,10 +172,11 @@ async function Continut({
 
   return (
     <Cadru
-      titlu="Șabloane de e-mail"
-      descriere="Două șabloane gata făcute, cu toate butoanele în ele. Tu scrii titlul, textul și pui poza."
+      titlu="E-mailuri"
+      descriere="Două șabloane de campanie, cu toate butoanele în ele. Tu scrii titlul, textul și pui poza."
       activ="/admin/sabloane"
     >
+      <FileEmailuri aici="sabloane" />
       {ratat && (
         <p
           role="alert"

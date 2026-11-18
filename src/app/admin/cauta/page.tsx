@@ -6,6 +6,7 @@ import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/adm
 import { areBazaDeDate } from "@/lib/baza";
 import { cautaPeste } from "@/lib/cautare";
 import Cadru from "@/componente/admin/Cadru";
+import { GRUPURI_CAUTARE } from "@/lib/cautare-grupuri";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 
@@ -22,11 +23,7 @@ export const metadata: Metadata = {
  * formular — nu care dintre cele trei se potrivește cu 4% mai bine.
  */
 
-const FELURI = [
-  { id: "donator", eticheta: "Donatori" },
-  { id: "firma", eticheta: "Firme" },
-  { id: "cerere", eticheta: "Cereri" },
-] as const;
+const FELURI = GRUPURI_CAUTARE;
 
 export default function PaginaCautare({
   searchParams,
@@ -92,7 +89,7 @@ async function Continut({
   return (
     <Cadru
       titlu={cautat ? `Căutare: ${cautat}` : "Căutare"}
-      descriere="Caută în donatori, firme și cereri, după nume, e-mail, telefon sau CUI."
+      descriere="Toate rezultatele: firme, donatori, cereri, voluntari, contracte, articole și presă. Apasă Ctrl K oriunde în panou pentru căutarea rapidă."
       activ="/admin/cauta"
     >
       {aCazut ? (
