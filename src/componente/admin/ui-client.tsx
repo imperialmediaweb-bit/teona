@@ -6,7 +6,7 @@ import { Plus, Search, X } from "lucide-react";
 
 /**
  * Sertarul din dreapta (pe telefon, tot ecranul): formularul acțiunii
- * principale a paginii — „Donație de mână”, „Adaugă firmă” — se deschide
+ * principale a paginii — „Adaugă donație”, „Adaugă firmă” — se deschide
  * peste listă, nu într-o secțiune pliată la capătul paginii.
  * Conținutul (formularul) vine de pe server; aici e doar deschiderea.
  */

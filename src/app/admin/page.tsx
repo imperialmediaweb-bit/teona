@@ -1,3 +1,4 @@
+import { CalendarDays, Repeat, Users, Wallet } from "lucide-react";
 import type { Metadata } from "next";
 import { cate, forma } from "@/lib/numere-ro";
 import { Suspense } from "react";
@@ -262,7 +263,7 @@ async function Continut({
         )}
       </section>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {/*
           Totalul e în lei, și numai în lei.
 
@@ -280,6 +281,8 @@ async function Continut({
               ? `Plus ${alteMonede.map((m) => scrieSuma(m.bani / 100, m.moneda)).join(" și ")}, neconvertiți`
               : "Toate donațiile încasate"
           }
+          culoare="turcoaz"
+          I={Wallet}
         />
         <Cifra
           eticheta="Luna asta"
@@ -290,6 +293,7 @@ async function Continut({
               : `${fataDeLunaTrecuta >= 0 ? "+" : ""}${fataDeLunaTrecuta}% față de 1–${ziuaDeAzi} ${numeLunaTrecuta}`
           }
           culoare="turcoaz"
+          I={CalendarDays}
         />
         {/*
           Venitul recurent, nu numărul de donatori.
@@ -302,13 +306,15 @@ async function Continut({
           eticheta="Vine lunar"
           valoare={scrieSuma(recurent.bani / 100)}
           nota={`${cate(recurent.donatori, "donator", "donatori")} cu plată recurentă activă`}
-          culoare="miere"
+          culoare="turcoaz"
+          I={Repeat}
         />
         <Cifra
           eticheta="Donatori"
           valoare={String(cifre.donatori)}
           nota={`${cate(totalDeLucru, "cerere așteaptă", "cereri așteaptă")} un răspuns`}
           culoare="cerneala"
+          I={Users}
         />
       </div>
 
@@ -340,7 +346,7 @@ async function Continut({
 
             <Card
               titlu="Pe ce cale intră"
-              nota="Inclusiv ce s-a trecut de mână. Numai donațiile în lei."
+              nota="Inclusiv donațiile adăugate din panou. Numai cele în lei."
             >
               <Felii
                 date={metode}

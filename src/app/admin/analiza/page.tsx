@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { CardCifra, CARD_ACTIV } from "@/componente/admin/ui";
+import type { LucideIcon } from "lucide-react";
+import { ArrowRight, BarChart3, Building2, Megaphone, Repeat, UserMinus, Users } from "lucide-react";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
@@ -81,26 +84,8 @@ function procent(parte: number, intreg: number): string {
   return `${Math.round((parte / intreg) * 100)}%`;
 }
 
-function Cifra({
-  eticheta,
-  valoare,
-  nota,
-}: {
-  eticheta: string;
-  valoare: string;
-  nota?: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-hartie-umbra bg-hartie p-5">
-      <p className="font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
-        {eticheta}
-      </p>
-      <p className="mt-2 font-titlu text-h3 leading-none font-extrabold text-cerneala tabular-nums">
-        {valoare}
-      </p>
-      {nota && <p className="mt-1 text-nota text-cerneala-moale">{nota}</p>}
-    </div>
-  );
+function Cifra({ eticheta, valoare, nota }: { eticheta: string; valoare: string; nota?: string }) {
+  return <CardCifra eticheta={eticheta} valoare={valoare} context={nota} sectiune="rapoarte" />;
 }
 
 function Tabel({
@@ -215,10 +200,10 @@ function Filele({ aici }: { aici: Fila }) {
           }
           prefetch={false}
           aria-current={f.id === aici ? "page" : undefined}
-          className={`shrink-0 rounded-xl px-4 py-2 font-titlu text-mic font-bold whitespace-nowrap transition-colors ${
+          className={`shrink-0 rounded-full px-4 py-2 font-titlu text-mic font-bold whitespace-nowrap transition-colors ${
             f.id === aici
-              ? "bg-cerneala text-hartie"
-              : "text-cerneala-moale hover:bg-hartie-calda hover:text-cerneala"
+              ? "bg-cerneala text-hartie shadow-sm"
+              : "text-cerneala-moale hover:bg-hartie hover:text-cerneala"
           }`}
         >
           {f.nume}
@@ -229,6 +214,14 @@ function Filele({ aici }: { aici: Fila }) {
 }
 
 /** Un card de pe „Pe scurt”: o cifră mare și drumul spre fila ei. */
+const USI: Record<string, { I: LucideIcon; ton: string }> = {
+  Donatori: { I: Users, ton: "from-sky-400 to-sky-600 shadow-sky-500/30" },
+  "Vine lunar": { I: Repeat, ton: "from-emerald-400 to-emerald-600 shadow-emerald-500/30" },
+  "S-au oprit": { I: UserMinus, ton: "from-amber-400 to-amber-600 shadow-amber-500/30" },
+  Firme: { I: Building2, ton: "from-orange-400 to-orange-600 shadow-orange-500/30" },
+  Campanii: { I: Megaphone, ton: "from-pink-400 to-pink-600 shadow-pink-500/30" },
+};
+
 function Usa({
   fila,
   titlu,
@@ -242,40 +235,25 @@ function Usa({
   nota: string;
   accent?: boolean;
 }) {
+  const { I, ton } = USI[titlu] ?? { I: BarChart3, ton: "from-violet-400 to-violet-600 shadow-violet-500/30" };
   return (
     <Link
       href={`/admin/analiza?fila=${fila}`}
       prefetch={false}
-      className={`group flex flex-col justify-between rounded-2xl border p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg ${
-        accent
-          ? "border-caramiziu-700 bg-caramiziu-700 text-hartie"
-          : "border-hartie-umbra bg-hartie text-cerneala"
-      }`}
+      className={`group/usa relative flex min-w-0 flex-col justify-between overflow-hidden p-5 ${CARD_ACTIV}`}
     >
-      <p
-        className={`font-titlu text-nota font-bold tracking-wide uppercase ${
-          accent ? "text-hartie/75" : "text-cerneala-slab"
-        }`}
+      <span
+        aria-hidden="true"
+        className={`absolute top-4 right-4 grid size-10 place-items-center rounded-xl bg-gradient-to-br text-white shadow-lg ring-1 ring-white/40 transition-transform duration-200 group-hover/usa:scale-110 group-hover/usa:-rotate-3 ${ton}`}
       >
-        {titlu}
-      </p>
-      <p className="mt-3 font-titlu text-h2 leading-none font-extrabold tabular-nums">
-        {cifra}
-      </p>
-      <p
-        className={`mt-3 text-mic ${accent ? "text-hartie/85" : "text-cerneala-moale"}`}
-      >
-        {nota}
-      </p>
-      <p
-        className={`mt-4 font-titlu text-mic font-bold ${
-          accent ? "text-hartie" : "text-caramiziu-700"
-        }`}
-      >
-        Vezi detaliile{" "}
-        <span className="inline-block transition-transform group-hover:translate-x-0.5">
-          →
-        </span>
+        <I className="size-[19px]" strokeWidth={2} />
+      </span>
+      <p className="pr-12 text-[13px] font-semibold text-cerneala-moale">{titlu}</p>
+      <p className="mt-2 font-titlu text-[30px] leading-none font-bold text-cerneala tabular-nums">{cifra}</p>
+      <p className="mt-2 text-[13px] leading-snug text-cerneala-slab">{nota}</p>
+      <p className="mt-4 inline-flex items-center gap-1 font-titlu text-[13px] font-bold text-caramiziu-700">
+        Vezi detaliile
+        <ArrowRight className="size-3.5 transition-transform duration-200 group-hover/usa:translate-x-1" aria-hidden="true" />
       </p>
     </Link>
   );

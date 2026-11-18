@@ -112,7 +112,7 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
         <>
           <Descarca ce="donatii" />
           {/* Acțiunea principală a paginii: formularul se deschide în sertar, nu într-o secțiune pliată jos. */}
-          <Sertar eticheta="Donație de mână" titlu="Trece o donație de mână" deschisLaInceput={deMana === "1"}>
+          <Sertar eticheta="Adaugă donație" titlu="Adaugă o donație" deschisLaInceput={deMana === "1"}>
         <p className="mb-5 text-mic text-cerneala-moale">
           Pentru banii care nu trec prin site: transfer bancar, numerar, SMS,
           Galantom. Intră în aceleași totaluri și în aceleași grafice ca
@@ -250,8 +250,8 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
           className="mb-6 rounded-card border border-hartie-umbra bg-hartie-calda p-4 text-mic text-cerneala-moale"
         >
           <strong className="font-titlu font-bold">Transferul e scos.</strong>{" "}
-          Nu intră în totaluri. Dacă banii apar mai târziu în extras, trece
-          donația de mână.
+          Nu intră în totaluri. Dacă banii apar mai târziu în extras, adaug-o
+          cu „Adaugă donație”.
         </p>
       )}
       {eroare && (

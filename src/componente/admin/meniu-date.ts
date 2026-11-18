@@ -126,7 +126,7 @@ export function eActiva(p: IntrareMeniu, cale: string, fel: string | null): bool
 
 /** Acțiunile din căutarea rapidă, cu pagina care trebuie să fie deschisă rolului. */
 export const ACTIUNI_RAPIDE: ReadonlyArray<{ eticheta: string; detaliu: string; href: string; pictograma: NumePictograma; drept: string }> = [
-  { eticheta: "Donație nouă", detaliu: "Trece o donație de mână", href: "/admin/donatii?de-mana=1", pictograma: "inima", drept: "/admin/donatii" },
+  { eticheta: "Adaugă donație", detaliu: "Transfer, numerar, SMS, Galantom", href: "/admin/donatii?de-mana=1", pictograma: "inima", drept: "/admin/donatii" },
   { eticheta: "E-mail nou către o firmă", detaliu: "Una, mai multe sau una nouă", href: "/admin/firme/scrie", pictograma: "plic", drept: "/admin/firme" },
   { eticheta: "Articol nou", detaliu: "Pe blog", href: "/admin/scrie/nou?fel=noutate", pictograma: "document", drept: "/admin/scrie" },
   { eticheta: "Campanie nouă", detaliu: "Pe site", href: "/admin/scrie/nou?fel=campanie", pictograma: "inima", drept: "/admin/scrie" },

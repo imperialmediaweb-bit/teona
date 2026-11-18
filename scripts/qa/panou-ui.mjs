@@ -37,8 +37,8 @@ await p.goto(`${B}/admin/donatii`);
 await p.waitForFunction(() => document.querySelectorAll("aside").length === 1);
 await p.waitForTimeout(800);
 v(await p.locator("details#de-mana").count() === 0, "Donații: formularul nu mai stă într-o secțiune pliată");
-const buton = p.getByRole("button", { name: "Donație de mână" });
-v((await buton.count()) === 1, "Donații: „+ Donație de mână” e butonul din antet");
+const buton = p.getByRole("button", { name: "Adaugă donație" });
+v((await buton.count()) === 1, "Donații: „+ Adaugă donație” e butonul din antet");
 v(!(await p.locator("[data-sertar]").isVisible().catch(() => false)), "sertarul e închis din start");
 await buton.click();
 await p.locator("[data-sertar]").waitFor({ state: "visible", timeout: 3000 }).catch(() => {});
@@ -49,7 +49,7 @@ await p.waitForTimeout(300);
 v(!(await p.locator("[data-sertar]").isVisible()), "Esc îl închide");
 await p.goto(`${B}/admin/donatii?de-mana=1`);
 await p.locator("[data-sertar]").waitFor({ state: "visible", timeout: 5000 }).catch(() => {});
-v(await p.locator("[data-sertar]").isVisible(), "acțiunea „Donație nouă” (?de-mana=1) îl deschide direct");
+v(await p.locator("[data-sertar]").isVisible(), "acțiunea „Adaugă donație” (?de-mana=1) îl deschide direct");
 // Salvarea din sertar chiar scrie donația (numai pe o bază locală).
 if (process.env.SCRIE === "1") {
   const ref = `proba-sertar-${Date.now()}`;
@@ -84,7 +84,7 @@ for (const u of ["/admin/donatii", "/admin/firme", "/admin/abonati"]) {
 const m = await (await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, storageState: await c.storageState() })).newPage();
 await m.goto(`${B}/admin/donatii`);
 await m.waitForTimeout(1200);
-await m.getByRole("button", { name: "Donație de mână" }).click();
+await m.getByRole("button", { name: "Adaugă donație" }).click();
 await m.waitForTimeout(400);
 const s = await m.locator("[data-sertar]").boundingBox();
 v(s && s.width >= 389, `telefon: sertarul are toată lățimea (${s?.width})`);

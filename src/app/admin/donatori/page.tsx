@@ -6,7 +6,7 @@ import { areBazaDeDate } from "@/lib/baza";
 import { donatori, rezumat, type Filtru } from "@/lib/plati/donatori";
 import { scrieSuma } from "@/lib/suma";
 import { cate } from "@/lib/numere-ro";
-import { CARD_ACTIV, CardCifra, Eticheta, File, StareGoala } from "@/componente/admin/ui";
+import { ButonPrincipal, CARD_ACTIV, CardCifra, Eticheta, File, StareGoala } from "@/componente/admin/ui";
 import { Building2, CalendarDays, Repeat, Search, Users, Wallet } from "lucide-react";
 import Cadru from "@/componente/admin/Cadru";
 import Descarca from "@/componente/admin/Descarca";
@@ -113,7 +113,12 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
     <Cadru
       titlu="Donatori"
       activ="/admin/donatori"
-      actiuni={<Descarca ce="donatori" />}
+      actiuni={
+        <>
+          <Descarca ce="donatori" />
+          <ButonPrincipal href="/admin/donatii?de-mana=1">Adaugă donație</ButonPrincipal>
+        </>
+      }
     >
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <CardCifra eticheta="Total strâns" valoare={scrieSuma(cifre.totalBani / 100)} sectiune="bani" I={Wallet} />

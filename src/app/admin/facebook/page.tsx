@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CardCifra } from "@/componente/admin/ui";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { areParolaConfigurata, arePermisiune, esteAutentificat } from "@/lib/admin";
@@ -220,26 +221,8 @@ async function Continut({
   );
 }
 
-function Cifra({
-  eticheta,
-  valoare,
-  nota,
-}: {
-  eticheta: string;
-  valoare: string;
-  nota?: string;
-}) {
-  return (
-    <div className="colt-mic-a border border-hartie-umbra bg-hartie p-4">
-      <p className="font-titlu text-nota font-bold tracking-wide text-cerneala-slab uppercase">
-        {eticheta}
-      </p>
-      <p className="mt-1 font-titlu text-h4 font-extrabold text-cerneala">
-        {valoare}
-      </p>
-      {nota && <p className="mt-1 text-nota text-cerneala-moale">{nota}</p>}
-    </div>
-  );
+function Cifra({ eticheta, valoare, nota }: { eticheta: string; valoare: string; nota?: string }) {
+  return <CardCifra eticheta={eticheta} valoare={valoare} context={nota} sectiune="promovare" />;
 }
 
 function Cifrele({ p }: { p: Pagina }) {

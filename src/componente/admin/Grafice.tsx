@@ -1,3 +1,5 @@
+import type { LucideIcon } from "lucide-react";
+import { CardCifra } from "@/componente/admin/ui";
 import { scrieSuma } from "@/lib/suma";
 
 /**
@@ -123,7 +125,7 @@ export function Card({
       `overflow-x-auto` nu apuca niciodată să intre în funcțiune: nu avea ce
       depăși, fiindcă părintele creștea odată cu el.
     */
-    <section className="min-w-0 rounded-card border border-hartie-umbra bg-hartie p-6">
+    <section className="min-w-0 rounded-2xl border border-hartie-umbra bg-hartie p-5 sm:p-6">
       <h2 className="font-titlu text-amplu font-bold text-cerneala">{titlu}</h2>
       {nota && <p className="mt-1 text-nota text-cerneala-slab">{nota}</p>}
       <div className="mt-5">{children}</div>
@@ -407,28 +409,14 @@ export function Cifra({
   valoare,
   nota,
   culoare = "caramiziu",
+  I,
 }: {
   eticheta: string;
   valoare: string;
   nota?: string;
   culoare?: "caramiziu" | "turcoaz" | "miere" | "cerneala";
+  I?: LucideIcon;
 }) {
-  const fundal = {
-    caramiziu: "bg-caramiziu-50 text-caramiziu-800",
-    turcoaz: "bg-turcoaz-50 text-turcoaz-900",
-    miere: "bg-miere-100 text-cerneala",
-    cerneala: "bg-hartie text-cerneala",
-  }[culoare];
-
-  return (
-    <div className={`rounded-card border border-hartie-umbra p-5 ${fundal}`}>
-      <p className="font-titlu text-nota font-bold tracking-wide uppercase opacity-70">
-        {eticheta}
-      </p>
-      <p className="mt-1 font-titlu text-h3 leading-none font-extrabold">
-        {valoare}
-      </p>
-      {nota && <p className="mt-1.5 text-nota opacity-75">{nota}</p>}
-    </div>
-  );
+  const sectiune = ({ caramiziu: "sponsori", turcoaz: "bani", miere: "promovare", cerneala: "oameni" } as const)[culoare];
+  return <CardCifra eticheta={eticheta} valoare={valoare} context={nota} sectiune={sectiune} I={I} />;
 }
