@@ -20,6 +20,9 @@ import {
   esteStadiuCerere,
 } from "@/lib/crm";
 import Cadru from "@/componente/admin/Cadru";
+import { CARD, CardCifra, CifreSus, Eticheta, File, StareGoala } from "@/componente/admin/ui";
+import type { LucideIcon } from "lucide-react";
+import { CheckCircle2, Clock, FileText, HeartHandshake, Inbox, Mail, MessageSquare, Phone, ShieldBan, Users } from "lucide-react";
 import TextCuAdrese from "@/componente/admin/TextCuAdrese";
 import Descarca from "@/componente/admin/Descarca";
 import Intrare from "@/componente/admin/Intrare";
@@ -109,192 +112,157 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
       ? "nerezolvate"
       : undefined;
   const lista = await cereri(felAles, stadiuAles);
+  // Cifrele de sus numără toate cererile, oricare ar fi filtrul ales.
+  const toate = await cereri(undefined, undefined, 1000);
+  const cate = (st: string) => toate.filter((c) => c.stadiu === st).length;
+  const cuFel = (fl: string | undefined, st: string | undefined) => {
+    const q = new URLSearchParams();
+    if (fl) q.set("fel", fl);
+    if (st) q.set("stadiu", st);
+    return `/admin/cereri${q.size ? `?${q}` : ""}`;
+  };
 
   return (
     <Cadru
       titlu="Cereri"
+      descriere="Mesajele venite de pe site: contact, voluntariat și 3,5%."
       activ="/admin/cereri"
       actiuni={<Descarca ce="cereri" />}
     >
       {(stare === "blocat" || stare === "sters") && (
-        <p role="status" className="mb-4 rounded-moale bg-emerald-50 px-4 py-3 text-mic font-semibold text-emerald-900">
+        <p role="status" className="mb-5 rounded-2xl bg-emerald-50 px-5 py-4 font-semibold text-emerald-900">
           {stare === "blocat"
             ? "Șters și blocat. Mesajele noi de la adresa asta nu mai ajung aici. Lista blocaților e la Setări."
             : "Șters."}
         </p>
       )}
-      <div className="flex flex-wrap items-center gap-2">
-        <Filtru href="/admin/cereri" activ={!felAles && !stadiuAles}>
-          Toate
-        </Filtru>
-        {FELURI_CERERE.map((f) => (
-          <Filtru
-            key={f.id}
-            href={`/admin/cereri?fel=${f.id}`}
-            activ={felAles === f.id && !stadiuAles}
-          >
-            {f.eticheta}
-          </Filtru>
-        ))}
-        <span aria-hidden="true" className="mx-1 text-hartie-umbra">
-          |
-        </span>
-        <Filtru href={`/admin/cereri?stadiu=nerezolvate${felAles ? `&fel=${felAles}` : ""}`} activ={nerezolvate}>
-          Așteaptă
-        </Filtru>
-        {STADII_CERERE.map((s) => (
-          <Filtru
-            key={s.id}
-            href={`/admin/cereri?stadiu=${s.id}${felAles ? `&fel=${felAles}` : ""}`}
-            activ={stadiuAles === s.id}
-          >
-            {s.eticheta}
-          </Filtru>
-        ))}
-      </div>
+
+      <CifreSus>
+        <CardCifra eticheta="Noi" valoare={String(cate("nou"))} context="așteaptă un răspuns" sectiune="oameni" I={Inbox} href={cuFel(felAles, "nou")} activ={stadiuAles === "nou"} />
+        <CardCifra eticheta="În lucru" valoare={String(cate("in_lucru"))} context="ai început să le rezolvi" sectiune="oameni" I={Clock} href={cuFel(felAles, "in_lucru")} activ={stadiuAles === "in_lucru"} />
+        <CardCifra eticheta="Rezolvate" valoare={String(cate("rezolvat"))} sectiune="oameni" I={CheckCircle2} href={cuFel(felAles, "rezolvat")} activ={stadiuAles === "rezolvat"} />
+        <CardCifra eticheta="Toate" valoare={String(toate.length)} sectiune="oameni" I={Users} href={cuFel(felAles, undefined)} activ={!stadiuAles} />
+      </CifreSus>
+
+      <File
+        file={[
+          { eticheta: "Toate", href: cuFel(undefined, stadiuAles), numar: toate.length, activ: !felAles },
+          ...FELURI_CERERE.map((f) => ({
+            eticheta: f.eticheta,
+            href: cuFel(f.id, stadiuAles),
+            numar: toate.filter((c) => c.fel === f.id).length,
+            activ: felAles === f.id,
+          })),
+        ]}
+      />
 
       {lista.length === 0 ? (
-        <p className="mt-10 text-amplu text-cerneala-moale">
-          Nicio cerere aici. Cererile apar singure când cineva completează un formular pe site: 3,5%, voluntariat sau contact.
-        </p>
+        <div className="mt-4">
+          <StareGoala I={Inbox} text="Nicio cerere aici. Cererile apar singure când cineva completează un formular pe site: 3,5%, voluntariat sau contact." />
+        </div>
       ) : (
-        <ul className="mt-8 grid gap-4">
-          {lista.map((c) => (
-            <li
-              key={c.id}
-              className="rounded-card border border-hartie-umbra bg-hartie p-5"
-            >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="font-titlu text-amplu font-bold text-cerneala">
-                    {c.nume}
-                  </p>
-                  <p className="mt-0.5 text-nota text-cerneala-slab">
-                    {FELURI_CERERE.find((f) => f.id === c.fel)?.eticheta ??
-                      c.fel}{" "}
-                    · {CAND.format(new Date(c.creatLa))}
-                  </p>
-                </div>
-                <span
-                  className={`shrink-0 rounded-full px-3 py-1 font-titlu text-nota font-bold ${
-                    c.stadiu === "rezolvat"
-                      ? "bg-turcoaz-100 text-turcoaz-900"
-                      : c.stadiu === "in_lucru"
-                        ? "bg-miere-100 text-cerneala"
-                        : "bg-caramiziu-100 text-caramiziu-800"
-                  }`}
-                >
-                  {STADII_CERERE.find((s) => s.id === c.stadiu)?.eticheta}
-                </span>
-              </div>
-
-              <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-mic">
-                <a
-                  href={`mailto:${c.email}`}
-                  className="break-all text-caramiziu-700 underline underline-offset-2"
-                >
-                  {c.email}
-                </a>
-                {c.telefon && (
-                  <a
-                    href={`tel:${c.telefon.replace(/\s/g, "")}`}
-                    className="font-titlu font-bold text-caramiziu-700 underline underline-offset-2"
-                  >
-                    {c.telefon}
-                  </a>
-                )}
-              </div>
-
-              {Object.keys(c.detalii).length > 0 && (
-                <dl className="mt-3 grid gap-x-6 gap-y-1 rounded-moale bg-hartie-calda p-3 text-mic sm:grid-cols-[auto_1fr]">
-                  {Object.entries(c.detalii).map(([k, v]) => (
-                    <div key={k} className="contents">
-                      <dt className="text-cerneala-slab">{k}</dt>
-                      <dd className="whitespace-pre-wrap text-cerneala-moale">
-                        <TextCuAdrese>{String(v)}</TextCuAdrese>
-                      </dd>
+        <ul className="mt-4 grid gap-3">
+          {lista.map((c) => {
+            const fel = FEL[c.fel] ?? FEL.contact;
+            const ton = c.stadiu === "rezolvat" ? "bani" : c.stadiu === "in_lucru" ? "asteptam" : "deFacut";
+            return (
+              <li key={c.id} data-cerere={c.fel} className={`${CARD} relative overflow-hidden py-4 pr-4 pl-5 sm:py-5 sm:pr-5 sm:pl-6`}>
+                <span aria-hidden="true" className={`absolute inset-y-0 left-0 w-1 ${fel.bara}`} />
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <span aria-hidden="true" className={`grid size-11 shrink-0 place-items-center rounded-full ${fel.semn}`}>
+                    <fel.I className="size-5" strokeWidth={1.9} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                      <span className="truncate font-titlu text-[16px] font-bold text-cerneala">{c.nume}</span>
+                      <Eticheta ton={ton}>{STADII_CERERE.find((x) => x.id === c.stadiu)?.eticheta ?? c.stadiu}</Eticheta>
+                    </p>
+                    <p className="text-[13px] text-cerneala-slab">
+                      {FELURI_CERERE.find((f) => f.id === c.fel)?.eticheta ?? c.fel} · {CAND.format(new Date(c.creatLa))}
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {c.email && (
+                        <a href={`mailto:${c.email}`} className="inline-flex h-8 max-w-full items-center gap-1.5 rounded-full bg-hartie-calda px-3 text-[13px] font-semibold text-cerneala-moale hover:text-caramiziu-700">
+                          <Mail className="size-3.5 shrink-0" aria-hidden="true" />
+                          <span className="truncate">{c.email}</span>
+                        </a>
+                      )}
+                      {c.telefon && (
+                        <a href={`tel:${c.telefon.replace(/\s/g, "")}`} className="inline-flex h-8 items-center gap-1.5 rounded-full bg-hartie-calda px-3 text-[13px] font-semibold text-cerneala-moale hover:text-caramiziu-700">
+                          <Phone className="size-3.5" aria-hidden="true" />
+                          {c.telefon}
+                        </a>
+                      )}
                     </div>
-                  ))}
-                </dl>
-              )}
+                  </div>
+                </div>
 
-              <form
-                action="/api/admin/cereri"
-                method="post"
-                className="mt-4 flex flex-wrap items-center gap-2 border-t border-hartie-umbra pt-4"
-              >
-                <input type="hidden" name="id" value={c.id} />
-                {felAles && <input type="hidden" name="fel" value={felAles} />}
-                <select
-                  name="stadiu"
-                  defaultValue={c.stadiu}
-                  className="rounded-moale border border-hartie-umbra bg-hartie px-3 py-1.5 font-titlu text-mic"
-                >
-                  {STADII_CERERE.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.eticheta}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="submit"
-                  className="rounded-full bg-cerneala px-4 py-1.5 font-titlu text-mic font-bold text-hartie"
-                >
-                  Salvează
-                </button>
-              </form>
-              {c.email && (
-                <FormularConfirmat
-                  action="/api/admin/cereri"
-                  method="post"
-                  data-spam
-                  className="mt-2 flex flex-wrap items-center gap-3"
-                  intrebare={`Ștergi mesajul și blochezi ${c.email}? Mesajele noi de la ea nu vor mai ajunge aici.`}
-                >
-                  <input type="hidden" name="id" value={c.id} />
-                  <input type="hidden" name="actiune" value="spam" />
-                  <button
-                    type="submit"
-                    className="rounded-full border border-caramiziu-300 px-4 py-1.5 font-titlu text-mic font-bold text-caramiziu-800 hover:bg-caramiziu-50"
-                  >
-                    Spam: șterge și blochează
-                  </button>
-                  {!domeniuPublic(domeniul(c.email)) && (
-                    <label className="inline-flex items-center gap-1.5 text-mic text-cerneala-moale">
-                      <input type="checkbox" name="domeniu" value="1" />
-                      tot domeniul @{domeniul(c.email)}
-                    </label>
+                {Object.keys(c.detalii).length > 0 && (
+                  <dl className="mt-3 grid gap-x-6 gap-y-1.5 rounded-xl bg-[#faf8f5] p-3.5 text-mic sm:ml-15 sm:grid-cols-[auto_1fr]">
+                    {Object.entries(c.detalii).map(([k, v]) => (
+                      <div key={k} className="contents">
+                        <dt className="font-semibold text-cerneala-slab">{k}</dt>
+                        <dd className="min-w-0 whitespace-pre-wrap text-cerneala-moale [overflow-wrap:anywhere]">
+                          <TextCuAdrese>{String(v)}</TextCuAdrese>
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-hartie-umbra/70 pt-3 sm:ml-15">
+                  <form action="/api/admin/cereri" method="post" className="flex items-center gap-1.5">
+                    <input type="hidden" name="id" value={c.id} />
+                    {felAles && <input type="hidden" name="fel" value={felAles} />}
+                    <select name="stadiu" defaultValue={c.stadiu} aria-label="Stadiul" className="h-9 rounded-full border border-hartie-umbra bg-hartie px-3 text-[13px]">
+                      {STADII_CERERE.map((x) => (
+                        <option key={x.id} value={x.id}>
+                          {x.eticheta}
+                        </option>
+                      ))}
+                    </select>
+                    <button type="submit" className="h-9 rounded-full bg-cerneala px-4 font-titlu text-[13px] font-bold text-hartie hover:bg-cerneala/85">
+                      Salvează
+                    </button>
+                  </form>
+                  {c.email && (
+                    <FormularConfirmat
+                      action="/api/admin/cereri"
+                      method="post"
+                      data-spam
+                      className="flex flex-wrap items-center gap-2"
+                      intrebare={`Ștergi mesajul și blochezi ${c.email}? Mesajele noi de la ea nu vor mai ajunge aici.`}
+                    >
+                      <input type="hidden" name="id" value={c.id} />
+                      <input type="hidden" name="actiune" value="spam" />
+                      {!domeniuPublic(domeniul(c.email)) && (
+                        <label className="inline-flex items-center gap-1.5 text-[12.5px] text-cerneala-slab">
+                          <input type="checkbox" name="domeniu" value="1" />
+                          tot domeniul @{domeniul(c.email)}
+                        </label>
+                      )}
+                      <button
+                        type="submit"
+                        className="inline-flex h-9 items-center gap-1.5 rounded-full border border-caramiziu-200 px-3.5 font-titlu text-[13px] font-bold text-caramiziu-800 hover:bg-caramiziu-50"
+                      >
+                        <ShieldBan className="size-4" aria-hidden="true" />
+                        Spam: șterge și blochează
+                      </button>
+                    </FormularConfirmat>
                   )}
-                </FormularConfirmat>
-              )}
-            </li>
-          ))}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </Cadru>
   );
 }
 
-function Filtru({
-  href,
-  activ,
-  children,
-}: {
-  href: string;
-  activ: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <a
-      href={href}
-      aria-current={activ ? "page" : undefined}
-      className={`rounded-full px-4 py-1.5 font-titlu text-mic font-bold transition-colors ${
-        activ
-          ? "bg-cerneala text-hartie"
-          : "border border-hartie-umbra bg-hartie text-cerneala-moale hover:text-cerneala"
-      }`}
-    >
-      {children}
-    </a>
-  );
-}
+/** Culoarea și iconița fiecărui fel de cerere. */
+const FEL: Record<string, { I: LucideIcon; bara: string; semn: string }> = {
+  redirectionare: { I: FileText, bara: "bg-emerald-400", semn: "bg-emerald-50 text-emerald-700" },
+  voluntariat: { I: HeartHandshake, bara: "bg-sky-400", semn: "bg-sky-50 text-sky-700" },
+  contact: { I: MessageSquare, bara: "bg-orange-400", semn: "bg-orange-50 text-orange-700" },
+};
