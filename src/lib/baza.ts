@@ -667,6 +667,18 @@ const ADAOSURI = `
     email     text PRIMARY KEY,
     oprit_la  timestamptz NOT NULL DEFAULT now()
   );
+  /*
+    Stadiile Contactat si A raspuns (18 nov. 2026) se pun singure de acum
+    incolo; firmele carora li se scrisese inainte primesc aici aceeasi regula,
+    numai inainte, fara sa le schimbe data (altfel ar iesi din cele uitate).
+    Dupa prima rulare nu mai gaseste nimic de schimbat.
+  */
+  UPDATE firme SET stadiu = 'a_raspuns'
+   WHERE stadiu IN ('prospect', 'contactat')
+     AND EXISTS (SELECT 1 FROM mesaje_firme m WHERE m.firma_id = firme.id AND m.directie = 'primit');
+  UPDATE firme SET stadiu = 'contactat'
+   WHERE stadiu = 'prospect'
+     AND EXISTS (SELECT 1 FROM mesaje_firme m WHERE m.firma_id = firme.id AND m.directie = 'trimis');
 `;
 
 async function pregateste(): Promise<void> {
