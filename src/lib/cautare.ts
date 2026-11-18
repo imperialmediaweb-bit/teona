@@ -13,8 +13,11 @@ import { cate, forma } from "@/lib/numere-ro";
  * care s-ar putea să fie.
  */
 
+import { type FelGasit } from "@/lib/cautare-grupuri";
+export { GRUPURI_CAUTARE, type FelGasit } from "@/lib/cautare-grupuri";
+
 export type Gasit = {
-  fel: "donator" | "firma" | "cerere";
+  fel: FelGasit;
   titlu: string;
   detaliu: string;
   unde: string;
@@ -27,7 +30,7 @@ function tipar(text: string): string {
   return `%${text.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
 }
 
-export async function cautaPeste(text: string): Promise<Gasit[]> {
+export async function cautaPeste(text: string, limita = 12): Promise<Gasit[]> {
   const q = text.trim();
   if (q.length < 2) return [];
   const ca = tipar(q);
@@ -49,7 +52,8 @@ export async function cautaPeste(text: string): Promise<Gasit[]> {
     întoarce nimic — arătând exact ca „n-am găsit nimic".
   */
 
-  const [donatori, firme, cereri] = await Promise.all([
+  const fd = (x: string) => `translate(lower(${x}), 'ăâîșşțţ', 'aaisstt')`;
+  const [donatori, firme, cereri, voluntari, contracte, texte, presa] = await Promise.all([
     intreaba<{
       email: string;
       nume: string | null;
@@ -69,8 +73,8 @@ export async function cautaPeste(text: string): Promise<Gasit[]> {
                OR ($2::text IS NOT NULL AND regexp_replace(COALESCE(d.telefon,''), '\\D', '', 'g') ILIKE $2::text))
         GROUP BY d.email
         ORDER BY MAX(d.platita_la) DESC NULLS LAST
-        LIMIT 12`,
-      [ca, caCifre],
+        LIMIT $3`,
+      [ca, caCifre, limita],
     ),
     intreaba<{
       id: string;
@@ -85,8 +89,8 @@ export async function cautaPeste(text: string): Promise<Gasit[]> {
            OR ($2::text IS NOT NULL AND cui ILIKE $2::text)
            OR ($2::text IS NOT NULL AND regexp_replace(COALESCE(telefon,''), '\\D', '', 'g') ILIKE $2::text)
         ORDER BY schimbat_la DESC
-        LIMIT 12`,
-      [ca, caCifre],
+        LIMIT $3`,
+      [ca, caCifre, limita],
     ),
     intreaba<{
       id: string;
@@ -97,11 +101,50 @@ export async function cautaPeste(text: string): Promise<Gasit[]> {
     }>(
       `SELECT id, fel, nume, email, stadiu
          FROM cereri
-        WHERE translate(lower(nume), 'ăâîșşțţ', 'aaisstt') LIKE translate(lower($1), 'ăâîșşțţ', 'aaisstt') OR translate(lower(email), 'ăâîșşțţ', 'aaisstt') LIKE translate(lower($1), 'ăâîșşțţ', 'aaisstt')
-           OR ($2::text IS NOT NULL AND regexp_replace(COALESCE(telefon,''), '\\D', '', 'g') ILIKE $2::text)
+        -- Voluntarii au grupul lor, cu link spre baza de voluntari.
+        WHERE fel <> 'voluntariat' AND (translate(lower(nume), 'ăâîșşțţ', 'aaisstt') LIKE translate(lower($1), 'ăâîșşțţ', 'aaisstt') OR translate(lower(email), 'ăâîșşțţ', 'aaisstt') LIKE translate(lower($1), 'ăâîșşțţ', 'aaisstt')
+           OR ($2::text IS NOT NULL AND regexp_replace(COALESCE(telefon,''), '\\D', '', 'g') ILIKE $2::text))
         ORDER BY creat_la DESC
-        LIMIT 12`,
-      [ca, caCifre],
+        LIMIT $3`,
+      [ca, caCifre, limita],
+    ),
+    intreaba<{ id: string; nume: string; email: string; localitate: string | null }>(
+      `SELECT id, nume, email, detalii->>'localitate' AS localitate
+         FROM cereri
+        WHERE fel = 'voluntariat'
+          AND (${fd("nume")} LIKE ${fd("$1")} OR ${fd("email")} LIKE ${fd("$1")}
+               OR ${fd("COALESCE(detalii->>'localitate','')")} LIKE ${fd("$1")}
+               OR ($2::text IS NOT NULL AND regexp_replace(COALESCE(telefon,''), '\\D', '', 'g') ILIKE $2::text))
+        ORDER BY creat_la DESC
+        LIMIT $3`,
+      [ca, caCifre, limita],
+    ),
+    intreaba<{ id: string; an: number; numar: number; denumire: string; firma_id: string | null; stadiu: string }>(
+      `SELECT id, an, numar, denumire, firma_id, stadiu
+         FROM contracte
+        WHERE ${fd("denumire")} LIKE ${fd("$1")}
+           OR ($2::text IS NOT NULL AND COALESCE(cui,'') ILIKE $2::text)
+           OR (numar::text || '/' || an::text) LIKE $4
+        ORDER BY an DESC, numar DESC
+        LIMIT $3`,
+      [ca, caCifre, limita, `%${q.replace(/\s+/g, "")}%`],
+    ),
+    intreaba<{ id: string; fel: string; titlu: string; stare: string }>(
+      `SELECT id, fel, titlu, stare
+         FROM texte
+        WHERE ${fd("titlu")} LIKE ${fd("$1")}
+        ORDER BY coalesce(publicat_la, creat_la) DESC
+        LIMIT $2`,
+      [ca, limita],
+    ),
+    intreaba<{ id: string; publicatie: string; persoana: string | null; email: string | null }>(
+      `SELECT id, publicatie, persoana, email
+         FROM contacte_presa
+        WHERE ${fd("publicatie")} LIKE ${fd("$1")} OR ${fd("COALESCE(persoana,'')")} LIKE ${fd("$1")}
+           OR ${fd("COALESCE(email,'')")} LIKE ${fd("$1")}
+        ORDER BY publicatie
+        LIMIT $2`,
+      [ca, limita],
     ),
   ]);
 
@@ -124,7 +167,7 @@ export async function cautaPeste(text: string): Promise<Gasit[]> {
       fel: "firma",
       titlu: f.denumire,
       detaliu: `${f.cui.startsWith("fara-cui-") ? "fără CUI" : `CUI ${f.cui}`} · ${f.persoana}`,
-      unde: `/admin/firme?cauta=${encodeURIComponent(f.denumire)}`,
+      unde: `/admin/firme/${f.id}/mesaje`,
     });
   }
 
@@ -137,5 +180,38 @@ export async function cautaPeste(text: string): Promise<Gasit[]> {
     });
   }
 
+  const FEL_TEXT: Record<string, string> = { noutate: "Articol", campanie: "Campanie", proiect: "Tabără" };
+  for (const v of voluntari) {
+    rezultate.push({
+      fel: "voluntar",
+      titlu: v.nume,
+      detaliu: [v.email, v.localitate].filter(Boolean).join(" · "),
+      unde: `/admin/voluntari?q=${encodeURIComponent(v.email)}`,
+    });
+  }
+  for (const c of contracte) {
+    rezultate.push({
+      fel: "contract",
+      titlu: `Contractul ${c.numar}/${c.an}`,
+      detaliu: `${c.denumire} · ${c.stadiu}`,
+      unde: c.firma_id ? `/admin/firme/${c.firma_id}/mesaje` : `/admin/contracte?an=${c.an}`,
+    });
+  }
+  for (const t of texte) {
+    rezultate.push({
+      fel: "text",
+      titlu: t.titlu,
+      detaliu: `${FEL_TEXT[t.fel] ?? t.fel} · ${t.stare === "publicat" ? "publicat" : "nepublicat"}`,
+      unde: `/admin/scrie/${t.id}`,
+    });
+  }
+  for (const r of presa) {
+    rezultate.push({
+      fel: "presa",
+      titlu: r.publicatie,
+      detaliu: [r.persoana, r.email].filter(Boolean).join(" · ") || "fără contact",
+      unde: `/admin/presa#redactii`,
+    });
+  }
   return rezultate;
 }

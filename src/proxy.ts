@@ -195,6 +195,8 @@ async function estePublicat(fel: string, slug: string): Promise<boolean | null> 
 
 /** Rutele pe care intrarea de probă are voie să scrie: numai conținut. */
 const RUTE_PROBA = [
+  // Căutarea rapidă numai citește, ca paginile panoului pe care proba le vede oricum.
+  "/api/admin/cauta",
   "/api/admin/texte",
   "/api/admin/poze-tabara",
   "/api/admin/poza-in-text",
@@ -298,6 +300,20 @@ export default async function proxy(cerere: NextRequest) {
       },
       { status: 403, headers: { "Cache-Control": "no-store" } },
     );
+  }
+
+  /*
+    Panoul nu trece prin „Email Obfuscation” de la Cloudflare: aia înlocuia
+    fiecare adresă din panou cu „[email protected]” și un script care, pe
+    paginile noastre, cădea cu o eroare în consolă — adresele rămâneau
+    ascunse chiar pentru cine trebuia să le citească (Cereri, Presă,
+    Donatori, Căutare; găsit la verificarea din 18 noiembrie 2026).
+    `no-transform` îi spune lui Cloudflare să nu atingă răspunsul.
+  */
+  if (cerere.nextUrl.pathname === "/admin" || cerere.nextUrl.pathname.startsWith("/admin/")) {
+    const r = NextResponse.next();
+    r.headers.set("Cache-Control", "private, no-cache, no-store, max-age=0, must-revalidate, no-transform");
+    return r;
   }
 
   /*
