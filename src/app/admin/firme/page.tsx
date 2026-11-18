@@ -16,7 +16,7 @@ import Cadru from "@/componente/admin/Cadru";
 import Descarca from "@/componente/admin/Descarca";
 import MesajFirma from "@/componente/admin/firme/MesajFirma";
 import PanouFirme, { type CardFirma } from "@/componente/admin/firme/PanouFirme";
-import Pictograma from "@/componente/Pictograma";
+import { ButonPrincipal } from "@/componente/admin/ui";
 import { poarta } from "@/componente/admin/firme/Poarta";
 
 /**
@@ -152,14 +152,9 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
       actiuni={
         <span className="flex flex-wrap items-center gap-2">
           <Descarca ce="firme" />
-          <Link
-            href="/admin/firme/scrie"
-            data-email-nou
-            className="inline-flex items-center gap-2 rounded-full bg-caramiziu-700 px-5 py-2.5 font-titlu text-mic font-bold text-hartie shadow-sm hover:bg-caramiziu-800"
-          >
-            <Pictograma nume="plus" className="size-4" strokeWidth={2.5} />
+          <ButonPrincipal href="/admin/firme/scrie" data-email-nou>
             E-mail nou
-          </Link>
+          </ButonPrincipal>
         </span>
       }
     >

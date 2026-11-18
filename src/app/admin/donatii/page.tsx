@@ -13,6 +13,7 @@ import { DESTINATII_DONATIE } from "@/date/asociatie";
 import { scrieSuma } from "@/lib/suma";
 import { platiEsuate } from "@/lib/plati/esuate";
 import Cadru from "@/componente/admin/Cadru";
+import { Sertar } from "@/componente/admin/ui-client";
 import TextCuAdrese from "@/componente/admin/TextCuAdrese";
 import { verificaInainte } from "@/lib/plati/confirmare";
 import Descarca from "@/componente/admin/Descarca";
@@ -99,7 +100,127 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
     <Cadru
       titlu="Donații"
       activ="/admin/donatii"
-      actiuni={<Descarca ce="donatii" />}
+      actiuni={
+        <>
+          <Descarca ce="donatii" />
+          {/* Acțiunea principală a paginii: formularul se deschide în sertar, nu într-o secțiune pliată jos. */}
+          <Sertar eticheta="Donație de mână" titlu="Trece o donație de mână" deschisLaInceput={deMana === "1"}>
+        <p className="mb-5 text-mic text-cerneala-moale">
+          Pentru banii care nu trec prin site: transfer bancar, numerar, SMS,
+          Galantom. Intră în aceleași totaluri și în aceleași grafice ca
+          donațiile cu cardul.
+        </p>
+
+        <form
+          action="/api/admin/donatii"
+          method="post"
+          className="grid gap-4"
+        >
+          <label>
+            <span className="mb-1 block font-titlu text-mic font-bold">
+              Pe ce cale
+            </span>
+            <select name="metoda" className={camp}>
+              {METODE_MANUALE.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.eticheta}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            <span className="mb-1 block font-titlu text-mic font-bold">
+              Suma (lei)
+            </span>
+            <input name="suma" inputMode="decimal" required className={camp} />
+          </label>
+
+          <label>
+            <span className="mb-1 block font-titlu text-mic font-bold">
+              Data
+            </span>
+            <input
+              name="data"
+              type="date"
+              required
+              defaultValue={azi}
+              max={azi}
+              className={camp}
+            />
+          </label>
+
+          <label>
+            <span className="mb-1 block font-titlu text-mic font-bold">
+              Pentru ce
+            </span>
+            <select name="destinatie" className={camp}>
+              {DESTINATII_DONATIE.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.eticheta}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="sm:col-span-2">
+            <span className="mb-1 block font-titlu text-mic font-bold">
+              Referința
+            </span>
+            <input
+              name="referinta"
+              required
+              maxLength={120}
+              placeholder="Nr. extrasului, al chitanței, data transferului"
+              className={camp}
+            />
+            <span className="mt-1 block text-nota text-cerneala-slab">
+              Orice o identifică fără dubiu. Două donații nu pot avea aceeași
+              referință pe aceeași cale — așa nu se trece aceeași sumă de două
+              ori dintr-un extras citit în două reprize.
+            </span>
+          </label>
+
+          <label>
+            <span className="mb-1 block font-titlu text-mic font-bold">
+              Numele donatorului{" "}
+              <span className="font-normal text-cerneala-slab">(opțional)</span>
+            </span>
+            <input name="nume" maxLength={120} className={camp} />
+          </label>
+
+          <label>
+            <span className="mb-1 block font-titlu text-mic font-bold">
+              E-mail{" "}
+              <span className="font-normal text-cerneala-slab">(opțional)</span>
+            </span>
+            <input name="email" type="email" className={camp} />
+            <span className="mt-1 block text-nota text-cerneala-slab">
+              Cu e-mail, donația se leagă de donatorul din listă. Fără, rămâne
+              în totaluri, dar nu are un om în spate.
+            </span>
+          </label>
+
+          <label className="sm:col-span-2">
+            <span className="mb-1 block font-titlu text-mic font-bold">
+              Observații{" "}
+              <span className="font-normal text-cerneala-slab">(opțional)</span>
+            </span>
+            <input name="observatii" maxLength={1000} className={camp} />
+          </label>
+
+          <div className="sm:col-span-2">
+            <button
+              type="submit"
+              className="rounded-full bg-caramiziu-600 px-6 py-2.5 font-titlu font-bold text-hartie"
+            >
+              Trece donația
+            </button>
+          </div>
+        </form>
+          </Sertar>
+        </>
+      }
     >
       {gata && (
         <p
@@ -268,124 +389,6 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
         </section>
       )}
 
-      <details id="de-mana" open={deMana === "1"} className="scroll-mt-20 rounded-card border border-hartie-umbra bg-hartie p-5">
-        <summary className="cursor-pointer font-titlu text-amplu font-bold text-cerneala">
-          Trece o donație de mână
-        </summary>
-        <p className="mt-2 max-w-2xl text-mic text-cerneala-moale">
-          Pentru banii care nu trec prin site: transfer bancar, numerar, SMS,
-          Galantom. Intră în aceleași totaluri și în aceleași grafice ca
-          donațiile cu cardul.
-        </p>
-
-        <form
-          action="/api/admin/donatii"
-          method="post"
-          className="mt-5 grid gap-4 sm:grid-cols-2"
-        >
-          <label>
-            <span className="mb-1 block font-titlu text-mic font-bold">
-              Pe ce cale
-            </span>
-            <select name="metoda" className={camp}>
-              {METODE_MANUALE.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.eticheta}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label>
-            <span className="mb-1 block font-titlu text-mic font-bold">
-              Suma (lei)
-            </span>
-            <input name="suma" inputMode="decimal" required className={camp} />
-          </label>
-
-          <label>
-            <span className="mb-1 block font-titlu text-mic font-bold">
-              Data
-            </span>
-            <input
-              name="data"
-              type="date"
-              required
-              defaultValue={azi}
-              max={azi}
-              className={camp}
-            />
-          </label>
-
-          <label>
-            <span className="mb-1 block font-titlu text-mic font-bold">
-              Pentru ce
-            </span>
-            <select name="destinatie" className={camp}>
-              {DESTINATII_DONATIE.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.eticheta}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="sm:col-span-2">
-            <span className="mb-1 block font-titlu text-mic font-bold">
-              Referința
-            </span>
-            <input
-              name="referinta"
-              required
-              maxLength={120}
-              placeholder="Nr. extrasului, al chitanței, data transferului"
-              className={camp}
-            />
-            <span className="mt-1 block text-nota text-cerneala-slab">
-              Orice o identifică fără dubiu. Două donații nu pot avea aceeași
-              referință pe aceeași cale — așa nu se trece aceeași sumă de două
-              ori dintr-un extras citit în două reprize.
-            </span>
-          </label>
-
-          <label>
-            <span className="mb-1 block font-titlu text-mic font-bold">
-              Numele donatorului{" "}
-              <span className="font-normal text-cerneala-slab">(opțional)</span>
-            </span>
-            <input name="nume" maxLength={120} className={camp} />
-          </label>
-
-          <label>
-            <span className="mb-1 block font-titlu text-mic font-bold">
-              E-mail{" "}
-              <span className="font-normal text-cerneala-slab">(opțional)</span>
-            </span>
-            <input name="email" type="email" className={camp} />
-            <span className="mt-1 block text-nota text-cerneala-slab">
-              Cu e-mail, donația se leagă de donatorul din listă. Fără, rămâne
-              în totaluri, dar nu are un om în spate.
-            </span>
-          </label>
-
-          <label className="sm:col-span-2">
-            <span className="mb-1 block font-titlu text-mic font-bold">
-              Observații{" "}
-              <span className="font-normal text-cerneala-slab">(opțional)</span>
-            </span>
-            <input name="observatii" maxLength={1000} className={camp} />
-          </label>
-
-          <div className="sm:col-span-2">
-            <button
-              type="submit"
-              className="rounded-full bg-caramiziu-600 px-6 py-2.5 font-titlu font-bold text-hartie"
-            >
-              Trece donația
-            </button>
-          </div>
-        </form>
-      </details>
 
       <h2 className="mt-10 font-titlu text-amplu font-bold text-cerneala">
         Ultimele donații

@@ -261,7 +261,7 @@ export default function MeniuPanou({
         <div className="grid gap-1 border-t border-white/10 px-3 pt-3 pb-2">
           {setari && <Element p={setari} culoare={CULORI_SECTIUNI.rapoarte} aici={eActiva(setari, cale, fel)} nr={0} />}
           {/* Contul: avatar și rol; la clic, un meniu mic. */}
-          <details className="relative">
+          <details className="relative min-w-0">
             <summary
               title={`${cont.nume} · ${cont.rol}`}
               className="flex h-11 cursor-pointer list-none items-center gap-2.5 rounded-[10px] px-2 hover:bg-white/[0.06] group-data-[restrans=true]/bara:justify-center [&::-webkit-details-marker]:hidden"

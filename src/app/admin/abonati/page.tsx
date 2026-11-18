@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
-import Link from "next/link";
 import {
   areParolaConfigurata,
   arePermisiune,
@@ -11,6 +10,8 @@ import { areBazaDeDate } from "@/lib/baza";
 import { NUMELE_SURSEI, type SursaAbonare, abonati, areBuletin } from "@/lib/buletin";
 import { type AbonatMailerLite, abonatiiGrupului, grupuri } from "@/lib/email/mailerlite";
 import Cadru from "@/componente/admin/Cadru";
+import { ButonPrincipal, CardCifra } from "@/componente/admin/ui";
+import { Building2, Mail, Users } from "lucide-react";
 import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 
@@ -136,19 +137,16 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
       titlu="Abonați la buletin"
       activ={activ}
       actiuni={
-        <Link
-          href="/admin/abonati/incarca"
-          className="inline-flex min-h-10 items-center rounded-full bg-caramiziu-700 px-4 font-titlu text-mic font-bold text-hartie hover:bg-caramiziu-600"
-        >
-          Încarcă abonați
-        </Link>
+        <ButonPrincipal href="/admin/abonati/incarca">Încarcă abonați</ButonPrincipal>
       }
     >
       {/* Cifrele mari: din MailerLite, la fiecare deschidere. */}
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Cifra eticheta="Persoane fizice" valoare={nr(inMailerLite.persoane)} />
-        <Cifra eticheta="Firme" valoare={nr(inMailerLite.firme)} />
-        <Cifra
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+        <CardCifra sectiune="promovare" I={Users} eticheta="Persoane" valoare={nr(inMailerLite.persoane)} context="în lista din MailerLite" />
+        <CardCifra sectiune="promovare" I={Building2} eticheta="Firme" valoare={nr(inMailerLite.firme)} context="în lista din MailerLite" />
+        <CardCifra
+          sectiune="promovare"
+          I={Mail}
           eticheta="Total"
           valoare={
             inMailerLite.persoane === null && inMailerLite.firme === null
@@ -277,15 +275,6 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
         )}
       </section>
     </Cadru>
-  );
-}
-
-function Cifra({ eticheta, valoare }: { eticheta: string; valoare: string }) {
-  return (
-    <div className="colt-a border border-hartie-umbra bg-hartie p-4">
-      <p className="text-nota text-cerneala-slab">{eticheta}</p>
-      <p className="font-titlu text-h3 font-extrabold text-cerneala">{valoare}</p>
-    </div>
   );
 }
 

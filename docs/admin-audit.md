@@ -140,3 +140,20 @@ Găsite și reparate pe drum: fereastra de căutare era prinsă în bara lateral
 nu se vedea; stă acum în `body`. Esc o închide de oriunde.
 
 Probă: `scratchpad/mf/cautare.mjs` (38), plus toate cele de dinainte (trec).
+
+## Etapa 2 — piesele comune (18 noiembrie 2026)
+
+- `src/componente/admin/ui.tsx`: `Eticheta` (5 tonuri cu sens: nou, bani,
+  de făcut, așteptăm, gri), `ButonPrincipal`, `CardCifra` (+ `CifreSus`),
+  `RandCard` + `ListaCarduri`, `SemnIconita`, `StareGoala`, `File`,
+  `CumFunctioneaza`; clasele `CARD` / `CARD_ACTIV` (16 px, umbră fină,
+  ridicare 2 px la hover).
+- `src/componente/admin/ui-client.tsx`: `Sertar` (dreapta, 480 px; tot ecranul
+  pe telefon; Esc îl închide) și `CautaPeLoc`.
+- Intrate deja: Donații („+ Donație de mână” în antet, deschide sertarul;
+  `?de-mana=1` îl deschide direct, din Ctrl K), Abonați (trei carduri cu cifre,
+  „+ Încarcă abonați”), Firme („+ E-mail nou”), „Descarcă pentru Excel” ca
+  buton contur. Contul din meniu nu mai iese din bară.
+- Restul paginilor primesc piesele în etapele 3–6, pagină cu pagină.
+- Probă: `BAZA=… PAROLA_ADMIN=… node scripts/qa/panou-ui.mjs` (19; cu
+  `SCRIE=1`, numai pe o bază locală, salvează și o donație din sertar).
