@@ -668,6 +668,25 @@ const ADAOSURI = `
     oprit_la  timestamptz NOT NULL DEFAULT now()
   );
   /*
+    Spam (18 nov. 2026): adresele sau domeniile blocate din panou, si urma
+    scurta a mesajelor oprite (30 de zile), ca un mesaj bun oprit din greseala
+    sa poata fi gasit la Setari.
+  */
+  CREATE TABLE IF NOT EXISTS expeditori_blocati (
+    valoare     text PRIMARY KEY,
+    motiv       text,
+    adaugat_de  text,
+    creat_la    timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE TABLE IF NOT EXISTS mesaje_oprite (
+    id        bigserial PRIMARY KEY,
+    email     text,
+    nume      text,
+    inceput   text,
+    motiv     text NOT NULL,
+    la        timestamptz NOT NULL DEFAULT now()
+  );
+  /*
     Stadiile Contactat si A raspuns (18 nov. 2026) se pun singure de acum
     incolo; firmele carora li se scrisese inainte primesc aici aceeasi regula,
     numai inainte, fara sa le schimbe data (altfel ar iesi din cele uitate).

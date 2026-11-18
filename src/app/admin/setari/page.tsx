@@ -10,7 +10,8 @@ import Intrare from "@/componente/admin/Intrare";
 import FaraDrept from "@/componente/admin/FaraDrept";
 import InstaleazaAplicatia from "@/componente/admin/InstaleazaAplicatia";
 import Link from "next/link";
-import { KeyRound, Smartphone, Users } from "lucide-react";
+import { KeyRound, ShieldBan, Smartphone, Users } from "lucide-react";
+import { listaBlocati, mesajeOprite } from "@/lib/spam";
 
 /**
  * Setări: ce trebuie pornit o dată, în afara panoului (Resend, Railway,
@@ -69,6 +70,7 @@ async function Continut({ searchParams }: { searchParams: Promise<{ gresit?: str
   const poateUtilizatori = await arePermisiune("/admin/utilizatori");
   const primeste = Boolean(domeniuRaspuns());
   const urmareste = Boolean(mediu("RESEND_WEBHOOK_SECRET"));
+  const [blocati, oprite] = await Promise.all([listaBlocati().catch(() => []), mesajeOprite().catch(() => [])]);
   const trimite = Boolean(mediu("RESEND_API_KEY"));
 
   return (
@@ -99,6 +101,57 @@ async function Continut({ searchParams }: { searchParams: Promise<{ gresit?: str
           </span>
         </div>
       </div>
+      <section id="spam" className="mb-8 max-w-3xl scroll-mt-24 rounded-2xl bg-hartie p-5 shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_rgb(0_0_0/0.04)]">
+        <h2 className="flex items-center gap-2 font-titlu text-amplu font-bold text-cerneala">
+          <ShieldBan className="size-5 text-caramiziu-700" aria-hidden="true" />
+          Spam și oferte
+        </h2>
+        <p className="mt-1 text-mic text-cerneala-moale">
+          Ofertele comerciale (preț + TVA, „valabil doar azi”, audituri, servicii de marketing) și adresele blocate din Cereri
+          nu mai ajung în panou și nu vă anunță. Cine le trimite vede „Mulțumim”.
+        </p>
+        <h3 className="mt-5 font-titlu text-mic font-bold text-cerneala">Adrese blocate ({blocati.length})</h3>
+        {blocati.length === 0 ? (
+          <p className="mt-1 text-mic text-cerneala-slab">Niciuna. Se blochează din Cereri, cu „Spam: șterge și blochează”.</p>
+        ) : (
+          <ul className="mt-2 divide-y divide-hartie-umbra/70">
+            {blocati.map((b) => (
+              <li key={b.valoare} className="flex flex-wrap items-center gap-3 py-2 text-mic">
+                <span className="min-w-0 flex-1 font-semibold [overflow-wrap:anywhere] text-cerneala">
+                  {b.valoare.startsWith("@") ? `tot domeniul ${b.valoare}` : b.valoare}
+                </span>
+                <span className="text-nota text-cerneala-slab">
+                  {new Date(b.la).toLocaleDateString("ro-RO", { timeZone: "Europe/Bucharest", day: "numeric", month: "short" })}
+                  {b.adaugatDe ? ` · ${b.adaugatDe}` : ""}
+                </span>
+                <form action="/api/admin/cereri" method="post">
+                  <input type="hidden" name="actiune" value="deblocheaza" />
+                  <input type="hidden" name="valoare" value={b.valoare} />
+                  <button type="submit" className="rounded-full border border-hartie-umbra px-3 py-1 font-titlu text-nota font-bold text-cerneala-moale hover:text-cerneala">
+                    Deblochează
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        )}
+        <details className="mt-5">
+          <summary className="cursor-pointer font-titlu text-mic font-bold text-cerneala">
+            Mesaje oprite în ultimele 30 de zile ({oprite.length})
+          </summary>
+          <p className="mt-1 text-nota text-cerneala-slab">Dacă vezi aici un mesaj bun, scrie-i omului direct și, dacă e blocat, deblochează-l.</p>
+          <ul className="mt-2 divide-y divide-hartie-umbra/70">
+            {oprite.map((m, i) => (
+              <li key={i} className="py-2 text-nota text-cerneala-moale">
+                <span className="font-semibold text-cerneala">{m.nume || "—"}</span> · {m.email} ·{" "}
+                {m.motiv === "blocat" ? "adresă blocată" : "ofertă"} ·{" "}
+                {new Date(m.la).toLocaleDateString("ro-RO", { timeZone: "Europe/Bucharest", day: "numeric", month: "short" })}
+                <span className="mt-0.5 block line-clamp-2 [overflow-wrap:anywhere]">{m.inceput}</span>
+              </li>
+            ))}
+          </ul>
+        </details>
+      </section>
       <section id="email-firme" className="max-w-3xl scroll-mt-24 colt-a border border-hartie-umbra bg-hartie p-5">
         <h2 className="font-titlu text-amplu font-bold text-cerneala">E-mailurile cu firmele</h2>
         <ol className="mt-4 grid list-decimal gap-3 pl-5 text-mic text-cerneala-moale">

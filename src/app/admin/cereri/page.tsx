@@ -1,3 +1,5 @@
+import FormularConfirmat from "@/componente/admin/FormularConfirmat";
+import { domeniuPublic, domeniul } from "@/lib/spam";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
@@ -28,7 +30,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-type Cautare = { fel?: string; stadiu?: string; gresit?: string };
+type Cautare = { fel?: string; stadiu?: string; gresit?: string; stare?: string };
 
 const CAND = new Intl.DateTimeFormat("ro-RO", {
   day: "numeric",
@@ -52,7 +54,7 @@ export default function PaginaCereri({
 
 async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
   await connection();
-  const { fel, stadiu, gresit } = await searchParams;
+  const { fel, stadiu, gresit, stare } = await searchParams;
 
   if (!areParolaConfigurata()) {
     return (
@@ -114,6 +116,13 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
       activ="/admin/cereri"
       actiuni={<Descarca ce="cereri" />}
     >
+      {(stare === "blocat" || stare === "sters") && (
+        <p role="status" className="mb-4 rounded-moale bg-emerald-50 px-4 py-3 text-mic font-semibold text-emerald-900">
+          {stare === "blocat"
+            ? "Șters și blocat. Mesajele noi de la adresa asta nu mai ajung aici. Lista blocaților e la Setări."
+            : "Șters."}
+        </p>
+      )}
       <div className="flex flex-wrap items-center gap-2">
         <Filtru href="/admin/cereri" activ={!felAles && !stadiuAles}>
           Toate
@@ -235,6 +244,30 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                   Salvează
                 </button>
               </form>
+              {c.email && (
+                <FormularConfirmat
+                  action="/api/admin/cereri"
+                  method="post"
+                  data-spam
+                  className="mt-2 flex flex-wrap items-center gap-3"
+                  intrebare={`Ștergi mesajul și blochezi ${c.email}? Mesajele noi de la ea nu vor mai ajunge aici.`}
+                >
+                  <input type="hidden" name="id" value={c.id} />
+                  <input type="hidden" name="actiune" value="spam" />
+                  <button
+                    type="submit"
+                    className="rounded-full border border-caramiziu-300 px-4 py-1.5 font-titlu text-mic font-bold text-caramiziu-800 hover:bg-caramiziu-50"
+                  >
+                    Spam: șterge și blochează
+                  </button>
+                  {!domeniuPublic(domeniul(c.email)) && (
+                    <label className="inline-flex items-center gap-1.5 text-mic text-cerneala-moale">
+                      <input type="checkbox" name="domeniu" value="1" />
+                      tot domeniul @{domeniul(c.email)}
+                    </label>
+                  )}
+                </FormularConfirmat>
+              )}
             </li>
           ))}
         </ul>

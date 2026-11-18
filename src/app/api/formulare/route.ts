@@ -1,3 +1,4 @@
+import { filtruSpam } from "@/lib/spam";
 import {
   citesteJson,
   email as citesteEmail,
@@ -117,6 +118,12 @@ export async function POST(cerere: Request) {
         : "Introdu o adresă de e-mail validă.",
       400,
     );
+  }
+
+  // Adresa blocată din panou: oprită în tăcere. Ofertele nu se caută aici —
+  // o firmă care sponsorizează scrie despre bani (lib/spam.ts).
+  if (await filtruSpam({ email: adresa, nume: String(corp.nume ?? corp.firma ?? ""), text: String(corp.mesaj ?? ""), oferte: false })) {
+    return raspuns("Mulțumim! Ți-am trimis un e-mail cu toți pașii.", 200);
   }
 
   if (corp.acord !== true) {

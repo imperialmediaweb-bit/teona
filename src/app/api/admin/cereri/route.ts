@@ -1,6 +1,8 @@
+import { intreaba } from "@/lib/baza";
+import { blocheaza, deblocheaza, valoareDeBlocat } from "@/lib/spam";
 import { probaAreVoie } from "@/lib/proba";
 import { cuBaza, formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
-import { arePermisiune } from "@/lib/admin";
+import { arePermisiune, numeleConectat } from "@/lib/admin";
 import {
   esteFelCerere,
   esteStadiuCerere,
@@ -74,9 +76,32 @@ async function posteaza(cerere: Request) {
     return trimiteLa(camp("inapoi") || "/admin/cereri");
   }
 
+  // Deblocarea, de la Setări → „Adrese blocate”.
+  if (camp("actiune") === "deblocheaza") {
+    const v = camp("valoare").toLowerCase();
+    if (!(await probaAreVoie("email", v))) return new Response("Proba lucrează numai pe rândurile ei.", { status: 403 });
+    if (v) await deblocheaza(v);
+    return trimiteLa("/admin/setari#spam");
+  }
+
   const id = String(formular.get("id") ?? "");
   if (!(await probaAreVoie("cereri", id))) return new Response("Proba lucrează numai pe rândurile ei.", { status: 403 });
   if (!/^[0-9a-f-]{36}$/i.test(id)) return nuTrece("Cerere necunoscută.");
+
+  /*
+    „Spam: șterge și blochează”: cererea pleacă de tot, iar adresa (sau tot
+    domeniul, dacă e bifat și nu e Gmail & co.) intră pe lista blocaților —
+    mesajele noi de acolo se opresc în tăcere (lib/spam.ts).
+  */
+  if (camp("actiune") === "spam") {
+    const r = await intreaba<{ email: string | null }>(`SELECT email FROM cereri WHERE id = $1`, [id]);
+    if (!r[0]) return nuTrece("Cerere necunoscută.");
+    const valoare = r[0].email ? valoareDeBlocat(r[0].email, camp("domeniu") === "1") : null;
+    if (valoare) await blocheaza(valoare, "spam, din Cereri", await numeleConectat());
+    await intreaba(`DELETE FROM raspunsuri_voluntari WHERE cerere_id = $1`, [id]).catch(() => {});
+    await intreaba(`DELETE FROM cereri WHERE id = $1`, [id]);
+    return trimiteLa(`/admin/cereri?stare=${valoare ? "blocat" : "sters"}`);
+  }
 
   const stadiu = formular.get("stadiu");
   if (!esteStadiuCerere(stadiu)) return nuTrece("Stadiu necunoscut.");

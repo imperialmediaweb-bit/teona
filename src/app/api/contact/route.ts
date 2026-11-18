@@ -1,3 +1,4 @@
+import { filtruSpam } from "@/lib/spam";
 import {
   citesteJson,
   email,
@@ -169,6 +170,15 @@ export async function POST(cerere: Request) {
   const voluntariat = corp.fel === "voluntariat";
   const adresaOmului = String(corp.email);
   const numeleOmului = String(corp.nume ?? "").trim();
+
+  // Spam: adresa blocată din panou sau o ofertă comercială. Nu intră la
+  // Cereri, nu anunță pe nimeni; răspunsul e „ca și cum a mers” (lib/spam.ts).
+  const oprit = await filtruSpam({
+    email: adresaOmului,
+    nume: numeleOmului,
+    text: [corp.firma, corp.cui, corp.motiv, corp.mesaj].map((v) => String(v ?? "")).join("\n"),
+  });
+  if (oprit) return raspuns("Mulțumim! Am primit mesajul tău.", 200);
 
   // În CRM înainte de e-mail: un mesaj citit și uitat dispare din inbox, un
   // rând în `cereri` rămâne, cu stadiul lui — nou, în lucru, rezolvat.

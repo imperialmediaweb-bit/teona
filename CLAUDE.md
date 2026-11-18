@@ -1605,6 +1605,26 @@ Cerut de asociație: „/admin/firme/mesaje e greu de folosit”. „Firme” ș
 - Orele din jurnal sunt la ora României (`timeZone`), ca la e-mailuri.
 - Probă: `scratchpad/mf/ux.mjs` (47), plus cele vechi, adaptate.
 
+## Spam și oferte: oprite înainte de panou
+
+Cerut pe 18 noiembrie 2026, după un „audit GEO la 19 € + TVA, valabil doar
+azi” venit pe formularul de contact: „să le blochezi, fără să mai ajungă aici”.
+`src/lib/spam.ts`, chemat din `/api/contact` și `/api/formulare`:
+
+- **Oferta comercială se oprește singură** (numai la contact; la
+  sponsorizare o firmă scrie firesc despre bani): cel puțin **două** semne
+  diferite din patru — preț + TVA, grabă („valabil doar azi”), servicii
+  (audit SEO/GEO, marketing, site-uri), vânzare („serviciile noastre”,
+  dezabonare). Un singur semn trece: un părinte care scrie „azi” sau o firmă
+  care pomenește „ofertă” nu se pierd.
+- **„Spam: șterge și blochează”** pe fiecare cerere: șterge cererea (cu
+  confirmare) și blochează adresa, sau „tot domeniul” — niciodată Gmail,
+  Yahoo & co. (`DOMENII_PUBLICE`).
+- Oprirea e tăcută: cine trimite vede „Mulțumim”, nu intră nimic la Cereri,
+  nu pleacă niciun anunț. Rămâne numai o urmă scurtă în `mesaje_oprite`, 30 de
+  zile, la **Setări → Spam și oferte**, lângă lista blocaților cu „Deblochează”.
+- Probă (numai local): `BAZA=… PAROLA_ADMIN=… PSQL="psql …" node scripts/qa/spam.mjs` — 15.
+
 ## Site-ul nu face campanii de e-mail
 
 Asociația a fost oprită odată de Railway pentru e-mailuri trimise în masă.
