@@ -485,6 +485,17 @@ vizitele și donațiile pot sta pe același rând.
   Google) lângă donații (din baza noastră), **niciodată adunate**.
 - Probă: `BAZA=… PAROLA_ADMIN=… node scripts/qa/atribuire.mjs`
 
+### Și la firme (18 noiembrie 2026)
+
+Cerut de fundraiser: „prin ce canal vin banii… aseară a completat cineva un
+contract de sponsorizare și aș fi vrut să știu cum a ajuns pe pagină”. Același
+canal se scrie acum și la **formularul de sponsorizare**, la **contractul
+făcut pe site** (`firme.canal`, prima urmă: `COALESCE(firme.canal, …)`) și la
+**3,5%** (în detaliile cererii, „A venit din”). Formularele trimit
+`atribuireaCurenta()?.canal ?? "direct"`; serverul primește numai numele din
+`CANALE`. Se vede pe pagina firmei și, la donații, pe fiecare card din listă.
+Firmele de dinainte n-au canal. Probă: `… node scripts/qa/canal-firme.mjs` — 7.
+
 ### Reclamele Meta
 
 Cu `META_TOKEN` și `META_AD_ACCOUNT_ID` în Railway, tot la `/admin/analiza`

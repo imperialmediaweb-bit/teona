@@ -1,5 +1,6 @@
 "use client";
 
+import { atribuireaCurenta } from "@/lib/atribuire-browser";
 import { useId, useState } from "react";
 import { EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
 import { PREFERINTE_REDIRECTIONARE } from "@/date/formulare";
@@ -74,6 +75,7 @@ export default function FormularRedirectionare() {
           telefon: date.get("telefon"),
           preferinta: date.get("preferinta"),
           acord: date.get("acord") === "da",
+          canal: atribuireaCurenta()?.canal ?? "direct",
         }),
       });
       const corp = (await raspuns.json().catch(() => ({}))) as {

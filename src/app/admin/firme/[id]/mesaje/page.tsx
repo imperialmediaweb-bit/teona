@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { lamurireCanal, numeCanal } from "@/lib/atribuire";
 import { cate, forma } from "@/lib/numere-ro";
 import { Suspense } from "react";
 import { connection } from "next/server";
@@ -91,6 +92,15 @@ async function Continut({
           <span className="text-nota text-cerneala-slab">
             {f.cui.startsWith("fara-cui-") ? "fără CUI" : `CUI ${f.cui}`} · {f.cale}
           </span>
+          {f.canal && (
+            <span
+              data-canal
+              title={lamurireCanal(f.canal)}
+              className="inline-flex items-center gap-1 rounded-full bg-violet-50 px-2.5 py-0.5 font-titlu text-[12.5px] font-bold text-violet-800"
+            >
+              A venit din: {numeCanal(f.canal)}
+            </span>
+          )}
           <Link
             href={`/admin/firme/${f.id}/contract`}
             className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-hartie-umbra px-3.5 py-1.5 font-titlu text-nota font-bold text-cerneala hover:border-caramiziu-700 hover:text-caramiziu-800"

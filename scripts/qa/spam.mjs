@@ -73,6 +73,7 @@ await p.waitForURL(/stare=blocat/, { timeout: 8000 }).catch(() => {});
 v(/Ștergi mesajul și blochezi/.test(intrebare), "cere confirmare înainte");
 v(sql(`SELECT count(*) FROM cereri WHERE id='${id}'`) === "0", "cererea e ștearsă");
 v(sql(`SELECT count(*) FROM expeditori_blocati WHERE valoare='@firma-spam-proba.ro'`) === "1", "domeniul e blocat");
+await p.getByText("Șters și blocat").waitFor({ timeout: 8000 }).catch(() => {});
 v(await p.getByText("Șters și blocat").isVisible(), "mesajul „Șters și blocat” se vede");
 
 // 4. Altă adresă de pe același domeniu, mesaj nevinovat: oprit.

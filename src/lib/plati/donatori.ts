@@ -536,6 +536,8 @@ export type Donatie = {
   observatii: string | null;
   /** De la o firmă (persoană juridică), nu de la o persoană fizică. */
   deLaFirma?: boolean;
+  /** De unde a venit omul pe site; lipsă la cele adăugate din panou și la cele vechi. */
+  canal?: string | null;
 };
 
 /**
@@ -589,9 +591,10 @@ export async function donatii(limita = 100): Promise<Donatie[]> {
     platita_la: Date | null;
     observatii: string | null;
     firma: boolean;
+    canal: string | null;
   }>(
     `SELECT id, procesator, referinta, suma_bani, moneda, frecventa,
-            destinatie, email, prenume, nume, platita_la, observatii,
+            destinatie, email, prenume, nume, platita_la, observatii, canal,
             ${SQL_DE_LA_FIRMA} AS firma
        FROM donatii d
       WHERE stare = 'platita'
@@ -612,6 +615,7 @@ export async function donatii(limita = 100): Promise<Donatie[]> {
     platitaLa: r.platita_la?.toISOString() ?? "",
     observatii: r.observatii,
     deLaFirma: r.firma,
+    canal: r.canal,
   }));
 }
 

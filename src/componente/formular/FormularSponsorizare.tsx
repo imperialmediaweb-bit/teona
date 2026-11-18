@@ -1,5 +1,6 @@
 "use client";
 
+import { atribuireaCurenta } from "@/lib/atribuire-browser";
 import { useId, useState } from "react";
 import { CONTACT_FIRME, EMAIL } from "@/date/asociatie";
 import { CAI_SPONSORIZARE, pasulUrmatorSponsorizare } from "@/date/formulare";
@@ -108,6 +109,8 @@ export default function FormularSponsorizare() {
           suma: date.get("suma"),
           mesaj: date.get("mesaj"),
           acord: date.get("acord") === "da",
+          // De unde a venit omul — vezi `src/lib/atribuire-browser.ts`.
+          canal: atribuireaCurenta()?.canal ?? "direct",
         }),
       });
       const corp = (await raspuns.json().catch(() => ({}))) as {

@@ -3,6 +3,7 @@ import { limitaDeRata, raspuns, text, formularCuLimita } from "@/lib/api";
 import { email as emailValid } from "@/lib/api";
 import { areBazaDeDate, intreaba } from "@/lib/baza";
 import { salveazaFirma, scrieInteractiune } from "@/lib/crm";
+import { esteCanal } from "@/lib/atribuire";
 import { numarPentruContract } from "@/lib/contracte";
 import { notificaPanoul } from "@/lib/notificari";
 import { inBani } from "@/date/plati";
@@ -165,6 +166,7 @@ export async function POST(cerere: Request) {
       telefon: d.telefon || undefined,
       cale: "Contract de sponsorizare",
       sumaEstimata: d.valoare || undefined,
+      canal: esteCanal(formular.get("canal")) ? String(formular.get("canal")) : null,
     }).catch(() => null);
     if (firma) {
       const { suma } = citesteSuma(d.valoare);

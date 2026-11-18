@@ -674,6 +674,8 @@ const ADAOSURI = `
   */
   /* Donatia de la o firma (persoana juridica), bifata la donatia de mana; NULL = se recunoaste dupa nume. */
   ALTER TABLE donatii ADD COLUMN IF NOT EXISTS de_la_firma boolean;
+  /* De unde a venit firma pe site (canal din lib/atribuire.ts), la formular sau contract. */
+  ALTER TABLE firme ADD COLUMN IF NOT EXISTS canal text;
   CREATE TABLE IF NOT EXISTS expeditori_blocati (
     valoare     text PRIMARY KEY,
     motiv       text,

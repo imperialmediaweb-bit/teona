@@ -56,6 +56,8 @@ export type Firma = {
   faraEmailuri: string | null;
   /** Scoasă din liste (are contracte sau donații, deci nu s-a putut șterge). */
   arhivataLa: string | null;
+  /** De unde a venit pe site, la formular sau contract (`lib/atribuire.ts`). */
+  canal: string | null;
 };
 
 type RandFirma = {
@@ -74,6 +76,7 @@ type RandFirma = {
   schimbat_la: Date;
   fara_emailuri_la?: Date | null;
   arhivata_la?: Date | null;
+  canal?: string | null;
 };
 
 function laFirma(r: RandFirma): Firma {
@@ -93,6 +96,7 @@ function laFirma(r: RandFirma): Firma {
     schimbatLa: r.schimbat_la.toISOString(),
     faraEmailuri: r.fara_emailuri_la ? r.fara_emailuri_la.toISOString() : null,
     arhivataLa: r.arhivata_la ? r.arhivata_la.toISOString() : null,
+    canal: r.canal ?? null,
   };
 }
 
@@ -124,6 +128,8 @@ export async function salveazaFirma(date: {
   cale: string;
   sumaEstimata?: string;
   mesaj?: string;
+  /** De unde a venit omul pe site (`lib/atribuire.ts`); se ține prima urmă. */
+  canal?: string | null;
 }): Promise<{ id: string; eraDeja: boolean } | null> {
   /*
     Un lead adăugat din panou fără CUI („fara-cui-…”) care scrie acum de pe
@@ -140,8 +146,8 @@ export async function salveazaFirma(date: {
   );
   const randuri = await intreaba<{ id: string; era_deja: boolean }>(
     `INSERT INTO firme
-       (cui, denumire, persoana, email, telefon, cale, suma_estimata, mesaj)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+       (cui, denumire, persoana, email, telefon, cale, suma_estimata, mesaj, canal)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
      ON CONFLICT (cui) DO UPDATE SET
        denumire      = EXCLUDED.denumire,
        persoana      = EXCLUDED.persoana,
@@ -150,6 +156,7 @@ export async function salveazaFirma(date: {
        cale          = EXCLUDED.cale,
        suma_estimata = COALESCE(EXCLUDED.suma_estimata, firme.suma_estimata),
        mesaj         = COALESCE(EXCLUDED.mesaj, firme.mesaj),
+       canal         = COALESCE(firme.canal, EXCLUDED.canal),
        /*
          O firmă care a renunțat, sau a sponsorizat într-un an trecut, și
          scrie din nou e o cerere nouă: altfel rămânea pe „A renunțat” cu
@@ -178,6 +185,7 @@ export async function salveazaFirma(date: {
       date.cale,
       date.sumaEstimata ?? null,
       date.mesaj ?? null,
+      date.canal ?? null,
     ],
   );
   const r = randuri[0];

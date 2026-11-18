@@ -1,4 +1,5 @@
 import { filtruSpam } from "@/lib/spam";
+import { esteCanal, numeCanal } from "@/lib/atribuire";
 import {
   citesteJson,
   email as citesteEmail,
@@ -109,6 +110,8 @@ export async function POST(cerere: Request) {
   // „tu”. Mesajele de eroare trebuie să sune ca formularul din care vin,
   // altfel se vede că răspunde altcineva decât pagina.
   const firme = fel === "sponsorizare";
+  // De unde a venit omul pe site: numai unul dintre numele noastre (lib/atribuire.ts).
+  const canal = esteCanal(corp.canal) ? corp.canal : null;
 
   const adresa = citesteEmail(corp.email);
   if (!adresa) {
@@ -186,6 +189,7 @@ export async function POST(cerere: Request) {
           cale,
           sumaEstimata: suma,
           mesaj,
+          canal,
         }).catch(() => null)
       : null;
 
@@ -245,7 +249,7 @@ export async function POST(cerere: Request) {
       nume,
       email: adresa,
       telefon,
-      detalii: { preferinta },
+      detalii: { preferinta, ...(canal ? { "A venit din": numeCanal(canal) } : {}) },
     }).catch(() => null);
   }
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { atribuireaCurenta } from "@/lib/atribuire-browser";
 import { Suspense, useId, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ASOCIATIA, EMAIL, TELEFON_PRINCIPAL } from "@/date/asociatie";
@@ -127,6 +128,8 @@ function Formular() {
     setErori(gasite);
     if (Object.keys(gasite).length > 0) return;
 
+    // De unde a venit omul — vezi `src/lib/atribuire-browser.ts`.
+    date.set("canal", atribuireaCurenta()?.canal ?? "direct");
     setDescarc(fel);
     setStare({ fel: "gol" });
     try {

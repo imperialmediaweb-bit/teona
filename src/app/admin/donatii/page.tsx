@@ -13,6 +13,7 @@ import {
 import { DESTINATII_DONATIE } from "@/date/asociatie";
 import { scrieSuma } from "@/lib/suma";
 import { cate } from "@/lib/numere-ro";
+import { lamurireCanal, numeCanal } from "@/lib/atribuire";
 import { platiEsuate } from "@/lib/plati/esuate";
 import Cadru from "@/componente/admin/Cadru";
 import { Sertar } from "@/componente/admin/ui-client";
@@ -457,6 +458,15 @@ async function Continut({ searchParams }: { searchParams: Promise<Cautare> }) {
                     </span>
                     {d.deLaFirma && <Eticheta ton="nou">Firmă</Eticheta>}
                     {d.frecventa === "lunar" && <Eticheta ton="asteptam">lunar</Eticheta>}
+                    {d.canal && (
+                      <span
+                        data-canal
+                        title={lamurireCanal(d.canal)}
+                        className="inline-flex shrink-0 items-center rounded-full bg-violet-50 px-2.5 py-0.5 font-titlu text-[12.5px] font-bold whitespace-nowrap text-violet-800"
+                      >
+                        {numeCanal(d.canal)}
+                      </span>
+                    )}
                   </span>
                   <span className="block truncate text-[13px] text-cerneala-moale">
                     {[d.nume ? d.email : null, pentru, numeleMetodei(d.procesator)].filter(Boolean).join(" · ")}
