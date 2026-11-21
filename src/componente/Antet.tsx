@@ -156,6 +156,9 @@ export default function Antet() {
 
   const navigatie = useRef<HTMLElement>(null);
   const hamburger = useRef<HTMLButtonElement>(null);
+  const antet = useRef<HTMLElement>(null);
+  const panou = useRef<HTMLDivElement>(null);
+  const [sus, setSus] = useState(0);
   const [pastila, setPastila] = useState<Pastila>(null);
 
   const mutaPastila = useCallback(
@@ -185,10 +188,28 @@ export default function Antet() {
   }, [meniuDeschis]);
 
   // Escape închide meniul de ecran mic și dă focusul înapoi pe buton, ca
-  // tastatura să nu rămână într-un meniu închis.
+  // tastatura să nu rămână într-un meniu închis. Tab nu iese din meniu cât
+  // e deschis: pagina din spate e acoperită, deci focusul n-are ce căuta acolo.
   useEffect(() => {
     if (!meniuDeschis) return;
     const laTasta = (ev: KeyboardEvent) => {
+      if (ev.key === "Tab") {
+        const tinte = [
+          hamburger.current,
+          ...(panou.current?.querySelectorAll<HTMLElement>("a[href], button") ??
+            []),
+        ].filter((el): el is HTMLElement => Boolean(el));
+        const prima = tinte[0];
+        const ultima = tinte[tinte.length - 1];
+        if (ev.shiftKey && document.activeElement === prima) {
+          ev.preventDefault();
+          ultima.focus();
+        } else if (!ev.shiftKey && document.activeElement === ultima) {
+          ev.preventDefault();
+          prima.focus();
+        }
+        return;
+      }
       if (ev.key !== "Escape") return;
       setMeniu({ deschis: false, pe: cale });
       hamburger.current?.focus();
@@ -227,6 +248,7 @@ export default function Antet() {
 
   return (
     <header
+      ref={antet}
       className={`doar-site sticky top-0 z-50 bg-hartie transition-shadow duration-300 ease-cald ${
         compact
           ? "shadow-[0_1px_0_0_var(--color-hartie-umbra),0_14px_34px_-24px_rgba(35,35,35,0.5)]"
@@ -332,7 +354,12 @@ export default function Antet() {
           <button
             ref={hamburger}
             type="button"
-            onClick={() => setMeniuDeschis(!meniuDeschis)}
+            onClick={() => {
+              // Panoul începe exact sub antet, oricât de sus e acum antetul
+              // (cu sau fără banda de anunț deasupra).
+              setSus(antet.current?.getBoundingClientRect().bottom ?? 0);
+              setMeniuDeschis(!meniuDeschis);
+            }}
             aria-expanded={meniuDeschis}
             aria-controls="meniu-ecran-mic"
             aria-label={meniuDeschis ? "Închide meniul" : "Deschide meniul"}
@@ -520,20 +547,28 @@ export default function Antet() {
         </div>
       </div>
 
-      {/* Meniul de ecran mic. Stă în pagină tot timpul, cu înălțimea 0 când e
-          închis: se desface în jos, în loc să apară din nimic. `inert` ține
-          linkurile în afara tabulării și a cititoarelor de ecran cât e închis.
-          Intrările vin pe rând, dar numai prin deplasare, niciodată din
-          transparent: dacă tranziția nu rulează, rândurile sunt tot acolo. */}
+      {/* Meniul de ecran mic: un panou fix, de la marginea de jos a
+          antetului până la capătul ecranului, opac, cu derulare proprie.
+          Înainte se desfăcea în pagină cu înălțimea „ecran minus 5rem”, iar
+          cu banda de anunț deasupra ieșea din ecran: ultimele intrări
+          rămâneau tăiate peste conținut. `inert` ține linkurile în afara
+          tabulării cât e închis; un clic pe orice link îl închide. */}
       <div
         id="meniu-ecran-mic"
+        ref={panou}
         inert={!meniuDeschis}
-        className={`grid transition-[grid-template-rows] duration-300 ease-cald motion-reduce:transition-none xl:hidden ${
-          meniuDeschis ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        style={{ top: sus, height: `calc(100dvh - ${sus}px)` }}
+        onClick={(ev) => {
+          if ((ev.target as HTMLElement).closest("a")) setMeniuDeschis(false);
+        }}
+        className={`fixed inset-x-0 z-40 overflow-y-auto overscroll-contain border-t border-hartie-umbra bg-hartie-calda transition-[opacity,transform,visibility] duration-300 ease-cald motion-reduce:transition-none xl:hidden ${
+          meniuDeschis
+            ? "visible translate-y-0 opacity-100"
+            : "invisible -translate-y-2 opacity-0"
         }`}
       >
-        <div className="min-h-0 overflow-hidden">
-          <div className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-hartie-umbra bg-gradient-to-b from-tenta-cald to-hartie-calda px-3 pt-3 pb-5 min-[380px]:px-4 sm:px-6">
+        <div>
+          <div className="px-3 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))] min-[380px]:px-4 sm:px-6">
             <nav
               aria-label="Meniu principal (ecran mic)"
               className="mx-auto grid max-w-7xl gap-1 sm:grid-cols-2 sm:gap-x-6"
@@ -610,7 +645,7 @@ export default function Antet() {
             <div className="mx-auto mt-4 flex max-w-7xl flex-col gap-3 border-t border-hartie-umbra pt-4 sm:flex-row sm:items-center sm:justify-between">
               <Link
                 href={RUTE.doneaza}
-                className="sclipire group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 px-6 py-3 font-titlu text-amplu font-bold text-hartie shadow-[0_2px_0_0_var(--color-caramiziu-700),0_12px_28px_-12px_rgba(247,79,34,0.9)] transition-all duration-200 ease-cald hover:translate-y-px motion-reduce:hover:translate-y-0 sm:order-2"
+                className="sclipire group inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-br from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 px-6 py-4 font-titlu text-h4 font-bold text-hartie order-last sm:w-auto shadow-[0_2px_0_0_var(--color-caramiziu-700),0_12px_28px_-12px_rgba(247,79,34,0.9)] transition-all duration-200 ease-cald hover:translate-y-px motion-reduce:hover:translate-y-0 sm:order-2"
               >
                 <Inima className="bate-la-hover size-5" />
                 Donează
