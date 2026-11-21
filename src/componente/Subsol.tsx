@@ -11,6 +11,7 @@ import {
 import Retele from "./Retele";
 import Sigla from "./Sigla";
 import DeschideSetariCookieuri from "./DeschideSetariCookieuri";
+import { arePublicate } from "@/lib/texte-vizibile";
 import { anulCurent } from "@/lib/an";
 
 const titlu =
@@ -42,7 +43,10 @@ const link = `${linkLegal} text-mic`;
  * rândul legal. Nimic nu s-a scos; s-a schimbat doar cât spațiu ocupă.
  */
 export default async function Subsol() {
-  const anul = await anulCurent();
+  const [anul, cuNoutati] = await Promise.all([
+    anulCurent(),
+    arePublicate("noutate"),
+  ]);
 
   const linkuriMeniu = MENIU.flatMap((element) =>
     element.subpagini
@@ -143,11 +147,13 @@ export default async function Subsol() {
             <div>
               <h2 className={titlu}>Pe site</h2>
               <ul className="mt-2 grid">
-                <li>
-                  <Link href={RUTE.noutati} className={link}>
-                    Noutăți
-                  </Link>
-                </li>
+                {cuNoutati && (
+                  <li>
+                    <Link href={RUTE.noutati} className={link}>
+                      Noutăți
+                    </Link>
+                  </li>
+                )}
                 <li>
                   <Link href={RUTE.campanii} className={link}>
                     Campanii

@@ -38,7 +38,11 @@ function lista(randuri: string[]): string {
   return randuri.filter(Boolean).join("\n");
 }
 
-export function stiinta(cifre: ReadonlyArray<Cifra> = CIFRE_DIN_COD): string {
+export function stiinta(
+  cifre: ReadonlyArray<Cifra> = CIFRE_DIN_COD,
+  /** Fără noutăți publicate, asistentul nu trimite pe nimeni la o pagină goală. */
+  cuNoutati = true,
+): string {
   const proiecte = proiecteAfisate();
 
   /*
@@ -108,7 +112,7 @@ export function stiinta(cifre: ReadonlyArray<Cifra> = CIFRE_DIN_COD): string {
     "",
     "## Pagini",
     `- Acasă: ${RUTE.acasa} · Despre noi: ${RUTE.despre} · Casa Teona: ${RUTE.casaTeona}`,
-    `- Proiecte și tabere: ${RUTE.proiecte} · Campanii: ${RUTE.campanii} · Noutăți: ${RUTE.noutati}`,
+    `- Proiecte și tabere: ${RUTE.proiecte} · Campanii: ${RUTE.campanii}${cuNoutati ? ` · Noutăți: ${RUTE.noutati}` : ""}`,
     `- Donează: ${RUTE.doneaza} · 3,5%: ${RUTE.redirectionare35} · Firme: ${RUTE.directionare20}`,
     `- Voluntariat: ${RUTE.voluntar} · Sponsori: ${RUTE.sponsori} · Contact: ${RUTE.contact}`,
     `- În presă: ${RUTE.media}`,

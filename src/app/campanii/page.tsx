@@ -10,6 +10,10 @@ import { slugEticheta } from "@/lib/etichete";
 import AntetPagina from "@/componente/pagina/AntetPagina";
 import ListaScrise from "@/componente/pagina/ListaScrise";
 import IndemnFinal from "@/componente/IndemnFinal";
+import GrilaProiecte from "@/componente/proiecte/GrilaProiecte";
+import { proiecteleToate } from "@/date/proiecte";
+import { listaCuPozeDinCloud } from "@/date/proiecte-cloud";
+import { arePublicate } from "@/lib/texte-vizibile";
 
 export const metadata: Metadata = metadate({
   titlu: "Campanii",
@@ -50,18 +54,6 @@ export default function PaginaCampanii({
 
       <section className="relative bg-hartie pt-4 pb-24 lg:pt-10 lg:pb-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          {/* Legătura dintre cele două secțiuni. În meniu încape doar una —
-              zece intrări rup antetul pe un laptop de 1280 px — așa că fiecare
-              trimite la cealaltă, de unde o caută cineva oricum. */}
-          <p className="mb-8 text-mic text-cerneala-moale">
-            <Link
-              href={RUTE.noutati}
-              className="font-titlu font-semibold text-caramiziu-700 underline underline-offset-4 hover:text-caramiziu-800"
-            >
-              Vezi și noutățile asociației →
-            </Link>
-          </p>
-
           <Suspense
             fallback={
               <p className="text-center text-amplu text-cerneala-moale">
@@ -85,9 +77,18 @@ async function Lista({
   searchParams: Promise<{ eticheta?: string }>;
 }) {
   await connection();
-  if (!areBazaDeDate()) return null;
   const { eticheta } = await searchParams;
-  const toate = await textePublicate("campanie");
+  const [toate, proiecte, cuNoutati] = await Promise.all([
+    areBazaDeDate()
+      ? textePublicate("campanie").catch(() => [])
+      : Promise.resolve([]),
+    proiecteleToate(),
+    arePublicate("noutate"),
+  ]);
+  // Aceleași campanii ca fila „Campanii” de pe /proiecte: o singură sursă.
+  const campanii = await listaCuPozeDinCloud(
+    proiecte.filter((p) => p.categorie === "campanii"),
+  );
   const cautata = eticheta ? slugEticheta(eticheta) : "";
   const texte = cautata
     ? toate.filter((t) => t.etichete.some((e) => slugEticheta(e) === cautata))
@@ -113,15 +114,41 @@ async function Lista({
           </Link>
         </p>
       )}
-      <ListaScrise
-        texte={texte}
-        cale={RUTE.campanii}
-        gol={
-          cautata
-            ? "Nimic publicat cu acest cuvânt cheie."
-            : "Nu e nicio campanie deschisă chiar acum. Poți să ne ajuți oricând printr-o donație."
-        }
-      />
+      {(cautata || texte.length > 0) && (
+        <ListaScrise
+          texte={texte}
+          cale={RUTE.campanii}
+          gol="Nimic publicat cu acest cuvânt cheie."
+        />
+      )}
+      {!cautata && campanii.length > 0 && (
+        <div className={texte.length > 0 ? "mt-20" : ""}>
+          {texte.length > 0 && (
+            <h2 className="mb-10 text-h3 text-cerneala">
+              Campaniile pe care le facem an de an
+            </h2>
+          )}
+          <GrilaProiecte proiecte={campanii} />
+        </div>
+      )}
+      {!cautata && texte.length === 0 && campanii.length === 0 && (
+        <p className="text-amplu text-cerneala-moale">
+          Nu e nicio campanie deschisă chiar acum. Poți să ne ajuți oricând
+          printr-o donație.
+        </p>
+      )}
+      {/* În meniu încape doar una dintre cele două secțiuni; legătura spre
+          noutăți apare numai după primul articol publicat. */}
+      {cuNoutati && (
+        <p className="mt-14 text-mic text-cerneala-moale">
+          <Link
+            href={RUTE.noutati}
+            className="font-titlu font-semibold text-caramiziu-700 underline underline-offset-4 hover:text-caramiziu-800"
+          >
+            Vezi și noutățile asociației →
+          </Link>
+        </p>
+      )}
     </>
   );
 }

@@ -3,6 +3,7 @@ import { curataHtml } from "@/lib/curata-html";
 import { esteHtml, textSimplu } from "@/lib/text-bogat";
 import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
+import { ETICHETA_TEXTE_PUBLICATE } from "@/lib/texte-vizibile";
 import { ETICHETA_PROIECTE_PANOU, proiecteAfisate } from "@/date/proiecte";
 import { cuBaza, formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
@@ -59,6 +60,7 @@ async function posteaza(cerere: Request) {
     if (!/^[0-9a-f-]{36}$/i.test(id)) return nuTrece("Text necunoscut.");
     const text = await textDupaId(id);
     await stergeText(id);
+    revalidateTag(ETICHETA_TEXTE_PUBLICATE, ACUM);
     // Fără asta, tabăra ștearsă rămânea în lista de proiecte, cu un link
     // care ducea la „pagina nu există”.
     if (text?.fel === "proiect") revalidateTag(ETICHETA_PROIECTE_PANOU, ACUM);
@@ -190,6 +192,7 @@ async function posteaza(cerere: Request) {
 
   if (/^[0-9a-f-]{36}$/i.test(id)) {
     await schimbaText(id, date);
+    revalidateTag(ETICHETA_TEXTE_PUBLICATE, ACUM);
     // Descrierile taberelor se citesc dintr-un cache cu etichetă. Fără
     // golirea asta, omul publică și nu vede nimic schimbat pe site.
     if (fel === "proiect") revalidateTag(ETICHETA_PROIECTE_PANOU, ACUM);
@@ -212,6 +215,7 @@ async function posteaza(cerere: Request) {
     fel === "proiect" ? camp("slug") : undefined,
     fel === "proiect" ? proiecteAfisate().map((p) => p.slug) : [],
   );
+  revalidateTag(ETICHETA_TEXTE_PUBLICATE, ACUM);
   return inapoi(
     cerere,
     fel,

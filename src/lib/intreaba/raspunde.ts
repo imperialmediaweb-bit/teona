@@ -1,6 +1,7 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { REGULI, stiinta } from "./stiinta";
+import { arePublicate } from "@/lib/texte-vizibile";
 import { CIFRE_DIN_COD, cifreSite } from "@/lib/cifre";
 
 /**
@@ -72,7 +73,7 @@ export async function* raspunde(
     system: [
       {
         type: "text",
-        text: `${REGULI}\n\n---\n\n${stiinta(await cifreSite().catch(() => CIFRE_DIN_COD))}`,
+        text: `${REGULI}\n\n---\n\n${stiinta(await cifreSite().catch(() => CIFRE_DIN_COD), await arePublicate("noutate"))}`,
         cache_control: { type: "ephemeral" },
       },
     ],

@@ -8,6 +8,7 @@ import { areBazaDeDate } from "@/lib/baza";
 import { FELURI, textePublicate } from "@/lib/texte";
 import { adresaPentruDistribuire } from "@/lib/poza-urcata";
 import { adresaPublica } from "@/lib/cloud";
+import { arePublicate } from "@/lib/texte-vizibile";
 import { ADRESA_SITE } from "./seo";
 
 /**
@@ -38,8 +39,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     adresă `noindex` trecută în sitemap e un semnal contradictoriu pentru
     Google: o dată îi spunem „uite-o”, apoi „n-o indexa”.
   */
+  // `/noutati` intră numai după primul articol publicat: o pagină goală în
+  // sitemap e o pagină goală pe care o trimitem la Google.
+  const cuNoutati = await arePublicate("noutate");
   const pagini = Object.values(RUTE)
     .filter((cale) => cale !== RUTE.multumim)
+    .filter((cale) => cuNoutati || cale !== RUTE.noutati)
     .map((cale) => ({ url: `${ADRESA_SITE}${cale}` }));
 
   /*
