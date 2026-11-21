@@ -155,7 +155,9 @@ function Formular({
   const id = useId();
   const [suma, setSuma] = useState<number | null>(dinAdresa.suma);
   const [altaSuma, setAltaSuma] = useState(dinAdresa.alta);
-  const [lunar, setLunar] = useState(useFrecventaDinAdresa(true));
+  // „O dată” din start: donația lunară e o alegere a omului, nu o bifă
+  // pe care trebuie s-o observe și s-o scoată.
+  const [lunar, setLunar] = useState(useFrecventaDinAdresa(false));
   const [erori, setErori] = useState<Erori>({});
   const [seTrimite, setSeTrimite] = useState(false);
   /*
@@ -511,7 +513,7 @@ function Formular({
           </div>
         </fieldset>
 
-        {/* Frecvența — „Lunar” preselectat. Un comutator cu două poziții. */}
+        {/* Frecvența — „O dată” din start. Un comutator cu două poziții. */}
         <fieldset>
           <legend className="mb-3 font-titlu text-mic font-bold text-cerneala">
             Frecvența
@@ -626,6 +628,12 @@ function Formular({
             <Pictograma nume="inima" className="size-5" />
             {seTrimite ? "Te ducem la plată…" : etichetaButon}
           </button>
+
+          {lunar && (
+            <p className="mt-3 text-center font-titlu text-mic font-semibold text-cerneala">
+              Vei fi taxat lunar, poți anula oricând.
+            </p>
+          )}
 
           {erori.general && (
             <p
