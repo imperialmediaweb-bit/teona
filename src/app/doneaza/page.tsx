@@ -23,6 +23,8 @@ import Intrebari, { type Intrebare } from "@/componente/pagina/Intrebari";
 import TitluSectiune from "@/componente/pagina/TitluSectiune";
 import AnuntTransfer from "@/componente/formular/AnuntTransfer";
 import FormularDonatie from "@/componente/formular/FormularDonatie";
+import AntetPagina from "@/componente/pagina/AntetPagina";
+import DonatiaTa from "@/componente/pagina/DonatiaTa";
 import { arePayPal } from "@/lib/plati/paypal";
 
 export const metadata: Metadata = metadate({
@@ -197,54 +199,57 @@ export default async function Doneaza() {
   return (
     <>
       <JsonLd date={jsonLdFir([{ nume: "Donează", cale: RUTE.doneaza }])} />
-      {/* 2.1 — antet, cu formularul de card (2.2) în prim-plan, în dreapta. */}
-      <section className="granulatie relative isolate overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-14 lg:pb-32">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 -z-10"
-        >
-          <span className="pata absolute -top-32 right-[-8%] size-[28rem] rounded-full bg-caramiziu-100/60 blur-3xl" />
-          <span className="pata pata-2 absolute bottom-[-8rem] left-[-8rem] size-[24rem] rounded-full bg-miere-100/70 blur-3xl" />
-          <Decor
-            semn="inima"
-            className="pluteste-lent absolute top-10 right-[5%] hidden size-10 text-caramiziu-200 lg:block"
-          />
-          <Decor
-            semn="stea"
-            className="pluteste-lent absolute bottom-24 left-[4%] size-8 text-miere-300 lg:size-11"
-          />
-        </div>
+      {/* 2.1 — antet scurt: la Donează omul a venit să doneze, deci
+          formularul trebuie să fie în primul ecran, și pe telefon. */}
+      <AntetPagina
+        varianta="compact"
+        scris={`„${ASOCIATIA.motto}”`}
+        titlu="Donează"
+        subtitlu={texte["doneaza.antet"]}
+      />
 
-        <div className="relative mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:px-8">
-          <div className="lg:pt-4">
-            <p className="scris text-amplu text-caramiziu-700">
-              „{ASOCIATIA.motto}”
-            </p>
-            <h1 className="mt-3 text-h1 text-cerneala">Donează</h1>
-            <p className="mt-6 max-w-xl text-amplu text-cerneala-moale">
-              {texte["doneaza.antet"]}
-            </p>
+      <section className="relative bg-hartie-calda pt-2 pb-24 lg:pt-4 lg:pb-32">
+        <div className="relative mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:px-8">
+          {/* 2.2 — donația cu cardul, primul bloc de pe pagină. Pe telefon
+              vine înaintea coloanei din stânga. */}
+          {/* `id` ca să se poată trimite aici de pe celelalte căi de plată. */}
+          <div id="card" className="lg:order-2">
+            <h2 className="sr-only">Donează cu cardul</h2>
+            <FormularDonatie arePayPal={arePayPal()} />
+          </div>
 
-            <ul className="mt-9 grid grid-cols-2 gap-3">
-              {SCURTATURI.map((link, i) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    className={`flex min-h-14 items-center gap-3 ${
-                      i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"
-                    } border border-hartie-umbra bg-hartie px-4 py-3 font-titlu text-mic font-bold text-cerneala shadow-[0_14px_30px_-20px_rgba(35,35,35,0.45)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:text-caramiziu-700 motion-reduce:hover:translate-y-0`}
-                  >
-                    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-caramiziu-100 text-caramiziu-700">
-                      <Pictograma nume={link.pictograma} className="size-5" />
-                    </span>
-                    {link.eticheta}
-                  </a>
-                </li>
-              ))}
-            </ul>
+          <div className="grid content-start gap-10 lg:order-1">
+            <nav aria-label="Alte feluri de a dona">
+              <p className="mb-3 font-titlu text-nota font-bold tracking-wider text-cerneala-slab uppercase">
+                Sau altfel
+              </p>
+              <ul className="grid gap-3">
+                {SCURTATURI.map((link, i) => (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      className={`group flex min-h-14 items-center gap-3 ${
+                        i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"
+                      } border border-hartie-umbra bg-hartie px-4 py-3 font-titlu text-mic font-bold text-cerneala shadow-[0_14px_30px_-20px_rgba(35,35,35,0.45)] transition-all duration-300 ease-cald hover:-translate-y-0.5 hover:text-caramiziu-700 motion-reduce:hover:translate-y-0`}
+                    >
+                      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-caramiziu-100 text-caramiziu-700">
+                        <Pictograma nume={link.pictograma} className="size-5" />
+                      </span>
+                      <span className="min-w-0 flex-1 truncate">
+                        {link.eticheta}
+                      </span>
+                      <Pictograma
+                        nume="sageata"
+                        className="size-4 shrink-0 text-caramiziu-700 transition-transform duration-300 group-hover:translate-x-0.5"
+                      />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
 
             {/* Cutia de donații de la Casa Teona: ce se vede când dai. */}
-            <figure className="relative mt-12 hidden lg:block">
+            <figure className="relative hidden lg:block">
               <span
                 aria-hidden="true"
                 className="absolute -right-4 -bottom-4 h-[70%] w-[62%] colt-a bg-miere-200"
@@ -264,13 +269,11 @@ export default async function Doneaza() {
                 </span>
               </figcaption>
             </figure>
-          </div>
 
-          {/* 2.2 — donația cu cardul, primul bloc de pe pagină. */}
-          {/* `id` ca să se poată trimite aici de pe celelalte căi de plată. */}
-          <div id="card">
-            <h2 className="sr-only">Donează cu cardul</h2>
-            <FormularDonatie arePayPal={arePayPal()} />
+            {/* Rămâne pe loc cât formularul din dreapta continuă. */}
+            <div className="lg:sticky lg:top-28">
+              <DonatiaTa />
+            </div>
           </div>
         </div>
       </section>

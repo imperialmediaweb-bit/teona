@@ -141,18 +141,16 @@ export default async function DevinoVoluntar() {
         date={jsonLdFir([{ nume: "Devino voluntar", cale: RUTE.voluntar }])}
       />
       <AntetPagina
+        varianta="lata"
         scris="Culegătorii de Zâmbete"
         titlu="Devino voluntar"
         subtitlu={texte["voluntar.antet"]}
         accent="miere"
         poza={{
-          cale: "/poze/2024/11/348477655_10078995242126230_596613811472728663_n.jpg",
-          alt: "Opt voluntari în uniforme medicale, cu diplomele de participare, în fața pensiunii din tabără",
-          legenda: "Culegătorii de Zâmbete",
-        }}
-        pozaMica={{
-          cale: "/poze/2024/11/348219986_630992459048403_8812479006845932206_n.jpg",
-          alt: "Un băiat și o voluntară, cu capetele apropiate, pictează împreună o foaie la masă",
+          // Lată și mare (2560 px): cea de dinainte avea 1024 px și se vedea
+          // înmuiată pe toată lățimea ecranului.
+          cale: "/poze/2024/11/348438093_2538038893031463_8837165391100434397_n-scaled.jpg",
+          alt: "Peste douăzeci de voluntari în tricouri albe, în picioare pe iarbă, între două bannere ale asociației „Tabăra RESPIRO, mai 2023”, în fața pensiunii",
         }}
         butoane={
           <Buton href="#formular" marime="mare">

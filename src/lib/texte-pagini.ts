@@ -161,6 +161,16 @@ Casa Teona înseamnă, în același timp, joacă, încredere, sprijin și aparte
     implicit: `Alege modul care ți se potrivește. Donația ta ne ajută enorm să oferim în continuare sprijin celor care au atât de mare nevoie.`,
   },
   {
+    cheie: "doneaza.efect",
+    pagina: "Donează",
+    titlu: "Ce face donația ta (exemple de sume)",
+    ajutor:
+      "Un exemplu pe rând: suma, o liniuță, ce face cu ea asociația. Doar cifre verificate. Cât timp e gol, blocul nu apare pe site.",
+    // Gol dinadins: o sumă și un efect scrise de dezvoltator ar fi cifre
+    // inventate pe pagina de donații. Le scrie asociația.
+    implicit: "",
+  },
+  {
     cheie: "voluntar.antet",
     pagina: "Devino voluntar",
     titlu: "Fraza din capul paginii",

@@ -20,9 +20,19 @@ import { taietura } from "@/date/taieturi";
  * prima, ca o poză pusă peste alta. Pe telefon poza vine prima, apoi titlul
  * — așa a cerut clientul la erou, și la fel se așteaptă și aici.
  *
- * Textul nu stă peste poză. Textul peste poză e ieftin de făcut și greu de
- * citit — mai ales cu diacritice, care au nevoie de spațiu liber deasupra
- * literei.
+ * Textul nu stă peste poză în varianta obișnuită. Textul peste poză e ieftin
+ * de făcut și greu de citit — mai ales cu diacritice, care au nevoie de spațiu
+ * liber deasupra literei.
+ *
+ * **Trei variante, aceeași componentă** (`varianta`):
+ * - `standard` — titlul în stânga, poza mare în dreapta, cea mică peste ea.
+ *   Acasă, Despre noi, Casa Teona, Proiecte și restul.
+ * - `compact` — titlul și fraza, fără poză. Pentru paginile la care omul a
+ *   venit să facă ceva anume (Contact, Donează): ce caută trebuie să fie în
+ *   primul ecran, nu sub o fotografie.
+ * - `lata` — fotografia pe toată lățimea, cu titlul peste ea. Aici textul
+ *   stă pe poză, deci poza primește un văl întunecat dedesubt, cât să se
+ *   citească titlul alb pe orice fotografie.
  */
 
 const ACCENTE = {
@@ -54,7 +64,33 @@ const ACCENTE = {
 
 export type Accent = keyof typeof ACCENTE;
 
-export default function AntetPagina({
+type Poza = { cale: string; alt: string; legenda?: string };
+
+export default function AntetPagina(props: {
+  titlu: string;
+  subtitlu: string;
+  /** Rândul scris de mână de deasupra titlului. */
+  scris?: string;
+  butoane?: ReactNode;
+  accent?: Accent;
+  /** Culoarea secțiunii care urmează, pentru valul de închidere. */
+  urmeaza?: string;
+} & (
+  | {
+      varianta?: "standard";
+      poza: Poza;
+      /** A doua fotografie, mai mică, suprapusă peste colțul primei. */
+      pozaMica?: { cale: string; alt: string };
+    }
+  | { varianta: "compact" }
+  | { varianta: "lata"; poza: Poza }
+)) {
+  if (props.varianta === "compact") return <Compact {...props} />;
+  if (props.varianta === "lata") return <Lata {...props} />;
+  return <Standard {...props} />;
+}
+
+function Standard({
   titlu,
   subtitlu,
   poza,
@@ -62,15 +98,12 @@ export default function AntetPagina({
   scris,
   butoane,
   accent = "caramiziu",
-  /** Culoarea secțiunii care urmează, pentru valul de închidere. */
   urmeaza = "text-hartie",
 }: {
   titlu: string;
   subtitlu: string;
-  poza: { cale: string; alt: string; legenda?: string };
-  /** A doua fotografie, mai mică, suprapusă peste colțul primei. */
+  poza: Poza;
   pozaMica?: { cale: string; alt: string };
-  /** Rândul scris de mână de deasupra titlului. */
   scris?: string;
   butoane?: ReactNode;
   accent?: Accent;
@@ -167,6 +200,108 @@ export default function AntetPagina({
               )}
             </figure>
           </div>
+        </div>
+      </section>
+      <Val culoare={urmeaza} className={VAL_PESTE} />
+    </>
+  );
+}
+
+/**
+ * Titlul și fraza, fără fotografie. Fără val la capăt: secțiunea care
+ * urmează continuă pe aceeași hârtie, ca formularul sau cardurile de contact
+ * să înceapă imediat sub titlu.
+ */
+function Compact({
+  titlu,
+  subtitlu,
+  scris,
+  butoane,
+  accent = "caramiziu",
+}: {
+  titlu: string;
+  subtitlu: string;
+  scris?: string;
+  butoane?: ReactNode;
+  accent?: Accent;
+}) {
+  const a = ACCENTE[accent];
+  return (
+    <section className="granulatie relative isolate overflow-hidden bg-hartie-calda pt-8 pb-8 lg:pt-14 lg:pb-10">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10"
+      >
+        <span
+          className={`pata absolute -top-40 right-[-6%] size-[26rem] rounded-full blur-3xl ${a.pata}`}
+        />
+      </div>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {scris && <p className={`scris text-amplu ${a.scris}`}>{scris}</p>}
+        <h1 className={`text-h1 text-cerneala ${scris ? "mt-2" : ""}`}>
+          {titlu}
+        </h1>
+        <p className="mt-4 max-w-2xl text-amplu text-cerneala-moale">
+          {subtitlu}
+        </p>
+        {butoane && <div className="mt-7 flex flex-wrap gap-3">{butoane}</div>}
+      </div>
+    </section>
+  );
+}
+
+/** Fotografia pe toată lățimea, cu titlul jos, peste un văl întunecat. */
+function Lata({
+  titlu,
+  subtitlu,
+  poza,
+  scris,
+  butoane,
+  urmeaza = "text-hartie",
+}: {
+  titlu: string;
+  subtitlu: string;
+  poza: Poza;
+  scris?: string;
+  butoane?: ReactNode;
+  urmeaza?: string;
+}) {
+  return (
+    <>
+      <section className="relative isolate flex min-h-[34rem] items-end overflow-hidden bg-cerneala sm:min-h-[36rem] lg:min-h-[40rem]">
+        <Image
+          src={poza.cale}
+          alt={poza.alt}
+          fill
+          priority
+          sizes="100vw"
+          quality={86}
+          style={{ objectPosition: taietura(poza.cale) }}
+          className="-z-10 object-cover"
+        />
+        {/* Vălul: de jos în sus, cât să țină textul lizibil oriunde. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 bg-gradient-to-t from-cerneala/90 via-cerneala/60 to-cerneala/15 lg:via-cerneala/45 lg:to-cerneala/5"
+        />
+        <div className="mx-auto w-full max-w-7xl px-4 pt-32 pb-24 sm:px-6 lg:px-8 lg:pb-32">
+          {scris && (
+            <p className="scris text-amplu text-miere-300">{scris}</p>
+          )}
+          <h1 className={`max-w-3xl text-h1 text-hartie ${scris ? "mt-2" : ""}`}>
+            {titlu}
+          </h1>
+          <p className="mt-5 max-w-2xl text-amplu text-hartie/90">
+            {subtitlu}
+          </p>
+          {butoane && (
+            <div className="mt-8 flex flex-wrap gap-3">{butoane}</div>
+          )}
+          {poza.legenda && (
+            <p className="mt-8 font-titlu text-nota font-bold tracking-wider text-hartie/70 uppercase">
+              {poza.legenda}
+            </p>
+          )}
         </div>
       </section>
       <Val culoare={urmeaza} className={VAL_PESTE} />

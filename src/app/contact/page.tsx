@@ -85,42 +85,26 @@ export default function Contact() {
     <>
       <JsonLd date={jsonLdFir([{ nume: "Contact", cale: RUTE.contact }])} />
       <AntetPagina
+        varianta="compact"
         scris="Scrie-ne sau sună-ne"
         titlu="Contact"
         subtitlu="Scrie-ne pentru orice întrebare sau dorință de implicare. Împreună putem aduce speranță și schimbare în viețile copiilor care au nevoie de noi."
         accent="turcoaz"
-        poza={{
-          cale: "/poze/2024/11/413839128_386434587290219_1905121098743660996_n.jpg",
-          alt: "Opt voluntari tineri, în veste albe cu sigla asociației, în grup, la apus",
-          legenda: "Echipa noastră",
-        }}
-        pozaMica={{
-          // Asociația a spus în octombrie 2026 că poza de dinainte (cu
-          // pictura din junglă) e făcută în altă parte, nu la Casa Teona.
-          // Asta e de pe site-ul vechi, etichetată de ei „Casa Teona”, și
-          // nu mai apare nicăieri pe site — cea cu tabla e deja în trei locuri.
-          cale: "/poze/2024/11/resizedimage.webp",
-          alt: "O voluntară ajută un băiețel să deseneze, la masă, în sala cu tavan de lemn de la Casa Teona",
-        }}
       />
 
       {/* 10.2 — date de contact. Fără persoane de contact: caietul cere
           explicit ca lista de persoane de pe pagina veche să fie scoasă. */}
-      {/* Fără `overflow-hidden`: cardurile de dedesubt sunt trase în sus
-          intenționat, ca să iasă peste valul antetului. Cu el, secțiunea
-          le reteza exact partea ieșită — primul rând de text apărea tăiat
-          pe jumătate. */}
-      <section className="relative bg-hartie pb-24 lg:pb-32">
+      <section className="relative bg-hartie-calda pt-2 pb-24 lg:pt-4 lg:pb-32">
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="sr-only">Date de contact</h2>
-          {/* Cele trei carduri ies peste valul antetului, ca banda de cifre
-              de pe prima pagină. */}
-          <ul className="relative z-20 -mt-6 grid gap-5 sm:-mt-10 sm:grid-cols-3 lg:-mt-16">
+          {/* Cele trei carduri vin imediat sub titlu: la Contact omul a venit
+              după un telefon sau o adresă, nu după o fotografie. */}
+          <ul className="relative z-20 grid gap-5 sm:grid-cols-3">
             {CAI_DE_CONTACT.map((rand, i) => (
               <li key={rand.valoare}>
                 <a
                   href={rand.href}
-                  className={`relative flex h-full flex-col overflow-hidden ${
+                  className={`@container relative flex h-full flex-col overflow-hidden ${
                     i % 2 === 0 ? "colt-a" : "colt-b"
                   } p-6 transition-all duration-500 ease-cald hover:-translate-y-1.5 motion-reduce:hover:translate-y-0 sm:p-7 ${rand.clase}`}
                 >
@@ -139,7 +123,7 @@ export default function Contact() {
                   <span className="relative mt-6 block font-titlu text-nota font-bold tracking-wider uppercase opacity-80">
                     {rand.eticheta}
                   </span>
-                  <span className="relative mt-1 block font-titlu text-[1.5rem] leading-tight font-extrabold tracking-tight break-all sm:text-[1.35rem] lg:text-[1.65rem]">
+                  <span className="relative mt-1 block font-titlu text-[clamp(1.05rem,7.2cqi,1.65rem)] leading-tight font-extrabold tracking-tight [overflow-wrap:anywhere]">
                     {rand.valoare}
                   </span>
                 </a>
