@@ -1196,7 +1196,10 @@ picată, `pause_turn`, pistă respinsă care nu învie:
   Linkurile poartă etichete UTM, deci Google Analytics arată singur ce a adus
   buletinul. Probă: `BAZA=… PAROLA_ADMIN=… node scripts/qa/sabloane-email.mjs`.
 
-Publicul: **`/noutati`** și **`/campanii`**, cu paginile lor. Nu sunt în meniul
+Publicul: **`/noutati`** și **`/campanii`**, cu paginile lor. `/noutati`
+apare în subsol, în sitemap și la asistent numai după primul articol
+publicat (`arePublicate` din `lib/texte-vizibile.ts`); `/campanii` arată și
+campaniile din proiecte (fila „Campanii” de pe /proiecte). Nu sunt în meniul
 principal — caietul îl fixează la nouă intrări (12.1), iar a zecea rupe antetul
 la orice lățime peste 1300 px — ci în subsol.
 
@@ -1736,8 +1739,9 @@ ce e Casa Teona, cum sponsorizează o firmă, cum se devine voluntar.
   conversația șase schimburi, răspunsul plafonat. Partea care nu se schimbă —
   regulile și ce știe asociația — se păstrează în cache-ul API-ului, deci a
   doua întrebare costă a zecea parte din prima.
-- Pe telefon caseta stă jos-stânga: jos-dreapta e butonul plutitor „Donează",
-  iar două butoane rotunde unul peste altul se apasă din greșeală.
+- Pe telefon butonul e rotund, de 48 px, jos-dreapta (peste safe-area), se
+  ascunde la derulare în jos și nu apare pe /doneaza. Butonul plutitor
+  „Donează” a fost scos în noiembrie 2026: rămâne cel din antet.
 - Modelul se schimbă dintr-o variabilă, `MODEL_ASISTENT`; implicit
   `claude-opus-5-5`. Codul nou folosește SDK-ul oficial (`@anthropic-ai/sdk`);
   `src/lib/asistent.ts` și `src/lib/analiza/intreaba.ts` au rămas pe `fetch`
