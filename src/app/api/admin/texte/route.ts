@@ -4,6 +4,7 @@ import { esteHtml, textSimplu } from "@/lib/text-bogat";
 import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { ETICHETA_TEXTE_PUBLICATE } from "@/lib/texte-vizibile";
+import { dataAfisata } from "@/lib/data-proiect";
 import { ETICHETA_PROIECTE_PANOU, proiecteAfisate } from "@/date/proiecte";
 import { cuBaza, formularAdmin, limitaDeRata, nuTrece, raspuns, sesiuneExpirata, trimiteLa } from "@/lib/api";
 import { arePermisiune } from "@/lib/admin";
@@ -171,18 +172,11 @@ async function posteaza(cerere: Request) {
     poza,
     tintaBani,
     dataInceput: fel === "proiect" ? dataInceput : null,
-    // Fără „cum se citește data”, se scrie prima zi: „5 ianuarie 2026”.
+    // Fără „cum se citește data”, se scrie prima zi: „5 ianuarie 2026”; cu
+    // ea, dar fără an, i se pune anul primei zile.
     dataCitita:
       fel === "proiect"
-        ? camp("dataCitita") ||
-          (dataInceput
-            ? new Intl.DateTimeFormat("ro-RO", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-                timeZone: "UTC",
-              }).format(new Date(`${dataInceput}T12:00:00Z`))
-            : null)
+        ? dataAfisata(camp("dataCitita"), dataInceput)
         : null,
     dosarCloud: camp("dosarCloud") || null,
     categorie: fel === "proiect" ? categorie : null,

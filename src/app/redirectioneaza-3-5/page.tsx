@@ -249,7 +249,7 @@ export default async function Redirectioneaza35() {
         >
           <Decor
             semn="stea"
-            className="pluteste-lent absolute top-12 right-[6%] size-8 text-miere-300 lg:size-11"
+            className="pluteste-lent absolute top-12 right-[6%] size-8 text-miere-300 lg:size-11 hidden opacity-50 md:block"
           />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -283,7 +283,7 @@ export default async function Redirectioneaza35() {
         >
           <Decor
             semn="unda"
-            className="pluteste-lent absolute bottom-24 left-[3%] size-10 text-turcoaz-200 lg:size-14"
+            className="pluteste-lent absolute bottom-24 left-[3%] size-10 text-turcoaz-200 lg:size-14 hidden opacity-50 md:block"
           />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -347,7 +347,7 @@ export default async function Redirectioneaza35() {
         >
           <Decor
             semn="spirala"
-            className="pluteste-lent absolute top-14 right-[5%] size-9 text-caramiziu-200 lg:size-12"
+            className="pluteste-lent absolute top-14 right-[5%] size-9 text-caramiziu-200 lg:size-12 hidden opacity-50 md:block"
           />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -543,7 +543,7 @@ export default async function Redirectioneaza35() {
         >
           <Decor
             semn="soare"
-            className="pluteste-lent absolute top-12 right-[5%] size-9 text-miere-300 lg:size-12"
+            className="pluteste-lent absolute top-12 right-[5%] size-9 text-miere-300 lg:size-12 hidden opacity-50 md:block"
           />
         </div>
         <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">

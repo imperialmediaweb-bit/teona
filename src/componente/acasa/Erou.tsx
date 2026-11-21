@@ -144,11 +144,7 @@ export default function Erou({
         <span className="pata pata-2 absolute bottom-[-10rem] left-[-8rem] size-[26rem] rounded-full bg-caramiziu-100/60 blur-3xl" />
         <Decor
           semn="stea"
-          className="pluteste-lent absolute top-5 right-[4%] hidden size-10 text-miere-700 lg:block"
-        />
-        <Decor
-          semn="soare"
-          className="pluteste-lent absolute right-[3%] bottom-8 size-9 text-caramiziu-300 lg:bottom-14 lg:size-12"
+          className="pluteste-lent absolute top-5 right-[4%] size-10 text-miere-700 hidden opacity-50 md:block"
         />
       </div>
 

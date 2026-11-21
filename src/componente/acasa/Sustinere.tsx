@@ -50,15 +50,7 @@ export default function Sustinere() {
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <Decor
           semn="spirala"
-          className="pluteste-lent absolute top-12 right-[4%] size-10 text-turcoaz-200 lg:size-14"
-        />
-        <Decor
-          semn="stea"
-          className="pluteste-lent absolute bottom-24 left-[2%] size-9 text-miere-300 lg:size-12"
-        />
-        <Decor
-          semn="unda"
-          className="pluteste-lent absolute top-1/2 left-[46%] hidden size-12 text-caramiziu-200 lg:block"
+          className="pluteste-lent absolute top-12 right-[4%] size-10 text-turcoaz-200 lg:size-14 hidden opacity-50 md:block"
         />
       </div>
 

@@ -126,11 +126,7 @@ function Standard({
           <span className="pata pata-2 absolute bottom-[-8rem] left-[-8rem] size-[24rem] rounded-full bg-miere-100/60 blur-3xl" />
           <Decor
             semn="stea"
-            className="pluteste-lent absolute top-8 right-[5%] hidden size-10 text-miere-700 lg:block"
-          />
-          <Decor
-            semn="unda"
-            className="pluteste-lent absolute bottom-20 left-[3%] size-9 text-caramiziu-200 lg:size-12"
+            className="pluteste-lent absolute top-8 right-[5%] size-10 text-miere-700 hidden opacity-50 md:block"
           />
         </div>
 

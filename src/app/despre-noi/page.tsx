@@ -203,11 +203,7 @@ export default async function DespreNoi() {
         >
           <Decor
             semn="spirala"
-            className="pluteste-lent absolute top-20 right-[4%] size-10 text-turcoaz-200 lg:size-14"
-          />
-          <Decor
-            semn="stea"
-            className="pluteste-lent absolute top-[55%] left-[2%] size-9 text-miere-300 lg:size-12"
+            className="pluteste-lent absolute top-20 right-[4%] size-10 text-turcoaz-200 lg:size-14 hidden opacity-50 md:block"
           />
         </div>
 
@@ -270,11 +266,7 @@ export default async function DespreNoi() {
         >
           <Decor
             semn="spirala"
-            className="pluteste-lent absolute top-16 left-[4%] size-9 text-turcoaz-300 lg:size-12"
-          />
-          <Decor
-            semn="inima"
-            className="pluteste-lent absolute right-[6%] bottom-20 size-8 text-caramiziu-200 lg:size-11"
+            className="pluteste-lent absolute top-16 left-[4%] size-9 text-turcoaz-300 lg:size-12 hidden opacity-50 md:block"
           />
         </div>
 
@@ -380,7 +372,7 @@ export default async function DespreNoi() {
         >
           <Decor
             semn="soare"
-            className="pluteste-lent absolute top-14 right-[5%] size-9 text-miere-300 lg:size-12"
+            className="pluteste-lent absolute top-14 right-[5%] size-9 text-miere-300 lg:size-12 hidden opacity-50 md:block"
           />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -581,7 +573,7 @@ export default async function DespreNoi() {
         >
           <Decor
             semn="soare"
-            className="pluteste-lent absolute top-10 right-[5%] size-10 text-miere-300 lg:size-14"
+            className="pluteste-lent absolute top-10 right-[5%] size-10 text-miere-300 lg:size-14 hidden opacity-50 md:block"
           />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

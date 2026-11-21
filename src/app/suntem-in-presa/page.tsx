@@ -65,11 +65,7 @@ export default async function SuntemInPresa() {
         >
           <Decor
             semn="unda"
-            className="pluteste-lent absolute top-20 right-[3%] size-10 text-turcoaz-200 lg:size-14"
-          />
-          <Decor
-            semn="stea"
-            className="pluteste-lent absolute bottom-32 left-[2%] size-8 text-miere-300 lg:size-11"
+            className="pluteste-lent absolute top-20 right-[3%] size-10 text-turcoaz-200 lg:size-14 hidden opacity-50 md:block"
           />
         </div>
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">

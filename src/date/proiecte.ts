@@ -10,6 +10,7 @@ import type { IdCategorie, ProiectAfisat } from "./proiecte-tipuri";
 import { cacheLife, cacheTag } from "next/cache";
 import { areBazaDeDate } from "@/lib/baza";
 import { textePublicate, textPublicat, type Text as TextPanou } from "@/lib/texte";
+import { dataAfisata, dataDinIso } from "@/lib/data-proiect";
 import { PREFIX_CLOUD } from "@/lib/cloud";
 
 export { CATEGORII } from "./proiecte-tipuri";
@@ -40,26 +41,6 @@ export type { IdCategorie, ProiectAfisat } from "./proiecte-tipuri";
 
 /** Categoriile vechi din WordPress care înseamnă „caz umanitar”. */
 const CATEGORII_UMANITARE = new Set(["Cazuri medicale", "Strângere Fonduri"]);
-
-const LUNI = [
-  "ianuarie",
-  "februarie",
-  "martie",
-  "aprilie",
-  "mai",
-  "iunie",
-  "iulie",
-  "august",
-  "septembrie",
-  "octombrie",
-  "noiembrie",
-  "decembrie",
-];
-
-function dataCitita(iso: string): string {
-  const [an, luna, zi] = iso.slice(0, 10).split("-").map(Number);
-  return `${zi} ${LUNI[luna - 1]} ${an}`;
-}
 
 /**
  * Calea unei poze, dacă fișierul chiar există pe disc.
@@ -142,7 +123,7 @@ export function proiecteAfisate(): ProiectAfisat[] {
         slug,
         titlu,
         data,
-        dataCitita: dataCitita(data),
+        dataCitita: dataDinIso(data),
         categorie,
         coperta:
           pozaCareExista(pozaLocala(proiect.pozaPrincipala)) ?? poze[0] ?? null,
@@ -205,7 +186,7 @@ function dinText(t: TextPanou): ProiectAfisat {
     titlu: t.titlu,
     // Fără dată de început, data publicării ține locul doar la ordonare.
     data: t.dataInceput ?? (t.publicatLa ?? "").slice(0, 10),
-    dataCitita: t.dataCitita,
+    dataCitita: dataAfisata(t.dataCitita, t.dataInceput),
     categorie: (CATEGORIILE.find((c) => c.id === t.categorie)?.id ??
       "2026") as IdCategorie,
     coperta: t.poza ? `${PREFIX_CLOUD}${t.poza.id}` : null,

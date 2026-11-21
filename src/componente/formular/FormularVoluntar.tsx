@@ -283,7 +283,7 @@ export default function FormularVoluntar() {
           />
           <Decor
             semn="soare"
-            className="pluteste-lent absolute bottom-6 right-[12%] size-10 text-hartie/40"
+            className="pluteste-lent absolute bottom-6 right-[12%] size-10 text-hartie/40 hidden opacity-50 md:block"
           />
           <span className="relative flex size-16 items-center justify-center colt-mic-b bg-hartie text-turcoaz-600 shadow-[0_16px_32px_-14px_rgba(35,35,35,0.4)]">
             <svg

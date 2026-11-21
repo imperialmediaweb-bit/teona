@@ -81,7 +81,7 @@ export default function Intrebari({
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <Decor
           semn="spirala"
-          className="pluteste-lent absolute top-16 right-[4%] size-9 text-turcoaz-200 lg:size-12"
+          className="pluteste-lent absolute top-16 right-[4%] size-9 text-turcoaz-200 lg:size-12 hidden opacity-50 md:block"
         />
       </div>
 

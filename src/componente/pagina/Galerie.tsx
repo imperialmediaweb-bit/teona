@@ -124,11 +124,7 @@ export default function Galerie({
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <Decor
           semn="soare"
-          className="pluteste-lent absolute top-12 right-[5%] size-9 text-miere-300 lg:size-12"
-        />
-        <Decor
-          semn="stea"
-          className="pluteste-lent absolute bottom-16 left-[3%] size-7 text-caramiziu-200 lg:size-10"
+          className="pluteste-lent absolute top-12 right-[5%] size-9 text-miere-300 lg:size-12 hidden opacity-50 md:block"
         />
       </div>
 

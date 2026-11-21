@@ -228,7 +228,7 @@ export default async function Directioneaza20() {
         >
           <Decor
             semn="stea"
-            className="pluteste-lent absolute top-16 right-[4%] size-9 text-miere-300 lg:size-12"
+            className="pluteste-lent absolute top-16 right-[4%] size-9 text-miere-300 lg:size-12 hidden opacity-50 md:block"
           />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -324,7 +324,7 @@ export default async function Directioneaza20() {
         >
           <Decor
             semn="spirala"
-            className="pluteste-lent absolute top-14 right-[5%] size-9 text-caramiziu-200 lg:size-12"
+            className="pluteste-lent absolute top-14 right-[5%] size-9 text-caramiziu-200 lg:size-12 hidden opacity-50 md:block"
           />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -525,7 +525,7 @@ export default async function Directioneaza20() {
         >
           <Decor
             semn="soare"
-            className="pluteste-lent absolute top-12 right-[5%] size-10 text-miere-300 lg:size-14"
+            className="pluteste-lent absolute top-12 right-[5%] size-10 text-miere-300 lg:size-14 hidden opacity-50 md:block"
           />
         </div>
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:gap-16 lg:px-8">
@@ -577,7 +577,7 @@ export default async function Directioneaza20() {
         >
           <Decor
             semn="unda"
-            className="pluteste-lent absolute bottom-24 left-[3%] size-10 text-turcoaz-200 lg:size-14"
+            className="pluteste-lent absolute bottom-24 left-[3%] size-10 text-turcoaz-200 lg:size-14 hidden opacity-50 md:block"
           />
         </div>
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">

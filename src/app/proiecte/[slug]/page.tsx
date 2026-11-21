@@ -138,11 +138,7 @@ export default async function PaginaProiect({
           <span className="pata absolute -top-32 right-[-8%] size-[26rem] rounded-full bg-miere-100/70 blur-3xl" />
           <Decor
             semn="stea"
-            className="pluteste-lent absolute top-10 right-[6%] hidden size-10 text-miere-700 lg:block"
-          />
-          <Decor
-            semn="unda"
-            className="pluteste-lent absolute bottom-16 left-[3%] size-9 text-caramiziu-200 lg:size-12"
+            className="pluteste-lent absolute top-10 right-[6%] size-10 text-miere-700 hidden opacity-50 md:block"
           />
         </div>
 

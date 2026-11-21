@@ -146,7 +146,7 @@ export default async function PrimaPagina() {
         >
           <Decor
             semn="soare"
-            className="pluteste-lent absolute top-12 left-[3%] size-9 text-miere-300 lg:size-12"
+            className="pluteste-lent absolute top-12 left-[3%] size-9 text-miere-300 lg:size-12 hidden opacity-50 md:block"
           />
         </div>
         <div className="relative mx-auto grid max-w-7xl items-center gap-16 px-4 sm:px-6 lg:grid-cols-2 lg:gap-20 lg:px-8">

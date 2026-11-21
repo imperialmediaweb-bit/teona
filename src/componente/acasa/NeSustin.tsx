@@ -50,7 +50,7 @@ export default function NeSustin({
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <Decor
           semn="soare"
-          className="pluteste-lent absolute top-10 right-[5%] size-10 text-miere-300 lg:size-14"
+          className="pluteste-lent absolute top-10 right-[5%] size-10 text-miere-300 lg:size-14 hidden opacity-50 md:block"
         />
       </div>
 

@@ -57,7 +57,7 @@ export default function Semneaza() {
         >
           <Decor
             semn="spirala"
-            className="pluteste-lent absolute top-20 right-[4%] size-10 text-turcoaz-200 lg:size-14"
+            className="pluteste-lent absolute top-20 right-[4%] size-10 text-turcoaz-200 lg:size-14 hidden opacity-50 md:block"
           />
         </div>
 

@@ -92,11 +92,7 @@ export default function Newsletter() {
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <Decor
           semn="stea"
-          className="pluteste-lent absolute top-10 right-[8%] size-7 text-turcoaz-300 lg:size-10"
-        />
-        <Decor
-          semn="unda"
-          className="pluteste-lent absolute bottom-10 left-[4%] size-9 text-turcoaz-300 lg:size-12"
+          className="pluteste-lent absolute top-10 right-[8%] size-7 text-turcoaz-300 lg:size-10 hidden opacity-50 md:block"
         />
       </div>
 

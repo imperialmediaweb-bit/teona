@@ -202,11 +202,7 @@ export default function Contact() {
         >
           <Decor
             semn="stea"
-            className="pluteste-lent absolute top-16 right-[6%] size-8 text-miere-300 lg:size-11"
-          />
-          <Decor
-            semn="unda"
-            className="pluteste-lent absolute bottom-24 left-[3%] size-9 text-caramiziu-200 lg:size-12"
+            className="pluteste-lent absolute top-16 right-[6%] size-8 text-miere-300 lg:size-11 hidden opacity-50 md:block"
           />
         </div>
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:px-8">
@@ -302,7 +298,7 @@ export default function Contact() {
         >
           <Decor
             semn="spirala"
-            className="pluteste-lent absolute top-14 left-[3%] size-9 text-turcoaz-200 lg:size-12"
+            className="pluteste-lent absolute top-14 left-[3%] size-9 text-turcoaz-200 lg:size-12 hidden opacity-50 md:block"
           />
         </div>
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">

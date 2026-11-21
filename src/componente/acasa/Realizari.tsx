@@ -122,7 +122,7 @@ export default async function Realizari() {
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <Decor
           semn="spirala"
-          className="pluteste-lent absolute top-14 right-[5%] hidden size-12 text-miere-300 opacity-60 md:block"
+          className="pluteste-lent absolute top-14 right-[5%] size-12 text-miere-300 hidden opacity-50 md:block"
         />
       </div>
 

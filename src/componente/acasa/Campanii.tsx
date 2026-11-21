@@ -63,15 +63,7 @@ export default function Campanii() {
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <Decor
           semn="stea"
-          className="pluteste-lent absolute top-16 right-[7%] size-8 text-caramiziu-300 lg:size-11"
-        />
-        <Decor
-          semn="unda"
-          className="pluteste-lent absolute bottom-28 left-[4%] size-10 text-miere-300 lg:size-14"
-        />
-        <Decor
-          semn="soare"
-          className="pluteste-lent absolute top-1/3 right-[2%] hidden size-14 text-miere-200 lg:block"
+          className="pluteste-lent absolute top-16 right-[7%] size-8 text-caramiziu-300 lg:size-11 hidden opacity-50 md:block"
         />
       </div>
 

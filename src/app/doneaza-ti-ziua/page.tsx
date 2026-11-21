@@ -133,7 +133,7 @@ export default function DoneazaTiZiua() {
         >
           <Decor
             semn="stea"
-            className="pluteste-lent absolute top-16 right-[5%] size-9 text-miere-200 lg:size-12"
+            className="pluteste-lent absolute top-16 right-[5%] size-9 text-miere-200 lg:size-12 hidden opacity-50 md:block"
           />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

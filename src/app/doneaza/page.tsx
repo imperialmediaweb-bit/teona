@@ -287,11 +287,7 @@ export default async function Doneaza() {
         >
           <Decor
             semn="spirala"
-            className="pluteste-lent absolute top-16 right-[4%] size-10 text-turcoaz-200 lg:size-14"
-          />
-          <Decor
-            semn="unda"
-            className="pluteste-lent absolute bottom-40 left-[2%] size-10 text-miere-300 lg:size-14"
+            className="pluteste-lent absolute top-16 right-[4%] size-10 text-turcoaz-200 lg:size-14 hidden opacity-50 md:block"
           />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -590,7 +586,7 @@ export default async function Doneaza() {
         >
           <Decor
             semn="soare"
-            className="pluteste-lent absolute top-14 right-[5%] size-10 text-miere-300 lg:size-14"
+            className="pluteste-lent absolute top-14 right-[5%] size-10 text-miere-300 lg:size-14 hidden opacity-50 md:block"
           />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

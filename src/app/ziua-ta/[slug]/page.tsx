@@ -174,11 +174,7 @@ async function Continut(proprietati: Proprietati) {
         >
           <Decor
             semn="stea"
-            className="pluteste-lent absolute top-14 left-[4%] size-8 text-miere-200 lg:size-12"
-          />
-          <Decor
-            semn="unda"
-            className="pluteste-lent absolute right-[5%] bottom-24 size-9 text-turcoaz-200 lg:size-12"
+            className="pluteste-lent absolute top-14 left-[4%] size-8 text-miere-200 lg:size-12 hidden opacity-50 md:block"
           />
         </div>
 

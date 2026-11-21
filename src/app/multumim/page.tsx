@@ -35,11 +35,7 @@ export default function Multumim() {
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <Decor
           semn="stea"
-          className="pluteste-lent absolute top-16 left-[6%] size-9 text-miere-200 lg:size-14"
-        />
-        <Decor
-          semn="unda"
-          className="pluteste-lent absolute right-[7%] bottom-28 size-9 text-turcoaz-200 lg:size-12"
+          className="pluteste-lent absolute top-16 left-[6%] size-9 text-miere-200 lg:size-14 hidden opacity-50 md:block"
         />
       </div>
 
