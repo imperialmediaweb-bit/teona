@@ -3,6 +3,7 @@ import { RUTE, SMS } from "@/date/asociatie";
 import Aparitie from "@/componente/Aparitie";
 import Buton from "@/componente/Buton";
 import Decor from "@/componente/Decor";
+import Carusel from "@/componente/Carusel";
 import Pictograma from "@/componente/Pictograma";
 
 /**
@@ -61,9 +62,12 @@ export default function Sustinere() {
           Cum poți să ne susții
         </h2>
 
-        <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:grid-rows-2">
+        <Carusel
+          eticheta="Cum poți să ne susții"
+          className="mt-12 gap-4 md:grid md:grid-cols-2 md:gap-5 lg:grid-cols-3 lg:grid-rows-2"
+        >
           {/* Cardul 1 · Donează — mare, portocaliu, cu fotografie. */}
-          <li className="sm:col-span-2 lg:col-span-1 lg:row-span-2">
+          <li className="md:col-span-2 lg:col-span-1 lg:row-span-2">
             <Aparitie className="h-full">
               <article className="granulatie relative flex h-full flex-col overflow-hidden colt-a bg-gradient-to-b from-caramiziu-700 via-caramiziu-800 to-caramiziu-900 text-hartie shadow-[0_36px_70px_-28px_rgba(247,79,34,0.85)]">
                 <div className="relative aspect-[4/3] w-full sm:aspect-[16/9] lg:aspect-auto lg:min-h-[19rem] lg:flex-1">
@@ -292,7 +296,7 @@ export default function Sustinere() {
               </article>
             </Aparitie>
           </li>
-        </ul>
+        </Carusel>
       </div>
     </section>
   );

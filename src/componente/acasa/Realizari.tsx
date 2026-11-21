@@ -5,6 +5,7 @@ import Decor from "@/componente/Decor";
 import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
 import { proiecteleToate } from "@/date/proiecte";
 import { cuPozeDinCloud } from "@/date/proiecte-cloud";
+import Carusel from "@/componente/Carusel";
 import IlustratieUmanitara from "./IlustratieUmanitara";
 
 /**
@@ -80,17 +81,20 @@ function Numar({ n, className }: { n: number; className: string }) {
 
 const CULORI = [
   {
-    numar: "bg-caramiziu-700 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]",
+    numar:
+      "bg-caramiziu-700 text-hartie shadow-[0_10px_22px_-10px_rgba(247,79,34,0.9)]",
     umbra: "shadow-[0_24px_50px_-28px_rgba(247,79,34,0.55)]",
     pictograma: "bg-caramiziu-100 text-caramiziu-700",
   },
   {
-    numar: "bg-miere-400 text-cerneala shadow-[0_10px_22px_-10px_rgba(255,172,0,0.9)]",
+    numar:
+      "bg-miere-400 text-cerneala shadow-[0_10px_22px_-10px_rgba(255,172,0,0.9)]",
     umbra: "shadow-[0_24px_50px_-28px_rgba(255,172,0,0.6)]",
     pictograma: "bg-miere-100 text-miere-800",
   },
   {
-    numar: "bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
+    numar:
+      "bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]",
     umbra: "shadow-[0_24px_50px_-28px_rgba(42,159,163,0.55)]",
     pictograma: "bg-turcoaz-100 text-turcoaz-700",
   },
@@ -136,7 +140,11 @@ export default async function Realizari() {
 
         {/* Trei carduri pe primul rând și două, mai late, pe al doilea.
             Ordinea din caiet e ordinea din listă. */}
-        <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-6">
+        <Carusel
+          ordonata
+          eticheta="Ce am realizat împreună"
+          className="mt-12 gap-4 md:grid md:grid-cols-2 md:gap-5 lg:grid-cols-6"
+        >
           {carduri.map((card, i) => {
             const c = CULORI[i % CULORI.length];
             const lat = i >= 3;
@@ -145,7 +153,7 @@ export default async function Realizari() {
                 key={card.titlu}
                 className={
                   i === 4
-                    ? "sm:col-span-2 lg:col-span-3"
+                    ? "md:col-span-2 lg:col-span-3"
                     : lat
                       ? "lg:col-span-3"
                       : "lg:col-span-2"
@@ -196,7 +204,7 @@ export default async function Realizari() {
               </li>
             );
           })}
-        </ol>
+        </Carusel>
 
         {/* „Sub carduri: butonul Vezi toate proiectele” (1.7). */}
         <div className="mt-12 text-center">

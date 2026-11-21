@@ -48,6 +48,12 @@ export default function Fotografie({
   dimensiuni = "(min-width: 1024px) 460px, 92vw",
   /** Hârtia colorată de dedesubt. Lipsă = poza stă direct pe fundal. */
   bloc,
+  /**
+   * Pe telefon, cel mult 4:3 și 40% din ecran: în paginile cu secțiuni care
+   * alternează text și poză, o poză verticală cât ecranul lungea pagina cu
+   * un ecran întreg la fiecare secțiune.
+   */
+  scundaPeMobil = false,
   className = "",
 }: {
   cale: string;
@@ -60,6 +66,7 @@ export default function Fotografie({
   prioritara?: boolean;
   dimensiuni?: string;
   bloc?: Bloc;
+  scundaPeMobil?: boolean;
   className?: string;
 }) {
   return (
@@ -79,7 +86,9 @@ export default function Fotografie({
           din spate. E diferența dintre o poză pusă pe pagină și una tipărită
           pe ea.
         */
-        className={`relative overflow-hidden colt-${colt} bg-hartie-calda ring-1 ring-cerneala/[0.06] ring-inset transition-all duration-500 ease-cald group-hover:-translate-y-1.5 motion-reduce:group-hover:translate-y-0 ${raport} ${UMBRE[umbra]}`}
+        className={`relative overflow-hidden colt-${colt} bg-hartie-calda ring-1 ring-cerneala/[0.06] ring-inset transition-all duration-500 ease-cald group-hover:-translate-y-1.5 motion-reduce:group-hover:translate-y-0 ${raport} ${
+          scundaPeMobil ? "max-md:aspect-[4/3] max-md:max-h-[40svh]" : ""
+        } ${UMBRE[umbra]}`}
       >
         <Image
           src={cale}

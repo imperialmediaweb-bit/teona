@@ -100,7 +100,12 @@ export default function Erou({
   useEffect(() => {
     if (pornit) return;
     const porneste = () => setPornit(true);
-    const evenimente = ["pointerdown", "keydown", "scroll", "touchstart"] as const;
+    const evenimente = [
+      "pointerdown",
+      "keydown",
+      "scroll",
+      "touchstart",
+    ] as const;
     for (const e of evenimente) {
       window.addEventListener(e, porneste, { once: true, passive: true });
     }

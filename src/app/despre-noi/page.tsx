@@ -7,7 +7,10 @@ import Aparitie from "@/componente/Aparitie";
 import Buton from "@/componente/Buton";
 import Cifre from "@/componente/Cifre";
 import { cifreSite } from "@/lib/cifre";
-import { intrUnParagraf, paragrafeBogate } from "@/componente/pagina/paragrafe-bogate";
+import {
+  intrUnParagraf,
+  paragrafeBogate,
+} from "@/componente/pagina/paragrafe-bogate";
 import { textelePaginilor } from "@/lib/texte-pagini";
 
 /**
@@ -196,7 +199,7 @@ export default async function DespreNoi() {
       />
 
       {/* 3.2 — Povestea noastră */}
-      <section className="relative overflow-hidden bg-hartie pt-10 pb-24 lg:pt-16 lg:pb-32">
+      <section className="relative overflow-hidden bg-hartie pt-4 pb-14 md:pt-10 md:pb-24 lg:pt-16 lg:pb-32">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
@@ -222,6 +225,7 @@ export default async function DespreNoi() {
                   }`}
                 >
                   <Fotografie
+                    scundaPeMobil
                     cale={bloc.poza.cale}
                     alt={bloc.poza.alt}
                     legenda={bloc.poza.legenda}
@@ -259,7 +263,7 @@ export default async function DespreNoi() {
 
       {/* 3.3 — Misiune, viziune, valori */}
       <Val culoare="text-tenta-turcoaz" className={VAL_PESTE} />
-      <section className="granulatie relative overflow-hidden bg-tenta-turcoaz pt-6 pb-24 lg:pt-10 lg:pb-32">
+      <section className="granulatie relative overflow-hidden bg-tenta-turcoaz pt-4 pb-14 md:pt-6 md:pb-24 lg:pt-10 lg:pb-32">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
@@ -365,7 +369,7 @@ export default async function DespreNoi() {
 
       {/* 3.4 — Echipa */}
       <Val culoare="text-hartie" className={VAL_PESTE} />
-      <section className="relative overflow-hidden bg-hartie pt-6 pb-24 lg:pt-10 lg:pb-32">
+      <section className="relative overflow-hidden bg-hartie pt-4 pb-14 md:pt-6 md:pb-24 lg:pt-10 lg:pb-32">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
@@ -474,7 +478,7 @@ export default async function DespreNoi() {
       {/* 3.5 — aceleași cifre ca pe prima pagină, din aceeași sursă, în
           același panou cu colțuri decupate. */}
       <Val culoare="text-hartie-calda" className={VAL_PESTE} />
-      <section className="granulatie relative overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-10 lg:pb-32">
+      <section className="granulatie relative overflow-hidden bg-hartie-calda pt-4 pb-14 md:pt-6 md:pb-24 lg:pt-10 lg:pb-32">
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <TitluSectiune
             scris="Până acum, împreună"
@@ -497,7 +501,7 @@ export default async function DespreNoi() {
 
       {/* 3.6 — Culegătorii de Zâmbete */}
       <Val culoare="text-hartie" className={VAL_PESTE} />
-      <section className="relative overflow-hidden bg-hartie pt-6 pb-24 lg:pt-10 lg:pb-32">
+      <section className="relative overflow-hidden bg-hartie pt-4 pb-14 md:pt-6 md:pb-24 lg:pt-10 lg:pb-32">
         <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:px-8">
           <div>
             <TitluSectiune
@@ -566,7 +570,7 @@ export default async function DespreNoi() {
 
       {/* 3.7 — Parteneri instituționali */}
       <Val culoare="text-tenta-miere" className={VAL_PESTE} />
-      <section className="granulatie relative overflow-hidden bg-tenta-miere pt-6 pb-24 lg:pt-10 lg:pb-32">
+      <section className="granulatie relative overflow-hidden bg-tenta-miere pt-4 pb-14 md:pt-6 md:pb-24 lg:pt-10 lg:pb-32">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"

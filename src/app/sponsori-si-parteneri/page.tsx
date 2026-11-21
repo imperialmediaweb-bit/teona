@@ -108,7 +108,7 @@ export default async function SponsoriSiParteneri() {
       />
 
       {/* 6.2 */}
-      <section className="relative overflow-hidden bg-hartie pt-6 pb-24 lg:pt-10 lg:pb-32">
+      <section className="relative overflow-hidden bg-hartie pt-4 pb-14 md:pt-6 md:pb-24 lg:pt-10 lg:pb-32">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
@@ -169,6 +169,7 @@ export default async function SponsoriSiParteneri() {
                     </figure>
 
                     <Fotografie
+                      scundaPeMobil
                       cale={testimonial.poza.cale}
                       alt={testimonial.poza.alt}
                       legenda={testimonial.poza.legenda}
@@ -189,7 +190,7 @@ export default async function SponsoriSiParteneri() {
 
       {/* 6.3 — Ne-au fost alături */}
       <Val culoare="text-hartie-calda" className={VAL_PESTE} />
-      <section className="relative overflow-hidden bg-hartie-calda pt-6 pb-24 lg:pt-10 lg:pb-32">
+      <section className="relative overflow-hidden bg-hartie-calda pt-4 pb-14 md:pt-6 md:pb-24 lg:pt-10 lg:pb-32">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
@@ -277,7 +278,7 @@ export default async function SponsoriSiParteneri() {
         n-au ce căuta într-un text pe care îl citește un contabil.
       */}
       <Val culoare="text-hartie" className={VAL_PESTE} />
-      <section className="relative overflow-hidden bg-hartie pt-6 pb-24 lg:pt-10 lg:pb-32">
+      <section className="relative overflow-hidden bg-hartie pt-4 pb-14 md:pt-6 md:pb-24 lg:pt-10 lg:pb-32">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"

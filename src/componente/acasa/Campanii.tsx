@@ -3,6 +3,7 @@ import { RUTE } from "@/date/asociatie";
 import Aparitie from "@/componente/Aparitie";
 import Buton from "@/componente/Buton";
 import Decor from "@/componente/Decor";
+import Carusel from "@/componente/Carusel";
 import IlustratieUmanitara from "./IlustratieUmanitara";
 
 /**
@@ -75,14 +76,17 @@ export default function Campanii() {
           Campaniile noastre
         </h2>
 
-        <ul className="mt-14 grid gap-x-7 gap-y-14 sm:grid-cols-2 lg:grid-cols-12">
+        <Carusel
+          eticheta="Campaniile noastre"
+          className="mt-14 gap-4 md:grid md:grid-cols-2 md:gap-x-7 md:gap-y-14 lg:grid-cols-12"
+        >
           {CAMPANII.map((campanie, i) => {
             const mare = i === 0;
             return (
               <li
                 key={campanie.titlu}
                 className={
-                  mare ? "sm:col-span-2 lg:col-span-6" : "lg:col-span-3"
+                  mare ? "md:col-span-2 lg:col-span-6" : "lg:col-span-3"
                 }
               >
                 <Aparitie intarziere={i * 0.07} className="h-full">
@@ -152,7 +156,7 @@ export default function Campanii() {
               </li>
             );
           })}
-        </ul>
+        </Carusel>
       </div>
     </section>
   );
