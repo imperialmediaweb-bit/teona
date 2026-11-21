@@ -7,7 +7,6 @@ import BannerCookieuri from "@/componente/BannerCookieuri";
 import BaraDeAnunt from "@/componente/BaraDeAnunt";
 import Analitice from "@/componente/Analitice";
 import Urma from "@/componente/Urma";
-import ButonDoneazaMobil from "@/componente/ButonDoneazaMobil";
 import AsistentDacaExista from "@/componente/AsistentDacaExista";
 import Newsletter from "@/componente/Newsletter";
 import Subsol from "@/componente/Subsol";
@@ -216,11 +215,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Newsletter />
         <Subsol />
 
-        {/* Spațiu cât butonul plutitor, ca să nu acopere sfârșitul subsolului. */}
-        <div aria-hidden="true" className="doar-site h-20 sm:hidden" />
-
         <Suspense>
-          <ButonDoneazaMobil />
           <Suspense fallback={null}>
             <AsistentDacaExista />
           </Suspense>

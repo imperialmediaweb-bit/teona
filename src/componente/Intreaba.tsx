@@ -59,6 +59,21 @@ export default function Intreaba() {
     if (deschis) camp.current?.focus();
   }, [deschis]);
 
+  // Pe telefon butonul se ascunde când omul derulează în jos (citește) și
+  // revine când derulează în sus (caută ceva).
+  const [ascuns, setAscuns] = useState(false);
+  useEffect(() => {
+    let ultim = window.scrollY;
+    const laDerulare = () => {
+      const y = window.scrollY;
+      if (Math.abs(y - ultim) < 8) return;
+      setAscuns(y > ultim && y > 120);
+      ultim = y;
+    };
+    window.addEventListener("scroll", laDerulare, { passive: true });
+    return () => window.removeEventListener("scroll", laDerulare);
+  }, []);
+
   useEffect(() => {
     if (!deschis) return;
     const peEscape = (e: KeyboardEvent) => {
@@ -129,9 +144,11 @@ export default function Intreaba() {
 
   if (acord === "0") return null;
   if (cale.startsWith("/admin")) return null;
+  // Pe Donează ar sta peste formular, chiar la butonul de plată.
+  if (cale === "/doneaza") return null;
 
   return (
-    <div className="doar-site pointer-events-none fixed inset-0 z-40 flex items-end justify-start p-4 sm:justify-end">
+    <div className="doar-site pointer-events-none fixed inset-0 z-40 flex items-end justify-end p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
       {deschis && (
         <div className="pointer-events-auto mb-16 flex h-[min(32rem,70vh)] w-[min(23rem,calc(100vw-2rem))] flex-col overflow-hidden colt-a border border-hartie-umbra bg-hartie shadow-[0_26px_60px_-24px_rgba(35,35,35,0.55)] sm:mb-16">
           <div className="flex items-start justify-between gap-3 bg-cerneala px-4 py-3">
@@ -240,7 +257,10 @@ export default function Intreaba() {
           type="button"
           onClick={() => setDeschis(true)}
           aria-expanded={false}
-          className="pointer-events-auto flex min-h-12 items-center gap-2 rounded-full bg-cerneala px-5 py-3 font-titlu text-mic font-bold text-hartie shadow-[0_10px_26px_-8px_rgba(35,35,35,0.55)] transition active:translate-y-px"
+          aria-label="Întreabă-ne"
+          className={`pointer-events-auto flex size-12 items-center justify-center gap-2 rounded-full bg-cerneala font-titlu text-mic font-bold text-hartie shadow-[0_10px_26px_-8px_rgba(35,35,35,0.55)] transition duration-300 active:translate-y-px sm:size-auto sm:min-h-12 sm:px-5 sm:py-3 ${
+            ascuns ? "max-sm:pointer-events-none max-sm:translate-y-[150%] max-sm:opacity-0" : ""
+          }`}
         >
           <svg viewBox="0 0 24 24" className="size-5" aria-hidden="true">
             <path
@@ -251,7 +271,9 @@ export default function Intreaba() {
               strokeLinecap="round"
             />
           </svg>
-          Întreabă-ne
+          <span aria-hidden="true" className="hidden sm:inline">
+            Întreabă-ne
+          </span>
         </button>
       )}
     </div>
