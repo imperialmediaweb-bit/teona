@@ -136,10 +136,12 @@ export default async function SponsoriSiParteneri() {
                           strokeWidth={0.8}
                           className="absolute -right-12 -bottom-12 size-52 text-miere-200/80"
                         />
-                        {/* Ghilimelele desenate, nu un semn de citat în text. */}
+                        {/* Ghilimelele desenate, nu un semn de citat în text.
+                            „ se desenează jos pe rând, deci cutia lui e urcată
+                            cât să-l lase în spațiul liber de deasupra textului. */}
                         <span
                           aria-hidden="true"
-                          className="scris absolute top-1 left-7 text-[6rem] leading-none text-miere-700/70"
+                          className="scris pointer-events-none absolute -top-11 left-7 text-[6rem] leading-none text-miere-700/70 sm:left-9 lg:left-11"
                         >
                           „
                         </span>

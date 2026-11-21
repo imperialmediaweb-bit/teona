@@ -158,22 +158,26 @@ export default function Sustinere() {
                     la {SMS.numar}
                   </span>
                 </p>
-                <h3 className="relative mt-4 text-h4 text-miere-900">
-                  Donează lunar prin SMS
-                </h3>
-                <p className="relative mt-2 flex-1 text-mic text-miere-900">
-                  Trimite {SMS.text} la {SMS.numar} și donezi {SMS.sumaLunara}{" "}
-                  pe lună, fără formulare.
-                </p>
-                <Buton
-                  href={`${RUTE.doneaza}#sms`}
-                  varianta="contur"
-                  marime="mic"
-                  className="relative mt-6 self-start border-miere-900/15"
-                >
-                  Cum funcționează
-                  <Pictograma nume="sageata" className="size-4" />
-                </Buton>
+                {/* Codul sus, restul jos: spațiul rămas stă între ele, nu
+                    deasupra butonului. */}
+                <div className="relative mt-auto pt-6">
+                  <h3 className="text-h4 text-miere-900">
+                    Donează lunar prin SMS
+                  </h3>
+                  <p className="mt-2 text-mic text-miere-900">
+                    Trimite {SMS.text} la {SMS.numar} și donezi {SMS.sumaLunara}{" "}
+                    pe lună, fără formulare.
+                  </p>
+                  <Buton
+                    href={`${RUTE.doneaza}#sms`}
+                    varianta="contur"
+                    marime="mic"
+                    className="mt-5 border-miere-900/15"
+                  >
+                    Cum funcționează
+                    <Pictograma nume="sageata" className="size-4" />
+                  </Buton>
+                </div>
               </article>
             </Aparitie>
           </li>
@@ -198,21 +202,23 @@ export default function Sustinere() {
                 >
                   3,5%
                 </p>
-                <h3 className="relative mt-4 text-h4 text-turcoaz-900">
-                  Redirecționează 3,5%
-                </h3>
-                <p className="relative mt-2 flex-1 text-mic text-turcoaz-900/80">
-                  Din impozitul pe venit, fără niciun cost pentru tine.
-                </p>
-                <Buton
-                  href={RUTE.redirectionare35}
-                  varianta="contur"
-                  marime="mic"
-                  className="relative mt-6 self-start border-turcoaz-900/15"
-                >
-                  Redirecționează
-                  <Pictograma nume="sageata" className="size-4" />
-                </Buton>
+                <div className="relative mt-auto pt-6">
+                  <h3 className="text-h4 text-turcoaz-900">
+                    Redirecționează 3,5%
+                  </h3>
+                  <p className="mt-2 text-mic text-turcoaz-900/80">
+                    Din impozitul pe venit, fără niciun cost pentru tine.
+                  </p>
+                  <Buton
+                    href={RUTE.redirectionare35}
+                    varianta="contur"
+                    marime="mic"
+                    className="mt-5 border-turcoaz-900/15"
+                  >
+                    Redirecționează
+                    <Pictograma nume="sageata" className="size-4" />
+                  </Buton>
+                </div>
               </article>
             </Aparitie>
           </li>
