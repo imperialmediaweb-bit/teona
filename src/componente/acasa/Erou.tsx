@@ -148,10 +148,13 @@ export default function Erou({
         />
       </div>
 
-      <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 pt-6 pb-24 sm:px-6 lg:grid-cols-[minmax(0,6fr)_minmax(0,7fr)] lg:gap-14 lg:px-8 lg:pt-16 lg:pb-32">
+      <div className="relative mx-auto grid max-w-7xl items-center gap-6 px-4 pt-4 pb-24 sm:gap-10 sm:px-6 sm:pt-6 lg:grid-cols-[minmax(0,6fr)_minmax(0,7fr)] lg:gap-14 lg:px-8 lg:pt-16 lg:pb-32">
         {/* Textul e primul în pagină (titlul rămâne primul lucru citit),
             dar pe telefon se vede sub poză: clientul a cerut poza sus. */}
-        <div className="order-2 lg:order-1">
+        {/* Pe telefon fraza vine după butoane: titlul și „Donează acum”
+            încap astfel în primul ecran, sub poză. În cod (și pentru
+            cititoarele de ecran) ordinea rămâne cea din caiet. */}
+        <div className="order-2 flex flex-col lg:order-1">
           <p className="scris text-amplu text-caramiziu-700">
             „{ASOCIATIA.motto}”
           </p>
@@ -180,14 +183,14 @@ export default function Erou({
             </span>
           </h1>
 
-          <p className="mt-7 max-w-xl text-amplu text-cerneala-moale">
+          <p className="max-w-xl text-amplu text-cerneala-moale max-sm:order-last max-sm:mt-6 sm:mt-7">
             {fraza}
           </p>
 
           {/* Cele trei elemente din 1.1, în ordinea cerută. Blocul SMS e
               informație, nu buton — de aceea nu e nici link, nici <button>.
               Sub ele nu mai urmează niciun text: „zona rămâne curată”. */}
-          <div className="mt-9 flex flex-wrap items-stretch gap-3">
+          <div className="mt-5 flex flex-wrap items-stretch gap-3 sm:mt-9">
             <Buton href={RUTE.doneaza} marime="mare">
               Donează acum
             </Buton>
@@ -231,12 +234,14 @@ export default function Erou({
         <div className="order-1 lg:order-2">
           <div className="relative">
             {/*
-              Rama pozei: 4:3 pe telefon, 3:2 pe ecran lat. Pozele sunt 16:9
+              Rama pozei: pe telefon cel mult o treime din ecran, ca titlul și
+              „Donează acum” să se vadă fără derulare; 4:3 pe tabletă, 3:2 pe
+              ecran lat. Pozele sunt 16:9
               sau 4:3; la 3:2 niciuna nu pierde mai mult de o șesime, în loc
               de jumătate ca înainte. Umbra e colorată, nu gri, ca la restul
               fotografiilor din site.
             */}
-            <div className="colt-a relative aspect-[4/3] overflow-hidden bg-hartie-umbra shadow-[0_32px_64px_-32px_rgba(247,79,34,0.5)] lg:aspect-[3/2]">
+            <div className="colt-a relative h-[min(34svh,75vw)] overflow-hidden bg-hartie-umbra shadow-[0_32px_64px_-32px_rgba(247,79,34,0.5)] sm:h-auto sm:aspect-[4/3] lg:aspect-[3/2]">
               {FOTOGRAFII.map((f, i) => {
                 // Până pornește caruselul se pune în pagină doar prima poză:
                 // celelalte, aflate tot în ecran (doar transparente), erau
@@ -279,7 +284,7 @@ export default function Erou({
           </div>
 
           {/* Comenzile stau sub poză, nu peste ea. */}
-          <div className="mt-9 flex items-center justify-end gap-3 pr-1">
+          <div className="mt-5 flex items-center justify-end gap-3 pr-1 sm:mt-9">
             {FOTOGRAFII.map((f, i) => (
               <button
                 key={f.cale}

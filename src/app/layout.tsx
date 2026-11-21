@@ -180,7 +180,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script
           dangerouslySetInnerHTML={{
             __html:
-              'try{if(sessionStorage.getItem("teona:bara-anunt-inchisa")==="1")' +
+              'try{if(localStorage.getItem("teona:bara-anunt-inchisa")==="1")' +
               'document.documentElement.classList.add("fara-bara-anunt")}catch(e){}',
           }}
         />

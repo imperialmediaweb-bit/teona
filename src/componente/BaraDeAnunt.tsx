@@ -19,7 +19,7 @@ const SNAPSHOT_SERVER = () => "vizibila" as const;
 
 function citeste(): "inchisa" | "vizibila" {
   try {
-    return sessionStorage.getItem(CHEIE) === "1" ? "inchisa" : "vizibila";
+    return localStorage.getItem(CHEIE) === "1" ? "inchisa" : "vizibila";
   } catch {
     // Navigare privată sau date de sit blocate: arătăm bara.
     return "vizibila";
@@ -29,8 +29,9 @@ function citeste(): "inchisa" | "vizibila" {
 /**
  * Bara de anunț de deasupra meniului (12.2 din caietul de sarcini).
  *
- * „Vizitatorul o poate închide și nu mai reapare în aceeași vizită” — de aceea
- * `sessionStorage`, nu `localStorage`: la următoarea vizită apare din nou.
+ * Caietul cere ca, închisă, să nu mai reapară în aceeași vizită. Din
+ * noiembrie 2026 închiderea se ține în `localStorage`, la cererea
+ * asociației: cine a închis-o nu mai vrea s-o vadă nici a doua zi.
  *
  * **De ce intră în HTML, deși serverul nu știe dacă a fost închisă.**
  * Înainte, starea pe server era „necunoscut” și bara nu se scria deloc:
@@ -40,7 +41,7 @@ function citeste(): "inchisa" | "vizibila" {
  * oricine apasă un buton în secunda aceea, iar Google îl numără la CLS.
  *
  * Acum bara se scrie pe server, iar cei care au închis-o n-o văd totuși: în
- * `<head>` e un script de două rânduri care citește `sessionStorage` **înainte
+ * `<head>` e un script de două rânduri care citește `localStorage` **înainte
  * de prima desenare** și pune o clasă pe `<html>`; CSS-ul o ascunde pe baza
  * ei. Fără clipire și fără salt, în ambele cazuri. Când React pornește,
  * `useSyncExternalStore` ajunge la aceeași concluzie și scoate bara din DOM —
@@ -56,7 +57,7 @@ export default function BaraDeAnunt() {
 
   function inchide() {
     try {
-      sessionStorage.setItem(CHEIE, "1");
+      localStorage.setItem(CHEIE, "1");
     } catch {
       // Dacă nu putem ține minte, bara reapare la navigare. Acceptabil.
     }
@@ -66,12 +67,17 @@ export default function BaraDeAnunt() {
   return (
     <div data-bara-anunt className="doar-site relative bg-cerneala text-hartie">
       <div className="mx-auto flex max-w-7xl items-center justify-center gap-3 px-4 py-2.5 pr-12 text-center sm:pr-4">
-        <p className="text-mic">
-          Trimite{" "}
+        {/* Pe telefon pe un singur rând: două rânduri împingeau titlul
+            primei pagini sub butoanele de jos. */}
+        <p className="text-mic whitespace-nowrap sm:whitespace-normal">
+          <span className="hidden sm:inline">Trimite </span>
           <strong className="font-semibold text-miere-300">
             {SMS.text} la {SMS.numar}
           </strong>{" "}
-          <span className="text-hartie/70">
+          <span className="text-hartie/70 sm:hidden">
+            · {SMS.sumaLunara}/lună
+          </span>
+          <span className="hidden text-hartie/70 sm:inline">
             · {SMS.sumaLunara} lunar, direct din telefon
           </span>
         </p>
