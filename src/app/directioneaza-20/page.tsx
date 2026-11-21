@@ -612,14 +612,14 @@ export default async function Directioneaza20() {
                       </span>
                       <a
                         href={`mailto:${persoana.email}`}
-                        className="mt-4 flex min-h-10 items-center gap-2 text-mic break-all text-cerneala-moale transition hover:text-caramiziu-700"
+                        className="mt-4 flex min-h-11 items-center gap-2 md:min-h-10 text-mic break-all text-cerneala-moale transition hover:text-caramiziu-700"
                       >
                         <Pictograma nume="plic" className="size-4 shrink-0" />
                         {persoana.email}
                       </a>
                       <a
                         href={`tel:${persoana.telefon.apel}`}
-                        className="flex min-h-10 items-center gap-2 font-titlu text-corp font-bold text-cerneala transition hover:text-caramiziu-700"
+                        className="flex min-h-11 items-center gap-2 md:min-h-10 font-titlu text-corp font-bold text-cerneala transition hover:text-caramiziu-700"
                       >
                         <Pictograma
                           nume="telefon"

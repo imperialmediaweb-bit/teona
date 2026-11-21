@@ -121,6 +121,17 @@
   --ease-cald: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/*
+  Pe telefon nimic nu coboară sub 14 px: notițele (etichete, legende, rândul
+  legal) au 13 px pe ecran lat, unde se citesc de aproape și cu mouse-ul.
+  Utilitarul `text-nota` citește variabila, deci se schimbă peste tot deodată.
+*/
+@media (max-width: 47.99rem) {
+  :root {
+    --text-nota: 0.875rem;
+  }
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;

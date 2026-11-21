@@ -25,7 +25,7 @@ const titlu =
  * telefon.
  */
 const linkLegal =
-  "-mx-2 inline-flex min-h-9 items-center px-2 transition-colors duration-200 hover:text-caramiziu-700";
+  "-mx-2 inline-flex min-h-11 items-center md:min-h-9 px-2 transition-colors duration-200 hover:text-caramiziu-700";
 const link = `${linkLegal} text-mic`;
 
 /**
