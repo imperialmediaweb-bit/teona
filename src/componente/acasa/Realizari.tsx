@@ -6,7 +6,6 @@ import Pictograma, { type NumePictograma } from "@/componente/Pictograma";
 import { proiecteleToate } from "@/date/proiecte";
 import { cuPozeDinCloud } from "@/date/proiecte-cloud";
 import Carusel from "@/componente/Carusel";
-import IlustratieUmanitara from "./IlustratieUmanitara";
 
 /**
  * 1.7 — „Ce am realizat împreună în ultimul an”: cinci carduri statice.
@@ -19,8 +18,8 @@ import IlustratieUmanitara from "./IlustratieUmanitara";
  * cardul: pentru tabăra copiilor care au trecut prin cancer și pentru
  * „Susținem Performanța”, coperta din folderul lor din Cloudinary (`slug`);
  * pentru autism și Casa Teona, poze din arhivă. Cazurile umanitare n-au
- * fotografie publicabilă (fără chipuri, cere caietul), deci au ilustrația.
- * Un proiect fără nicio poză încă primește și el ilustrația, nu un gol.
+ * fotografie publicabilă (fără chipuri, cere caietul): cardul lor e turcoaz,
+ * doar cu text, ca înainte. La fel orice card al cărui proiect n-are încă poză.
  */
 const REALIZARI: ReadonlyArray<{
   titlu: string;
@@ -159,48 +158,73 @@ export default async function Realizari() {
                       : "lg:col-span-2"
                 }
               >
-                <article
-                  className={`flex h-full flex-col overflow-hidden ${
-                    i % 2 === 0 ? "colt-a" : "colt-b"
-                  } border border-hartie-umbra bg-hartie ${c.umbra}`}
-                >
-                  <div
-                    className={`relative w-full ${lat ? "aspect-[16/9]" : "aspect-[16/10]"}`}
-                  >
-                    {card.poza ? (
-                      <Image
-                        src={card.poza.cale}
-                        alt={card.poza.alt}
-                        fill
-                        sizes={
-                          lat
-                            ? "(min-width: 1024px) 600px, 92vw"
-                            : "(min-width: 1024px) 400px, (min-width: 640px) 46vw, 92vw"
-                        }
-                        quality={86}
-                        className="object-cover"
-                      />
-                    ) : (
-                      <IlustratieUmanitara />
-                    )}
-                    <span
-                      className={`${i % 2 === 0 ? "colt-mic-b" : "colt-mic-a"} absolute top-4 left-4 flex h-12 min-w-12 items-center justify-center px-3 ${c.numar}`}
-                    >
-                      <Numar n={i + 1} className="text-[1.5rem]" />
-                    </span>
-                  </div>
-                  <div className="flex flex-1 flex-col p-6 sm:p-7">
-                    <span
-                      className={`${i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"} flex size-11 items-center justify-center ${c.pictograma}`}
-                    >
+                {!card.poza ? (
+                  /* Fără fotografie (cazurile umanitare: fără chipuri): cardul
+                     își ține singur greutatea, prin culoare și cifră. */
+                  <article className="granulatie relative flex h-full flex-col justify-center overflow-hidden colt-a bg-turcoaz-100 p-7 shadow-[0_24px_50px_-28px_rgba(42,159,163,0.6)] lg:p-8">
+                    <Numar
+                      n={i + 1}
+                      className="absolute -top-5 -right-2 text-[9rem] text-turcoaz-200/70"
+                    />
+                    <Decor
+                      semn="inima"
+                      strokeWidth={0.8}
+                      className="absolute -bottom-10 -left-6 size-40 text-turcoaz-200/80"
+                    />
+                    <span className="colt-mic-a relative flex size-12 items-center justify-center bg-turcoaz-600 text-hartie shadow-[0_10px_22px_-10px_rgba(42,159,163,0.9)]">
                       <Pictograma nume={card.pictograma} className="size-6" />
                     </span>
-                    <h3 className="mt-4 text-h4 text-cerneala">{card.titlu}</h3>
-                    <p className="mt-2 text-corp text-cerneala-moale">
+                    <h3 className="relative mt-5 text-h3 text-turcoaz-900">
+                      {card.titlu}
+                    </h3>
+                    <p className="relative mt-2 max-w-md text-corp text-turcoaz-900/80">
                       {card.text}
                     </p>
-                  </div>
-                </article>
+                  </article>
+                ) : (
+                  <article
+                    className={`flex h-full flex-col overflow-hidden ${
+                      i % 2 === 0 ? "colt-a" : "colt-b"
+                    } border border-hartie-umbra bg-hartie ${c.umbra}`}
+                  >
+                    <div
+                      className={`relative w-full ${lat ? "aspect-[16/9]" : "aspect-[16/10]"}`}
+                    >
+                      {card.poza && (
+                        <Image
+                          src={card.poza.cale}
+                          alt={card.poza.alt}
+                          fill
+                          sizes={
+                            lat
+                              ? "(min-width: 1024px) 600px, 92vw"
+                              : "(min-width: 1024px) 400px, (min-width: 640px) 46vw, 92vw"
+                          }
+                          quality={86}
+                          className="object-cover"
+                        />
+                      )}
+                      <span
+                        className={`${i % 2 === 0 ? "colt-mic-b" : "colt-mic-a"} absolute top-4 left-4 flex h-12 min-w-12 items-center justify-center px-3 ${c.numar}`}
+                      >
+                        <Numar n={i + 1} className="text-[1.5rem]" />
+                      </span>
+                    </div>
+                    <div className="flex flex-1 flex-col p-6 sm:p-7">
+                      <span
+                        className={`${i % 2 === 0 ? "colt-mic-a" : "colt-mic-b"} flex size-11 items-center justify-center ${c.pictograma}`}
+                      >
+                        <Pictograma nume={card.pictograma} className="size-6" />
+                      </span>
+                      <h3 className="mt-4 text-h4 text-cerneala">
+                        {card.titlu}
+                      </h3>
+                      <p className="mt-2 text-corp text-cerneala-moale">
+                        {card.text}
+                      </p>
+                    </div>
+                  </article>
+                )}
               </li>
             );
           })}

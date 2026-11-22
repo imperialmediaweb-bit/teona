@@ -1,10 +1,9 @@
 import Image from "next/image";
-import { RUTE } from "@/date/asociatie";
+import { ASOCIATIA, RUTE } from "@/date/asociatie";
 import Aparitie from "@/componente/Aparitie";
 import Buton from "@/componente/Buton";
 import Decor from "@/componente/Decor";
 import Carusel from "@/componente/Carusel";
-import IlustratieUmanitara from "./IlustratieUmanitara";
 
 /**
  * 1.4 — trei campanii fixe, fără sume, fără bare de progres și fără termene.
@@ -15,8 +14,8 @@ import IlustratieUmanitara from "./IlustratieUmanitara";
  * trei coloane egale arătau ca trei cutii din același șablon.
  *
  * „Cazuri umanitare” nu are fotografie: caietul cere o imagine fără chipuri
- * recognoscibile, iar pozele din proiectele umanitare arată toate fața unui
- * copil. Locul ei îl ține o ilustrație în aceeași ramă (`IlustratieUmanitara`).
+ * recognoscibile, iar în arhiva preluată nu există una verificată. Locul ei
+ * îl ține motto-ul, pe miere.
  */
 const CAMPANII: ReadonlyArray<{
   titlu: string;
@@ -120,7 +119,26 @@ export default function Campanii() {
                           </span>
                         </>
                       ) : (
-                        <IlustratieUmanitara />
+                        <div className="absolute inset-0 bg-miere-100">
+                          <Decor
+                            semn="inima"
+                            strokeWidth={0.9}
+                            className="absolute -right-14 -bottom-12 size-64 text-miere-300"
+                          />
+                          <Decor
+                            semn="stea"
+                            className="absolute top-8 left-8 size-10 text-caramiziu-300"
+                          />
+                          <Decor
+                            semn="soare"
+                            className="absolute top-16 right-10 size-12 text-miere-700"
+                          />
+                          <div className="relative flex size-full items-center justify-center px-8">
+                            <p className="scris text-center text-h3 leading-tight text-caramiziu-700">
+                              „{ASOCIATIA.motto}”
+                            </p>
+                          </div>
+                        </div>
                       )}
                     </div>
 
