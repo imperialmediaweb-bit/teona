@@ -149,7 +149,17 @@ export async function trimiteEmailCuId(mesaj: {
         subject: mesaj.subiect,
         html: mesaj.html,
         text: mesaj.text,
-        ...(mesaj.raspundeLa ? { reply_to: mesaj.raspundeLa } : {}),
+        // La e-mailurile către firme, adresa de răspuns e lungă și urâtă
+        // (firma-<id>-<semn>@raspuns…: prin ea răspunsul ajunge în panou).
+        // Cu numele în față, la „răspunde la” firma vede numele omului.
+        ...(mesaj.raspundeLa
+          ? {
+              reply_to:
+                mesaj.expeditorNume && !mesaj.raspundeLa.includes("<")
+                  ? `${mesaj.expeditorNume.replace(/[<>"\r\n]/g, "")} <${mesaj.raspundeLa}>`
+                  : mesaj.raspundeLa,
+            }
+          : {}),
         ...(mesaj.antete ? { headers: mesaj.antete } : {}),
         ...(mesaj.atasamente?.length
           ? {
