@@ -26,7 +26,10 @@ export default function incarcator({ src, width, quality }: Parametri): string {
   // adaugă folderul în față.
   if (esteCloud(src)) return adresaCloud(src, width, quality ?? "auto");
 
-  if (CLOUD) {
+  // Numai fotografiile din `/poze/` au copie în Cloudinary. Restul fișierelor
+  // locale (sigle din `/sigle/`) se servesc direct de pe site: altfel ar cere
+  // de la Cloudinary un identificator care nu există.
+  if (CLOUD && src.startsWith("/poze/")) {
     // `/poze/2024/11/nume.webp` -> `Teona/2024/11/nume`. Extensia lipsește
     // intenționat: `f_auto` alege formatul după ce acceptă browserul.
     const id = `${FOLDER}/${src

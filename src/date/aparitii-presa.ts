@@ -8,7 +8,10 @@
 export const PUBLICATII = {
   monitorul: {
     nume: "Monitorul de Suceava",
-    sigla: "/poze/2024/11/download.png",
+    // Nu `/poze/2024/11/download.png`: în Cloudinary extensia cade, deci ea și
+    // sigla Suceava News (`download.jpeg`) erau aceeași poză, și Monitorul
+    // apărea cu sigla Suceava News. Din `/sigle/` se servește direct de pe site.
+    sigla: "/sigle/monitorul-de-suceava.png",
   },
   obiectiv: {
     nume: "Obiectiv de Suceava",
